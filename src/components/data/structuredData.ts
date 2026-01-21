@@ -124,6 +124,23 @@ export const HOMEPAGE_BREADCRUMB: BreadcrumbItem[] = [
  *   { name: 'Configurações' }
  * ])
  */
+/**
+ * Slugify a string for safe URLs
+ * - Remove diacritics
+ * - Lowercase
+ * - Replace spaces and non-alphanumeric with hyphens
+ * - Remove duplicate hyphens
+ */
+function slugify(str: string): string {
+  return str
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/--+/g, '-')
+}
+
 export const createBreadcrumb = (items: BreadcrumbItem[]): BreadcrumbItem[] => {
   return items.map((item, index) => {
     const isLast = index === items.length - 1
@@ -131,7 +148,9 @@ export const createBreadcrumb = (items: BreadcrumbItem[]): BreadcrumbItem[] => {
       name: item.name,
       ...(isLast
         ? {}
-        : { url: item.url || `${url}${item.name.toLowerCase()}` }),
+        : {
+            url: item.url || `${url.replace(/\/$/, '')}/${slugify(item.name)}`,
+          }),
     }
   })
 }
