@@ -46,11 +46,11 @@ export const COMPANY_INFO = {
 
   // Social Media
   social: {
-    instagram: '', // TODO: Add when available
-    linkedin: '', // TODO: Add when available
-    facebook: '', // TODO: Add when available
-    twitter: '', // TODO: Add when available
-    youtube: '', // TODO: Add when available
+    instagram: '',
+    linkedin: '',
+    facebook: '',
+    twitter: '',
+    youtube: '',
   },
 
   // Business Info
@@ -96,7 +96,10 @@ export type CompanyInfo = typeof COMPANY_INFO
 export const hasPlaceholderData = (): boolean => {
   // Check for common placeholder patterns in critical fields
   const hasPlaceholderPhone = COMPANY_INFO.contact.phone.includes('99999')
-  const hasPlaceholderEmail = COMPANY_INFO.contact.email.includes('example')
+  const hasPlaceholderEmail =
+    /example|example\.com|no-reply|contato@faladoria\.com\.br/i.test(
+      COMPANY_INFO.contact.email
+    )
   const hasPlaceholderCNPJ = COMPANY_INFO.legal.cnpj.includes('00.000.000')
 
   return hasPlaceholderPhone || hasPlaceholderEmail || hasPlaceholderCNPJ
