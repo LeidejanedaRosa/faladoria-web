@@ -13,69 +13,73 @@
 
 export const COMPANY_INFO = {
   // Basic Info
-  name: 'Your Company Name',
-  legalName: 'Your Company Legal Name',
+  name: 'Faladoria',
+  legalName: 'Faladoria Tecnologia LTDA', // TODO: Update with real legal name
   description:
-    'A brief description of your company or project. This will be used in meta descriptions and SEO.',
-  shortDescription: 'Short tagline for your company',
+    'Canal de mediação entre usuários do SUS e gestores de saúde para resolver problemas de atendimento via WhatsApp.',
+  shortDescription: 'Sua voz no SUS',
 
   // URLs
-  url: 'https://www.yourcompany.com',
+  url: 'https://www.faladoria.com.br', // TODO: Update with real URL
   logo: '/logo.svg',
   ogImage: '/og-image.jpg', // 1200x630px recommended
 
   // Contact
   contact: {
-    email: 'contact@yourcompany.com',
-    phone: '+55 11 99999-9999',
-    whatsapp: '+5511999999999',
+    email: 'contato@faladoria.com.br', // TODO: Update with real email
+    phone: '+55 11 99999-9999', // TODO: Update with real phone
+    whatsapp: '+5511999999999', // TODO: Update with real WhatsApp
   },
 
   // Address
   address: {
-    street: 'Your Street',
+    street: 'Rua Example', // TODO: Update with real address
     number: '123',
     complement: '',
-    neighborhood: 'Your Neighborhood',
-    city: 'Your City',
+    neighborhood: 'Centro',
+    city: 'São Paulo', // TODO: Update with real city
     state: 'SP',
-    zipCode: '00000-000',
+    zipCode: '00000-000', // TODO: Update with real ZIP
     country: 'Brasil',
     countryCode: 'BR',
   },
 
   // Social Media
   social: {
-    instagram: 'https://www.instagram.com/yourcompany/',
-    linkedin: 'https://www.linkedin.com/company/yourcompany/',
-    facebook: 'https://www.facebook.com/yourcompany/',
-    twitter: 'https://twitter.com/yourcompany',
-    youtube: 'https://www.youtube.com/@yourcompany',
+    instagram: '', // TODO: Add when available
+    linkedin: '', // TODO: Add when available
+    facebook: '', // TODO: Add when available
+    twitter: '', // TODO: Add when available
+    youtube: '', // TODO: Add when available
   },
 
   // Business Info
   foundingDate: '2024',
-  industry: 'Technology',
+  industry: 'HealthTech',
 
   // SEO
   seo: {
-    title: 'Your Company - Main Tagline',
-    titleTemplate: '%s | Your Company',
+    title: 'Faladoria - Sua voz no SUS',
+    titleTemplate: '%s | Faladoria',
     keywords: [
-      'keyword1',
-      'keyword2',
-      'keyword3',
-      'your industry',
-      'your service',
+      'SUS',
+      'saúde pública',
+      'ouvidoria',
+      'atendimento saúde',
+      'WhatsApp saúde',
+      'gestão saúde',
+      'mediação saúde',
+      'reclamação SUS',
+      'faladoria',
     ],
     locale: 'pt_BR',
     language: 'pt-BR',
-    themeColor: '#3b82f6',
+    themeColor: '#3b82f6', // TODO: Update with brand color
   },
 
-  // Legal (Brazilian specific - adjust for your country)
+  // Legal (Brazilian specific)
   legal: {
-    cnpj: '00.000.000/0000-00',
+    cnpj: '00.000.000/0000-00', // TODO: Update with real CNPJ
     registrationNumber: '',
   },
 } as const
@@ -90,10 +94,12 @@ export type CompanyInfo = typeof COMPANY_INFO
  * Use this to warn during build if data hasn't been updated
  */
 export const hasPlaceholderData = (): boolean => {
-  return (
-    COMPANY_INFO.name === 'Your Company Name' ||
-    COMPANY_INFO.url === 'https://www.yourcompany.com'
-  )
+  // Check for common placeholder patterns in critical fields
+  const hasPlaceholderPhone = COMPANY_INFO.contact.phone.includes('99999')
+  const hasPlaceholderEmail = COMPANY_INFO.contact.email.includes('example')
+  const hasPlaceholderCNPJ = COMPANY_INFO.legal.cnpj.includes('00.000.000')
+
+  return hasPlaceholderPhone || hasPlaceholderEmail || hasPlaceholderCNPJ
 }
 
 /**
@@ -115,11 +121,11 @@ export const getFullAddress = (): string => {
 }
 
 /**
- * Get social media links as array (filters out placeholder values)
+ * Get social media links as array (filters out empty values)
  */
 export const getSocialLinks = () => {
   return Object.entries(COMPANY_INFO.social)
-    .filter(([, url]) => url && !url.includes('yourcompany'))
+    .filter(([, url]) => url !== '')
     .map(([platform, url]) => ({ platform, url }))
 }
 
