@@ -24,7 +24,13 @@ export function OrganizationSchema() {
     seo,
   } = COMPANY_INFO
 
-  const socialLinks = Object.values(social).filter(link => link !== '')
+  // Filter out falsy values and known placeholders (e.g., 'yourcompany')
+  const socialLinks = Object.values(social).filter(
+    link =>
+      typeof link === 'string' &&
+      link.trim() !== '' &&
+      !/yourcompany/i.test(link)
+  )
 
   const organizationSchema = {
     '@type': 'Organization' as const,
