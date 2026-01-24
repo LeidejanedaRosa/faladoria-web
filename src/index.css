@@ -1,5 +1,12 @@
 @import 'tailwindcss';
 
+@theme {
+  --color-purple-dark: #453fee;
+  --color-purple-medium: #5f58f3;
+  --color-lavender: #b3abf2;
+  --color-gray-light: #f7f0f7;
+}
+
 :root {
   --color-purple-dark: #453fee;
   --color-purple-medium: #5f58f3;
