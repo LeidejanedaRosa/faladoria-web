@@ -8,10 +8,7 @@ export interface ContainerProps extends HTMLAttributes<HTMLDivElement> {
 export function Container({ children, className, ...props }: ContainerProps) {
   return (
     <div
-      className={cn(
-        'mx-auto h-screen max-w-7xl px-4 sm:px-6 lg:px-8',
-        className
-      )}
+      className={cn('mx-auto h-dvh max-w-7xl px-4 sm:px-6 lg:px-8', className)}
       {...props}
     >
       {children}
