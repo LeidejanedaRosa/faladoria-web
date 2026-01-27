@@ -3,26 +3,13 @@ import { HTMLAttributes, ReactNode } from 'react'
 
 export interface ContainerProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
 }
 
-export function Container({
-  children,
-  size = 'xl',
-  className,
-  ...props
-}: ContainerProps) {
+export function Container({ children, className, ...props }: ContainerProps) {
   return (
     <div
       className={cn(
-        'mx-auto w-full px-4 sm:px-6 lg:px-8',
-        {
-          'max-w-screen-sm': size === 'sm',
-          'max-w-screen-3xl': size === 'md',
-          'max-w-screen-5xl': size === 'lg',
-          'max-w-screen-7xl': size === 'xl',
-          'max-w-full': size === 'full',
-        },
+        'mx-auto h-screen max-w-7xl px-4 sm:px-6 lg:px-8',
         className
       )}
       {...props}
