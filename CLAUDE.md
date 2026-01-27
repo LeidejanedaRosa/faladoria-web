@@ -137,8 +137,6 @@ src/
 - File naming: `kebab-case.spec.ts` (e.g., `hero-section.spec.ts`)
 - Each test file uses `test.describe` for grouping related tests
 - Use `test.beforeEach` with `page.goto('/')` and appropriate `waitFor` calls
-- Full application flow testing
-- Critical user journeys
 
 #### When to write E2E tests
 
