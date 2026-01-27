@@ -1,5 +1,5 @@
-import { HTMLAttributes, ReactNode } from 'react'
 import { cn } from '@utils/cn'
+import { HTMLAttributes, ReactNode } from 'react'
 
 export interface ContainerProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode
@@ -18,9 +18,9 @@ export function Container({
         'mx-auto w-full px-4 sm:px-6 lg:px-8',
         {
           'max-w-screen-sm': size === 'sm',
-          'max-w-screen-md': size === 'md',
-          'max-w-screen-lg': size === 'lg',
-          'max-w-screen-xl': size === 'xl',
+          'max-w-screen-3xl': size === 'md',
+          'max-w-screen-5xl': size === 'lg',
+          'max-w-screen-7xl': size === 'xl',
           'max-w-full': size === 'full',
         },
         className

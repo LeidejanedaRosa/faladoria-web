@@ -1,28 +1,30 @@
-import logoFaladoria from '@assets/Faladoria secundária.svg'
+import logoFaladoria from '@assets/faladoria_secundaria.svg'
 
 import { COMPANY_INFO } from '@components/data/companyInfo'
+import { Container } from '@components/layout/Container'
 import { ScreenReaderOnly } from '@components/ui/Accessibility'
+
+const HERO_HEADING_ID = 'hero-heading'
 
 const HERO_CONTENT = {
   headline: {
     lines: ['Você fala.', 'O SUS escuta.', 'Nós resolvemos.'],
   },
   logo: {
-    alt: `Logo ${COMPANY_INFO.name} - Dois balões de conversa com as palavras Fala e Doria`,
-    ariaLabel: `${COMPANY_INFO.name}: ${COMPANY_INFO.shortDescription}`,
+    ariaLabel: `Logo ${COMPANY_INFO.name} - Dois balões de conversa com as palavras Fala e Doria. ${COMPANY_INFO.shortDescription}`,
   },
 } as const
 
 export const HeroSection = () => {
   return (
     <section
-      className="bg-purple-medium flex min-h-screen items-center justify-center"
-      aria-labelledby="hero-heading"
+      className="bg-purple-medium flex min-h-screen"
+      aria-labelledby={HERO_HEADING_ID}
     >
-      <div className="flex items-center">
-        <HeroHeadline />
+      <Container className="flex flex-col items-center justify-center md:flex-row-reverse">
         <HeroLogo />
-      </div>
+        <HeroHeadline />
+      </Container>
 
       <ScreenReaderOnly>
         <p>{COMPANY_INFO.description}</p>
@@ -33,28 +35,26 @@ export const HeroSection = () => {
 
 const HeroHeadline = () => (
   <h1
-    id="hero-heading"
-    className="text-right text-2xl leading-tight font-bold tracking-tight text-white italic sm:text-3xl md:text-4xl lg:text-5xl"
+    id={HERO_HEADING_ID}
+    className="text-right text-2xl leading-tight tracking-tight text-nowrap text-white uppercase italic sm:text-3xl md:text-4xl lg:text-5xl"
   >
-    {HERO_CONTENT.headline.lines.map((line, index) => (
-      <span key={index} className="block">
-        {line.toUpperCase()}
+    {HERO_CONTENT.headline.lines.map(line => (
+      <span key={line} className="block">
+        {line}{' '}
       </span>
     ))}
   </h1>
 )
 
 const HeroLogo = () => (
-  <div role="img" aria-label={HERO_CONTENT.logo.ariaLabel}>
-    <img
-      src={logoFaladoria}
-      alt={HERO_CONTENT.logo.alt}
-      width={320}
-      height={260}
-      className="h-auto w-44 sm:w-52 md:w-64 lg:w-80"
-      loading="eager"
-      decoding="async"
-      fetchPriority="high"
-    />
-  </div>
+  <img
+    src={logoFaladoria}
+    alt={HERO_CONTENT.logo.ariaLabel}
+    width={320}
+    height={260}
+    className="mb-10 h-[40vh] w-auto md:mb-0 md:ml-5 lg:h-[60vh] xl:h-[40vh]"
+    loading="eager"
+    decoding="async"
+    fetchPriority="high"
+  />
 )

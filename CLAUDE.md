@@ -116,11 +116,70 @@ src/
 - **Required**: Critical business logic and utilities
 - **Required**: Complex component logic
 - Location: `__tests__/` folder alongside components
+- File naming: `ComponentName.test.tsx` or `utilityName.test.ts`
+- Use `@testing-library/react` for component rendering
+- Test behavior, not implementation details
+- Mock external dependencies (APIs, services), never internal logic
+
+#### When to write unit tests
+
+| Scenario                                                                  | Unit test?      |
+| ------------------------------------------------------------------------- | --------------- |
+| Custom hooks with state/effects                                           | Yes             |
+| Utility functions with logic                                              | Yes             |
+| Components with conditional rendering, user interaction, or derived state | Yes             |
+| Pure presentational components (no logic, no hooks, no interactions)      | No — prefer E2E |
+| Data constants / static config objects                                    | No              |
 
 ### E2E Tests (Playwright)
 
+- Location: `tests/` directory, organized by domain (`tests/seo/`, `tests/sections/`, etc.)
+- File naming: `kebab-case.spec.ts` (e.g., `hero-section.spec.ts`)
+- Each test file uses `test.describe` for grouping related tests
+- Use `test.beforeEach` with `page.goto('/')` and appropriate `waitFor` calls
 - Full application flow testing
 - Critical user journeys
+
+#### When to write E2E tests
+
+| Scenario                                                                          | E2E test?        |
+| --------------------------------------------------------------------------------- | ---------------- |
+| Section/page rendering in real browser (visual structure, layout, responsiveness) | Yes              |
+| Accessibility validation (aria attributes, screen reader content, keyboard nav)   | Yes              |
+| SEO validation (meta tags, structured data, headings)                             | Yes              |
+| Performance attributes (image loading strategy, CLS prevention)                   | Yes              |
+| User flows spanning multiple pages/interactions                                   | Yes              |
+| Isolated unit logic (pure functions, hooks)                                       | No — prefer unit |
+
+#### E2E test structure pattern
+
+```typescript
+import { expect, test } from '@playwright/test'
+
+test.describe('ComponentName', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/', { waitUntil: 'domcontentloaded' })
+    await page.locator('target-element').waitFor({ timeout: 15000 })
+  })
+
+  test.describe('Rendering & Structure', () => {
+    /* ... */
+  })
+  test.describe('Accessibility', () => {
+    /* ... */
+  })
+  test.describe('Responsive Layout', () => {
+    /* ... */
+  })
+})
+```
+
+#### Test coverage categories for E2E
+
+1. **Rendering & Structure**: Elements exist, correct hierarchy, expected content
+2. **Accessibility**: ARIA attributes, alt text, screen-reader content, semantic HTML
+3. **Image Performance**: `width`/`height`, `loading`, `fetchPriority`
+4. **Responsive Layout**: Viewport-specific layout assertions using `boundingBox()`
 
 ## Commit Guidelines
 
