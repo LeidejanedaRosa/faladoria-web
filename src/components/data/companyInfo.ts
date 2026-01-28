@@ -28,7 +28,7 @@ export const COMPANY_INFO = {
   contact: {
     email: 'contato@faladoria.com.br', // TODO: Update with real email
     phone: '+55 11 99999-9999', // TODO: Update with real phone
-    whatsapp: '+5511999999999', // TODO: Update with real WhatsApp
+    whatsapp: '+5535991414032',
   },
 
   // Address
@@ -83,6 +83,8 @@ export const COMPANY_INFO = {
     registrationNumber: '',
   },
 } as const
+
+export const WHATSAPP_URL = `https://wa.me/${COMPANY_INFO.contact.whatsapp.replace(/\D/g, '')}`
 
 /**
  * Type for company info

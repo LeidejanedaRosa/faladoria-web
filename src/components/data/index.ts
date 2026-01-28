@@ -1,5 +1,6 @@
 export {
   COMPANY_INFO,
+  WHATSAPP_URL,
   hasPlaceholderData,
   getFullAddress,
   getSocialLinks,
