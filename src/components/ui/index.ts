@@ -14,5 +14,8 @@ export {
 // Loading components
 export { LoadingSpinner, SectionSkeleton } from './Loading'
 
+// WhatsApp CTA
+export { WhatsAppCTA } from './WhatsAppCTA'
+
 // Icons
-export { PlayIcon, PauseIcon } from './icons'
+export { CloseIcon, MenuIcon, PauseIcon, PlayIcon, WhatsAppIcon } from './icons'

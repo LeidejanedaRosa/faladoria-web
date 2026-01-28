@@ -10,7 +10,7 @@ export const SkipLink = forwardRef<HTMLAnchorElement, SkipLinkProps>(
     <a
       ref={ref}
       href={href}
-      className='sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-[1600] focus:bg-primary focus:text-secondary focus:px-4 focus:py-2 focus:text-base focus:font-medium focus:rounded-br focus:shadow-lg'
+      className="focus:bg-primary focus:text-secondary sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-[1600] focus:rounded-br focus:px-4 focus:py-2 focus:text-base focus:font-medium focus:shadow-lg"
       {...props}
     >
       {children}
@@ -57,7 +57,7 @@ export const ScreenReaderOnly = ({
     })
   }
 
-  return <span className='sr-only'>{children}</span>
+  return <span className="sr-only">{children}</span>
 }
 
 interface AccessibleButtonProps extends Omit<
@@ -128,7 +128,7 @@ export const AccessibleButton = forwardRef<
     return (
       <button
         ref={ref}
-        type='button'
+        type="button"
         className={[
           ...baseClasses,
           variantClasses[variant],
@@ -143,7 +143,7 @@ export const AccessibleButton = forwardRef<
         {...props}
       >
         {loading && (
-          <span className='mr-2' aria-hidden='true'>
+          <span className="mr-2" aria-hidden="true">
             <LoadingSpinner />
           </span>
         )}
@@ -157,25 +157,25 @@ AccessibleButton.displayName = 'AccessibleButton'
 
 const LoadingSpinner = () => (
   <svg
-    className='animate-spin h-4 w-4'
-    xmlns='http://www.w3.org/2000/svg'
-    fill='none'
-    viewBox='0 0 24 24'
-    aria-hidden='true'
-    data-testid='loading-spinner'
+    className="h-4 w-4 animate-spin"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+    data-testid="loading-spinner"
   >
     <circle
-      className='opacity-25'
-      cx='12'
-      cy='12'
-      r='10'
-      stroke='currentColor'
-      strokeWidth='4'
+      className="opacity-25"
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="currentColor"
+      strokeWidth="4"
     />
     <path
-      className='opacity-75'
-      fill='currentColor'
-      d='m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+      className="opacity-75"
+      fill="currentColor"
+      d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
     />
   </svg>
 )
@@ -216,6 +216,7 @@ const computeAriaLabel = (
 interface AccessibleLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   children: React.ReactNode
   external?: boolean
+  showExternalIcon?: boolean
   variant?: 'primary' | 'secondary' | 'ghost'
   isCurrent?: boolean
   ariaCurrent?:
@@ -236,6 +237,7 @@ export const AccessibleLink = forwardRef<
     {
       children,
       external = false,
+      showExternalIcon = true,
       variant = 'primary',
       'aria-label': ariaLabel,
       className = '',
@@ -283,8 +285,8 @@ export const AccessibleLink = forwardRef<
         aria-label={computedAriaLabel}
       >
         {children}
-        {external && (
-          <span className='ml-1' aria-hidden='true'>
+        {external && showExternalIcon && (
+          <span className="ml-1" aria-hidden="true">
             <ExternalLinkIcon />
           </span>
         )}
@@ -297,13 +299,13 @@ AccessibleLink.displayName = 'AccessibleLink'
 
 const ExternalLinkIcon = () => (
   <svg
-    className='h-4 w-4'
-    xmlns='http://www.w3.org/2000/svg'
-    viewBox='0 0 20 20'
-    fill='currentColor'
-    aria-hidden='true'
+    className="h-4 w-4"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 20 20"
+    fill="currentColor"
+    aria-hidden="true"
   >
-    <path d='M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z' />
-    <path d='M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z' />
+    <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+    <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
   </svg>
 )
