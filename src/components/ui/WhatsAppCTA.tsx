@@ -13,7 +13,7 @@ export const WhatsAppCTA = ({ className }: WhatsAppCTAProps) => (
     external
     showExternalIcon={false}
     className={cn(
-      'items-center gap-2 rounded-full bg-green-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none',
+      'inline-flex items-center gap-2 rounded-full bg-green-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none',
       className
     )}
     aria-label="Reclamar agora pelo WhatsApp (abre em nova aba)"
