@@ -1,2 +1,5 @@
-export { PlayIcon } from './PlayIcon'
+export { CloseIcon } from './CloseIcon'
+export { MenuIcon } from './MenuIcon'
 export { PauseIcon } from './PauseIcon'
+export { PlayIcon } from './PlayIcon'
+export { WhatsAppIcon } from './WhatsAppIcon'
