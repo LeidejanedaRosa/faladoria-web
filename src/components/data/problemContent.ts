@@ -37,7 +37,7 @@ export const PROBLEM_CONTENT = {
     source: {
       label: 'Pesquisa Datafolha',
       text: '93% da população está insatisfeita com a saúde no Brasil',
-      url: 'https://www.poder360.com.br/pesquisas/93-dos-brasileiros-avaliam-saude-publica-como-pessima-ou-ruim-diz-datafolha/',
+      url: 'https://www.sbcm.org.br/v2/index.php/not%C3%ADcias/3089-datafolha-revela-93-da-populacao-esta-insatisfeita-com-a-saude-no-brasil',
     },
   },
   statistic: {
