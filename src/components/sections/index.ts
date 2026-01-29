@@ -1,2 +1,2 @@
-export { AboutSection } from './AboutSection'
 export { HeroSection } from './HeroSection'
+export { ProblemSection } from './ProblemSection'
