@@ -1,24 +1,44 @@
+import type { ReactNode } from 'react'
+
 import { WHATSAPP_URL } from '@components/data/companyInfo'
 import { AccessibleLink } from '@components/ui'
 import { WhatsAppIcon } from '@components/ui/icons'
 import { cn } from '@utils/cn'
 
+const VARIANT_STYLES = {
+  primary:
+    'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 focus:ring-offset-2',
+  secondary:
+    'bg-white text-purple-dark hover:bg-gray-100 focus:ring-white focus:ring-offset-2 focus:ring-offset-purple-dark shadow-lg',
+} as const
+
+type WhatsAppCTAVariant = keyof typeof VARIANT_STYLES
+
 interface WhatsAppCTAProps {
+  variant?: WhatsAppCTAVariant
+  children?: ReactNode
+  'aria-label'?: string
   className?: string
 }
 
-export const WhatsAppCTA = ({ className }: WhatsAppCTAProps) => (
+export const WhatsAppCTA = ({
+  variant = 'primary',
+  children = 'Reclamar Agora',
+  'aria-label': ariaLabel = 'Reclamar agora pelo WhatsApp (abre em nova aba)',
+  className,
+}: WhatsAppCTAProps) => (
   <AccessibleLink
     href={WHATSAPP_URL}
     external
     showExternalIcon={false}
     className={cn(
-      'inline-flex items-center gap-2 rounded-full bg-green-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none',
+      'inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors focus:ring-2 focus:outline-none',
+      VARIANT_STYLES[variant],
       className
     )}
-    aria-label="Reclamar agora pelo WhatsApp (abre em nova aba)"
+    aria-label={ariaLabel}
   >
     <WhatsAppIcon className="h-5 w-5" />
-    Reclamar Agora
+    {children}
   </AccessibleLink>
 )
