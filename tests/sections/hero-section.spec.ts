@@ -43,6 +43,81 @@ test.describe('HeroSection', () => {
       await expect(logo).toBeVisible()
       await expect(logo).toHaveAttribute('src', /faladoria_secundaria/)
     })
+
+    test('should render the badge with status indicator', async ({ page }) => {
+      const hero = page.locator('section[aria-labelledby="hero-heading"]')
+      const badge = hero.locator('p').filter({
+        hasText: 'Uma plataforma independente para ouvir, mediar e resolver.',
+      })
+
+      await expect(badge).toBeVisible()
+
+      const statusDot = badge.locator('span.rounded-full')
+      await expect(statusDot).toBeAttached()
+      await expect(statusDot).toHaveAttribute('aria-hidden', 'true')
+    })
+
+    test('should render the description paragraph', async ({ page }) => {
+      const hero = page.locator('section[aria-labelledby="hero-heading"]')
+      const description = hero.locator('p').filter({
+        hasText: 'Criamos a faladoria para conectar usuários do SUS',
+      })
+
+      await expect(description).toBeVisible()
+    })
+  })
+
+  test.describe('CTAs & Navigation', () => {
+    test('should render a nav landmark with accessible label', async ({
+      page,
+    }) => {
+      const hero = page.locator('section[aria-labelledby="hero-heading"]')
+      const nav = hero.locator('nav[aria-label="Ações principais"]')
+
+      await expect(nav).toBeVisible()
+    })
+
+    test('should render WhatsApp CTA with correct external link attributes', async ({
+      page,
+    }) => {
+      const hero = page.locator('section[aria-labelledby="hero-heading"]')
+      const whatsappLink = hero.locator(
+        'a[aria-label="Reclamar no WhatsApp (abre em nova aba)"]'
+      )
+
+      await expect(whatsappLink).toBeVisible()
+      await expect(whatsappLink).toHaveAttribute(
+        'href',
+        /^https:\/\/wa\.me\/\d+$/
+      )
+      await expect(whatsappLink).toHaveAttribute('target', '_blank')
+      await expect(whatsappLink).toHaveAttribute('rel', 'noopener noreferrer')
+    })
+
+    test('should not show external icon on WhatsApp CTA', async ({ page }) => {
+      const hero = page.locator('section[aria-labelledby="hero-heading"]')
+      const whatsappLink = hero.locator(
+        'a[aria-label="Reclamar no WhatsApp (abre em nova aba)"]'
+      )
+      const whatsappIcon = whatsappLink.locator('svg')
+
+      // Should have exactly 1 SVG (the WhatsAppIcon), not 2 (no ExternalLinkIcon)
+      await expect(whatsappIcon).toHaveCount(1)
+    })
+
+    test('should render transparency CTA as internal anchor link', async ({
+      page,
+    }) => {
+      const hero = page.locator('section[aria-labelledby="hero-heading"]')
+      const transparencyLink = hero.locator(
+        'a[aria-label="Ver dados em tempo real - ir para seção de transparência"]'
+      )
+
+      await expect(transparencyLink).toBeVisible()
+      await expect(transparencyLink).toHaveAttribute('href', '#transparencia')
+      await expect(transparencyLink).not.toHaveAttribute('target')
+      await expect(transparencyLink).not.toHaveAttribute('rel')
+    })
   })
 
   test.describe('Accessibility', () => {
@@ -67,14 +142,29 @@ test.describe('HeroSection', () => {
       expect(textContent).not.toMatch(/^[A-ZÀ-Ú\s.]+$/)
     })
 
-    test('should have screen-reader-only description', async ({ page }) => {
+    test('should have screen-reader-only company description', async ({
+      page,
+    }) => {
       const hero = page.locator('section[aria-labelledby="hero-heading"]')
-      const srOnly = hero.locator('.sr-only')
+      const srDescription = hero.locator('p.sr-only')
 
-      await expect(srOnly).toBeAttached()
+      await expect(srDescription).toBeAttached()
 
-      const text = await srOnly.textContent()
-      expect(text?.trim().length).toBeGreaterThan(20)
+      const text = await srDescription.textContent()
+      expect(text).toContain('Canal de mediação')
+      expect(text).toContain('SUS')
+    })
+
+    test('should have screen-reader-only badge status text', async ({
+      page,
+    }) => {
+      const hero = page.locator('section[aria-labelledby="hero-heading"]')
+      const badgeSrOnly = hero.locator('span.sr-only')
+
+      await expect(badgeSrOnly).toBeAttached()
+
+      const text = await badgeSrOnly.textContent()
+      expect(text).toContain('Plataforma ativa')
     })
 
     test('h1 should be the labelling element for the section', async ({
@@ -107,6 +197,15 @@ test.describe('HeroSection', () => {
 
       await expect(logo).toHaveAttribute('loading', 'eager')
       await expect(logo).toHaveAttribute('fetchpriority', 'high')
+    })
+
+    test('should have async decoding for non-blocking rendering', async ({
+      page,
+    }) => {
+      const hero = page.locator('section[aria-labelledby="hero-heading"]')
+      const logo = hero.locator('img')
+
+      await expect(logo).toHaveAttribute('decoding', 'async')
     })
   })
 
@@ -146,14 +245,30 @@ test.describe('HeroSection', () => {
       expect(logoBounds!.x).toBeGreaterThan(h1Bounds!.x)
     })
 
-    test('should occupy at least full viewport height', async ({ page }) => {
+    test('should occupy at least viewport height minus header', async ({
+      page,
+    }) => {
       const hero = page.locator('section[aria-labelledby="hero-heading"]')
       const bounds = await hero.boundingBox()
       const viewport = page.viewportSize()
 
+      const headerHeight = await page.evaluate(() => {
+        const value = getComputedStyle(
+          document.documentElement
+        ).getPropertyValue('--header-height')
+        const temp = document.createElement('div')
+        temp.style.height = value
+        document.body.appendChild(temp)
+        const px = temp.getBoundingClientRect().height
+        temp.remove()
+        return px
+      })
+
       expect(bounds).toBeTruthy()
       expect(viewport).toBeTruthy()
-      expect(bounds!.height).toBeGreaterThanOrEqual(viewport!.height)
+      expect(bounds!.height).toBeGreaterThanOrEqual(
+        viewport!.height - headerHeight
+      )
     })
   })
 })
