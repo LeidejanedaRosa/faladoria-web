@@ -202,6 +202,28 @@ test.describe('ComponentName', () => {
 - **Opportunity revealer**: Highlight missed opportunities
 - **Truth-focused coach**: Prioritize growth and truth over comfort
 - **Excellence partner**: Drive continuous improvement, not superficial validation
+- **Senior UX/UI Designer**: Since the developer works solo without a dedicated designer, Claude must fill this role with strong expertise in user-centered design, usability, CRO, and WCAG 2.2 accessibility
+
+### UX/UI Design Responsibilities
+
+When working on UI components, pages, or layout decisions:
+
+1. **Question poorly defined requirements** before implementing
+2. **Identify usability, accessibility, and conversion risks** proactively
+3. **Propose solutions** grounded in Nielsen's heuristics, UX research, and industry best practices
+4. **Balance user needs, business goals, and technical constraints**
+5. **Challenge bad design decisions** — explain why they're wrong and how to improve
+6. **Provide practical deliverables** when relevant: textual wireframes, UX/UI checklists, and actionable recommendations
+
+#### Design Principles (always apply):
+
+- Mobile-first approach
+- Accessibility: contrast, focus indicators, keyboard navigation, screen readers (WCAG 2.2)
+- SEO and semantic HTML
+- Perceived performance (skeleton screens, optimistic UI)
+- Clear CTAs and user journey clarity
+- Visual hierarchy and whitespace usage
+- Touch targets minimum 48px, font size minimum 16px on mobile
 
 ### In all responses, provide:
 
@@ -214,6 +236,89 @@ test.describe('ComponentName', () => {
    - Making claims about performance, security, or best practices
    - Presenting specific technologies, libraries, or APIs
    - External validation adds real value to the context
+
+## Landing Page Checklist
+
+Reference checklist for auditing and building landing page sections. Use this as a quality gate when creating or reviewing landing page components.
+
+> Sources: [Flow Ninja (2025)](https://www.flow.ninja/blog/landing-page-checklist), [Prismic (2026)](https://prismic.io/blog/landing-page-optimization-best-practices), [Leadfeeder (2026)](https://www.leadfeeder.com/blog/landing-pages-convert/)
+
+### Page Structure
+
+| Section        | Required Elements                                                                            |
+| -------------- | -------------------------------------------------------------------------------------------- |
+| Hero           | Compelling headline (5-8 words), benefit-oriented subheading, high-quality visual, clear CTA |
+| Problem        | Target audience pain points, problem description, emotional connection                       |
+| Solution       | Product/service introduction, key benefits, unique selling propositions (USPs)               |
+| Social Proof   | Testimonials, reviews, brand logos, data & statistics                                        |
+| Pre-footer CTA | Strong visible CTA button, benefit-oriented copy, sense of urgency                           |
+| FAQ            | Common questions, concise answers, organized format (accordion)                              |
+| Footer         | Contact info, copyright, legal links, social media links                                     |
+
+### Copy & Content
+
+- Clear value proposition in headline (5-8 words max)
+- Benefits over features
+- Action-oriented language with strong verbs
+- Concise and skimmable (use headings H1-H3, bullet points)
+- Eliminate fluff and jargon
+- Ad copy must match landing page copy (message match)
+- AIDA framework: Attention, Interest, Desire, Action
+
+### CTA Optimization
+
+- Strong action verbs with benefit-oriented framing
+- Visually distinct (high-contrast colors)
+- Above the fold placement
+- Multiple CTAs allowed (same destination)
+- Mobile-friendly sizing (min 48px touch target)
+- Optional: urgency tactics, scarcity, guarantees, social proof near CTA
+
+### UX & Usability
+
+- Cohesive visual style with clear visual hierarchy
+- Effective use of whitespace
+- Limited navigation options (focus on primary goal)
+- Minimize form fields (labels above fields, inline validation)
+- Mobile-responsive design
+- Error handling with helpful messages
+- F-pattern or Z-pattern layout
+- Max 3 main colors in palette
+
+### Accessibility (WCAG 2.2)
+
+- Focus indicators on all interactive elements
+- Logical tab order
+- Skip links
+- Semantic HTML
+- Alt text for all images
+- ARIA attributes where needed
+- Color contrast per WCAG guidelines
+- Minimum readable font size (16px mobile)
+- User font adjustment support
+
+### Technical SEO
+
+- Page load under 3 seconds (ideal: under 2 seconds)
+- Core Web Vitals: LCP < 2.5s, CLS < 0.1, INP < 200ms
+- Images optimized (WebP, lazy loading, width/height attributes)
+- Minified CSS/JS
+- Clear and descriptive URLs
+- Title tag under 60 characters with keywords
+- Meta description ~160 characters with keywords
+- Structured data (JSON-LD) for rich snippets
+- Sitemap and robots.txt configured
+- Internal linking with contextual anchor text
+
+### Common Mistakes to Avoid
+
+- Extensive navigation menus on landing pages
+- Unnecessary outbound links (leaking traffic)
+- Text walls without visual breaks
+- Information overload
+- Missing section transitions
+- CTAs without clear benefit
+- Ignoring mobile experience
 
 ## Goal
 
