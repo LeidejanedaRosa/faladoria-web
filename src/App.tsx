@@ -6,8 +6,7 @@ import {
 } from './components/data'
 import { ErrorBoundary } from './components/error'
 import { Header } from './components/layout'
-// import { AboutSection } from './components/sections'
-import { HeroSection } from './components/sections'
+import { HeroSection, ProblemSection } from './components/sections'
 import { BreadcrumbSchema, JsonLdScript } from './components/seo'
 import { MainContent, SkipLink } from './components/ui'
 
@@ -26,7 +25,7 @@ function App() {
           inert={isSidebarOpen || undefined}
         >
           <HeroSection />
-          {/* <AboutSection /> */}
+          <ProblemSection />
         </MainContent>
       </div>
     </ErrorBoundary>
