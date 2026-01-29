@@ -57,7 +57,7 @@ export const ScreenReaderOnly = ({
     }
 
     return React.cloneElement(children, {
-      className: cn('sr-only', children.props.className),
+      className: cn(children.props.className, 'sr-only'),
     })
   }
 
