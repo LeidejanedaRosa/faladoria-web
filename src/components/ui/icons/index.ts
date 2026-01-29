@@ -1,3 +1,4 @@
+export { ActivityIcon } from './ActivityIcon'
 export { CloseIcon } from './CloseIcon'
 export { MenuIcon } from './MenuIcon'
 export { PauseIcon } from './PauseIcon'
