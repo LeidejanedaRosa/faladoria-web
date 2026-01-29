@@ -1,5 +1,6 @@
 import React, { forwardRef } from 'react'
 
+import { cn } from '@utils/cn'
 import type {
   AccessibilityProps,
   SkipLinkProps,
@@ -30,7 +31,7 @@ export const MainContent = forwardRef<HTMLElement, MainContentProps>(
     <main
       ref={ref}
       id={id}
-      className={`focus:outline-none ${className}`}
+      className={cn('focus:outline-none', className)}
       tabIndex={-1}
       {...props}
     >
@@ -51,9 +52,12 @@ export const ScreenReaderOnly = ({
   asChild = false,
 }: ScreenReaderOnlyProps) => {
   if (asChild) {
-    const child = children as React.ReactElement<{ className?: string }>
-    return React.cloneElement(child, {
-      className: `sr-only ${child.props.className || ''}`.trim(),
+    if (!React.isValidElement<{ className?: string }>(children)) {
+      return <span className="sr-only">{children}</span>
+    }
+
+    return React.cloneElement(children, {
+      className: cn('sr-only', children.props.className),
     })
   }
 
@@ -264,18 +268,12 @@ export const AccessibleLink = forwardRef<
     const safeProps = filterSecurityProps(props)
     const computedAriaLabel = computeAriaLabel(external, ariaLabel, children)
 
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLAnchorElement>) => {
-      if (onKeyDown) {
-        onKeyDown(event)
-      }
-    }
-
     return (
       <a
         ref={ref}
         href={href}
         className={[...baseClasses, variantClass, className].join(' ')}
-        onKeyDown={handleKeyDown}
+        onKeyDown={onKeyDown}
         aria-current={currentValue || undefined}
         {...safeProps}
         {...(external && {
