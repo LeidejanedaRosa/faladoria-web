@@ -14,12 +14,12 @@ test.describe('ProblemSection', () => {
       await expect(section).toBeVisible()
     })
 
-    test('should render the news headline as h2', async ({ page }) => {
+    test('should render the news headline as h3', async ({ page }) => {
       const section = page.locator('section[aria-labelledby="problem-heading"]')
-      const h2 = section.locator('h2')
+      const newsHeadline = section.locator('h3').first()
 
-      await expect(h2).toBeVisible()
-      await expect(h2).toContainText('desafios enfrentados')
+      await expect(newsHeadline).toBeVisible()
+      await expect(newsHeadline).toContainText('desafios enfrentados')
     })
 
     test('should render exactly 3 news article cards', async ({ page }) => {
@@ -63,10 +63,11 @@ test.describe('ProblemSection', () => {
       page,
     }) => {
       const section = page.locator('section[aria-labelledby="problem-heading"]')
-      const h3 = section.locator('h3')
+      const ctaHeading = section.locator('h3').filter({
+        hasText: 'Você já viveu algum desses problemas?',
+      })
 
-      await expect(h3).toBeVisible()
-      await expect(h3).toContainText('Você já viveu algum desses problemas?')
+      await expect(ctaHeading).toBeVisible()
 
       const ctaDescription = section.locator('p').filter({
         hasText: 'Sua história importa',

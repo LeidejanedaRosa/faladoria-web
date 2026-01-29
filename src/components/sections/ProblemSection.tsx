@@ -12,7 +12,7 @@ export const ProblemSection = () => {
   return (
     <section className="bg-gray-light" aria-labelledby={PROBLEM_HEADING_ID}>
       <ScreenReaderOnly>
-        <p id={PROBLEM_HEADING_ID}>{PROBLEM_CONTENT.sectionHeading}</p>
+        <h2 id={PROBLEM_HEADING_ID}>{PROBLEM_CONTENT.sectionHeading}</h2>
       </ScreenReaderOnly>
 
       <Container className="flex flex-col gap-16 py-16 sm:gap-20 sm:py-20 lg:gap-24 lg:py-24">
@@ -106,9 +106,9 @@ const NewsBlock = () => {
 
   return (
     <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
-      <h2 className="text-purple-dark max-w-md text-3xl leading-tight font-bold italic sm:text-4xl lg:text-5xl">
+      <h3 className="text-purple-dark max-w-md text-3xl leading-tight font-bold italic sm:text-4xl lg:text-5xl">
         {newsHeadline}
-      </h2>
+      </h3>
       {newsArticles.map(article => (
         <NewsCard key={article.id} article={article} />
       ))}
