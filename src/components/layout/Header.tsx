@@ -2,17 +2,11 @@ import { createPortal } from 'react-dom'
 
 import logoFaladoria from '@assets/logo_faladoria.svg'
 import { COMPANY_INFO } from '@components/data/companyInfo'
+import { NAV_ITEMS } from '@components/data/navigation'
 import { WhatsAppCTA } from '@components/ui'
 import { CloseIcon, MenuIcon } from '@components/ui/icons'
 import { useSidebar } from '@hooks/useSidebar'
 import { cn } from '@utils/cn'
-
-const NAV_ITEMS = [
-  { label: 'Quem somos', href: '#quem-somos' },
-  { label: 'Como funciona', href: '#como-funciona' },
-  { label: 'Transparência', href: '#transparencia' },
-  { label: 'Contato', href: '#contato' },
-] as const
 
 const MOBILE_MENU_ID = 'mobile-menu'
 
