@@ -82,7 +82,7 @@ test.describe('HeroSection', () => {
     }) => {
       const hero = page.locator('section[aria-labelledby="hero-heading"]')
       const whatsappLink = hero.locator(
-        'a[aria-label="Reclamar no WhatsApp (abre em nova aba)"]'
+        'a[aria-label="Reclamar Agora (abre em nova aba)"]'
       )
 
       await expect(whatsappLink).toBeVisible()
@@ -97,7 +97,7 @@ test.describe('HeroSection', () => {
     test('should not show external icon on WhatsApp CTA', async ({ page }) => {
       const hero = page.locator('section[aria-labelledby="hero-heading"]')
       const whatsappLink = hero.locator(
-        'a[aria-label="Reclamar no WhatsApp (abre em nova aba)"]'
+        'a[aria-label="Reclamar Agora (abre em nova aba)"]'
       )
       const whatsappIcon = whatsappLink.locator('svg')
 

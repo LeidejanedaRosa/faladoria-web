@@ -72,10 +72,10 @@ const HeroCTAs = () => (
       external
       showExternalIcon={false}
       className="focus:ring-offset-purple-medium inline-flex items-center gap-2 rounded-full bg-green-600 px-6 py-3 text-base font-semibold text-white shadow-lg transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
-      aria-label="Reclamar no WhatsApp (abre em nova aba)"
+      aria-label="Reclamar Agora (abre em nova aba)"
     >
       <WhatsAppIcon className="h-5 w-5" />
-      Reclamar no WhatsApp
+      Reclamar Agora
     </AccessibleLink>
 
     <AccessibleLink
