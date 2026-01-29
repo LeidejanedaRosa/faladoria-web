@@ -159,7 +159,10 @@ test.describe('HeroSection', () => {
       page,
     }) => {
       const hero = page.locator('section[aria-labelledby="hero-heading"]')
-      const badgeSrOnly = hero.locator('span.sr-only')
+      const badge = hero.locator('p').filter({
+        hasText: 'Uma plataforma independente',
+      })
+      const badgeSrOnly = badge.locator('span.sr-only')
 
       await expect(badgeSrOnly).toBeAttached()
 
@@ -253,9 +256,14 @@ test.describe('HeroSection', () => {
       const viewport = page.viewportSize()
 
       const headerHeight = await page.evaluate(() => {
-        const value = getComputedStyle(
-          document.documentElement
-        ).getPropertyValue('--header-height')
+        const value = getComputedStyle(document.documentElement)
+          .getPropertyValue('--header-height')
+          .trim()
+
+        if (!value) {
+          throw new Error('CSS variable --header-height is not defined')
+        }
+
         const temp = document.createElement('div')
         temp.style.height = value
         document.body.appendChild(temp)
