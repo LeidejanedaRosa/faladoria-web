@@ -14,6 +14,7 @@
   --color-gray-light: #f7f0f7;
   --color-white: #ffffff;
   --color-black: #000000;
+  --header-height: 5.5rem;
 
   font-family: 'Inter', Arial, system-ui, sans-serif;
   line-height: 1.5;
