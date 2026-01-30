@@ -1,8 +1,8 @@
-import canalIndependente from '@assets/canal_independente.png'
+import canalIndependente from '@assets/canal_independente.webp'
 import logoFaladoria from '@assets/logo_faladoria.svg'
-import mediacao from '@assets/mediacao.png'
-import transparencia from '@assets/transparencia.png'
-import relatorios from '@assets/relatorios.png'
+import medicacao from '@assets/medicacao.webp'
+import relatorios from '@assets/relatorios.webp'
+import transparencia from '@assets/transparencia.webp'
 
 export const SOLUTION_HEADING_ID = 'solution-heading'
 
@@ -25,7 +25,7 @@ export const SOLUTION_CONTENT = {
     },
     {
       id: 'mediation',
-      icon: mediacao,
+      icon: medicacao,
       iconAlt: 'Ícone de mediação entre cidadãos e gestão pública',
       title: 'Mediação ativa',
       description: 'Mediação ativa entre cidadãos e gestão pública.',
