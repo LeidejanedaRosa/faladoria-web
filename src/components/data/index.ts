@@ -22,4 +22,9 @@ export type { NewsArticle, NewsArticleImage } from './problemContent'
 
 export { SOLUTION_HEADING_ID, SOLUTION_CONTENT } from './solutionContent'
 
+export {
+  HOW_IT_WORKS_HEADING_ID,
+  HOW_IT_WORKS_CONTENT,
+} from './howItWorksContent'
+
 export { SECTION_IDS, NAV_ITEMS } from './navigation'
