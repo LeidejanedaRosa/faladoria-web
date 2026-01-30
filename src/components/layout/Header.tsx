@@ -24,7 +24,7 @@ export const Header = ({ onSidebarToggle }: HeaderProps) => {
 
   return (
     <>
-      <header className="bg-white shadow-sm">
+      <header role="banner" className="bg-white shadow-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
           <a
             href="/"
@@ -46,13 +46,14 @@ export const Header = ({ onSidebarToggle }: HeaderProps) => {
           <button
             ref={triggerRef}
             type="button"
-            className="text-purple-dark hover:bg-gray-light focus:ring-purple-medium inline-flex items-center justify-center rounded-lg p-2 transition-colors focus:ring-2 focus:outline-none md:hidden"
+            className="text-purple-dark hover:bg-gray-light focus:ring-purple-medium inline-flex items-center justify-center rounded-lg p-2.5 transition-colors focus:ring-2 focus:outline-none md:hidden"
             onClick={open}
             aria-expanded={isOpen}
             aria-controls={MOBILE_MENU_ID}
             aria-label="Abrir menu"
           >
             <MenuIcon className="h-6 w-6" />
+            <span className="sr-only">Abrir menu</span>
           </button>
         </div>
       </header>
@@ -137,7 +138,7 @@ const MobileSidebar = ({ isOpen, onClose, sidebarRef }: MobileSidebarProps) => (
         </a>
         <button
           type="button"
-          className="text-purple-dark hover:bg-gray-light focus:ring-purple-medium inline-flex items-center justify-center rounded-lg p-2 transition-colors focus:ring-2 focus:outline-none"
+          className="text-purple-dark hover:bg-gray-light focus:ring-purple-medium inline-flex items-center justify-center rounded-lg p-2.5 transition-colors focus:ring-2 focus:outline-none"
           onClick={onClose}
           aria-label="Fechar menu"
         >
