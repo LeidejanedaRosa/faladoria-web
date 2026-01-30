@@ -24,9 +24,9 @@ export const SOLUTION_CONTENT = {
         'Canal independente para denunciar problemas na saúde pública.',
     },
     {
-      id: 'mediation',
+      id: 'medication',
       icon: medicacao,
-      iconAlt: 'Ícone de mediação entre cidadãos e gestão pública',
+      iconAlt: 'Ícone de medicação entre cidadãos e gestão pública',
       title: 'Medicação ativa',
       description: 'Medicação ativa entre cidadãos e gestão pública.',
     },
