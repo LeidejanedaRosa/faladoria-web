@@ -11,7 +11,7 @@ import { PersonIcon } from '@components/ui/icons'
 export const ProblemSection = () => {
   return (
     <section className="bg-gray-light" aria-labelledby={PROBLEM_HEADING_ID}>
-      <ScreenReaderOnly>
+      <ScreenReaderOnly asChild>
         <h2 id={PROBLEM_HEADING_ID}>{PROBLEM_CONTENT.sectionHeading}</h2>
       </ScreenReaderOnly>
 
