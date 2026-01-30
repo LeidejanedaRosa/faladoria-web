@@ -27,8 +27,8 @@ export const SOLUTION_CONTENT = {
       id: 'mediation',
       icon: medicacao,
       iconAlt: 'Ícone de mediação entre cidadãos e gestão pública',
-      title: 'Mediação ativa',
-      description: 'Mediação ativa entre cidadãos e gestão pública.',
+      title: 'Medicação ativa',
+      description: 'Medicação ativa entre cidadãos e gestão pública.',
     },
     {
       id: 'transparency',
