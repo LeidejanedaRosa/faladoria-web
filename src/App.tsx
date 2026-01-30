@@ -6,7 +6,11 @@ import {
 } from './components/data'
 import { ErrorBoundary } from './components/error'
 import { Header } from './components/layout'
-import { HeroSection, ProblemSection } from './components/sections'
+import {
+  HeroSection,
+  ProblemSection,
+  SolutionSection,
+} from './components/sections'
 import { BreadcrumbSchema, JsonLdScript } from './components/seo'
 import { MainContent, SkipLink } from './components/ui'
 
@@ -26,6 +30,7 @@ function App() {
         >
           <HeroSection />
           <ProblemSection />
+          <SolutionSection />
         </MainContent>
       </div>
     </ErrorBoundary>
