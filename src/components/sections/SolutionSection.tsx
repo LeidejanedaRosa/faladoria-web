@@ -1,8 +1,8 @@
+import { SECTION_IDS } from '@components/data/navigation'
 import {
   SOLUTION_CONTENT,
   SOLUTION_HEADING_ID,
 } from '@components/data/solutionContent'
-import { SECTION_IDS } from '@components/data/navigation'
 import { Container } from '@components/layout/Container'
 import { ScreenReaderOnly } from '@components/ui/Accessibility'
 
