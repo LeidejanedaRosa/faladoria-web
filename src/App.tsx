@@ -8,6 +8,7 @@ import { ErrorBoundary } from './components/error'
 import { Header } from './components/layout'
 import {
   HeroSection,
+  HowItWorksSection,
   ProblemSection,
   SolutionSection,
 } from './components/sections'
@@ -31,6 +32,7 @@ function App() {
           <HeroSection />
           <ProblemSection />
           <SolutionSection />
+          <HowItWorksSection />
         </MainContent>
       </div>
     </ErrorBoundary>
