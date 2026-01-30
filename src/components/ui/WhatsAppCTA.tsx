@@ -7,9 +7,9 @@ import { cn } from '@utils/cn'
 
 const VARIANT_STYLES = {
   primary:
-    'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 focus:ring-offset-2',
+    'bg-green-700 text-white hover:bg-green-800 hover:text-white focus:ring-green-500 focus:ring-offset-2',
   secondary:
-    'bg-white text-purple-dark hover:bg-gray-100 focus:ring-white focus:ring-offset-2 focus:ring-offset-purple-dark shadow-lg',
+    'bg-white text-purple-dark hover:bg-lavender hover:text-white focus:ring-white focus:ring-offset-2 focus:ring-offset-purple-dark shadow-lg',
 } as const
 
 type WhatsAppCTAVariant = keyof typeof VARIANT_STYLES
@@ -32,7 +32,7 @@ export const WhatsAppCTA = ({
     external
     showExternalIcon={false}
     className={cn(
-      'inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors focus:ring-2 focus:outline-none',
+      'inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-colors focus:ring-2 focus:outline-none',
       VARIANT_STYLES[variant],
       className
     )}
