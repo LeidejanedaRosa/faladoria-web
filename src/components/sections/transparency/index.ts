@@ -1,0 +1,1 @@
+export { TransparencySection } from './TransparencySection'

@@ -11,6 +11,7 @@ import {
   HowItWorksSection,
   ProblemSection,
   SolutionSection,
+  TransparencySection,
 } from './components/sections'
 import { BreadcrumbSchema, JsonLdScript } from './components/seo'
 import { MainContent, SkipLink } from './components/ui'
@@ -33,6 +34,7 @@ function App() {
           <ProblemSection />
           <SolutionSection />
           <HowItWorksSection />
+          <TransparencySection />
         </MainContent>
       </div>
     </ErrorBoundary>
