@@ -27,4 +27,16 @@ export {
   HOW_IT_WORKS_CONTENT,
 } from './howItWorksContent'
 
+export {
+  TRANSPARENCY_HEADING_ID,
+  TRANSPARENCY_CONTENT,
+  TOTAL_DEMANDS,
+  STATUS_CONFIG,
+} from './transparencyContent'
+export type {
+  InteractionStatus,
+  Interaction,
+  TransparencyStat,
+} from './transparencyContent'
+
 export { SECTION_IDS, NAV_ITEMS } from './navigation'
