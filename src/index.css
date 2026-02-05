@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 
 @theme {
+  --color-purple-deepest: #0e0b3d;
+  --color-purple-deep: #1a1452;
   --color-purple-dark: #453fee;
   --color-purple-medium: #5f58f3;
   --color-lavender: #b3abf2;
@@ -13,6 +15,8 @@ body {
 }
 
 :root {
+  --color-purple-deepest: #0e0b3d;
+  --color-purple-deep: #1a1452;
   --color-purple-dark: #453fee;
   --color-purple-medium: #5f58f3;
   --color-lavender: #b3abf2;
