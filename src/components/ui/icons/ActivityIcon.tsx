@@ -1,6 +1,6 @@
 import type { IconProps } from '@/types/icon'
 
-export const ActivityIcon = ({ className = 'w-4 h-4' }: IconProps) => (
+export const ActivityIcon = ({ className = 'h-5 w-5' }: IconProps) => (
   <svg
     className={className}
     fill="none"
