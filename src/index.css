@@ -6,7 +6,20 @@
   --color-purple-dark: #453fee;
   --color-purple-medium: #5f58f3;
   --color-lavender: #b3abf2;
+  --color-lavender-light: #f5f2ff;
   --color-gray-light: #f7f0f7;
+
+  --animate-glow-pulse: glow-pulse 3s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 24px 4px rgba(179, 171, 242, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 48px 8px rgba(179, 171, 242, 0.6);
+  }
 }
 
 html,
@@ -20,6 +33,7 @@ body {
   --color-purple-dark: #453fee;
   --color-purple-medium: #5f58f3;
   --color-lavender: #b3abf2;
+  --color-lavender-light: #f5f2ff;
   --color-gray-light: #f7f0f7;
   --color-white: #ffffff;
   --color-black: #000000;
@@ -64,4 +78,15 @@ body {
 ::selection {
   background-color: var(--color-lavender);
   color: var(--color-black);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
