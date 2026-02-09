@@ -39,4 +39,7 @@ export type {
   TransparencyStat,
 } from './transparencyContent'
 
+export { ABOUT_HEADING_ID, ABOUT_CONTENT } from './aboutContent'
+export type { Partnership } from './aboutContent'
+
 export { SECTION_IDS, NAV_ITEMS } from './navigation'
