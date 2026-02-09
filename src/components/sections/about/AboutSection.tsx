@@ -10,7 +10,7 @@ export const AboutSection = () => {
   return (
     <section
       id={SECTION_IDS.aboutUs}
-      className="via-lavender-light to-lavender/30 overflow-hidden bg-linear-to-b from-white lg:flex lg:min-h-screen lg:items-center"
+      className="via-lavender-light to-lavender overflow-hidden bg-linear-to-b from-white lg:flex lg:min-h-screen lg:items-center"
       aria-labelledby={ABOUT_HEADING_ID}
     >
       <ScreenReaderOnly asChild>
@@ -20,7 +20,7 @@ export const AboutSection = () => {
         <p>{ABOUT_CONTENT.screenReaderDescription}</p>
       </ScreenReaderOnly>
 
-      <Container className="flex w-full flex-col py-12">
+      <Container className="flex w-full flex-col py-8">
         <div className="flex flex-col items-center gap-10 lg:flex-row lg:items-center lg:gap-16">
           <div className="flex flex-1 flex-col items-center gap-6 text-center lg:items-start lg:text-left">
             <span
@@ -34,7 +34,7 @@ export const AboutSection = () => {
           <FounderPhoto />
         </div>
 
-        <div className="mt-16">
+        <div className="mt-16 xl:mt-0">
           <PartnershipsBlock />
         </div>
       </Container>

@@ -6,7 +6,7 @@ export const FounderPhoto = () => {
   return (
     <figure className="relative flex flex-1 items-end justify-center">
       <div
-        className="from-lavender/70 to-purple-medium animate-glow-pulse absolute h-64 w-64 rounded-full bg-linear-to-br sm:h-72 sm:w-72 lg:h-80 lg:w-80 xl:h-96 xl:w-96"
+        className="from-lavender/30 to-purple-medium animate-glow-pulse absolute h-64 w-64 rounded-full bg-linear-to-br sm:h-72 sm:w-72 lg:h-80 lg:w-80 xl:h-96 xl:w-96"
         aria-hidden="true"
       />
 
