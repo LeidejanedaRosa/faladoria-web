@@ -139,10 +139,10 @@ test.describe('AboutSection', () => {
       page,
     }) => {
       const about = page.locator(ABOUT_SECTION)
-      const figure = about.locator('figure')
-      const blockquote = figure.locator('blockquote')
+      const quoteFigure = about.locator('figure:has(blockquote)')
+      const blockquote = quoteFigure.locator('blockquote')
 
-      await expect(figure).toBeAttached()
+      await expect(quoteFigure).toBeAttached()
       await expect(blockquote).toBeAttached()
       await expect(blockquote).toContainText('saúde pública')
     })
@@ -151,12 +151,25 @@ test.describe('AboutSection', () => {
       page,
     }) => {
       const about = page.locator(ABOUT_SECTION)
-      const figcaption = about.locator('figure figcaption')
+      const figcaption = about.locator('figure:has(blockquote) figcaption')
       const cite = figcaption.locator('cite')
 
       await expect(figcaption).toBeAttached()
       await expect(cite).toBeAttached()
       await expect(cite).toContainText('Simone Celina')
+    })
+
+    test('should use figure with figcaption for founder photo', async ({
+      page,
+    }) => {
+      const about = page.locator(ABOUT_SECTION)
+      const photoFigure = about.locator('figure:has(img)')
+      const figcaption = photoFigure.locator('figcaption')
+
+      await expect(photoFigure).toBeAttached()
+      await expect(figcaption).toBeAttached()
+      await expect(figcaption).toContainText('Simone Celina')
+      await expect(figcaption).toContainText('Fundadora')
     })
 
     test('should have aria-label on partnership list', async ({ page }) => {
