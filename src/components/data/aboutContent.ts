@@ -24,8 +24,7 @@ export const ABOUT_CONTENT = {
     name: 'Simone Celina',
     role: 'Fundadora',
     image: simoneCelina,
-    imageAlt:
-      'Foto de Simone Celina, fundadora da Faladoria, sorrindo em ambiente profissional',
+    imageAlt: 'Fundadora da Faladoria sorrindo em ambiente profissional',
     quote:
       'A saúde pública melhora quando as pessoas são ouvidas e os gestores têm dados para agir.',
   } satisfies FounderInfo,
