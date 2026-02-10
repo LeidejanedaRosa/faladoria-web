@@ -5,7 +5,7 @@ import {
   ORGANIZATION_STRUCTURED_DATA,
 } from './components/data'
 import { ErrorBoundary } from './components/error'
-import { Header } from './components/layout'
+import { FooterSection, Header } from './components/layout'
 import {
   AboutSection,
   HeroSection,
@@ -27,17 +27,17 @@ function App() {
       <SkipLink href="#main-content">Pular para o conteúdo principal</SkipLink>
       <div>
         <Header onSidebarToggle={setIsSidebarOpen} />
-        <MainContent
-          aria-label="Conteúdo principal"
-          inert={isSidebarOpen || undefined}
-        >
-          <HeroSection />
-          <ProblemSection />
-          <SolutionSection />
-          <HowItWorksSection />
-          <TransparencySection />
-          <AboutSection />
-        </MainContent>
+        <div inert={isSidebarOpen || undefined}>
+          <MainContent aria-label="Conteúdo principal">
+            <HeroSection />
+            <ProblemSection />
+            <SolutionSection />
+            <HowItWorksSection />
+            <TransparencySection />
+            <AboutSection />
+          </MainContent>
+          <FooterSection />
+        </div>
       </div>
     </ErrorBoundary>
   )
