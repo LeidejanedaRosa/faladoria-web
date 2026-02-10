@@ -42,4 +42,11 @@ export type {
 export { ABOUT_HEADING_ID, ABOUT_CONTENT } from './aboutContent'
 export type { Partnership } from './aboutContent'
 
+export { FOOTER_HEADING_ID, FOOTER_CONTENT } from './footerContent'
+export type {
+  FooterLink,
+  FooterLinkGroup,
+  FooterContactItem,
+} from './footerContent'
+
 export { SECTION_IDS, NAV_ITEMS } from './navigation'
