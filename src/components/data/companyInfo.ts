@@ -26,9 +26,9 @@ export const COMPANY_INFO = {
 
   // Contact
   contact: {
-    email: 'contato@faladoria.com.br', // TODO: Update with real email
-    phone: '+55 11 99999-9999', // TODO: Update with real phone
-    whatsapp: '+5535991414032',
+    email: 'canalfaladoria@gmail.com', // TODO: Update with real email
+    phone: '+55 11 997003315', // TODO: Update with real phone
+    whatsapp: '+5535997003315',
   },
 
   // Address
@@ -37,9 +37,9 @@ export const COMPANY_INFO = {
     number: '123',
     complement: '',
     neighborhood: 'Centro',
-    city: 'São Paulo', // TODO: Update with real city
-    state: 'SP',
-    zipCode: '00000-000', // TODO: Update with real ZIP
+    city: 'São Lourenço', // TODO: Update with real city
+    state: 'MG',
+    zipCode: '37470-000', // TODO: Update with real ZIP
     country: 'Brasil',
     countryCode: 'BR',
   },
