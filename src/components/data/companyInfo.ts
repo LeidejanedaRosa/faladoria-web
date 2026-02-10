@@ -26,8 +26,8 @@ export const COMPANY_INFO = {
 
   // Contact
   contact: {
-    email: 'canalfaladoria@gmail.com', // TODO: Update with real email
-    phone: '+55 11 997003315', // TODO: Update with real phone
+    email: 'canalfaladoria@gmail.com',
+    phone: '+55 35 997003315',
     whatsapp: '+5535997003315',
   },
 
@@ -37,9 +37,9 @@ export const COMPANY_INFO = {
     number: '123',
     complement: '',
     neighborhood: 'Centro',
-    city: 'São Lourenço', // TODO: Update with real city
+    city: 'São Lourenço',
     state: 'MG',
-    zipCode: '37470-000', // TODO: Update with real ZIP
+    zipCode: '37470-000',
     country: 'Brasil',
     countryCode: 'BR',
   },
