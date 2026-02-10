@@ -20,7 +20,7 @@ export const COMPANY_INFO = {
   shortDescription: 'Sua voz no SUS',
 
   // URLs
-  url: 'https://www.faladoria.com.br', // TODO: Update with real URL
+  url: 'https://faladoria-web.vercel.app', // TODO: Update with real URL
   logo: '/logo.svg',
   ogImage: '/og-image.jpg', // 1200x630px recommended
 
