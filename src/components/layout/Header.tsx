@@ -41,7 +41,7 @@ export const Header = ({ onSidebarToggle }: HeaderProps) => {
 
           <DesktopNav />
 
-          <WhatsAppCTA className="hidden md:inline-flex" />
+          <WhatsAppCTA className="hidden text-nowrap md:inline-flex" />
 
           <button
             ref={triggerRef}
@@ -78,7 +78,7 @@ const DesktopNav = () => (
         <li key={item.href}>
           <a
             href={item.href}
-            className="text-purple-dark hover:text-purple-medium text-sm font-medium transition-colors lg:text-xl"
+            className="text-purple-dark hover:text-purple-medium text-sm font-medium text-nowrap transition-colors lg:text-xl"
           >
             {item.label}
           </a>
