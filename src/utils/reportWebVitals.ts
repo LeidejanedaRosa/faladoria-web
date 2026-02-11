@@ -18,7 +18,7 @@ export function reportWebVitals(onPerfEntry?: (metric: Metric) => void) {
         console.log(metric)
       } else {
         // Enviar para Google Analytics, Sentry, ou seu serviço
-        const body = JSON.stringify(metric)
+        // const body = JSON.stringify(metric)
 
         // Exemplo: Google Analytics
         if (window.gtag) {
@@ -32,10 +32,10 @@ export function reportWebVitals(onPerfEntry?: (metric: Metric) => void) {
           })
         }
 
-        // Exemplo: endpoint próprio
-        if (navigator.sendBeacon) {
-          navigator.sendBeacon('/api/analytics', body)
-        }
+        // TODO: configurar endpoint próprio quando disponível
+        // if (navigator.sendBeacon) {
+        //   navigator.sendBeacon('/api/analytics', body)
+        // }
       }
     }
 
