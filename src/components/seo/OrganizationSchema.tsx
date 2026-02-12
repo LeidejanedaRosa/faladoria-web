@@ -58,7 +58,7 @@ export function OrganizationSchema() {
     contactPoint: [
       {
         '@type': 'ContactPoint' as const,
-        telephone: contact.phone,
+        telephone: contact.whatsapp,
         email: contact.email,
         contactType: 'customer service',
         availableLanguage: ['Portuguese'],

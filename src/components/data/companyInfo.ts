@@ -27,8 +27,7 @@ export const COMPANY_INFO = {
   // Contact
   contact: {
     email: 'canalfaladoria@gmail.com',
-    phone: '+55 35 997003315',
-    whatsapp: '+5535997003315',
+    whatsapp: '+55 35 997003315',
   },
 
   // Address
@@ -97,7 +96,7 @@ export type CompanyInfo = typeof COMPANY_INFO
  */
 export const hasPlaceholderData = (): boolean => {
   // Check for common placeholder patterns in critical fields
-  const hasPlaceholderPhone = COMPANY_INFO.contact.phone.includes('99999')
+  const hasPlaceholderPhone = COMPANY_INFO.contact.whatsapp.includes('99999')
   const hasPlaceholderEmail =
     /example|example\.com|no-reply|contato@faladoria\.com\.br/i.test(
       COMPANY_INFO.contact.email

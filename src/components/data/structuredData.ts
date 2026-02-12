@@ -75,7 +75,7 @@ export const ORGANIZATION_STRUCTURED_DATA = {
       contactPoint: [
         {
           '@type': 'ContactPoint',
-          telephone: contact.phone,
+          telephone: contact.whatsapp,
           email: contact.email,
           contactType: 'customer service',
           availableLanguage: ['Portuguese'],
