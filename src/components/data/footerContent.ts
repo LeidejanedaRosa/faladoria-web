@@ -16,7 +16,7 @@ export interface FooterLinkGroup {
 
 export interface FooterContactItem {
   id: string
-  iconName: 'email' | 'phone' | 'location'
+  iconName: 'email' | 'whatsapp' | 'location'
   label: string
   href?: string
   ariaLabel?: string
@@ -63,11 +63,11 @@ export const FOOTER_CONTENT = {
         ariaLabel: `Enviar e-mail para ${COMPANY_INFO.contact.email}`,
       },
       {
-        id: 'contact-phone',
-        iconName: 'phone',
-        label: COMPANY_INFO.contact.phone,
-        href: `tel:+${COMPANY_INFO.contact.phone.replace(/\D/g, '')}`,
-        ariaLabel: `Ligar para ${COMPANY_INFO.contact.phone}`,
+        id: 'contact-whatsapp',
+        iconName: 'whatsapp',
+        label: 'Fale com a gente',
+        href: `https://wa.me/${COMPANY_INFO.contact.whatsapp.replace(/\D/g, '')}`,
+        ariaLabel: `Enviar mensagem pelo WhatsApp para ${COMPANY_INFO.contact.phone}`,
       },
       {
         id: 'contact-address',

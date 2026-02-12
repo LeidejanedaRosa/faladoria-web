@@ -3,7 +3,7 @@ import type { ComponentType } from 'react'
 import type { FooterContactItem } from '@components/data/footerContent'
 import { FOOTER_CONTENT } from '@components/data/footerContent'
 import type { IconProps } from '@/types/icon'
-import { EmailIcon, LocationIcon, PhoneIcon } from '@components/ui/icons'
+import { EmailIcon, LocationIcon, WhatsAppIcon } from '@components/ui/icons'
 
 import { FOOTER_FOCUS_RING } from './footerStyles'
 
@@ -12,7 +12,7 @@ const ICON_MAP: Record<
   ComponentType<IconProps>
 > = {
   email: EmailIcon,
-  phone: PhoneIcon,
+  whatsapp: WhatsAppIcon,
   location: LocationIcon,
 }
 
@@ -27,12 +27,18 @@ const ContactItem = ({ item }: { item: FooterContactItem }) => {
   )
 
   if (item.href) {
+    const isExternal = item.href.startsWith('http')
+
     return (
       <li>
         <a
           href={item.href}
           className={`text-lavender inline-flex items-start gap-3 text-sm transition-colors hover:text-white focus:text-white ${FOOTER_FOCUS_RING}`}
           aria-label={item.ariaLabel}
+          {...(isExternal && {
+            target: '_blank',
+            rel: 'noopener noreferrer',
+          })}
         >
           {content}
         </a>
