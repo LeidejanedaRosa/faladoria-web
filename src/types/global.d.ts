@@ -1,5 +1,7 @@
 /// <reference types="vite/client" />
 
+declare module '@fontsource-variable/inter'
+
 interface ImportMetaEnv {
   readonly VITE_APP_NAME: string
   readonly VITE_APP_ENV: string
