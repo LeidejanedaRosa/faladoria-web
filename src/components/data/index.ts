@@ -12,6 +12,7 @@ export {
   ORGANIZATION_STRUCTURED_DATA,
   HOMEPAGE_BREADCRUMB,
   createBreadcrumb,
+  createFaqStructuredData,
 } from './structuredData'
 export type { BreadcrumbItem } from './structuredData'
 
@@ -41,6 +42,9 @@ export type {
 
 export { ABOUT_HEADING_ID, ABOUT_CONTENT } from './aboutContent'
 export type { Partnership } from './aboutContent'
+
+export { FAQ_HEADING_ID, FAQ_CONTENT } from './faqContent'
+export type { FaqItem } from './faqContent'
 
 export { FOOTER_HEADING_ID, FOOTER_CONTENT } from './footerContent'
 export type {

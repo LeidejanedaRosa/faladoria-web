@@ -1,12 +1,15 @@
 import { useState } from 'react'
 
 import {
+  createFaqStructuredData,
+  FAQ_CONTENT,
   HOMEPAGE_BREADCRUMB,
   ORGANIZATION_STRUCTURED_DATA,
 } from '@components/data'
 import { FooterSection, Header } from '@components/layout'
 import {
   AboutSection,
+  FaqSection,
   HeroSection,
   HowItWorksSection,
   ProblemSection,
@@ -22,6 +25,7 @@ export function HomePage() {
   return (
     <>
       <JsonLdScript data={ORGANIZATION_STRUCTURED_DATA} />
+      <JsonLdScript data={createFaqStructuredData(FAQ_CONTENT.items)} />
       <BreadcrumbSchema items={HOMEPAGE_BREADCRUMB} />
       <SkipLink href="#main-content">Pular para o conteúdo principal</SkipLink>
       <div>
@@ -34,6 +38,7 @@ export function HomePage() {
             <HowItWorksSection />
             <TransparencySection />
             <AboutSection />
+            <FaqSection />
           </MainContent>
           <FooterSection />
         </div>

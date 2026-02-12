@@ -3,6 +3,7 @@ export const SECTION_IDS = {
   solution: 'solucao',
   howItWorks: 'como-funciona',
   transparency: 'transparencia',
+  faq: 'perguntas-frequentes',
   contact: 'contato',
 } as const
 
@@ -11,5 +12,6 @@ export const NAV_ITEMS = [
   { label: 'Solução', href: `/#${SECTION_IDS.solution}` },
   { label: 'Como funciona', href: `/#${SECTION_IDS.howItWorks}` },
   { label: 'Transparência', href: `/#${SECTION_IDS.transparency}` },
+  { label: 'Dúvidas', href: `/#${SECTION_IDS.faq}` },
   { label: 'Contato', href: `/#${SECTION_IDS.contact}` },
 ] as const
