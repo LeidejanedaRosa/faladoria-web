@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
   createFaqStructuredData,
@@ -21,6 +21,18 @@ import { MainContent, SkipLink } from '@components/ui'
 
 export function HomePage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+  useEffect(() => {
+    const hash = window.location.hash
+    if (hash) {
+      requestAnimationFrame(() => {
+        const element = document.querySelector(hash)
+        if (element) {
+          element.scrollIntoView({ behavior: 'instant' })
+        }
+      })
+    }
+  }, [])
 
   return (
     <>
