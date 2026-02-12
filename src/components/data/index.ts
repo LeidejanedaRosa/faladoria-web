@@ -50,3 +50,8 @@ export type {
 } from './footerContent'
 
 export { SECTION_IDS, NAV_ITEMS } from './navigation'
+
+export { PRIVACY_POLICY_CONTENT } from './privacyPolicyContent'
+export type { LegalSection } from './privacyPolicyContent'
+
+export { TERMS_OF_USE_CONTENT } from './termsOfUseContent'
