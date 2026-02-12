@@ -79,7 +79,7 @@ const HeroCTAs = () => (
     </AccessibleLink>
 
     <AccessibleLink
-      href={`#${SECTION_IDS.transparency}`}
+      href={`/#${SECTION_IDS.transparency}`}
       className="focus:ring-offset-purple-medium inline-flex items-center gap-2 rounded-full border-2 border-white/40 px-6 py-3 text-base font-semibold text-white transition-colors hover:border-white hover:bg-white/10 focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:outline-none"
       aria-label="Ver dados em tempo real - ir para seção de transparência"
     >

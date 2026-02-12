@@ -58,10 +58,10 @@ describe('Header', () => {
       })
 
       const expectedLinks = [
-        { label: 'Quem somos', href: '#quem-somos' },
-        { label: 'Como funciona', href: '#como-funciona' },
-        { label: 'Transparência', href: '#transparencia' },
-        { label: 'Contato', href: '#contato' },
+        { label: 'Quem somos', href: '/#quem-somos' },
+        { label: 'Como funciona', href: '/#como-funciona' },
+        { label: 'Transparência', href: '/#transparencia' },
+        { label: 'Contato', href: '/#contato' },
       ]
 
       expectedLinks.forEach(({ label, href }) => {
