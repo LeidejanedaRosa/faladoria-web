@@ -1,4 +1,5 @@
 import { COMPANY_INFO } from './companyInfo'
+import type { FaqItem } from './faqContent'
 
 /**
  * Structured Data Constants
@@ -153,4 +154,27 @@ export const createBreadcrumb = (items: BreadcrumbItem[]): BreadcrumbItem[] => {
           }),
     }
   })
+}
+
+/**
+ * FAQPage Structured Data Factory
+ *
+ * Generates Schema.org FAQPage markup for rich snippets in search results.
+ *
+ * @see https://schema.org/FAQPage
+ * @see https://developers.google.com/search/docs/appearance/structured-data/faqpage
+ */
+export function createFaqStructuredData(items: readonly FaqItem[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: items.map(item => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  }
 }
