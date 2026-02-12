@@ -53,6 +53,8 @@ const PillarGrid = () => (
         key={pillar.id}
         icon={pillar.icon}
         iconAlt={pillar.iconAlt}
+        iconWidth={pillar.iconWidth}
+        iconHeight={pillar.iconHeight}
         title={pillar.title}
         description={pillar.description}
       />
@@ -63,25 +65,31 @@ const PillarGrid = () => (
 const PillarCard = ({
   icon,
   iconAlt,
+  iconWidth,
+  iconHeight,
   title,
   description,
 }: {
   icon: string
   iconAlt: string
+  iconWidth: number
+  iconHeight: number
   title: string
   description: string
 }) => {
   return (
     <li className="bg-gray-light flex flex-col items-center gap-4 rounded-2xl p-8 text-center">
-      <img
-        src={icon}
-        alt={iconAlt}
-        width={64}
-        height={64}
-        loading="lazy"
-        decoding="async"
-        className="h-16 w-16"
-      />
+      <div className="flex h-16 w-16 items-center justify-center">
+        <img
+          src={icon}
+          alt={iconAlt}
+          width={iconWidth}
+          height={iconHeight}
+          loading="lazy"
+          decoding="async"
+          className="h-16 w-auto"
+        />
+      </div>
       <h4 className="text-purple-dark text-lg font-semibold sm:text-xl">
         {title}
       </h4>
