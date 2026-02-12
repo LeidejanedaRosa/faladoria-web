@@ -94,13 +94,12 @@ test.describe('FooterSection', () => {
       expect(text).toMatch(/@/)
     })
 
-    test('should render contact phone', async ({ page }) => {
+    test('should render contact whatsapp', async ({ page }) => {
       const footer = page.locator(FOOTER_SECTION)
-      const phoneLink = footer.locator('a[href^="tel:"]')
+      const whatsappLink = footer.locator('a[href^="https://wa.me/"]')
 
-      await expect(phoneLink).toBeVisible()
-      const text = await phoneLink.textContent()
-      expect(text).toMatch(/\+55/)
+      await expect(whatsappLink).toBeVisible()
+      await expect(whatsappLink).toContainText('Fale com a gente')
     })
 
     test('should render contact address', async ({ page }) => {
@@ -204,8 +203,8 @@ test.describe('FooterSection', () => {
       const emailLink = footer.locator('a[href^="mailto:"]')
       await expect(emailLink).toHaveAttribute('aria-label', /e-mail/)
 
-      const phoneLink = footer.locator('a[href^="tel:"]')
-      await expect(phoneLink).toHaveAttribute('aria-label', /Ligar/)
+      const whatsappLink = footer.locator('a[href^="https://wa.me/"]')
+      await expect(whatsappLink).toHaveAttribute('aria-label', /WhatsApp/)
     })
 
     test('should have proper href for email link', async ({ page }) => {
@@ -216,12 +215,20 @@ test.describe('FooterSection', () => {
       expect(href).toMatch(/^mailto:.+@.+\..+$/)
     })
 
-    test('should have proper href for phone link', async ({ page }) => {
+    test('should have proper href for whatsapp link', async ({ page }) => {
       const footer = page.locator(FOOTER_SECTION)
-      const phoneLink = footer.locator('a[href^="tel:"]')
+      const whatsappLink = footer.locator('a[href^="https://wa.me/"]')
 
-      const href = await phoneLink.getAttribute('href')
-      expect(href).toMatch(/^tel:\+\d+$/)
+      const href = await whatsappLink.getAttribute('href')
+      expect(href).toMatch(/^https:\/\/wa\.me\/\d+$/)
+    })
+
+    test('should open whatsapp link in new tab', async ({ page }) => {
+      const footer = page.locator(FOOTER_SECTION)
+      const whatsappLink = footer.locator('a[href^="https://wa.me/"]')
+
+      await expect(whatsappLink).toHaveAttribute('target', '_blank')
+      await expect(whatsappLink).toHaveAttribute('rel', /noopener/)
     })
 
     test('should have id for anchor navigation from header', async ({
@@ -272,7 +279,7 @@ test.describe('FooterSection', () => {
 
     test.describe('Tablet', () => {
       test.beforeEach(async ({ page }) => {
-        await page.setViewportSize({ width: 640, height: 900 })
+        await page.setViewportSize({ width: 660, height: 900 })
         await page.goto('/', { waitUntil: 'domcontentloaded' })
         await page.locator(FOOTER_SECTION).waitFor({ timeout: 15000 })
       })
