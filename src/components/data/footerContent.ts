@@ -45,7 +45,7 @@ export const FOOTER_CONTENT = {
       title: 'Suporte',
       ariaLabel: 'Links de suporte',
       links: [
-        { label: 'Perguntas frequentes', href: '/#faq' },
+        { label: 'Perguntas frequentes', href: `/#${SECTION_IDS.faq}` },
         { label: 'Política de privacidade', href: '/politica-de-privacidade' },
         { label: 'Termos de uso', href: '/termos-de-uso' },
       ],
