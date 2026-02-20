@@ -136,7 +136,7 @@ test.describe('GuideHighlightSection', () => {
       await expect(h3s).toHaveCount(3)
     })
 
-    test('should have focus indicators on all interactive elements', async ({
+    test('should have expected number of interactive elements', async ({
       page,
     }) => {
       const section = page.locator(GUIDE_HIGHLIGHT)
