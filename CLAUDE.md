@@ -91,6 +91,16 @@ src/
 
 **Splitting criterion**: If only one feature uses it → goes into that feature. If two or more features use it → goes into `shared/`.
 
+**Internal subfolder criterion**: Features organize their `components/` directory based on the nature of their components — not by count:
+
+| Subfolder              | When to use                                                                                       |
+| ---------------------- | ------------------------------------------------------------------------------------------------- |
+| `components/sections/` | Components that are vertical page-layout blocks (Hero, Problem, CTA, etc.)                        |
+| `components/forms/`    | When the feature has multiple distinct form components                                            |
+| `components/` (flat)   | Components that don't share a common structural role — keep flat until a natural grouping emerges |
+
+Add a `hooks/` subdirectory only when the feature has more than one custom hook. A single hook lives directly in the feature root (e.g., `features/guide/useGuide.ts`), alongside `index.ts`. The target structure shows `hooks/` in `auth/` and `dashboard/` because those features are expected to have multiple hooks by nature.
+
 ## Naming Conventions
 
 ### Language
