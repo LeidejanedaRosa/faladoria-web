@@ -134,7 +134,7 @@ describe('Header', () => {
       })
       const list = within(desktopNav).getByRole('list')
       const items = within(list).getAllByRole('listitem')
-      expect(items).toHaveLength(6)
+      expect(items).toHaveLength(7)
     })
   })
 
