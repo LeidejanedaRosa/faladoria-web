@@ -38,43 +38,58 @@ src/
 │   └── ui/            # Reusable UI components
 │       ├── icons/     # Icon components
 │       └── __tests__/ # Component tests
+├── features/
+│   └── guide/         # Guia do SUS — multi-page feature with its own components, data and pages
+├── hooks/             # Custom hooks (useDocumentMeta, useScrollToTop, etc.)
 ├── lib/               # External service configurations (Sentry, etc.)
 ├── test/              # Test utilities and setup
 ├── types/             # TypeScript type definitions
 └── utils/             # Utility functions
 ```
 
-### Target Structure (When Dashboard Development Begins)
+**Rule for `features/`**: Use for any multi-page, multi-component domain that has its own routing, data and internal state — even during the landing phase. Each feature must expose a clean public API through its `index.ts`; other modules must never import from internal paths.
 
-Refactor to module-based architecture when starting dashboard/auth implementation:
+### Target Structure (Before Dashboard Development Begins)
+
+Migrate to feature-based architecture **before** starting auth/dashboard implementation, so the codebase is consistent from the start:
 
 ```
 src/
-├── modules/
+├── features/
 │   ├── landing/
 │   │   ├── components/
+│   │   │   └── sections/
+│   │   ├── data/
 │   │   └── pages/
-│   ├── auth/
+│   ├── guide/              # already exists
+│   │   ├── components/
+│   │   ├── data/
+│   │   └── pages/
+│   ├── auth/               # future
 │   │   ├── components/
 │   │   ├── hooks/
 │   │   └── pages/
-│   └── dashboard/
+│   └── dashboard/          # future
 │       ├── components/
 │       ├── hooks/
 │       └── pages/
 ├── shared/
 │   ├── components/
-│   │   ├── ui/        # Buttons, inputs, etc.
-│   │   ├── layout/    # Container, etc.
-│   │   └── error/     # Error boundaries
-│   ├── hooks/
-│   ├── lib/           # Sentry, etc.
+│   │   ├── ui/             # Buttons, inputs, icons, etc.
+│   │   ├── layout/         # Container, etc.
+│   │   ├── error/          # Error boundaries
+│   │   └── seo/            # JsonLd, schemas
+│   ├── data/               # Global constants (COMPANY_INFO, etc.)
+│   ├── hooks/              # Shared hooks
+│   ├── lib/                # Sentry, etc.
 │   ├── types/
 │   └── utils/
 └── test/
 ```
 
-**Migration trigger**: When creating the first auth or dashboard component.
+**Migration trigger**: Before writing the first auth or dashboard component. The migration is a dedicated task — not done alongside feature development.
+
+**Splitting criterion**: If only one feature uses it → goes into that feature. If two or more features use it → goes into `shared/`.
 
 ## Naming Conventions
 
