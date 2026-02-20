@@ -3,7 +3,7 @@ import type { ComponentType } from 'react'
 import type { FooterContactItem } from '@components/data/footerContent'
 import { FOOTER_CONTENT } from '@components/data/footerContent'
 import type { IconProps } from '@/types/icon'
-import { EmailIcon, LocationIcon, WhatsAppIcon } from '@components/ui/icons'
+import { EmailIcon, LocationIcon, WhatsAppIcon } from '@components/ui'
 
 import { FOOTER_FOCUS_RING } from './footerStyles'
 

@@ -1,5 +1,5 @@
 import { TRANSPARENCY_CONTENT } from '@components/data/transparencyContent'
-import { ChartIcon } from '@components/ui/icons'
+import { ChartIcon } from '@components/ui'
 
 export const TransparencyHeader = () => (
   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

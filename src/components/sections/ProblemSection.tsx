@@ -6,7 +6,7 @@ import {
 import { Container } from '@components/layout/Container'
 import { AccessibleLink, ScreenReaderOnly } from '@components/ui/Accessibility'
 import { WhatsAppCTA } from '@components/ui/WhatsAppCTA'
-import { PersonIcon } from '@components/ui/icons'
+import { PersonIcon } from '@components/ui'
 
 export const ProblemSection = () => {
   return (

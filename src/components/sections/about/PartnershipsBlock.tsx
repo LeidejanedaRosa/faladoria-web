@@ -1,11 +1,6 @@
 import { ABOUT_CONTENT } from '@components/data/aboutContent'
 import type { Partnership } from '@components/data/aboutContent'
-import {
-  ActivityIcon,
-  ChatIcon,
-  ChartIcon,
-  LocationIcon,
-} from '@components/ui/icons'
+import { ActivityIcon, ChartIcon, ChatIcon, LocationIcon } from '@components/ui'
 import type { IconProps } from '@/types/icon'
 import type { ComponentType } from 'react'
 

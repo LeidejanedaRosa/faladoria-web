@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 
 import { WHATSAPP_URL } from '@components/data/companyInfo'
 import { AccessibleLink } from '@components/ui'
-import { WhatsAppIcon } from '@components/ui/icons'
+import { WhatsAppIcon } from './icons'
 import { cn } from '@utils/cn'
 
 const VARIANT_STYLES = {

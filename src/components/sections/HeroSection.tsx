@@ -5,7 +5,7 @@ import { HERO_CONTENT, HERO_HEADING_ID } from '@components/data/heroContent'
 import { SECTION_IDS } from '@components/data/navigation'
 import { Container } from '@components/layout/Container'
 import { AccessibleLink, ScreenReaderOnly } from '@components/ui/Accessibility'
-import { ActivityIcon, WhatsAppIcon } from '@components/ui/icons'
+import { ActivityIcon, WhatsAppIcon } from '@components/ui'
 
 export const HeroSection = () => {
   return (

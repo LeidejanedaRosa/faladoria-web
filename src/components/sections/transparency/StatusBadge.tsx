@@ -2,7 +2,7 @@ import {
   STATUS_CONFIG,
   type InteractionStatus,
 } from '@components/data/transparencyContent'
-import { StatusIcon } from '@components/ui/icons'
+import { StatusIcon } from '@components/ui'
 
 const SIZE_STYLES = {
   sm: 'px-2.5 py-0.5',

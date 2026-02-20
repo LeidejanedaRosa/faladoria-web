@@ -2,7 +2,7 @@ import {
   TRANSPARENCY_CONTENT,
   type Interaction,
 } from '@components/data/transparencyContent'
-import { ChatIcon, LocationIcon } from '@components/ui/icons'
+import { ChatIcon, LocationIcon } from '@components/ui'
 import { StatusBadge } from './StatusBadge'
 
 export const InteractionsPanel = () => (

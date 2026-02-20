@@ -18,4 +18,24 @@ export { LoadingSpinner, SectionSkeleton } from './Loading'
 export { WhatsAppCTA } from './WhatsAppCTA'
 
 // Icons
-export { CloseIcon, MenuIcon, PauseIcon, PlayIcon, WhatsAppIcon } from './icons'
+export {
+  ActivityIcon,
+  ChartIcon,
+  ChatIcon,
+  ClipboardIcon,
+  CloseIcon,
+  EmailIcon,
+  HeartIcon,
+  LocationIcon,
+  MegaphoneIcon,
+  MenuIcon,
+  PauseIcon,
+  PersonIcon,
+  PhoneIcon,
+  PlayIcon,
+  SearchIcon,
+  ShieldIcon,
+  StatusIcon,
+  SyringeIcon,
+  WhatsAppIcon,
+} from './icons'
