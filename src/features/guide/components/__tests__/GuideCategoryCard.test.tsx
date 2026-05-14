@@ -11,12 +11,13 @@ const mockCategory: GuideCategory = {
   description:
     'Conheça seus direitos como usuário do SUS e saiba como exigi-los.',
   iconName: 'shield',
+  color: 'purple',
 }
 
-function renderCard(variant?: 'default' | 'highlight') {
+function renderCard() {
   return render(
     <MemoryRouter>
-      <GuideCategoryCard category={mockCategory} variant={variant} />
+      <GuideCategoryCard category={mockCategory} />
     </MemoryRouter>
   )
 }
@@ -29,12 +30,6 @@ describe('GuideCategoryCard', () => {
       expect(
         screen.getByRole('heading', { name: 'Seus Direitos', level: 3 })
       ).toBeInTheDocument()
-    })
-
-    it('should render the category description', () => {
-      renderCard()
-
-      expect(screen.getByText(mockCategory.description)).toBeInTheDocument()
     })
 
     it('should render a link with the category label as accessible name', () => {
@@ -54,33 +49,11 @@ describe('GuideCategoryCard', () => {
       )
     })
 
-    it('should have aria-describedby pointing to the description paragraph', () => {
-      const { container } = renderCard()
-
-      const link = screen.getByRole('link')
-      const descId = `guide-card-desc-${mockCategory.slug}`
-
-      expect(link).toHaveAttribute('aria-describedby', descId)
-      expect(container.querySelector(`#${descId}`)).toHaveTextContent(
-        mockCategory.description
-      )
-    })
-
     it('should render the icon with aria-hidden', () => {
       const { container } = renderCard()
 
       const icon = container.querySelector('svg')
       expect(icon).toHaveAttribute('aria-hidden', 'true')
-    })
-  })
-
-  describe('Variant: highlight', () => {
-    it('should render the category label as h3', () => {
-      renderCard('highlight')
-
-      expect(
-        screen.getByRole('heading', { name: 'Seus Direitos', level: 3 })
-      ).toBeInTheDocument()
     })
   })
 })
