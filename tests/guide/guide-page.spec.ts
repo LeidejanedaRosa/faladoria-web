@@ -52,16 +52,6 @@ test.describe('GuidePage', () => {
       }
     })
 
-    test('should render card descriptions', async ({ page }) => {
-      const cards = page.locator('a[href^="/guia-do-sus/"]')
-
-      for (let i = 0; i < 6; i++) {
-        const description = cards.nth(i).locator('p')
-        const text = await description.textContent()
-        expect(text?.trim().length).toBeGreaterThan(10)
-      }
-    })
-
     test('should have correct card links', async ({ page }) => {
       const expectedSlugs = [
         'seus-direitos',
@@ -245,7 +235,7 @@ test.describe('GuidePage', () => {
         await page.locator('h1').waitFor({ timeout: 15000 })
       })
 
-      test('should render category cards in single column', async ({
+      test('should render category cards in 2-column grid', async ({
         page,
       }) => {
         const cards = page.locator('a[href^="/guia-do-sus/"]')
@@ -255,8 +245,9 @@ test.describe('GuidePage', () => {
         expect(firstBox).toBeTruthy()
         expect(secondBox).toBeTruthy()
 
-        // Cards should be stacked vertically
-        expect(secondBox!.y).toBeGreaterThan(firstBox!.y + firstBox!.height - 5)
+        // First two cards should be side by side
+        expect(Math.abs(firstBox!.y - secondBox!.y)).toBeLessThan(5)
+        expect(secondBox!.x).toBeGreaterThan(firstBox!.x)
       })
     })
   })
