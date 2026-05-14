@@ -48,8 +48,8 @@ export const GuideHighlightSection = () => {
           <img
             src={bannerImg}
             alt="Mulher com megafone representando o poder da informação no acesso ao SUS"
-            width={1966}
-            height={492}
+            width={1280}
+            height={720}
             loading="lazy"
             className="aspect-video w-full rounded-2xl object-cover object-left shadow-lg"
           />
