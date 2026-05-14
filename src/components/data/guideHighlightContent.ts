@@ -4,7 +4,7 @@ export const GUIDE_HIGHLIGHT_CONTENT = {
   badge: 'Conteúdo gratuito',
   headline: 'Como conseguir pelo SUS',
   description:
-    'Um guia prático e completo para você acessar seus direitos na saúde pública. Saiba como conseguir consultas, exames, vacinas e muito mais.',
+    'Saúde pública é um direito. Saiba como conseguir consultas, exames, cirurgias, vacinas e medicamentos pelo SUS.',
 
   cta: {
     label: 'Explorar o Guia',
