@@ -1,9 +1,8 @@
-import { useEffect } from 'react'
-
-import { COMPANY_INFO } from '@shared/data/companyInfo'
 import { createBreadcrumb } from '@shared/data/structuredData'
 import { Container, PageShell } from '@shared/components/layout'
 import { BreadcrumbSchema } from '@shared/components/seo'
+import { useDocumentMeta } from '@shared/hooks/useDocumentMeta'
+import { useScrollToTop } from '@shared/hooks/useScrollToTop'
 
 import type { LegalSection } from '../data/privacyPolicyContent'
 
@@ -18,10 +17,8 @@ export function LegalPageLayout({
   lastUpdated,
   sections,
 }: LegalPageLayoutProps) {
-  useEffect(() => {
-    document.title = COMPANY_INFO.seo.titleTemplate.replace('%s', title)
-    window.scrollTo(0, 0)
-  }, [title])
+  useDocumentMeta({ title })
+  useScrollToTop()
 
   const breadcrumbItems = createBreadcrumb([
     { name: 'Início', url: '/' },
