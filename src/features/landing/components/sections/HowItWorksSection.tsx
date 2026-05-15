@@ -19,7 +19,7 @@ export const HowItWorksSection = () => {
         </h2>
       </ScreenReaderOnly>
 
-      <Container className="flex flex-col gap-12 py-16 sm:gap-16 sm:py-20 lg:gap-20 lg:py-11">
+      <Container className="flex flex-col gap-12 py-16 sm:gap-16 sm:py-20 lg:gap-20 lg:py-24">
         <HowItWorksHeader />
         <StepsGrid />
       </Container>
