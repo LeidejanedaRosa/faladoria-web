@@ -51,6 +51,7 @@ test.describe('AboutSection', () => {
       await expect(
         about.getByText('o poder maior, está nas mãos da população')
       ).toBeVisible()
+      await expect(about.getByText('direitos respeitados.')).toBeVisible()
       await expect(about.getByText('conta com você.')).toBeVisible()
     })
 
