@@ -8,8 +8,10 @@ export { WhatsAppCTA } from './WhatsAppCTA'
 
 export {
   ActivityIcon,
+  BuildingIcon,
   ChartIcon,
   ChatIcon,
+  ChevronRightIcon,
   ClipboardIcon,
   CloseIcon,
   EmailIcon,
@@ -22,9 +24,11 @@ export {
   PersonIcon,
   PhoneIcon,
   PlayIcon,
+  QuestionIcon,
   SearchIcon,
   ShieldIcon,
   SyringeIcon,
+  TargetIcon,
   UsersIcon,
   WhatsAppIcon,
 } from './icons'
