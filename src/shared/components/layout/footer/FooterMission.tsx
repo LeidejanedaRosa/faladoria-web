@@ -46,11 +46,9 @@ const MissionIllustration = () => (
 )
 
 export const FooterMission = () => {
-  const highlight = FOOTER_CONTENT.missionHighlight
-  const prefix = FOOTER_CONTENT.mission.slice(
-    0,
-    FOOTER_CONTENT.mission.lastIndexOf(highlight)
-  )
+  const { mission, missionHighlight: highlight } = FOOTER_CONTENT
+  const idx = mission.lastIndexOf(highlight)
+  const prefix = idx !== -1 ? mission.slice(0, idx) : mission
 
   return (
     <div className="bg-purple-deep mt-8 rounded-xl border border-white/10 p-6 lg:p-8">
