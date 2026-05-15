@@ -40,7 +40,7 @@ export const FounderTraits = () => {
                     {segment.text}
                   </strong>
                 ) : (
-                  segment.text
+                  <span key={index}>{segment.text}</span>
                 )
               )}
             </p>
