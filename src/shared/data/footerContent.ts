@@ -8,9 +8,12 @@ export interface FooterLink {
   href: string
 }
 
+export type FooterNavIconName = 'building' | 'question'
+
 export interface FooterLinkGroup {
   title: string
   ariaLabel: string
+  iconName: FooterNavIconName
   links: FooterLink[]
 }
 
@@ -30,13 +33,18 @@ export const FOOTER_CONTENT = {
   tagline:
     'Conectando cidadãos à gestão pública para um SUS melhor para todos.',
 
+  missionLabel: 'Nossa Missão',
+
   mission:
     'Facilitar o acesso à saúde pública garantindo informação organizada, mediação eficiente e busca ativa por soluções para os usuários do SUS.',
+
+  missionHighlight: 'usuários do SUS.',
 
   linkGroups: [
     {
       title: 'Institucional',
       ariaLabel: 'Links institucionais',
+      iconName: 'building',
       links: [
         { label: 'Quem somos', href: `/#${SECTION_IDS.aboutUs}` },
         { label: 'Solução', href: `/#${SECTION_IDS.solution}` },
@@ -47,6 +55,7 @@ export const FOOTER_CONTENT = {
     {
       title: 'Suporte',
       ariaLabel: 'Links de suporte',
+      iconName: 'question',
       links: [
         { label: 'Perguntas frequentes', href: `/#${SECTION_IDS.faq}` },
         { label: 'Política de privacidade', href: '/politica-de-privacidade' },
