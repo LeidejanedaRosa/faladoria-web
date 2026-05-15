@@ -42,43 +42,30 @@ class ErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Em produção, enviar erro para o Sentry com contexto completo
     if (import.meta.env.PROD) {
       Sentry.withScope(scope => {
-        // Tags para facilitar filtragem no Sentry
         scope.setTag('errorBoundary', 'custom')
         scope.setTag('environment', import.meta.env.MODE)
-
-        // Contexto adicional sobre o erro
         scope.setContext('errorInfo', {
           componentStack: errorInfo.componentStack,
           timestamp: new Date().toISOString(),
           userAgent: navigator.userAgent,
           url: window.location.href,
         })
-
-        // Nível do erro
         scope.setLevel('error')
-
-        // Capturar exceção no Sentry
         Sentry.captureException(error)
       })
     }
 
-    // Em desenvolvimento, log do erro para debugging
     if (import.meta.env.DEV) {
       console.error('ErrorBoundary caught an error:', error, errorInfo)
     }
 
-    // Chama callback personalizado se fornecido
     if (this.props.onError) {
       this.props.onError(error, errorInfo)
     }
 
-    this.setState({
-      error,
-      errorInfo,
-    })
+    this.setState({ error, errorInfo })
   }
 
   render() {
@@ -126,7 +113,7 @@ class ErrorBoundary extends React.Component<
             <div className="flex flex-col gap-2">
               <button
                 onClick={this.resetError}
-                className="bg-primary-600 hover:bg-primary-700 w-full rounded-md px-4 py-2 font-medium text-white transition-colors duration-200"
+                className="bg-purple-dark hover:bg-purple-medium w-full rounded-md px-4 py-2 font-medium text-white transition-colors duration-200"
                 type="button"
               >
                 Tentar novamente
