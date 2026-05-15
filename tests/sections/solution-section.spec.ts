@@ -44,16 +44,16 @@ test.describe('SolutionSection', () => {
       await expect(subtitle).toBeVisible()
     })
 
-    test('should render exactly 4 pillar cards', async ({ page }) => {
+    test('should render exactly 5 differentials', async ({ page }) => {
       const section = page.locator(
         'section[aria-labelledby="solution-heading"]'
       )
       const pillars = section.locator('ul > li')
 
-      await expect(pillars).toHaveCount(4)
+      await expect(pillars).toHaveCount(5)
     })
 
-    test('should render each pillar with icon, title and description', async ({
+    test('should render each differential with an icon, title and description', async ({
       page,
     }) => {
       const section = page.locator(
@@ -63,23 +63,29 @@ test.describe('SolutionSection', () => {
 
       for (let i = 0; i < 4; i++) {
         const pillar = pillars.nth(i)
-
         await expect(pillar.locator('img')).toBeVisible()
         await expect(pillar.locator('h4')).toBeVisible()
         await expect(pillar.locator('p')).toBeVisible()
       }
+
+      // 5th differential uses an SVG icon instead of an img
+      const lastPillar = pillars.nth(4)
+      await expect(lastPillar.locator('svg')).toBeVisible()
+      await expect(lastPillar.locator('h4')).toBeVisible()
+      await expect(lastPillar.locator('p')).toBeVisible()
     })
 
-    test('should render all 4 pillar titles', async ({ page }) => {
+    test('should render all 5 differential titles', async ({ page }) => {
       const section = page.locator(
         'section[aria-labelledby="solution-heading"]'
       )
       const titles = section.locator('ul h4')
 
-      await expect(titles.nth(0)).toContainText('Canal independente')
-      await expect(titles.nth(1)).toContainText('Mediação ativa')
+      await expect(titles.nth(0)).toContainText('Independência total')
+      await expect(titles.nth(1)).toContainText('Atuação ativa')
       await expect(titles.nth(2)).toContainText('Transparência')
-      await expect(titles.nth(3)).toContainText('Relatórios estratégicos')
+      await expect(titles.nth(3)).toContainText('Foco na solução')
+      await expect(titles.nth(4)).toContainText('Acessibilidade')
     })
   })
 
@@ -98,7 +104,7 @@ test.describe('SolutionSection', () => {
       expect(text).toContain('solução')
     })
 
-    test('should have descriptive alt text on all pillar icons', async ({
+    test('should have descriptive alt text on image icons', async ({
       page,
     }) => {
       const section = page.locator(
@@ -116,7 +122,9 @@ test.describe('SolutionSection', () => {
       }
     })
 
-    test('should use semantic list markup for pillars', async ({ page }) => {
+    test('should use semantic list markup for differentials', async ({
+      page,
+    }) => {
       const section = page.locator(
         'section[aria-labelledby="solution-heading"]'
       )
@@ -125,7 +133,7 @@ test.describe('SolutionSection', () => {
       await expect(list).toBeVisible()
 
       const items = list.locator('> li')
-      await expect(items).toHaveCount(4)
+      await expect(items).toHaveCount(5)
     })
 
     test('should maintain proper heading hierarchy (h3 > h4)', async ({
@@ -138,12 +146,14 @@ test.describe('SolutionSection', () => {
       const h4s = section.locator('h4')
 
       await expect(h3).toHaveCount(1)
-      await expect(h4s).toHaveCount(4)
+      await expect(h4s).toHaveCount(5)
     })
   })
 
   test.describe('Responsive Layout', () => {
-    test('should stack pillar cards vertically on mobile', async ({ page }) => {
+    test('should stack differential cards vertically on mobile', async ({
+      page,
+    }) => {
       await page.setViewportSize({ width: 375, height: 667 })
 
       const section = page.locator(
@@ -161,7 +171,7 @@ test.describe('SolutionSection', () => {
       expect(secondBounds!.y).toBeGreaterThan(firstBounds!.y)
     })
 
-    test('should display pillar cards in 2 columns on tablet', async ({
+    test('should display differential cards in 2 columns on tablet', async ({
       page,
     }) => {
       await page.setViewportSize({ width: 768, height: 1024 })
@@ -186,7 +196,7 @@ test.describe('SolutionSection', () => {
       expect(thirdBounds!.y).toBeGreaterThan(firstBounds!.y)
     })
 
-    test('should display all 4 pillar cards in a row on desktop', async ({
+    test('should display all 5 differential cards in a row on desktop', async ({
       page,
     }) => {
       await page.setViewportSize({ width: 1440, height: 900 })
@@ -196,20 +206,16 @@ test.describe('SolutionSection', () => {
       )
       const pillars = section.locator('ul > li')
 
-      const firstBounds = await pillars.nth(0).boundingBox()
-      const secondBounds = await pillars.nth(1).boundingBox()
-      const thirdBounds = await pillars.nth(2).boundingBox()
-      const fourthBounds = await pillars.nth(3).boundingBox()
+      const bounds = await Promise.all(
+        Array.from({ length: 5 }, (_, i) => pillars.nth(i).boundingBox())
+      )
 
-      expect(firstBounds).toBeTruthy()
-      expect(secondBounds).toBeTruthy()
-      expect(thirdBounds).toBeTruthy()
-      expect(fourthBounds).toBeTruthy()
+      bounds.forEach(b => expect(b).toBeTruthy())
 
-      // All 4 should be on the same row
-      expect(firstBounds!.y).toBeCloseTo(secondBounds!.y, -1)
-      expect(secondBounds!.y).toBeCloseTo(thirdBounds!.y, -1)
-      expect(thirdBounds!.y).toBeCloseTo(fourthBounds!.y, -1)
+      // All 5 should be on the same row
+      for (let i = 1; i < 5; i++) {
+        expect(bounds[i]!.y).toBeCloseTo(bounds[0]!.y, -1)
+      }
     })
   })
 })
