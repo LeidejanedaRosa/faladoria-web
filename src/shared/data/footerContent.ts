@@ -30,6 +30,9 @@ export const FOOTER_CONTENT = {
   tagline:
     'Conectando cidadãos à gestão pública para um SUS melhor para todos.',
 
+  mission:
+    'Facilitar o acesso à saúde pública garantindo informação organizada, mediação eficiente e busca ativa por soluções para os usuários do SUS.',
+
   linkGroups: [
     {
       title: 'Institucional',

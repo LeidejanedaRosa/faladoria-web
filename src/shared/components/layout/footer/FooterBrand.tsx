@@ -27,5 +27,9 @@ export const FooterBrand = () => (
     <p className="text-lavender mt-4 max-w-xs text-sm leading-relaxed">
       {FOOTER_CONTENT.tagline}
     </p>
+    <p className="text-lavender/70 mt-3 max-w-xs text-xs leading-relaxed">
+      <span className="text-lavender font-medium">Missão: </span>
+      {FOOTER_CONTENT.mission}
+    </p>
   </div>
 )
