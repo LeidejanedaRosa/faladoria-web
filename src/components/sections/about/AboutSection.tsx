@@ -3,8 +3,7 @@ import { SECTION_IDS } from '@components/data/navigation'
 import { Container } from '@components/layout/Container'
 import { ScreenReaderOnly } from '@components/ui/Accessibility'
 import { FounderPhoto } from './FounderPhoto'
-import { FounderQuote } from './FounderQuote'
-import { PartnershipsBlock } from './PartnershipsBlock'
+import { FounderTraits } from './FounderTraits'
 
 export const AboutSection = () => {
   return (
@@ -14,28 +13,28 @@ export const AboutSection = () => {
       aria-labelledby={ABOUT_HEADING_ID}
     >
       <ScreenReaderOnly asChild>
-        <h2 id={ABOUT_HEADING_ID}>{ABOUT_CONTENT.screenReaderHeading}</h2>
-      </ScreenReaderOnly>
-      <ScreenReaderOnly asChild>
         <p>{ABOUT_CONTENT.screenReaderDescription}</p>
       </ScreenReaderOnly>
 
-      <Container className="flex w-full flex-col py-8">
-        <div className="flex flex-col items-center gap-10 lg:flex-row lg:items-center lg:gap-16">
-          <div className="flex flex-1 flex-col items-center gap-6 text-center lg:items-start lg:text-left">
-            <span
-              className="text-purple-dark text-5xl font-bold sm:px-20 sm:text-6xl lg:px-0"
-              aria-hidden="true"
-            >
-              {ABOUT_CONTENT.headline}
-            </span>
-            <FounderQuote />
+      <Container className="flex w-full flex-col py-12 lg:py-8">
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-16">
+          <div className="flex flex-1 flex-col gap-8">
+            <div>
+              <h2
+                id={ABOUT_HEADING_ID}
+                className="text-purple-dark text-5xl font-bold sm:text-6xl"
+              >
+                {ABOUT_CONTENT.headline}
+              </h2>
+              <div
+                className="bg-purple-dark mt-3 h-1 w-12 rounded-full"
+                aria-hidden="true"
+              />
+            </div>
+            <FounderTraits />
           </div>
-          <FounderPhoto />
-        </div>
 
-        <div className="mt-16 xl:mt-0">
-          <PartnershipsBlock />
+          <FounderPhoto />
         </div>
       </Container>
     </section>

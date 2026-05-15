@@ -41,7 +41,7 @@ export type {
 } from './transparencyContent'
 
 export { ABOUT_HEADING_ID, ABOUT_CONTENT } from './aboutContent'
-export type { Partnership } from './aboutContent'
+export type { FounderInfo, FounderTrait, TextSegment } from './aboutContent'
 
 export { FAQ_HEADING_ID, FAQ_CONTENT } from './faqContent'
 export type { FaqItem } from './faqContent'
