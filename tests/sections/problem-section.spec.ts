@@ -22,6 +22,24 @@ test.describe('ProblemSection', () => {
       await expect(newsHeadline).toContainText('desafios enfrentados')
     })
 
+    test('should render the news description paragraph', async ({ page }) => {
+      const section = page.locator('section[aria-labelledby="problem-heading"]')
+      const description = section.locator('p').filter({
+        hasText: 'Problemas que impactam milhões de brasileiros',
+      })
+
+      await expect(description).toBeVisible()
+    })
+
+    test('should render the separator line below the news headline', async ({
+      page,
+    }) => {
+      const section = page.locator('section[aria-labelledby="problem-heading"]')
+      const separator = section.locator('h3 + div').first()
+
+      await expect(separator).toBeAttached()
+    })
+
     test('should render exactly 3 news article cards', async ({ page }) => {
       const section = page.locator('section[aria-labelledby="problem-heading"]')
       const articles = section.locator('article')
@@ -44,19 +62,22 @@ test.describe('ProblemSection', () => {
       }
     })
 
-    test('should render the statistic value', async ({ page }) => {
-      const section = page.locator('section[aria-labelledby="problem-heading"]')
-      const statValue = section.locator('p[aria-hidden="true"]')
-
-      await expect(statValue).toBeVisible()
-      await expect(statValue).toHaveText('93%')
-    })
-
     test('should render the people grid visualization', async ({ page }) => {
       const section = page.locator('section[aria-labelledby="problem-heading"]')
       const grid = section.locator('[role="img"]')
 
       await expect(grid).toBeVisible()
+    })
+
+    test('should render the caption with emphasis on muitas dificuldades', async ({
+      page,
+    }) => {
+      const section = page.locator('section[aria-labelledby="problem-heading"]')
+      const emphasis = section.locator('strong').filter({
+        hasText: 'muitas dificuldades',
+      })
+
+      await expect(emphasis).toBeVisible()
     })
 
     test('should render the CTA block with h3, description and button', async ({
@@ -78,15 +99,6 @@ test.describe('ProblemSection', () => {
         'a[aria-label="Compartilhar sua experiência no WhatsApp (abre em nova aba)"]'
       )
       await expect(ctaButton).toBeVisible()
-    })
-
-    test('should render the intro description paragraph', async ({ page }) => {
-      const section = page.locator('section[aria-labelledby="problem-heading"]')
-      const intro = section.locator('p').filter({
-        hasText: 'Milhões de brasileiros enfrentam filas',
-      })
-
-      await expect(intro).toBeVisible()
     })
   })
 
@@ -119,17 +131,15 @@ test.describe('ProblemSection', () => {
       }
     })
 
-    test('should render the Datafolha source link as external', async ({
-      page,
-    }) => {
+    test('should render the BBC source link as external', async ({ page }) => {
       const section = page.locator('section[aria-labelledby="problem-heading"]')
       const sourceLink = section.locator('a').filter({
-        hasText: 'Pesquisa Datafolha',
+        hasText: 'BBC News Brasil',
       })
 
       await expect(sourceLink).toHaveAttribute('target', '_blank')
       await expect(sourceLink).toHaveAttribute('rel', 'noopener noreferrer')
-      await expect(sourceLink).toHaveAttribute('href', /poder360\.com\.br/)
+      await expect(sourceLink).toHaveAttribute('href', /bbc\.com/)
     })
   })
 
@@ -143,8 +153,7 @@ test.describe('ProblemSection', () => {
       await expect(srHeading).toBeAttached()
 
       const text = await srHeading.textContent()
-      expect(text).toContain('93%')
-      expect(text).toContain('insatisfeita')
+      expect(text).toContain('dificuldades ao utilizar')
     })
 
     test('should have aria-label on the people grid with descriptive text', async ({
@@ -155,7 +164,7 @@ test.describe('ProblemSection', () => {
 
       await expect(grid).toHaveAttribute(
         'aria-label',
-        /93 de 100 pessoas insatisfeitas/
+        /dificuldades ao utilizar o SUS/
       )
     })
 
@@ -180,27 +189,13 @@ test.describe('ProblemSection', () => {
       }
     })
 
-    test('should have screen-reader-only text alternative for the statistic', async ({
+    test('should hide the quotation mark from screen readers', async ({
       page,
     }) => {
       const section = page.locator('section[aria-labelledby="problem-heading"]')
-      const srText = section.locator('.sr-only').filter({
-        hasText: '93 de 100 pessoas',
-      })
+      const quoteMark = section.locator('blockquote > span[aria-hidden="true"]')
 
-      await expect(srText).toBeAttached()
-
-      const text = await srText.textContent()
-      expect(text).toContain('93 de 100 pessoas')
-    })
-
-    test('should hide the visual statistic value from screen readers', async ({
-      page,
-    }) => {
-      const section = page.locator('section[aria-labelledby="problem-heading"]')
-      const statValue = section.locator('p[aria-hidden="true"]')
-
-      await expect(statValue).toHaveText('93%')
+      await expect(quoteMark).toHaveAttribute('aria-hidden', 'true')
     })
 
     test('should have descriptive aria-labels on all news article links', async ({
@@ -298,7 +293,6 @@ test.describe('ProblemSection', () => {
       expect(firstBounds).toBeTruthy()
       expect(secondBounds).toBeTruthy()
 
-      // On mobile, articles should be stacked (second below first)
       expect(secondBounds!.y).toBeGreaterThan(firstBounds!.y)
     })
 
@@ -316,7 +310,6 @@ test.describe('ProblemSection', () => {
       expect(secondBounds).toBeTruthy()
       expect(thirdBounds).toBeTruthy()
 
-      // On xl desktop, all 3 articles should be on the same row
       expect(firstBounds!.y).toBeCloseTo(secondBounds!.y, -1)
       expect(secondBounds!.y).toBeCloseTo(thirdBounds!.y, -1)
     })
@@ -327,19 +320,16 @@ test.describe('ProblemSection', () => {
       await page.setViewportSize({ width: 375, height: 667 })
 
       const section = page.locator('section[aria-labelledby="problem-heading"]')
-      const introText = section.locator('p').filter({
-        hasText: 'Milhões de brasileiros',
-      })
+      const quote = section.locator('blockquote')
       const grid = section.locator('[role="img"]')
 
-      const introBounds = await introText.boundingBox()
+      const quoteBounds = await quote.boundingBox()
       const gridBounds = await grid.boundingBox()
 
-      expect(introBounds).toBeTruthy()
+      expect(quoteBounds).toBeTruthy()
       expect(gridBounds).toBeTruthy()
 
-      // Intro text should be above the people grid
-      expect(gridBounds!.y).toBeGreaterThan(introBounds!.y)
+      expect(gridBounds!.y).toBeGreaterThan(quoteBounds!.y)
     })
 
     test('should display statistic blocks side by side on desktop', async ({
@@ -348,19 +338,16 @@ test.describe('ProblemSection', () => {
       await page.setViewportSize({ width: 1280, height: 800 })
 
       const section = page.locator('section[aria-labelledby="problem-heading"]')
-      const introText = section.locator('p').filter({
-        hasText: 'Milhões de brasileiros',
-      })
+      const quote = section.locator('blockquote')
       const grid = section.locator('[role="img"]')
 
-      const introBounds = await introText.boundingBox()
+      const quoteBounds = await quote.boundingBox()
       const gridBounds = await grid.boundingBox()
 
-      expect(introBounds).toBeTruthy()
+      expect(quoteBounds).toBeTruthy()
       expect(gridBounds).toBeTruthy()
 
-      // On desktop (md:flex-row), grid should be to the right of intro
-      expect(gridBounds!.x).toBeGreaterThan(introBounds!.x)
+      expect(gridBounds!.x).toBeGreaterThan(quoteBounds!.x)
     })
   })
 })
