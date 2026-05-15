@@ -31,6 +31,14 @@ test.describe('FooterSection', () => {
       ).toBeVisible()
     })
 
+    test('should render the company mission statement', async ({ page }) => {
+      const footer = page.locator(FOOTER_SECTION)
+
+      await expect(
+        footer.getByText('Facilitar o acesso à saúde pública')
+      ).toBeVisible()
+    })
+
     test('should render Institucional link group with heading', async ({
       page,
     }) => {
