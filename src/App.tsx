@@ -1,13 +1,13 @@
 import { lazy, Suspense } from 'react'
 import { Route, Routes } from 'react-router-dom'
 
-import { ErrorBoundary } from './components/error'
+import { ErrorBoundary } from '@shared/components/error'
 import {
   HomePage,
   NotFoundPage,
   PrivacyPolicyPage,
   TermsOfUsePage,
-} from './components/pages'
+} from '@features/landing/pages'
 
 // Intentional: imports from internal feature paths to enable per-page code splitting.
 // Importing from the feature barrel (features/guide) would bundle both pages into

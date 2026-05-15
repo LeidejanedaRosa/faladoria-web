@@ -23,14 +23,9 @@
     /* Path Aliases */
     "paths": {
       "@/*": ["./src/*"],
-      "@components/*": ["./src/components/*"],
+      "@shared/*": ["./src/shared/*"],
       "@features/*": ["./src/features/*"],
-      "@hooks/*": ["./src/hooks/*"],
-      "@utils/*": ["./src/utils/*"],
-      "@assets/*": ["./src/assets/*"],
-      "@types/*": ["./src/types/*"],
-      "@lib/*": ["./src/lib/*"],
-      "@services/*": ["./src/services/*"]
+      "@assets/*": ["./src/assets/*"]
     }
   },
   "include": ["src"],

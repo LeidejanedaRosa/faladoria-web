@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-import { Container } from '@components/layout'
+import { Container } from '@shared/components/layout'
 
 import { GUIDE_CONTENT } from '../data'
 import type { GuideCategory } from '../data'

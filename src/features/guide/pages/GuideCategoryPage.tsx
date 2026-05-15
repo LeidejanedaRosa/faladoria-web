@@ -1,13 +1,10 @@
 import { Navigate, useParams } from 'react-router-dom'
 
-import {
-  createBreadcrumb,
-  ORGANIZATION_STRUCTURED_DATA,
-} from '@components/data'
-import { PageShell } from '@components/layout'
-import { BreadcrumbSchema, JsonLdScript } from '@components/seo'
-import { useDocumentMeta } from '@hooks/useDocumentMeta'
-import { useScrollToTop } from '@hooks/useScrollToTop'
+import { createBreadcrumb, ORGANIZATION_STRUCTURED_DATA } from '@shared/data'
+import { PageShell } from '@shared/components/layout'
+import { BreadcrumbSchema, JsonLdScript } from '@shared/components/seo'
+import { useDocumentMeta } from '@shared/hooks/useDocumentMeta'
+import { useScrollToTop } from '@shared/hooks/useScrollToTop'
 
 import { GuideCategoryLayout } from '../components'
 import { GUIDE_CATEGORIES } from '../data'

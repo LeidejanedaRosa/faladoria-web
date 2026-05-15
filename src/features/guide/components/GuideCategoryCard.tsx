@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-import { cn } from '@utils/cn'
+import { cn } from '@shared/utils/cn'
 
 import type { GuideCategory } from '../data'
 import { GUIDE_ICON_MAP } from './guideIconMap'

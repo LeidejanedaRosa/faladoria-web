@@ -7,8 +7,8 @@ import {
   SearchIcon,
   ShieldIcon,
   SyringeIcon,
-} from '@components/ui'
-import type { IconProps } from '@/types/icon'
+} from '@shared/components/ui'
+import type { IconProps } from '@shared/types/icon'
 
 import type { GuideCategory } from '../data'
 

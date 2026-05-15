@@ -1,4 +1,4 @@
-import { COMPANY_INFO } from '@components/data'
+import { COMPANY_INFO } from '@shared/data/companyInfo'
 
 export const GUIDE_HEADING_ID = 'guide-heading'
 export const GUIDE_CATEGORIES_HEADING_ID = 'guide-categories-heading'
