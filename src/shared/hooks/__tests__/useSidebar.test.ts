@@ -168,16 +168,11 @@ describe('useSidebar', () => {
     it('should remove keydown listener on unmount', () => {
       const { result, unmount } = renderHook(() => useSidebar())
 
+      const spy = vi.spyOn(document, 'removeEventListener')
       act(() => result.current.open())
       unmount()
 
-      const spy = vi.spyOn(document, 'removeEventListener')
-      // No error should occur when dispatching events after unmount
-      expect(() => {
-        document.dispatchEvent(
-          new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
-        )
-      }).not.toThrow()
+      expect(spy).toHaveBeenCalledWith('keydown', expect.any(Function))
       spy.mockRestore()
     })
   })
