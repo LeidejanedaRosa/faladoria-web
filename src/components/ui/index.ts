@@ -25,6 +25,7 @@ export {
   ClipboardIcon,
   CloseIcon,
   EmailIcon,
+  FistIcon,
   HeartIcon,
   LocationIcon,
   MegaphoneIcon,
@@ -37,5 +38,6 @@ export {
   ShieldIcon,
   StatusIcon,
   SyringeIcon,
+  UsersIcon,
   WhatsAppIcon,
 } from './icons'
