@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom'
 
 import logoFaladoria from '@assets/faladoria_secundaria.svg'
 import { COMPANY_INFO } from '@shared/data/companyInfo'
-import { FOOTER_CONTENT } from '@shared/data/footerContent'
 
 import { FOOTER_FOCUS_RING } from './footerStyles'
 
@@ -25,11 +24,9 @@ export const FooterBrand = () => (
       />
     </Link>
     <p className="text-lavender mt-4 max-w-xs text-sm leading-relaxed">
-      {FOOTER_CONTENT.tagline}
-    </p>
-    <p className="text-lavender/70 mt-3 max-w-xs text-xs leading-relaxed">
-      <span className="text-lavender font-medium">Missão: </span>
-      {FOOTER_CONTENT.mission}
+      Conectando cidadãos à gestão pública para um{' '}
+      <strong className="text-purple-dark font-bold">SUS</strong> melhor para
+      todos.
     </p>
   </div>
 )
