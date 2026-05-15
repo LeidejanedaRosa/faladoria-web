@@ -52,7 +52,6 @@ export const Header = ({ onSidebarToggle }: HeaderProps) => {
             aria-label="Abrir menu"
           >
             <MenuIcon className="h-6 w-6" />
-            <span className="sr-only">Abrir menu</span>
           </button>
         </div>
       </header>
