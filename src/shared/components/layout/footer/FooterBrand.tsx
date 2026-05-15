@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 import logoFaladoria from '@assets/faladoria_secundaria.svg'
 import { COMPANY_INFO } from '@shared/data/companyInfo'
 import { FOOTER_CONTENT } from '@shared/data/footerContent'
@@ -9,8 +11,8 @@ const LOGO_HEIGHT = 485
 
 export const FooterBrand = () => (
   <div>
-    <a
-      href="/"
+    <Link
+      to="/"
       aria-label={`${COMPANY_INFO.name} - Ir para página inicial`}
       className={`inline-block ${FOOTER_FOCUS_RING}`}
     >
@@ -21,7 +23,7 @@ export const FooterBrand = () => (
         height={LOGO_HEIGHT}
         className="h-14 w-auto"
       />
-    </a>
+    </Link>
     <p className="text-lavender mt-4 max-w-xs text-sm leading-relaxed">
       {FOOTER_CONTENT.tagline}
     </p>
