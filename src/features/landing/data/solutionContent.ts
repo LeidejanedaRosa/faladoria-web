@@ -1,6 +1,6 @@
 import canalIndependente from '@assets/canal_independente.webp'
 import logoFaladoria from '@assets/logo_faladoria.svg'
-import medicacao from '@assets/medicacao.webp'
+import mediacao from '@assets/medicacao.webp'
 import relatorios from '@assets/relatorios.webp'
 import transparencia from '@assets/transparencia.webp'
 
@@ -16,41 +16,61 @@ export const SOLUTION_CONTENT = {
   subtitle: 'Dando voz a quem precisa ser ouvido',
   pillars: [
     {
-      id: 'independent-channel',
-      icon: canalIndependente,
-      iconAlt: 'Ícone de canal independente para denúncias',
-      iconWidth: 97,
-      iconHeight: 92,
-      title: 'Canal independente',
-      description:
-        'Canal independente para denunciar problemas na saúde pública.',
+      id: 'total-independence',
+      icon: {
+        kind: 'image',
+        src: canalIndependente,
+        alt: 'Ícone representando independência — sem vínculo político ou institucional',
+        width: 97,
+        height: 92,
+      },
+      title: 'Independência total',
+      description: 'Sem vínculo político ou institucional.',
     },
     {
-      id: 'medication',
-      icon: medicacao,
-      iconAlt: 'Ícone de medicação entre cidadãos e gestão pública',
-      iconWidth: 85,
-      iconHeight: 88,
-      title: 'Medicação ativa',
-      description: 'Medicação ativa entre cidadãos e gestão pública.',
+      id: 'active-mediation',
+      icon: {
+        kind: 'image',
+        src: mediacao,
+        alt: 'Ícone representando mediação ativa entre usuários e gestores de saúde',
+        width: 85,
+        height: 88,
+      },
+      title: 'Atuação ativa',
+      description: 'Mediação real entre usuários e gestores de saúde.',
     },
     {
       id: 'transparency',
-      icon: transparencia,
-      iconAlt: 'Ícone de transparência e acompanhamento de demandas',
-      iconWidth: 84,
-      iconHeight: 93,
+      icon: {
+        kind: 'image',
+        src: transparencia,
+        alt: 'Ícone representando transparência e dados abertos ao público',
+        width: 84,
+        height: 93,
+      },
       title: 'Transparência',
-      description: 'Transparência e acompanhamento das demandas.',
+      description: 'Dados e informações abertas ao público.',
     },
     {
-      id: 'reports',
-      icon: relatorios,
-      iconAlt: 'Ícone de relatórios estratégicos',
-      iconWidth: 89,
-      iconHeight: 91,
-      title: 'Relatórios estratégicos',
-      description: 'Relatórios estratégicos para melhoria dos serviços.',
+      id: 'solution-focus',
+      icon: {
+        kind: 'image',
+        src: relatorios,
+        alt: 'Ícone representando foco na solução e busca por mudanças concretas',
+        width: 89,
+        height: 91,
+      },
+      title: 'Foco na solução',
+      description: 'Indo além da escuta para buscar mudanças concretas.',
+    },
+    {
+      id: 'accessibility',
+      icon: {
+        kind: 'svg',
+        name: 'chat',
+      },
+      title: 'Acessibilidade',
+      description: 'Sem burocracia, com comunicação simples e eficiente.',
     },
   ],
 } as const

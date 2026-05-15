@@ -1,10 +1,22 @@
+import type { ComponentType } from 'react'
+
 import { SECTION_IDS } from '@shared/data/navigation'
+import { Container } from '@shared/components/layout/Container'
+import { ScreenReaderOnly } from '@shared/components/ui/Accessibility'
+import { ChatIcon } from '@shared/components/ui'
+import type { IconProps } from '@shared/types/icon'
+
 import {
   SOLUTION_CONTENT,
   SOLUTION_HEADING_ID,
 } from '../../data/solutionContent'
-import { Container } from '@shared/components/layout/Container'
-import { ScreenReaderOnly } from '@shared/components/ui/Accessibility'
+
+type Pillar = (typeof SOLUTION_CONTENT.pillars)[number]
+type PillarIcon = Pillar['icon']
+
+const SVG_ICON_MAP = {
+  chat: ChatIcon,
+} satisfies Record<string, ComponentType<IconProps>>
 
 export const SolutionSection = () => {
   return (
@@ -46,28 +58,37 @@ const SolutionHeader = () => (
   </div>
 )
 
-type Pillar = (typeof SOLUTION_CONTENT.pillars)[number]
-
 const PillarGrid = () => (
-  <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+  <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
     {SOLUTION_CONTENT.pillars.map(pillar => (
       <PillarCard key={pillar.id} pillar={pillar} />
     ))}
   </ul>
 )
 
-const PillarCard = ({ pillar }: { pillar: Pillar }) => (
-  <li className="bg-gray-light flex flex-col items-center gap-4 rounded-2xl p-8 text-center">
-    <div className="flex h-16 w-16 items-center justify-center">
+const PillarIconRenderer = ({ icon }: { icon: PillarIcon }) => {
+  if (icon.kind === 'image') {
+    return (
       <img
-        src={pillar.icon}
-        alt={pillar.iconAlt}
-        width={pillar.iconWidth}
-        height={pillar.iconHeight}
+        src={icon.src}
+        alt={icon.alt}
+        width={icon.width}
+        height={icon.height}
         loading="lazy"
         decoding="async"
         className="h-16 w-auto"
       />
+    )
+  }
+
+  const SvgIcon = SVG_ICON_MAP[icon.name]
+  return <SvgIcon className="text-purple-dark h-16 w-16" aria-hidden="true" />
+}
+
+const PillarCard = ({ pillar }: { pillar: Pillar }) => (
+  <li className="bg-gray-light flex flex-col items-center gap-4 rounded-2xl p-6 text-center">
+    <div className="flex h-16 w-16 items-center justify-center">
+      <PillarIconRenderer icon={pillar.icon} />
     </div>
     <h4 className="text-purple-dark text-lg font-semibold sm:text-xl">
       {pillar.title}
