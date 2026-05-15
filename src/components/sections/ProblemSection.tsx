@@ -4,9 +4,9 @@ import {
   PROBLEM_HEADING_ID,
 } from '@components/data/problemContent'
 import { Container } from '@components/layout/Container'
+import { PersonIcon } from '@components/ui'
 import { AccessibleLink, ScreenReaderOnly } from '@components/ui/Accessibility'
 import { WhatsAppCTA } from '@components/ui/WhatsAppCTA'
-import { PersonIcon } from '@components/ui'
 
 export const ProblemSection = () => {
   return (
@@ -15,7 +15,7 @@ export const ProblemSection = () => {
         <h2 id={PROBLEM_HEADING_ID}>{PROBLEM_CONTENT.sectionHeading}</h2>
       </ScreenReaderOnly>
 
-      <Container className="flex flex-col gap-16 py-16 sm:gap-20 sm:py-20 lg:gap-24 lg:py-24">
+      <Container className="flex flex-col gap-8 py-8 sm:gap-10 sm:py-10 lg:gap-12 lg:py-12">
         <NewsBlock />
         <StatisticBlock />
         <ProblemCTA />
@@ -28,48 +28,50 @@ const StatisticBlock = () => {
   const { intro, statistic } = PROBLEM_CONTENT
 
   return (
-    <div className="flex flex-col gap-10 md:flex-row lg:justify-between lg:gap-12">
-      <div className="flex flex-col gap-4 lg:items-start lg:gap-12">
-        <p className="text-purple-dark max-w-md text-lg leading-relaxed sm:text-xl">
-          {intro.description}
-        </p>
-        <p className="max-w-sm text-sm sm:text-base">
-          <strong className="text-purple-dark font-bold">
-            {PROBLEM_CONTENT.sourceLabel}{' '}
-          </strong>
-          <AccessibleLink
-            href={intro.source.url}
-            external
-            className="text-purple-dark hover:text-purple-medium underline underline-offset-2 transition-colors"
-            aria-label={`${intro.source.label} — ${intro.source.text} (abre em nova aba)`}
-          >
-            {intro.source.label} – {intro.source.text}
-          </AccessibleLink>
-        </p>
-      </div>
+    <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-12">
+      <blockquote className="flex gap-4 lg:flex-1">
+        <span
+          className="text-purple-dark/20 shrink-0 text-7xl leading-none font-bold select-none"
+          aria-hidden="true"
+        >
+          &ldquo;
+        </span>
+        <div className="border-purple-dark flex flex-col gap-2 border-l-2 pl-4">
+          <p className="text-purple-dark text-xl leading-relaxed font-semibold sm:text-2xl">
+            {intro.ministerQuote.text}
+          </p>
+          <footer className="mt-1 text-sm text-gray-600">
+            <strong className="text-purple-dark font-bold">
+              {intro.ministerQuote.author}
+            </strong>
+            {', '}
+            {intro.ministerQuote.role}
+          </footer>
+          <p className="mt-1 max-w-sm text-sm sm:text-base">
+            <strong className="text-purple-dark font-bold">
+              {PROBLEM_CONTENT.sourceLabel}{' '}
+            </strong>
+            <AccessibleLink
+              href={statistic.source.url}
+              external
+              className="text-purple-dark hover:text-purple-medium underline underline-offset-2 transition-colors"
+              aria-label={`${statistic.source.label} — ${statistic.source.text} (abre em nova aba)`}
+            >
+              {statistic.source.label} – {statistic.source.text}
+            </AccessibleLink>
+          </p>
+        </div>
+      </blockquote>
 
-      <div className="flex flex-col items-center gap-8 xl:flex-row-reverse xl:items-end xl:justify-between">
-        <div className="flex flex-col items-center gap-4 lg:items-end">
-          <PeopleGrid
-            total={statistic.total}
-            highlighted={statistic.highlighted}
-          />
-          <p className="max-w-xs text-center text-sm text-gray-600 lg:text-right">
-            {statistic.caption}
-          </p>
-        </div>
-        <div className="flex flex-col items-center gap-2 lg:items-start">
-          <p
-            className="text-purple-dark text-[clamp(6rem,20vw,14rem)] leading-none font-bold tracking-tighter"
-            aria-hidden="true"
-          >
-            {statistic.value}
-          </p>
-          <ScreenReaderOnly>
-            <span>{statistic.screenReaderText}</span>
-          </ScreenReaderOnly>
-        </div>
-      </div>
+      <PeopleGrid total={statistic.total} highlighted={statistic.highlighted} />
+
+      <p className="text-sm text-gray-600 lg:max-w-50">
+        A maioria da população encontra{' '}
+        <strong className="text-purple-dark font-bold underline underline-offset-2">
+          muitas dificuldades
+        </strong>{' '}
+        ao utilizar o SUS.
+      </p>
     </div>
   )
 }
@@ -87,12 +89,12 @@ const PeopleGrid = ({
     <div
       className="grid grid-cols-10 gap-0.5 sm:gap-1"
       role="img"
-      aria-label={`Representação visual: ${highlighted} de ${total} pessoas insatisfeitas`}
+      aria-label="Representação visual de pessoas em fila: a maioria encontra dificuldades ao utilizar o SUS"
     >
       {Array.from({ length: total }, (_, i) => (
         <PersonIcon
           key={i}
-          className={`h-5 w-5 sm:h-6 sm:w-6 ${
+          className={`h-4 w-4 sm:h-5 sm:w-5 ${
             i < satisfiedCount ? 'text-lavender/40' : 'text-purple-dark'
           }`}
         />
@@ -102,13 +104,19 @@ const PeopleGrid = ({
 }
 
 const NewsBlock = () => {
-  const { newsHeadline, newsArticles } = PROBLEM_CONTENT
+  const { newsHeadline, newsDescription, newsArticles } = PROBLEM_CONTENT
 
   return (
     <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
-      <h3 className="text-purple-dark max-w-md text-3xl leading-tight font-bold italic sm:text-4xl lg:text-5xl">
-        {newsHeadline}
-      </h3>
+      <div className="flex flex-col gap-4">
+        <div>
+          <h3 className="text-purple-dark max-w-md text-2xl leading-tight font-bold italic sm:text-3xl lg:text-4xl">
+            {newsHeadline}
+          </h3>
+          <div className="bg-purple-dark mt-3 h-1 w-8" />
+        </div>
+        <p className="text-sm text-gray-600 sm:text-base">{newsDescription}</p>
+      </div>
       {newsArticles.map(article => (
         <NewsCard key={article.id} article={article} />
       ))}
@@ -117,8 +125,8 @@ const NewsBlock = () => {
 }
 
 const NewsCard = ({ article }: { article: NewsArticle }) => (
-  <article className="flex flex-col gap-4">
-    <div className="mx-auto aspect-square w-48 overflow-hidden rounded-full sm:w-56 lg:w-64">
+  <article className="flex flex-col gap-4 rounded-2xl bg-white p-5">
+    <div className="aspect-square overflow-hidden rounded-full">
       <picture>
         <source srcSet={article.image.avif} type="image/avif" />
         <source srcSet={article.image.webp} type="image/webp" />

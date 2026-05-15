@@ -29,27 +29,31 @@ export const PROBLEM_HEADING_ID = 'problem-heading'
 
 export const PROBLEM_CONTENT = {
   sectionHeading:
-    '93% da população está insatisfeita com a saúde pública no Brasil',
+    'A maioria da população encontra muitas dificuldades ao utilizar a saúde pública no Brasil',
   sourceLabel: 'Fonte:',
   intro: {
     description:
       'Milhões de brasileiros enfrentam filas, falta de médicos e burocracia. Problemas se repetem, mas soluções não chegam a quem decide.',
-    source: {
-      label: 'Pesquisa Datafolha',
-      text: '93% da população está insatisfeita com a saúde no Brasil',
-      url: 'https://www.sbcm.org.br/v2/index.php/not%C3%ADcias/3089-datafolha-revela-93-da-populacao-esta-insatisfeita-com-a-saude-no-brasil',
+    ministerQuote: {
+      text: 'A principal reclamação da população hoje é sobre o tempo que ela espera para uma consulta especializada, para um exame, para uma cirurgia.',
+      author: 'Alexandre Padilha',
+      role: 'Ministro da Saúde',
     },
   },
   statistic: {
-    value: '93%',
     caption:
-      'da população está insatisfeita com o atendimento na saúde pública no Brasil.*',
-    screenReaderText:
-      '93 de 100 pessoas estão insatisfeitas com a saúde pública',
+      'A maioria da população encontra muitas dificuldades ao utilizar o SUS.',
     total: 100,
     highlighted: 93,
+    source: {
+      label: 'BBC News Brasil',
+      text: 'Ministro da Saúde reconhece as dificuldades no SUS',
+      url: 'https://www.bbc.com/portuguese/articles/crmxwvdjgl0o',
+    },
   },
   newsHeadline: 'Os desafios enfrentados diariamente na saúde pública:',
+  newsDescription:
+    'Problemas que impactam milhões de brasileiros todos os dias.',
   newsArticles: [
     {
       id: 'fila-sus',
