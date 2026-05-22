@@ -3,8 +3,18 @@
   "tabWidth": 2,
   "printWidth": 80,
   "singleQuote": true,
+  "jsxSingleQuote": true,
   "trailingComma": "es5",
   "arrowParens": "avoid",
   "endOfLine": "lf",
-  "plugins": ["prettier-plugin-tailwindcss"]
+  "quoteProps": "as-needed",
+  "proseWrap": "preserve",
+  "plugins": [
+    "@trivago/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
+  ],
+  "importOrder": ["^react$", "^react-dom$", "^@?\\w", "^[./]"],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "importOrderCaseInsensitive": true
 }
