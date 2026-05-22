@@ -1,5 +1,5 @@
-import { ABOUT_CONTENT } from '../../../data/aboutContent'
-import type { FounderTrait } from '../../../data/aboutContent'
+import type { ComponentType } from 'react'
+
 import {
   FistIcon,
   HeartIcon,
@@ -7,7 +7,8 @@ import {
   UsersIcon,
 } from '@shared/components/ui'
 import type { IconProps } from '@shared/types/icon'
-import type { ComponentType } from 'react'
+
+import { ABOUT_CONTENT, type FounderTrait } from '../../../data/aboutContent'
 
 const ICON_MAP: Record<FounderTrait['iconName'], ComponentType<IconProps>> = {
   person: PersonIcon,
@@ -21,27 +22,27 @@ export const FounderTraits = () => {
 
   return (
     <ul
-      className="relative flex flex-col gap-6"
-      aria-label="Quem é Simone Celina"
+      className='relative flex flex-col gap-6'
+      aria-label='Quem é Simone Celina'
     >
       <div
-        className="bg-purple-medium/25 absolute top-5 bottom-5 left-5 w-px"
-        aria-hidden="true"
+        className='bg-purple-medium/25 absolute top-5 bottom-5 left-5 w-px'
+        aria-hidden='true'
       />
 
       {traits.map(trait => {
         const Icon = ICON_MAP[trait.iconName]
 
         return (
-          <li key={trait.id} className="flex items-start gap-4">
-            <div className="bg-lavender-light relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
-              <Icon className="text-purple-dark h-5 w-5" aria-hidden="true" />
+          <li key={trait.id} className='flex items-start gap-4'>
+            <div className='bg-lavender-light relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full'>
+              <Icon className='text-purple-dark h-5 w-5' aria-hidden='true' />
             </div>
 
-            <p className="text-purple-deep pt-2 text-base leading-relaxed sm:text-lg">
+            <p className='text-purple-deep pt-2 text-base leading-relaxed sm:text-lg'>
               {trait.segments.map((segment, index) =>
                 segment.bold ? (
-                  <strong key={index} className="text-purple-dark font-bold">
+                  <strong key={index} className='text-purple-dark font-bold'>
                     {segment.text}
                   </strong>
                 ) : (

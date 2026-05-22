@@ -15,7 +15,7 @@ export const JsonLdScript: React.FC<JsonLdScriptProps> = ({
 
   return (
     <script
-      type="application/ld+json"
+      type='application/ld+json'
       dangerouslySetInnerHTML={{ __html: jsonString }}
     />
   )

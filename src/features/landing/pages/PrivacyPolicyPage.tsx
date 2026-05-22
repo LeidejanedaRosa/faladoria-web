@@ -1,5 +1,4 @@
 import { PRIVACY_POLICY_CONTENT } from '../data/privacyPolicyContent'
-
 import { LegalPageLayout } from './LegalPageLayout'
 
 export function PrivacyPolicyPage() {

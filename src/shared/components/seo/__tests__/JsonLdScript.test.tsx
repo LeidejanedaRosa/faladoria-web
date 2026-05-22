@@ -1,6 +1,7 @@
+import { render } from '@/test/test-utils'
+
 import { describe, expect, it } from 'vitest'
 
-import { render } from '@/test/test-utils'
 import { JsonLdScript } from '../JsonLdScript'
 
 describe('JsonLdScript', () => {

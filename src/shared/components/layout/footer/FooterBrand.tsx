@@ -1,7 +1,6 @@
-import { Link } from 'react-router-dom'
-
 import logoFaladoria from '@assets/faladoria_secundaria.svg'
 import { COMPANY_INFO } from '@shared/data/companyInfo'
+import { Link } from 'react-router-dom'
 
 import { FOOTER_FOCUS_RING } from './footerStyles'
 
@@ -11,7 +10,7 @@ const LOGO_HEIGHT = 485
 export const FooterBrand = () => (
   <div>
     <Link
-      to="/"
+      to='/'
       aria-label={`${COMPANY_INFO.name} - Ir para página inicial`}
       className={`inline-block ${FOOTER_FOCUS_RING}`}
     >
@@ -20,12 +19,12 @@ export const FooterBrand = () => (
         alt={`Logo ${COMPANY_INFO.name}`}
         width={LOGO_WIDTH}
         height={LOGO_HEIGHT}
-        className="h-14 w-auto"
+        className='h-14 w-auto'
       />
     </Link>
-    <p className="text-lavender mt-4 max-w-xs text-sm leading-relaxed">
+    <p className='text-lavender mt-4 max-w-xs text-sm leading-relaxed'>
       Conectando cidadãos à gestão pública para um{' '}
-      <strong className="text-purple-dark font-bold">SUS</strong> melhor para
+      <strong className='text-purple-dark font-bold'>SUS</strong> melhor para
       todos.
     </p>
   </div>

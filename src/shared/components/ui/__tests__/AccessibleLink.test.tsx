@@ -1,11 +1,12 @@
+import { render, screen, userEvent } from '@/test/test-utils'
+
 import { describe, expect, it, vi } from 'vitest'
 
-import { render, screen, userEvent } from '@/test/test-utils'
 import { AccessibleLink } from '../Accessibility'
 
 describe('AccessibleLink', () => {
   it('should render link with correct href and text', () => {
-    render(<AccessibleLink href="/about">About us</AccessibleLink>)
+    render(<AccessibleLink href='/about'>About us</AccessibleLink>)
 
     const link = screen.getByRole('link', { name: 'About us' })
     expect(link).toBeInTheDocument()
@@ -13,7 +14,7 @@ describe('AccessibleLink', () => {
   })
 
   it('should apply primary variant by default', () => {
-    render(<AccessibleLink href="/test">Link</AccessibleLink>)
+    render(<AccessibleLink href='/test'>Link</AccessibleLink>)
 
     const link = screen.getByRole('link')
     expect(link).toHaveClass('text-primary')
@@ -21,7 +22,7 @@ describe('AccessibleLink', () => {
 
   it('should apply secondary variant correctly', () => {
     render(
-      <AccessibleLink href="/test" variant="secondary">
+      <AccessibleLink href='/test' variant='secondary'>
         Link
       </AccessibleLink>
     )
@@ -32,7 +33,7 @@ describe('AccessibleLink', () => {
 
   it('should apply ghost variant correctly', () => {
     render(
-      <AccessibleLink href="/test" variant="ghost">
+      <AccessibleLink href='/test' variant='ghost'>
         Link
       </AccessibleLink>
     )
@@ -43,7 +44,7 @@ describe('AccessibleLink', () => {
 
   it('should handle external links with proper attributes', () => {
     render(
-      <AccessibleLink href="https://external.com" external>
+      <AccessibleLink href='https://external.com' external>
         External link
       </AccessibleLink>
     )
@@ -55,7 +56,7 @@ describe('AccessibleLink', () => {
 
   it('should show external link icon for external links', () => {
     const { container } = render(
-      <AccessibleLink href="https://external.com" external>
+      <AccessibleLink href='https://external.com' external>
         External
       </AccessibleLink>
     )
@@ -67,7 +68,7 @@ describe('AccessibleLink', () => {
 
   it('should add accessibility text for external links', () => {
     render(
-      <AccessibleLink href="https://external.com" external>
+      <AccessibleLink href='https://external.com' external>
         External
       </AccessibleLink>
     )
@@ -79,9 +80,9 @@ describe('AccessibleLink', () => {
   it('should preserve custom aria-label for external links', () => {
     render(
       <AccessibleLink
-        href="https://external.com"
+        href='https://external.com'
         external
-        aria-label="Custom label"
+        aria-label='Custom label'
       >
         External
       </AccessibleLink>
@@ -93,7 +94,7 @@ describe('AccessibleLink', () => {
 
   it('should handle aria-current="page" correctly', () => {
     render(
-      <AccessibleLink href="/current" ariaCurrent="page">
+      <AccessibleLink href='/current' ariaCurrent='page'>
         Current page
       </AccessibleLink>
     )
@@ -105,7 +106,7 @@ describe('AccessibleLink', () => {
 
   it('should handle isCurrent prop as shorthand for aria-current="page"', () => {
     render(
-      <AccessibleLink href="/current" isCurrent>
+      <AccessibleLink href='/current' isCurrent>
         Current
       </AccessibleLink>
     )
@@ -116,7 +117,7 @@ describe('AccessibleLink', () => {
 
   it('should apply different styles when isCurrent is true', () => {
     const { rerender } = render(
-      <AccessibleLink href="/test" variant="primary">
+      <AccessibleLink href='/test' variant='primary'>
         Link
       </AccessibleLink>
     )
@@ -126,7 +127,7 @@ describe('AccessibleLink', () => {
     expect(link).not.toHaveClass('font-semibold')
 
     rerender(
-      <AccessibleLink href="/test" variant="primary" isCurrent>
+      <AccessibleLink href='/test' variant='primary' isCurrent>
         Link
       </AccessibleLink>
     )
@@ -137,7 +138,7 @@ describe('AccessibleLink', () => {
 
   it('should support aria-current with different values', () => {
     const { rerender } = render(
-      <AccessibleLink href="/step1" ariaCurrent="step">
+      <AccessibleLink href='/step1' ariaCurrent='step'>
         Step 1
       </AccessibleLink>
     )
@@ -146,7 +147,7 @@ describe('AccessibleLink', () => {
     expect(link).toHaveAttribute('aria-current', 'step')
 
     rerender(
-      <AccessibleLink href="/location" ariaCurrent="location">
+      <AccessibleLink href='/location' ariaCurrent='location'>
         Location
       </AccessibleLink>
     )
@@ -158,7 +159,7 @@ describe('AccessibleLink', () => {
   it('should handle keyboard navigation', async () => {
     const user = userEvent.setup()
     render(
-      <AccessibleLink href="/test" onKeyDown={vi.fn()}>
+      <AccessibleLink href='/test' onKeyDown={vi.fn()}>
         Link
       </AccessibleLink>
     )
@@ -175,7 +176,7 @@ describe('AccessibleLink', () => {
     const user = userEvent.setup()
 
     render(
-      <AccessibleLink href="/test" onKeyDown={handleKeyDown}>
+      <AccessibleLink href='/test' onKeyDown={handleKeyDown}>
         Link
       </AccessibleLink>
     )
@@ -189,7 +190,7 @@ describe('AccessibleLink', () => {
 
   it('should apply custom className', () => {
     render(
-      <AccessibleLink href="/test" className="custom-class">
+      <AccessibleLink href='/test' className='custom-class'>
         Link
       </AccessibleLink>
     )
@@ -199,7 +200,7 @@ describe('AccessibleLink', () => {
   })
 
   it('should have proper focus styles', () => {
-    render(<AccessibleLink href="/test">Link</AccessibleLink>)
+    render(<AccessibleLink href='/test'>Link</AccessibleLink>)
 
     const link = screen.getByRole('link')
     expect(link).toHaveClass(
@@ -212,7 +213,7 @@ describe('AccessibleLink', () => {
 
   it('should filter out security props rel and target when not external', () => {
     render(
-      <AccessibleLink href="/test" rel="nofollow" target="_self">
+      <AccessibleLink href='/test' rel='nofollow' target='_self'>
         Link
       </AccessibleLink>
     )
@@ -224,7 +225,7 @@ describe('AccessibleLink', () => {
 
   it('should support all variant styles with isCurrent combinations', () => {
     const { rerender } = render(
-      <AccessibleLink href="/test" variant="secondary" isCurrent>
+      <AccessibleLink href='/test' variant='secondary' isCurrent>
         Link
       </AccessibleLink>
     )
@@ -233,7 +234,7 @@ describe('AccessibleLink', () => {
     expect(link).toHaveClass('text-gray-800', 'font-semibold')
 
     rerender(
-      <AccessibleLink href="/test" variant="ghost" isCurrent>
+      <AccessibleLink href='/test' variant='ghost' isCurrent>
         Link
       </AccessibleLink>
     )
@@ -245,7 +246,7 @@ describe('AccessibleLink', () => {
   it('should forward ref correctly', () => {
     const ref = { current: null }
     render(
-      <AccessibleLink href="/test" ref={ref}>
+      <AccessibleLink href='/test' ref={ref}>
         Link
       </AccessibleLink>
     )
@@ -254,7 +255,7 @@ describe('AccessibleLink', () => {
   })
 
   it('should have transition classes for smooth interactions', () => {
-    render(<AccessibleLink href="/test">Link</AccessibleLink>)
+    render(<AccessibleLink href='/test'>Link</AccessibleLink>)
 
     const link = screen.getByRole('link')
     expect(link).toHaveClass('transition-colors', 'duration-200')
@@ -263,7 +264,7 @@ describe('AccessibleLink', () => {
   it('should hide external icon when showExternalIcon is false', () => {
     const { container } = render(
       <AccessibleLink
-        href="https://external.com"
+        href='https://external.com'
         external
         showExternalIcon={false}
       >
@@ -281,7 +282,7 @@ describe('AccessibleLink', () => {
 
   it('should not show external icon for internal links', () => {
     const { container } = render(
-      <AccessibleLink href="/internal">Internal</AccessibleLink>
+      <AccessibleLink href='/internal'>Internal</AccessibleLink>
     )
 
     const icon = container.querySelector('svg')
@@ -290,7 +291,7 @@ describe('AccessibleLink', () => {
 
   it('should handle ariaCurrent taking precedence over isCurrent', () => {
     render(
-      <AccessibleLink href="/test" isCurrent ariaCurrent="step">
+      <AccessibleLink href='/test' isCurrent ariaCurrent='step'>
         Link
       </AccessibleLink>
     )
@@ -301,7 +302,7 @@ describe('AccessibleLink', () => {
 
   it('should handle ariaCurrent={false} correctly', () => {
     render(
-      <AccessibleLink href="/test" ariaCurrent={false}>
+      <AccessibleLink href='/test' ariaCurrent={false}>
         Link
       </AccessibleLink>
     )

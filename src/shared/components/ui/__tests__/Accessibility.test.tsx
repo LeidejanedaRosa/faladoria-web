@@ -1,18 +1,19 @@
+import { render, screen } from '@/test/test-utils'
+
 import { describe, expect, it } from 'vitest'
 
-import { render, screen } from '@/test/test-utils'
 import { MainContent, ScreenReaderOnly, SkipLink } from '../Accessibility'
 
 describe('SkipLink', () => {
   it('should render skip link with correct href', () => {
-    render(<SkipLink href="#main">Skip to content</SkipLink>)
+    render(<SkipLink href='#main'>Skip to content</SkipLink>)
 
     const link = screen.getByRole('link', { name: 'Skip to content' })
     expect(link).toHaveAttribute('href', '#main')
   })
 
   it('should be visually hidden by default but visible on focus', () => {
-    render(<SkipLink href="#main">Skip to content</SkipLink>)
+    render(<SkipLink href='#main'>Skip to content</SkipLink>)
 
     const link = screen.getByRole('link')
     expect(link).toHaveClass('sr-only')
@@ -20,7 +21,7 @@ describe('SkipLink', () => {
   })
 
   it('should have proper focus styles', () => {
-    render(<SkipLink href="#main">Skip to content</SkipLink>)
+    render(<SkipLink href='#main'>Skip to content</SkipLink>)
 
     const link = screen.getByRole('link')
     expect(link).toHaveClass(
@@ -45,14 +46,14 @@ describe('MainContent', () => {
   })
 
   it('should accept custom id', () => {
-    render(<MainContent id="custom-main">Content</MainContent>)
+    render(<MainContent id='custom-main'>Content</MainContent>)
 
     const main = screen.getByRole('main')
     expect(main).toHaveAttribute('id', 'custom-main')
   })
 
   it('should apply custom className', () => {
-    render(<MainContent className="custom-class">Content</MainContent>)
+    render(<MainContent className='custom-class'>Content</MainContent>)
 
     const main = screen.getByRole('main')
     expect(main).toHaveClass('custom-class')
@@ -94,7 +95,7 @@ describe('ScreenReaderOnly', () => {
   it('should clone child element when asChild is true', () => {
     render(
       <ScreenReaderOnly asChild>
-        <div data-testid="child-element">Hidden content</div>
+        <div data-testid='child-element'>Hidden content</div>
       </ScreenReaderOnly>
     )
 
@@ -107,7 +108,7 @@ describe('ScreenReaderOnly', () => {
   it('should preserve existing className when asChild is true', () => {
     render(
       <ScreenReaderOnly asChild>
-        <div className="existing-class" data-testid="existing-class-element">
+        <div className='existing-class' data-testid='existing-class-element'>
           Hidden content
         </div>
       </ScreenReaderOnly>
@@ -120,7 +121,7 @@ describe('ScreenReaderOnly', () => {
   it('should handle child without className when asChild is true', () => {
     render(
       <ScreenReaderOnly asChild>
-        <button data-testid="button-child">Click me</button>
+        <button data-testid='button-child'>Click me</button>
       </ScreenReaderOnly>
     )
 

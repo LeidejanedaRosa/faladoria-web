@@ -1,10 +1,9 @@
-import { Navigate, useParams } from 'react-router-dom'
-
-import { createBreadcrumb, ORGANIZATION_STRUCTURED_DATA } from '@shared/data'
 import { PageShell } from '@shared/components/layout'
 import { BreadcrumbSchema, JsonLdScript } from '@shared/components/seo'
+import { createBreadcrumb, ORGANIZATION_STRUCTURED_DATA } from '@shared/data'
 import { useDocumentMeta } from '@shared/hooks/useDocumentMeta'
 import { useScrollToTop } from '@shared/hooks/useScrollToTop'
+import { Navigate, useParams } from 'react-router-dom'
 
 import { GuideCategoryLayout } from '../components'
 import { GUIDE_CATEGORIES } from '../data'
@@ -21,7 +20,7 @@ export function GuideCategoryPage() {
   useScrollToTop()
 
   if (!category) {
-    return <Navigate to="/guia-do-sus" replace />
+    return <Navigate to='/guia-do-sus' replace />
   }
 
   const breadcrumbItems = createBreadcrumb([

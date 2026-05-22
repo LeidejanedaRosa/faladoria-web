@@ -1,16 +1,15 @@
 import { useEffect } from 'react'
 
+import { PageShell } from '@shared/components/layout'
+import { BreadcrumbSchema, JsonLdScript } from '@shared/components/seo'
 import { COMPANY_INFO } from '@shared/data/companyInfo'
 import {
   createFaqStructuredData,
   HOMEPAGE_BREADCRUMB,
   ORGANIZATION_STRUCTURED_DATA,
 } from '@shared/data/structuredData'
-import { PageShell } from '@shared/components/layout'
-import { BreadcrumbSchema, JsonLdScript } from '@shared/components/seo'
 import { useDocumentMeta } from '@shared/hooks/useDocumentMeta'
 
-import { FAQ_CONTENT } from '../data/faqContent'
 import {
   AboutSection,
   FaqSection,
@@ -21,6 +20,7 @@ import {
   SolutionSection,
   TransparencySection,
 } from '../components/sections'
+import { FAQ_CONTENT } from '../data/faqContent'
 
 export function HomePage() {
   useDocumentMeta({
@@ -42,7 +42,7 @@ export function HomePage() {
 
   return (
     <PageShell
-      mainContentLabel="Conteúdo principal"
+      mainContentLabel='Conteúdo principal'
       schemas={
         <>
           <JsonLdScript data={ORGANIZATION_STRUCTURED_DATA} />

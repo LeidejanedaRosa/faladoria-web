@@ -58,6 +58,7 @@ class ErrorBoundary extends React.Component<
     }
 
     if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
       console.error('ErrorBoundary caught an error:', error, errorInfo)
     }
 
@@ -81,57 +82,57 @@ class ErrorBoundary extends React.Component<
       }
 
       return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50">
-          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
-            <div className="mb-4 flex items-center">
-              <div className="shrink-0">
+        <div className='flex min-h-screen items-center justify-center bg-gray-50'>
+          <div className='w-full max-w-md rounded-lg bg-white p-6 shadow-lg'>
+            <div className='mb-4 flex items-center'>
+              <div className='shrink-0'>
                 <svg
-                  className="h-8 w-8 text-red-500"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  aria-hidden="true"
+                  className='h-8 w-8 text-red-500'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  stroke='currentColor'
+                  aria-hidden='true'
                 >
                   <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
                     strokeWidth={2}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5l-6.928-12c-.77-.833-2.695-.833-3.464 0L.33 16.5c-.77.833.192 2.5 1.732 2.5z"
+                    d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5l-6.928-12c-.77-.833-2.695-.833-3.464 0L.33 16.5c-.77.833.192 2.5 1.732 2.5z'
                   />
                 </svg>
               </div>
-              <div className="ml-3">
-                <h3 className="text-lg font-medium text-gray-900">
+              <div className='ml-3'>
+                <h3 className='text-lg font-medium text-gray-900'>
                   Algo deu errado
                 </h3>
               </div>
             </div>
-            <div className="mb-4 text-sm text-gray-600">
+            <div className='mb-4 text-sm text-gray-600'>
               Ocorreu um erro inesperado. Nossa equipe foi notificada e está
               trabalhando para resolver o problema.
             </div>
-            <div className="flex flex-col gap-2">
+            <div className='flex flex-col gap-2'>
               <button
                 onClick={this.resetError}
-                className="bg-purple-dark hover:bg-purple-medium w-full rounded-md px-4 py-2 font-medium text-white transition-colors duration-200"
-                type="button"
+                className='bg-purple-dark hover:bg-purple-medium w-full rounded-md px-4 py-2 font-medium text-white transition-colors duration-200'
+                type='button'
               >
                 Tentar novamente
               </button>
               <button
                 onClick={() => window.location.reload()}
-                className="w-full rounded-md bg-gray-200 px-4 py-2 font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-300"
-                type="button"
+                className='w-full rounded-md bg-gray-200 px-4 py-2 font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-300'
+                type='button'
               >
                 Recarregar página
               </button>
             </div>
             {import.meta.env.DEV && this.state.error && (
-              <details className="mt-4 rounded bg-gray-100 p-3 text-xs">
-                <summary className="cursor-pointer font-medium">
+              <details className='mt-4 rounded bg-gray-100 p-3 text-xs'>
+                <summary className='cursor-pointer font-medium'>
                   Detalhes do erro (desenvolvimento)
                 </summary>
-                <pre className="mt-2 whitespace-pre-wrap text-red-600">
+                <pre className='mt-2 whitespace-pre-wrap text-red-600'>
                   {this.state.error.toString()}
                   {this.state.errorInfo?.componentStack}
                 </pre>

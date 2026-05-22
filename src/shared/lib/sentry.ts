@@ -27,6 +27,7 @@ export function initSentry() {
   const environment = import.meta.env.VITE_SENTRY_ENVIRONMENT || 'production'
 
   if (!dsn) {
+    // eslint-disable-next-line no-console
     console.warn('Sentry DSN not configured')
     return
   }

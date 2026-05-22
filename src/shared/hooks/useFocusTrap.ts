@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { type RefObject, useEffect } from 'react'
 
 export const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
@@ -8,7 +8,7 @@ interface UseFocusTrapOptions {
 }
 
 export const useFocusTrap = (
-  containerRef: React.RefObject<HTMLElement | null>,
+  containerRef: RefObject<HTMLElement | null>,
   isActive: boolean,
   options: UseFocusTrapOptions = {}
 ) => {

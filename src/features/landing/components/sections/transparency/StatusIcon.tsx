@@ -1,5 +1,6 @@
-import type { InteractionStatus } from '../../../data/transparencyContent'
 import type { IconProps } from '@shared/types/icon'
+
+import type { InteractionStatus } from '../../../data/transparencyContent'
 
 interface StatusIconConfig {
   viewBox: string
@@ -90,7 +91,7 @@ export const StatusIcon = ({
       stroke={config.stroke}
       strokeWidth={config.strokeWidth}
       viewBox={config.viewBox}
-      aria-hidden="true"
+      aria-hidden='true'
     >
       {config.circles?.map(circle => (
         <circle key={`${circle.cx}-${circle.cy}`} {...circle} />

@@ -1,9 +1,11 @@
 import type { ComponentType } from 'react'
 
-import type { FooterContactItem } from '@shared/data/footerContent'
-import { FOOTER_CONTENT } from '@shared/data/footerContent'
-import type { IconProps } from '@shared/types/icon'
 import { EmailIcon, LocationIcon, WhatsAppIcon } from '@shared/components/ui'
+import {
+  FOOTER_CONTENT,
+  type FooterContactItem,
+} from '@shared/data/footerContent'
+import type { IconProps } from '@shared/types/icon'
 
 import { FOOTER_FOCUS_RING } from './footerStyles'
 
@@ -25,7 +27,7 @@ const ContactItem = ({ item }: { item: FooterContactItem }) => {
   const content = (
     <>
       <div className={ICON_CIRCLE}>
-        <Icon className="h-4 w-4" />
+        <Icon className='h-4 w-4' />
       </div>
       <span>{item.label}</span>
     </>
@@ -52,24 +54,24 @@ const ContactItem = ({ item }: { item: FooterContactItem }) => {
   }
 
   return (
-    <li className="text-lavender inline-flex items-center gap-3 text-sm">
+    <li className='text-lavender inline-flex items-center gap-3 text-sm'>
       {content}
     </li>
   )
 }
 
 export const FooterContact = () => (
-  <div className="lg:border-l lg:border-white/10 lg:pl-6">
-    <div className="flex items-center gap-3">
-      <div className="bg-purple-medium/20 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white">
-        <EmailIcon className="h-5 w-5" />
+  <div className='lg:border-l lg:border-white/10 lg:pl-6'>
+    <div className='flex items-center gap-3'>
+      <div className='bg-purple-medium/20 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white'>
+        <EmailIcon className='h-5 w-5' />
       </div>
-      <h3 className="text-sm font-semibold tracking-wide text-white">
+      <h3 className='text-sm font-semibold tracking-wide text-white'>
         {FOOTER_CONTENT.contact.title}
       </h3>
     </div>
-    <address className="mt-4 not-italic">
-      <ul className="space-y-3">
+    <address className='mt-4 not-italic'>
+      <ul className='space-y-3'>
         {FOOTER_CONTENT.contact.items.map(item => (
           <ContactItem key={item.id} item={item} />
         ))}

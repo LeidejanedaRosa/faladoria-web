@@ -1,9 +1,11 @@
+import { type RefObject } from 'react'
+
 import { createPortal } from 'react-dom'
 
 import logoFaladoria from '@assets/logo_faladoria.svg'
+import { CloseIcon, MenuIcon, WhatsAppCTA } from '@shared/components/ui'
 import { COMPANY_INFO } from '@shared/data/companyInfo'
 import { NAV_ITEMS } from '@shared/data/navigation'
-import { CloseIcon, MenuIcon, WhatsAppCTA } from '@shared/components/ui'
 import { useSidebar } from '@shared/hooks/useSidebar'
 import { cn } from '@shared/utils/cn'
 
@@ -23,10 +25,10 @@ export const Header = ({ onSidebarToggle }: HeaderProps) => {
 
   return (
     <>
-      <header role="banner" className="bg-white shadow-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
+      <header role='banner' className='bg-white shadow-sm'>
+        <div className='mx-auto flex max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8'>
           <a
-            href="/"
+            href='/'
             aria-label={`${COMPANY_INFO.name} - Ir para página inicial`}
           >
             <img
@@ -34,24 +36,24 @@ export const Header = ({ onSidebarToggle }: HeaderProps) => {
               alt={`Logo ${COMPANY_INFO.name}`}
               width={LOGO_WIDTH}
               height={LOGO_HEIGHT}
-              className="h-12 w-auto"
+              className='h-12 w-auto'
             />
           </a>
 
           <DesktopNav />
 
-          <WhatsAppCTA className="hidden text-nowrap md:inline-flex" />
+          <WhatsAppCTA className='hidden text-nowrap md:inline-flex' />
 
           <button
             ref={triggerRef}
-            type="button"
-            className="text-purple-dark hover:bg-gray-light focus:ring-purple-medium inline-flex items-center justify-center rounded-lg p-2.5 transition-colors focus:ring-2 focus:outline-none md:hidden"
+            type='button'
+            className='text-purple-dark hover:bg-gray-light focus:ring-purple-medium inline-flex items-center justify-center rounded-lg p-2.5 transition-colors focus:ring-2 focus:outline-none md:hidden'
             onClick={open}
             aria-expanded={isOpen}
             aria-controls={MOBILE_MENU_ID}
-            aria-label="Abrir menu"
+            aria-label='Abrir menu'
           >
-            <MenuIcon className="h-6 w-6" />
+            <MenuIcon className='h-6 w-6' />
           </button>
         </div>
       </header>
@@ -70,13 +72,13 @@ export const Header = ({ onSidebarToggle }: HeaderProps) => {
 }
 
 const DesktopNav = () => (
-  <nav aria-label="Navegação principal" className="hidden md:block">
-    <ul className="mx-5 flex items-center justify-center gap-5 lg:gap-8">
+  <nav aria-label='Navegação principal' className='hidden md:block'>
+    <ul className='mx-5 flex items-center justify-center gap-5 lg:gap-8'>
       {NAV_ITEMS.map(item => (
         <li key={item.href}>
           <a
             href={item.href}
-            className="text-purple-dark hover:text-purple-medium text-sm font-medium text-nowrap transition-colors lg:text-xl"
+            className='text-purple-dark hover:text-purple-medium text-sm font-medium text-nowrap transition-colors lg:text-xl'
           >
             {item.label}
           </a>
@@ -89,7 +91,7 @@ const DesktopNav = () => (
 interface MobileSidebarProps {
   isOpen: boolean
   onClose: () => void
-  sidebarRef: React.RefObject<HTMLDivElement | null>
+  sidebarRef: RefObject<HTMLDivElement | null>
 }
 
 const MobileSidebar = ({ isOpen, onClose, sidebarRef }: MobileSidebarProps) => (
@@ -99,18 +101,18 @@ const MobileSidebar = ({ isOpen, onClose, sidebarRef }: MobileSidebarProps) => (
       'fixed inset-0 z-50 md:hidden',
       isOpen ? 'visible' : 'invisible'
     )}
-    role="dialog"
-    aria-modal="true"
-    aria-label="Menu de navegação"
+    role='dialog'
+    aria-modal='true'
+    aria-label='Menu de navegação'
   >
     <div
       className={cn(
         'absolute inset-0 bg-black/50 transition-opacity duration-300',
         isOpen ? 'opacity-100' : 'opacity-0'
       )}
-      role="presentation"
+      role='presentation'
       onClick={onClose}
-      aria-hidden="true"
+      aria-hidden='true'
     />
 
     <div
@@ -120,9 +122,9 @@ const MobileSidebar = ({ isOpen, onClose, sidebarRef }: MobileSidebarProps) => (
         isOpen ? 'translate-x-0' : 'translate-x-full'
       )}
     >
-      <div className="flex items-center justify-between px-5 py-5">
+      <div className='flex items-center justify-between px-5 py-5'>
         <a
-          href="/"
+          href='/'
           aria-label={`${COMPANY_INFO.name} - Ir para página inicial`}
           onClick={onClose}
         >
@@ -131,26 +133,26 @@ const MobileSidebar = ({ isOpen, onClose, sidebarRef }: MobileSidebarProps) => (
             alt={`Logo ${COMPANY_INFO.name}`}
             width={LOGO_WIDTH}
             height={LOGO_HEIGHT}
-            className="h-10 w-auto"
+            className='h-10 w-auto'
           />
         </a>
         <button
-          type="button"
-          className="text-purple-dark hover:bg-gray-light focus:ring-purple-medium inline-flex items-center justify-center rounded-lg p-2.5 transition-colors focus:ring-2 focus:outline-none"
+          type='button'
+          className='text-purple-dark hover:bg-gray-light focus:ring-purple-medium inline-flex items-center justify-center rounded-lg p-2.5 transition-colors focus:ring-2 focus:outline-none'
           onClick={onClose}
-          aria-label="Fechar menu"
+          aria-label='Fechar menu'
         >
-          <CloseIcon className="h-6 w-6" />
+          <CloseIcon className='h-6 w-6' />
         </button>
       </div>
 
-      <nav aria-label="Links do menu" className="flex-1 px-4 pt-2">
-        <ul className="flex flex-col gap-1">
+      <nav aria-label='Links do menu' className='flex-1 px-4 pt-2'>
+        <ul className='flex flex-col gap-1'>
           {NAV_ITEMS.map(item => (
             <li key={item.href}>
               <a
                 href={item.href}
-                className="text-purple-dark hover:bg-gray-light block rounded-lg px-4 py-3 text-base font-medium transition-colors"
+                className='text-purple-dark hover:bg-gray-light block rounded-lg px-4 py-3 text-base font-medium transition-colors'
                 onClick={onClose}
               >
                 {item.label}
@@ -160,8 +162,8 @@ const MobileSidebar = ({ isOpen, onClose, sidebarRef }: MobileSidebarProps) => (
         </ul>
       </nav>
 
-      <div className="border-gray-light border-t px-5 py-6">
-        <WhatsAppCTA className="inline-flex w-full justify-center" />
+      <div className='border-gray-light border-t px-5 py-6'>
+        <WhatsAppCTA className='inline-flex w-full justify-center' />
       </div>
     </div>
   </div>

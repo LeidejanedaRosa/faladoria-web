@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react'
 
-import { WHATSAPP_URL } from '@shared/data/companyInfo'
 import { AccessibleLink } from '@shared/components/ui'
-import { WhatsAppIcon } from './icons'
+import { WHATSAPP_URL } from '@shared/data/companyInfo'
 import { cn } from '@shared/utils/cn'
+
+import { WhatsAppIcon } from './icons'
 
 const VARIANT_STYLES = {
   primary:
@@ -38,7 +39,7 @@ export const WhatsAppCTA = ({
     )}
     aria-label={ariaLabel}
   >
-    <WhatsAppIcon className="h-5 w-5" />
+    <WhatsAppIcon className='h-5 w-5' />
     {children}
   </AccessibleLink>
 )

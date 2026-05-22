@@ -1,17 +1,17 @@
 import React, { forwardRef } from 'react'
 
-import { cn } from '@shared/utils/cn'
 import type {
   AccessibilityProps,
   SkipLinkProps,
 } from '@shared/types/accessibility'
+import { cn } from '@shared/utils/cn'
 
 export const SkipLink = forwardRef<HTMLAnchorElement, SkipLinkProps>(
   ({ href, children, ...props }, ref) => (
     <a
       ref={ref}
       href={href}
-      className="focus:bg-primary focus:text-secondary sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-[1600] focus:rounded-br focus:px-4 focus:py-2 focus:text-base focus:font-medium focus:shadow-lg"
+      className='focus:bg-primary focus:text-secondary sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-[1600] focus:rounded-br focus:px-4 focus:py-2 focus:text-base focus:font-medium focus:shadow-lg'
       {...props}
     >
       {children}
@@ -53,7 +53,7 @@ export const ScreenReaderOnly = ({
 }: ScreenReaderOnlyProps) => {
   if (asChild) {
     if (!React.isValidElement<{ className?: string }>(children)) {
-      return <span className="sr-only">{children}</span>
+      return <span className='sr-only'>{children}</span>
     }
 
     return React.cloneElement(children, {
@@ -61,7 +61,7 @@ export const ScreenReaderOnly = ({
     })
   }
 
-  return <span className="sr-only">{children}</span>
+  return <span className='sr-only'>{children}</span>
 }
 
 const getVariantClasses = (
@@ -96,6 +96,11 @@ const computeAriaLabel = (
 ) => {
   return external ? ariaLabel || `${children} (abre em nova aba)` : ariaLabel
 }
+
+const resolveAriaCurrent = (
+  ariaCurrent: AccessibleLinkProps['ariaCurrent'],
+  isCurrent: boolean | undefined
+) => (ariaCurrent !== undefined ? ariaCurrent : isCurrent ? 'page' : undefined)
 
 interface AccessibleLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   children: React.ReactNode
@@ -133,8 +138,7 @@ export const AccessibleLink = forwardRef<
     },
     ref
   ) => {
-    const currentValue =
-      ariaCurrent !== undefined ? ariaCurrent : isCurrent ? 'page' : undefined
+    const currentValue = resolveAriaCurrent(ariaCurrent, isCurrent)
 
     const isCurrentPage = Boolean(currentValue)
 
@@ -164,7 +168,7 @@ export const AccessibleLink = forwardRef<
       >
         {children}
         {external && showExternalIcon && (
-          <span className="ml-1" aria-hidden="true">
+          <span className='ml-1' aria-hidden='true'>
             <ExternalLinkIcon />
           </span>
         )}
@@ -177,13 +181,13 @@ AccessibleLink.displayName = 'AccessibleLink'
 
 const ExternalLinkIcon = () => (
   <svg
-    className="h-4 w-4"
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 20 20"
-    fill="currentColor"
-    aria-hidden="true"
+    className='h-4 w-4'
+    xmlns='http://www.w3.org/2000/svg'
+    viewBox='0 0 20 20'
+    fill='currentColor'
+    aria-hidden='true'
   >
-    <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
-    <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+    <path d='M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z' />
+    <path d='M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z' />
   </svg>
 )

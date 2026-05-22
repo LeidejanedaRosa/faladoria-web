@@ -1,5 +1,4 @@
 import { TERMS_OF_USE_CONTENT } from '../data/termsOfUseContent'
-
 import { LegalPageLayout } from './LegalPageLayout'
 
 export function TermsOfUsePage() {

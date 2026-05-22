@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import type { ReactNode } from 'react'
+import { type ReactNode, useState } from 'react'
 
 import { MainContent, SkipLink } from '@shared/components/ui'
 
@@ -22,7 +21,7 @@ export function PageShell({
   return (
     <>
       {schemas}
-      <SkipLink href="#main-content">Pular para o conteúdo principal</SkipLink>
+      <SkipLink href='#main-content'>Pular para o conteúdo principal</SkipLink>
       <Header onSidebarToggle={setIsSidebarOpen} />
       <div inert={isSidebarOpen || undefined}>
         <MainContent aria-label={mainContentLabel}>{children}</MainContent>

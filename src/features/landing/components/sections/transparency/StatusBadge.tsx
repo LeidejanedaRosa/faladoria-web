@@ -1,6 +1,6 @@
 import {
-  STATUS_CONFIG,
   type InteractionStatus,
+  STATUS_CONFIG,
 } from '../../../data/transparencyContent'
 import { StatusIcon } from './StatusIcon'
 

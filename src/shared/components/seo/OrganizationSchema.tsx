@@ -1,5 +1,8 @@
 import { COMPANY_INFO } from '@shared/data/companyInfo'
+
 import { JsonLdScript } from './JsonLdScript'
+
+const SCHEMA_CONTEXT = 'https://schema.org'
 
 /**
  * Organization Schema Component
@@ -80,7 +83,7 @@ export function OrganizationSchema() {
   }
 
   const structuredData = {
-    '@context': 'https://schema.org',
+    '@context': SCHEMA_CONTEXT,
     '@graph': [webSiteSchema, organizationSchema],
   }
 
@@ -108,7 +111,7 @@ export function BreadcrumbSchema({ items }: BreadcrumbSchemaProps) {
   const { url: baseUrl } = COMPANY_INFO
 
   const breadcrumbSchema = {
-    '@context': 'https://schema.org',
+    '@context': SCHEMA_CONTEXT,
     '@type': 'BreadcrumbList' as const,
     itemListElement: items.map((item, index) => {
       const isLastItem = index === items.length - 1
@@ -160,7 +163,7 @@ export function ArticleSchema({
   const { url, name } = COMPANY_INFO
 
   const articleSchema = {
-    '@context': 'https://schema.org',
+    '@context': SCHEMA_CONTEXT,
     '@type': 'Article' as const,
     headline: title,
     description,
@@ -211,7 +214,7 @@ export function ProductSchema({
   const { url } = COMPANY_INFO
 
   const productSchema: Record<string, unknown> = {
-    '@context': 'https://schema.org',
+    '@context': SCHEMA_CONTEXT,
     '@type': 'Product' as const,
     name,
     description,
@@ -259,7 +262,7 @@ interface FAQSchemaProps {
 
 export function FAQSchema({ items }: FAQSchemaProps) {
   const faqSchema = {
-    '@context': 'https://schema.org',
+    '@context': SCHEMA_CONTEXT,
     '@type': 'FAQPage' as const,
     mainEntity: items.map(item => ({
       '@type': 'Question' as const,

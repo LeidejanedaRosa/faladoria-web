@@ -1,6 +1,7 @@
+import { render, screen, userEvent, within } from '@/test/test-utils'
+
 import { describe, expect, it, vi } from 'vitest'
 
-import { render, screen, userEvent, within } from '@/test/test-utils'
 import { Header } from '../Header'
 
 vi.mock('@assets/logo_faladoria.svg', () => ({

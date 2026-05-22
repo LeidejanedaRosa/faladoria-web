@@ -1,4 +1,4 @@
-import { onCLS, onFCP, onINP, onLCP, onTTFB, type Metric } from 'web-vitals'
+import { type Metric, onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals'
 
 export function reportWebVitals(onPerfEntry?: (metric: Metric) => void) {
   const send = onPerfEntry ?? sendToAnalytics
@@ -12,6 +12,7 @@ export function reportWebVitals(onPerfEntry?: (metric: Metric) => void) {
 
 function sendToAnalytics(metric: Metric) {
   if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
     console.log(metric)
     return
   }

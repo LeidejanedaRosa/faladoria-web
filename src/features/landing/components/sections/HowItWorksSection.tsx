@@ -1,16 +1,17 @@
+import { Container } from '@shared/components/layout/Container'
+import { ScreenReaderOnly } from '@shared/components/ui/Accessibility'
+import { SECTION_IDS } from '@shared/data/navigation'
+
 import {
   HOW_IT_WORKS_CONTENT,
   HOW_IT_WORKS_HEADING_ID,
 } from '../../data/howItWorksContent'
-import { SECTION_IDS } from '@shared/data/navigation'
-import { Container } from '@shared/components/layout/Container'
-import { ScreenReaderOnly } from '@shared/components/ui/Accessibility'
 
 export const HowItWorksSection = () => {
   return (
     <section
       id={SECTION_IDS.howItWorks}
-      className="bg-gray-light"
+      className='bg-gray-light'
       aria-labelledby={HOW_IT_WORKS_HEADING_ID}
     >
       <ScreenReaderOnly asChild>
@@ -19,7 +20,7 @@ export const HowItWorksSection = () => {
         </h2>
       </ScreenReaderOnly>
 
-      <Container className="flex flex-col gap-12 py-16 sm:gap-16 sm:py-20 lg:gap-20 lg:py-24">
+      <Container className='flex flex-col gap-12 py-16 sm:gap-16 sm:py-20 lg:gap-20 lg:py-24'>
         <HowItWorksHeader />
         <StepsGrid />
       </Container>
@@ -28,11 +29,11 @@ export const HowItWorksSection = () => {
 }
 
 const HowItWorksHeader = () => (
-  <div className="flex flex-col gap-4 text-center">
-    <h3 className="text-purple-dark text-3xl font-bold sm:text-4xl lg:text-5xl">
+  <div className='flex flex-col gap-4 text-center'>
+    <h3 className='text-purple-dark text-3xl font-bold sm:text-4xl lg:text-5xl'>
       {HOW_IT_WORKS_CONTENT.headline}
     </h3>
-    <p className="text-purple-dark text-lg sm:text-xl">
+    <p className='text-purple-dark text-lg sm:text-xl'>
       {HOW_IT_WORKS_CONTENT.subtitle}
     </p>
   </div>
@@ -41,7 +42,7 @@ const HowItWorksHeader = () => (
 type Step = (typeof HOW_IT_WORKS_CONTENT.steps)[number]
 
 const StepsGrid = () => (
-  <ol className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+  <ol className='grid gap-6 sm:grid-cols-2 lg:grid-cols-4'>
     {HOW_IT_WORKS_CONTENT.steps.map(step => (
       <StepCard key={step.id} step={step} />
     ))}
@@ -49,30 +50,30 @@ const StepsGrid = () => (
 )
 
 const StepCard = ({ step }: { step: Step }) => (
-  <li className="bg-purple-dark flex flex-col overflow-hidden rounded-2xl">
-    <div className="aspect-4/5">
+  <li className='bg-purple-dark flex flex-col overflow-hidden rounded-2xl'>
+    <div className='aspect-4/5'>
       <img
         src={step.image}
         alt={step.imageAlt}
         width={400}
         height={500}
-        loading="lazy"
-        decoding="async"
-        className="h-full w-full object-cover"
+        loading='lazy'
+        decoding='async'
+        className='h-full w-full object-cover'
       />
     </div>
-    <div className="relative overflow-hidden p-6">
+    <div className='relative overflow-hidden p-6'>
       <span
-        className="absolute top-1/2 right-0 translate-x-[30%] -translate-y-1/2 text-[8rem] leading-none font-bold text-white/30 sm:text-[10rem]"
-        aria-hidden="true"
+        className='absolute top-1/2 right-0 translate-x-[30%] -translate-y-1/2 text-[8rem] leading-none font-bold text-white/30 sm:text-[10rem]'
+        aria-hidden='true'
       >
         {step.number}
       </span>
-      <div className="relative flex flex-col gap-2">
-        <h4 className="text-lg font-semibold text-white sm:text-xl">
+      <div className='relative flex flex-col gap-2'>
+        <h4 className='text-lg font-semibold text-white sm:text-xl'>
           {step.title}
         </h4>
-        <p className="text-sm leading-relaxed text-white/80 sm:text-base">
+        <p className='text-sm leading-relaxed text-white/80 sm:text-base'>
           {step.description}
         </p>
       </div>
