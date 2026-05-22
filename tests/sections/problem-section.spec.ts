@@ -205,11 +205,12 @@ test.describe('ProblemSection', () => {
       const articleLinks = section.locator('article a')
 
       for (let i = 0; i < 3; i++) {
-        const ariaLabel = await articleLinks.nth(i).getAttribute('aria-label')
+        const link = articleLinks.nth(i)
+        const ariaLabelValue = await link.getAttribute('aria-label')
 
-        expect(ariaLabel).toBeTruthy()
-        expect(ariaLabel).toContain('Fonte:')
-        expect(ariaLabel).toContain('abre em nova aba')
+        await expect(link).toHaveAttribute('aria-label')
+        expect(ariaLabelValue).toContain('Fonte:')
+        expect(ariaLabelValue).toContain('abre em nova aba')
       }
     })
 
@@ -220,10 +221,11 @@ test.describe('ProblemSection', () => {
       const images = section.locator('article img')
 
       for (let i = 0; i < 3; i++) {
-        const alt = await images.nth(i).getAttribute('alt')
+        const img = images.nth(i)
+        const altText = await img.getAttribute('alt')
 
-        expect(alt).toBeTruthy()
-        expect(alt!.length).toBeGreaterThan(10)
+        await expect(img).toHaveAttribute('alt')
+        expect(altText?.length).toBeGreaterThan(10)
       }
     })
   })

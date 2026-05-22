@@ -62,12 +62,12 @@ test.describe('GuideHighlightSection', () => {
   test.describe('Accessibility', () => {
     test('should have aria-labelledby pointing to h2', async ({ page }) => {
       const section = page.locator(GUIDE_HIGHLIGHT)
-      const labelledbyId = await section.getAttribute('aria-labelledby')
+      const labelledbyId = section
       const h2Id = await section
         .locator('h2#guide-highlight-heading')
         .getAttribute('id')
 
-      expect(labelledbyId).toBe(h2Id)
+      await expect(labelledbyId).toHaveAttribute('aria-labelledby', h2Id!)
     })
 
     test('should have screen-reader-only description', async ({ page }) => {
@@ -104,8 +104,8 @@ test.describe('GuideHighlightSection', () => {
       const section = page.locator(GUIDE_HIGHLIGHT)
       const links = section.locator('a')
 
-      const count = await links.count()
-      expect(count).toBe(1)
+      const count = links
+      await expect(count).toHaveCount(1)
     })
 
     test('should render the banner image with lazy loading', async ({

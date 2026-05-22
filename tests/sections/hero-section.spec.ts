@@ -124,11 +124,11 @@ test.describe('HeroSection', () => {
     test('should have descriptive alt text on the logo', async ({ page }) => {
       const hero = page.locator('section[aria-labelledby="hero-heading"]')
       const logo = hero.locator('img')
-      const alt = await logo.getAttribute('alt')
+      const altText = await logo.getAttribute('alt')
 
-      expect(alt).toBeTruthy()
-      expect(alt!.length).toBeGreaterThan(10)
-      expect(alt).toContain('Faladoria')
+      await expect(logo).toHaveAttribute('alt')
+      expect(altText?.length).toBeGreaterThan(10)
+      expect(altText).toContain('Faladoria')
     })
 
     test('should use CSS uppercase instead of JS toUpperCase for screen readers', async ({
@@ -174,10 +174,10 @@ test.describe('HeroSection', () => {
       page,
     }) => {
       const hero = page.locator('section[aria-labelledby="hero-heading"]')
-      const labelledbyId = await hero.getAttribute('aria-labelledby')
+      const labelledbyId = hero
       const h1Id = await page.locator('h1').first().getAttribute('id')
 
-      expect(labelledbyId).toBe(h1Id)
+      await expect(labelledbyId).toHaveAttribute('aria-labelledby', h1Id!)
     })
   })
 

@@ -150,10 +150,10 @@ test.describe('GuidePage', () => {
 
     test('should have aria-hidden on all card icons', async ({ page }) => {
       const icons = page.locator('a[href^="/guia-do-sus/"] svg')
-      const count = await icons.count()
-      expect(count).toBe(6)
+      await expect(icons).toHaveCount(6)
+      const iconCount = await icons.count()
 
-      for (let i = 0; i < count; i++) {
+      for (let i = 0; i < iconCount; i++) {
         await expect(icons.nth(i)).toHaveAttribute('aria-hidden', 'true')
       }
     })

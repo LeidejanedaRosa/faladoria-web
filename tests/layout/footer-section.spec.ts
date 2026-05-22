@@ -149,9 +149,12 @@ test.describe('FooterSection', () => {
 
     test('should reference the h2 via aria-labelledby', async ({ page }) => {
       const footer = page.locator(FOOTER_SECTION)
-      const labelledbyId = await footer.getAttribute('aria-labelledby')
+      const labelledbyId = footer
 
-      expect(labelledbyId).toBe('footer-heading')
+      await expect(labelledbyId).toHaveAttribute(
+        'aria-labelledby',
+        'footer-heading'
+      )
     })
 
     test('should use semantic footer element', async ({ page }) => {
@@ -169,11 +172,11 @@ test.describe('FooterSection', () => {
 
       await expect(navs).toHaveCount(2)
 
-      const firstLabel = await navs.nth(0).getAttribute('aria-label')
-      const secondLabel = await navs.nth(1).getAttribute('aria-label')
+      const firstLabel = navs.nth(0)
+      const secondLabel = navs.nth(1)
 
-      expect(firstLabel).toBeTruthy()
-      expect(secondLabel).toBeTruthy()
+      await expect(firstLabel).toHaveAttribute('aria-label')
+      await expect(secondLabel).toHaveAttribute('aria-label')
       expect(firstLabel).not.toBe(secondLabel)
     })
 
@@ -197,10 +200,10 @@ test.describe('FooterSection', () => {
       const footer = page.locator(FOOTER_SECTION)
       const contactIcons = footer.locator('address svg')
 
-      const count = await contactIcons.count()
-      expect(count).toBe(3)
+      await expect(contactIcons).toHaveCount(3)
+      const iconCount = await contactIcons.count()
 
-      for (let i = 0; i < count; i++) {
+      for (let i = 0; i < iconCount; i++) {
         await expect(contactIcons.nth(i)).toHaveAttribute('aria-hidden', 'true')
       }
     })
@@ -243,9 +246,9 @@ test.describe('FooterSection', () => {
       page,
     }) => {
       const footer = page.locator(FOOTER_SECTION)
-      const id = await footer.getAttribute('id')
+      const id = footer
 
-      expect(id).toBe('contato')
+      await expect(id).toHaveAttribute('id', 'contato')
     })
 
     test('logo link should have accessible label', async ({ page }) => {

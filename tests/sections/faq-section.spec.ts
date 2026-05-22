@@ -59,10 +59,10 @@ test.describe('FaqSection', () => {
       const faq = page.locator(FAQ_SECTION)
       const summaries = faq.locator('details summary')
 
-      const count = await summaries.count()
-      expect(count).toBe(FAQ_ITEM_COUNT)
+      await expect(summaries).toHaveCount(FAQ_ITEM_COUNT)
+      const summaryCount = await summaries.count()
 
-      for (let i = 0; i < count; i++) {
+      for (let i = 0; i < summaryCount; i++) {
         const text = await summaries.nth(i).textContent()
         expect(text?.trim().length).toBeGreaterThan(10)
       }
@@ -72,10 +72,10 @@ test.describe('FaqSection', () => {
       const faq = page.locator(FAQ_SECTION)
       const answers = faq.locator('details p')
 
-      const count = await answers.count()
-      expect(count).toBe(FAQ_ITEM_COUNT)
+      await expect(answers).toHaveCount(FAQ_ITEM_COUNT)
+      const answerCount = await answers.count()
 
-      for (let i = 0; i < count; i++) {
+      for (let i = 0; i < answerCount; i++) {
         const text = await answers.nth(i).textContent()
         expect(text?.trim().length).toBeGreaterThan(20)
       }
@@ -87,10 +87,10 @@ test.describe('FaqSection', () => {
       page,
     }) => {
       const faq = page.locator(FAQ_SECTION)
-      const labelledbyId = await faq.getAttribute('aria-labelledby')
+      const labelledbyId = faq
       const h2Id = await faq.locator('h2#faq-heading').getAttribute('id')
 
-      expect(labelledbyId).toBe(h2Id)
+      await expect(labelledbyId).toHaveAttribute('aria-labelledby', h2Id!)
     })
 
     test('should have screen-reader-only heading', async ({ page }) => {
@@ -122,10 +122,10 @@ test.describe('FaqSection', () => {
       const faq = page.locator(FAQ_SECTION)
       const icons = faq.locator('details summary svg')
 
-      const count = await icons.count()
-      expect(count).toBe(FAQ_ITEM_COUNT)
+      await expect(icons).toHaveCount(FAQ_ITEM_COUNT)
+      const iconCount = await icons.count()
 
-      for (let i = 0; i < count; i++) {
+      for (let i = 0; i < iconCount; i++) {
         await expect(icons.nth(i)).toHaveAttribute('aria-hidden', 'true')
       }
     })

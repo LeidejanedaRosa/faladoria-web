@@ -138,8 +138,8 @@ test.describe('GuideCategoryPage', () => {
         const separators = page.locator(
           'nav[aria-label="Breadcrumb"] li[aria-hidden="true"]'
         )
-        const count = await separators.count()
-        expect(count).toBe(2)
+        const count = separators
+        await expect(count).toHaveCount(2)
       })
     })
   })

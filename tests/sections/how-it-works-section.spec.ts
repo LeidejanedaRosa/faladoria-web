@@ -119,13 +119,14 @@ test.describe('HowItWorksSection', () => {
       )
       const images = section.locator('ol img')
 
-      const count = await images.count()
-      expect(count).toBe(4)
+      await expect(images).toHaveCount(4)
+      const imageCount = await images.count()
 
-      for (let i = 0; i < count; i++) {
-        const alt = await images.nth(i).getAttribute('alt')
-        expect(alt).toBeTruthy()
-        expect(alt!.length).toBeGreaterThan(10)
+      for (let i = 0; i < imageCount; i++) {
+        const img = images.nth(i)
+        const altText = await img.getAttribute('alt')
+        await expect(img).toHaveAttribute('alt')
+        expect(altText?.length).toBeGreaterThan(10)
       }
     })
 
@@ -162,8 +163,8 @@ test.describe('HowItWorksSection', () => {
       )
       const numbers = section.locator('ol > li span[aria-hidden="true"]')
 
-      const count = await numbers.count()
-      expect(count).toBe(4)
+      const count = numbers
+      await expect(count).toHaveCount(4)
     })
   })
 

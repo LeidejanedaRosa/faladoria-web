@@ -73,9 +73,9 @@ test.describe('AboutSection', () => {
       page,
     }) => {
       const about = page.locator(ABOUT_SECTION)
-      const labelledbyId = await about.getAttribute('aria-labelledby')
+      const labelledbyId = about
       const h2Id = await about.locator('h2#about-heading').getAttribute('id')
-      expect(labelledbyId).toBe(h2Id)
+      await expect(labelledbyId).toHaveAttribute('aria-labelledby', h2Id!)
     })
 
     test('should have screen-reader-only description paragraph', async ({
@@ -121,10 +121,10 @@ test.describe('AboutSection', () => {
     test('should have aria-hidden on trait icons', async ({ page }) => {
       const about = page.locator(ABOUT_SECTION)
       const icons = about.locator('ul li svg')
-      const count = await icons.count()
-      expect(count).toBe(4)
+      await expect(icons).toHaveCount(4)
+      const iconCount = await icons.count()
 
-      for (let i = 0; i < count; i++) {
+      for (let i = 0; i < iconCount; i++) {
         await expect(icons.nth(i)).toHaveAttribute('aria-hidden', 'true')
       }
     })
@@ -132,16 +132,16 @@ test.describe('AboutSection', () => {
     test('should have alt text on founder image', async ({ page }) => {
       const about = page.locator(ABOUT_SECTION)
       const img = about.locator('img')
-      const alt = await img.getAttribute('alt')
-      expect(alt).toBeTruthy()
-      expect(alt!.length).toBeGreaterThan(10)
+      const altText = await img.getAttribute('alt')
+      await expect(img).toHaveAttribute('alt')
+      expect(altText?.length).toBeGreaterThan(10)
     })
 
     test('should have aria-label on traits list', async ({ page }) => {
       const about = page.locator(ABOUT_SECTION)
       const list = about.locator('ul')
-      const label = await list.getAttribute('aria-label')
-      expect(label).toBeTruthy()
+      const label = list
+      await expect(label).toHaveAttribute('aria-label')
     })
   })
 
