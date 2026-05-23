@@ -51,6 +51,10 @@ describe('HomePage — scroll to anchor on mount', () => {
   let mockQuerySelector: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
+    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+      cb(0)
+      return 0
+    })
     mockScrollIntoView = vi.fn()
     mockQuerySelector = vi
       .spyOn(document, 'querySelector')
@@ -67,24 +71,21 @@ describe('HomePage — scroll to anchor on mount', () => {
     vi.unstubAllGlobals()
   })
 
-  it('does nothing when hash is empty', async () => {
+  it('does nothing when hash is empty', () => {
     vi.stubGlobal('location', { hash: '' })
     renderHomePage()
-    await new Promise(r => setTimeout(r, 50))
     expect(mockScrollIntoView).not.toHaveBeenCalled()
   })
 
-  it('scrolls to the matching element when hash is present', async () => {
+  it('scrolls to the matching element when hash is present', () => {
     vi.stubGlobal('location', { hash: '#hero' })
     renderHomePage()
-    await new Promise(r => setTimeout(r, 50))
     expect(mockScrollIntoView).toHaveBeenCalledWith({ behavior: 'instant' })
   })
 
-  it('does nothing when the hash element does not exist in the DOM', async () => {
+  it('does nothing when the hash element does not exist in the DOM', () => {
     vi.stubGlobal('location', { hash: '#nao-existe' })
     renderHomePage()
-    await new Promise(r => setTimeout(r, 50))
     expect(mockScrollIntoView).not.toHaveBeenCalled()
   })
 })
