@@ -3,6 +3,7 @@ import { BreadcrumbSchema } from '@shared/components/seo'
 import { createBreadcrumb } from '@shared/data/structuredData'
 import { useDocumentMeta } from '@shared/hooks/useDocumentMeta'
 import { useScrollToTop } from '@shared/hooks/useScrollToTop'
+import { Link } from 'react-router-dom'
 
 import type { LegalSection } from '../data/privacyPolicyContent'
 
@@ -32,12 +33,12 @@ export function LegalPageLayout({
     >
       <Container className='py-12 sm:py-16 lg:py-20'>
         <nav aria-label='Breadcrumb' className='mb-8'>
-          <a
-            href='/'
+          <Link
+            to='/'
             className='text-purple-dark hover:text-purple-medium text-sm font-medium transition-colors'
           >
             &larr; Voltar para a página inicial
-          </a>
+          </Link>
         </nav>
 
         <article className='mx-auto max-w-3xl'>

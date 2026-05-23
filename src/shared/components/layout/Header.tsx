@@ -8,6 +8,7 @@ import { COMPANY_INFO } from '@shared/data/companyInfo'
 import { NAV_ITEMS } from '@shared/data/navigation'
 import { useSidebar } from '@shared/hooks/useSidebar'
 import { cn } from '@shared/utils/cn'
+import { Link } from 'react-router-dom'
 
 const MOBILE_MENU_ID = 'mobile-menu'
 
@@ -27,8 +28,8 @@ export const Header = ({ onSidebarToggle }: HeaderProps) => {
     <>
       <header role='banner' className='bg-white shadow-sm'>
         <div className='mx-auto flex max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8'>
-          <a
-            href='/'
+          <Link
+            to='/'
             aria-label={`${COMPANY_INFO.name} - Ir para página inicial`}
           >
             <img
@@ -38,7 +39,7 @@ export const Header = ({ onSidebarToggle }: HeaderProps) => {
               height={LOGO_HEIGHT}
               className='h-12 w-auto'
             />
-          </a>
+          </Link>
 
           <DesktopNav />
 
@@ -97,6 +98,7 @@ interface MobileSidebarProps {
 const MobileSidebar = ({ isOpen, onClose, sidebarRef }: MobileSidebarProps) => (
   <div
     id={MOBILE_MENU_ID}
+    data-state={isOpen ? 'open' : 'closed'}
     className={cn(
       'fixed inset-0 z-50 md:hidden',
       isOpen ? 'visible' : 'invisible'
@@ -123,8 +125,8 @@ const MobileSidebar = ({ isOpen, onClose, sidebarRef }: MobileSidebarProps) => (
       )}
     >
       <div className='flex items-center justify-between px-5 py-5'>
-        <a
-          href='/'
+        <Link
+          to='/'
           aria-label={`${COMPANY_INFO.name} - Ir para página inicial`}
           onClick={onClose}
         >
@@ -135,7 +137,7 @@ const MobileSidebar = ({ isOpen, onClose, sidebarRef }: MobileSidebarProps) => (
             height={LOGO_HEIGHT}
             className='h-10 w-auto'
           />
-        </a>
+        </Link>
         <button
           type='button'
           className='text-purple-dark hover:bg-gray-light focus:ring-purple-medium inline-flex items-center justify-center rounded-lg p-2.5 transition-colors focus:ring-2 focus:outline-none'
