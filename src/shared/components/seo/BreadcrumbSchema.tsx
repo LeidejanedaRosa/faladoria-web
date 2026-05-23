@@ -4,6 +4,17 @@ import { JsonLdScript } from './JsonLdScript'
 
 const SCHEMA_CONTEXT = 'https://schema.org'
 
+const slugify = (text: string): string =>
+  text
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\d\sa-z-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
 interface BreadcrumbItem {
   name: string
   url?: string
@@ -27,13 +38,7 @@ export function BreadcrumbSchema({ items }: BreadcrumbSchemaProps) {
         name: item.name,
       }
       if (!isLastItem) {
-        listItem.item =
-          item.url ||
-          `${baseUrl}/#${item.name
-            .toLowerCase()
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/\s+/g, '-')}`
+        listItem.item = item.url || `${baseUrl}/#${slugify(item.name)}`
       }
       return listItem
     }),
