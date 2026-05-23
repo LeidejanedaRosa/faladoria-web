@@ -3,7 +3,7 @@ import { WhatsAppCTA } from '@shared/components/ui/WhatsAppCTA'
 import { TRANSPARENCY_CONTENT } from '../../../data/transparencyContent'
 
 export const CtaCard = () => (
-  <div className='from-purple-dark to-purple-medium flex flex-col items-center gap-5 rounded-2xl bg-gradient-to-br p-6 text-center sm:p-8'>
+  <div className='from-purple-dark to-purple-medium flex flex-col items-center gap-5 rounded-2xl bg-linear-to-br p-6 text-center sm:p-8'>
     <h4 className='text-lg font-bold text-white sm:text-xl'>
       {TRANSPARENCY_CONTENT.cta.title}
     </h4>
