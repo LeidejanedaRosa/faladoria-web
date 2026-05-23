@@ -11,15 +11,12 @@ import {
 } from '@shared/data/footerContent'
 import type { IconProps } from '@shared/types/icon'
 
-import { FOOTER_FOCUS_RING } from './footerStyles'
+import { FOOTER_FOCUS_RING, ICON_CIRCLE_LG } from './footerStyles'
 
 const NAV_ICON_MAP: Record<FooterNavIconName, ComponentType<IconProps>> = {
   building: BuildingIcon,
   question: QuestionIcon,
 }
-
-const ICON_CIRCLE =
-  'flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-medium/20 text-white'
 
 export const FooterLinks = () => (
   <>
@@ -32,7 +29,7 @@ export const FooterLinks = () => (
           className='lg:border-l lg:border-white/10 lg:pl-6'
         >
           <div className='flex items-center gap-3'>
-            <div className={ICON_CIRCLE}>
+            <div className={ICON_CIRCLE_LG} aria-hidden='true'>
               <Icon className='h-5 w-5' />
             </div>
             <h3 className='text-sm font-semibold tracking-wide text-white'>

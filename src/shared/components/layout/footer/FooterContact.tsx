@@ -7,7 +7,11 @@ import {
 } from '@shared/data/footerContent'
 import type { IconProps } from '@shared/types/icon'
 
-import { FOOTER_FOCUS_RING } from './footerStyles'
+import {
+  FOOTER_FOCUS_RING,
+  ICON_CIRCLE_LG,
+  ICON_CIRCLE_SM,
+} from './footerStyles'
 
 const ICON_MAP: Record<
   FooterContactItem['iconName'],
@@ -18,15 +22,12 @@ const ICON_MAP: Record<
   location: LocationIcon,
 }
 
-const ICON_CIRCLE =
-  'flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-purple-medium/20 text-white'
-
 const ContactItem = ({ item }: { item: FooterContactItem }) => {
   const Icon = ICON_MAP[item.iconName]
 
   const content = (
     <>
-      <div className={ICON_CIRCLE}>
+      <div className={ICON_CIRCLE_SM} aria-hidden='true'>
         <Icon className='h-4 w-4' />
       </div>
       <span>{item.label}</span>
@@ -63,7 +64,7 @@ const ContactItem = ({ item }: { item: FooterContactItem }) => {
 export const FooterContact = () => (
   <div className='lg:border-l lg:border-white/10 lg:pl-6'>
     <div className='flex items-center gap-3'>
-      <div className='bg-purple-medium/20 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white'>
+      <div className={ICON_CIRCLE_LG} aria-hidden='true'>
         <EmailIcon className='h-5 w-5' />
       </div>
       <h3 className='text-sm font-semibold tracking-wide text-white'>
