@@ -1,5 +1,4 @@
 import { Container } from '@shared/components/layout/Container'
-import { ScreenReaderOnly } from '@shared/components/ui/Accessibility'
 import { SECTION_IDS } from '@shared/data/navigation'
 
 import { FAQ_CONTENT, FAQ_HEADING_ID } from '../../data/faqContent'
@@ -11,10 +10,6 @@ export const FaqSection = () => {
       className='bg-white'
       aria-labelledby={FAQ_HEADING_ID}
     >
-      <ScreenReaderOnly asChild>
-        <h2 id={FAQ_HEADING_ID}>{FAQ_CONTENT.screenReaderHeading}</h2>
-      </ScreenReaderOnly>
-
       <Container className='flex flex-col gap-10 py-16 sm:gap-12 sm:py-20 lg:gap-16 lg:py-24'>
         <FaqHeader />
         <FaqList />
@@ -25,12 +20,12 @@ export const FaqSection = () => {
 
 const FaqHeader = () => (
   <div className='flex flex-col items-center gap-3 text-center'>
-    <h3
+    <h2
+      id={FAQ_HEADING_ID}
       className='text-purple-dark text-3xl font-bold sm:text-4xl lg:text-5xl'
-      aria-hidden='true'
     >
       {FAQ_CONTENT.heading}
-    </h3>
+    </h2>
     <p className='text-purple-medium text-lg sm:text-xl'>
       {FAQ_CONTENT.description}
     </p>

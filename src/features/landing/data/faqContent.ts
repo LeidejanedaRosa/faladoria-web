@@ -7,7 +7,6 @@ export interface FaqItem {
 export const FAQ_HEADING_ID = 'faq-heading' as const
 
 export const FAQ_CONTENT = {
-  screenReaderHeading: 'Perguntas frequentes sobre a Faladoria',
   heading: 'Perguntas frequentes',
   description: 'Tire suas dúvidas sobre como a Faladoria funciona',
   items: [
@@ -49,7 +48,6 @@ export const FAQ_CONTENT = {
     },
   ],
 } as const satisfies {
-  screenReaderHeading: string
   heading: string
   description: string
   items: readonly FaqItem[]
