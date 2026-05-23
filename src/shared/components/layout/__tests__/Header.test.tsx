@@ -1,8 +1,14 @@
 import { render, screen, userEvent, within } from '@/test/test-utils'
 
+import { type ReactElement } from 'react'
+
+import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 
 import { Header } from '../Header'
+
+const renderWithRouter = (ui: ReactElement) =>
+  render(<MemoryRouter>{ui}</MemoryRouter>)
 
 vi.mock('@assets/logo_faladoria.svg', () => ({
   default: '/mock-logo.svg',
@@ -11,12 +17,12 @@ vi.mock('@assets/logo_faladoria.svg', () => ({
 describe('Header', () => {
   describe('Rendering & Structure', () => {
     it('should render the header element', () => {
-      render(<Header />)
+      renderWithRouter(<Header />)
       expect(screen.getByRole('banner')).toBeInTheDocument()
     })
 
     it('should render logos with correct alt text and dimensions', () => {
-      render(<Header />)
+      renderWithRouter(<Header />)
       const logos = screen.getAllByAltText('Logo Faladoria')
       expect(logos.length).toBe(2) // header + sidebar
       logos.forEach(logo => {
@@ -26,7 +32,7 @@ describe('Header', () => {
     })
 
     it('should render the logo link with accessible label', () => {
-      render(<Header />)
+      renderWithRouter(<Header />)
       const links = screen.getAllByLabelText(
         'Faladoria - Ir para página inicial'
       )
@@ -35,7 +41,7 @@ describe('Header', () => {
     })
 
     it('should render desktop navigation with all nav items', () => {
-      render(<Header />)
+      renderWithRouter(<Header />)
       const desktopNav = screen.getByRole('navigation', {
         name: 'Navegação principal',
       })
@@ -53,7 +59,7 @@ describe('Header', () => {
     })
 
     it('should render nav links with correct anchor hrefs', () => {
-      render(<Header />)
+      renderWithRouter(<Header />)
       const desktopNav = screen.getByRole('navigation', {
         name: 'Navegação principal',
       })
@@ -72,7 +78,7 @@ describe('Header', () => {
     })
 
     it('should render mobile menu toggle button', () => {
-      render(<Header />)
+      renderWithRouter(<Header />)
       expect(
         screen.getByRole('button', { name: 'Abrir menu' })
       ).toBeInTheDocument()
@@ -81,19 +87,19 @@ describe('Header', () => {
 
   describe('Accessibility', () => {
     it('should have aria-expanded="false" on menu button when closed', () => {
-      render(<Header />)
+      renderWithRouter(<Header />)
       const menuButton = screen.getByRole('button', { name: 'Abrir menu' })
       expect(menuButton).toHaveAttribute('aria-expanded', 'false')
     })
 
     it('should have aria-controls pointing to mobile menu', () => {
-      render(<Header />)
+      renderWithRouter(<Header />)
       const menuButton = screen.getByRole('button', { name: 'Abrir menu' })
       expect(menuButton).toHaveAttribute('aria-controls', 'mobile-menu')
     })
 
     it('should render mobile sidebar as dialog with correct ARIA', () => {
-      render(<Header />)
+      renderWithRouter(<Header />)
       const dialog = screen.getByRole('dialog', {
         name: 'Menu de navegação',
       })
@@ -103,7 +109,7 @@ describe('Header', () => {
 
     it('should have aria-expanded="true" when sidebar is open', async () => {
       const user = userEvent.setup()
-      render(<Header />)
+      renderWithRouter(<Header />)
 
       const menuButton = screen.getByRole('button', { name: 'Abrir menu' })
       await user.click(menuButton)
@@ -112,14 +118,14 @@ describe('Header', () => {
     })
 
     it('should render close button inside sidebar', () => {
-      render(<Header />)
+      renderWithRouter(<Header />)
       expect(
         screen.getByRole('button', { name: 'Fechar menu' })
       ).toBeInTheDocument()
     })
 
     it('should have distinct aria-labels for desktop and mobile nav', () => {
-      render(<Header />)
+      renderWithRouter(<Header />)
       expect(
         screen.getByRole('navigation', { name: 'Navegação principal' })
       ).toBeInTheDocument()
@@ -129,7 +135,7 @@ describe('Header', () => {
     })
 
     it('should have semantic list elements in navigation', () => {
-      render(<Header />)
+      renderWithRouter(<Header />)
       const desktopNav = screen.getByRole('navigation', {
         name: 'Navegação principal',
       })
@@ -142,7 +148,7 @@ describe('Header', () => {
   describe('Mobile Sidebar Interaction', () => {
     it('should open sidebar on menu button click', async () => {
       const user = userEvent.setup()
-      render(<Header />)
+      renderWithRouter(<Header />)
 
       const menuButton = screen.getByRole('button', { name: 'Abrir menu' })
       await user.click(menuButton)
@@ -150,12 +156,12 @@ describe('Header', () => {
       const dialog = screen.getByRole('dialog', {
         name: 'Menu de navegação',
       })
-      expect(dialog).toHaveClass('visible')
+      expect(dialog).toHaveAttribute('data-state', 'open')
     })
 
     it('should close sidebar on close button click', async () => {
       const user = userEvent.setup()
-      render(<Header />)
+      renderWithRouter(<Header />)
 
       await user.click(screen.getByRole('button', { name: 'Abrir menu' }))
 
@@ -165,12 +171,12 @@ describe('Header', () => {
       const dialog = screen.getByRole('dialog', {
         name: 'Menu de navegação',
       })
-      expect(dialog).toHaveClass('invisible')
+      expect(dialog).toHaveAttribute('data-state', 'closed')
     })
 
     it('should close sidebar on overlay click', async () => {
       const user = userEvent.setup()
-      render(<Header />)
+      renderWithRouter(<Header />)
 
       await user.click(screen.getByRole('button', { name: 'Abrir menu' }))
 
@@ -180,28 +186,28 @@ describe('Header', () => {
       const overlay = dialog.querySelector('[role="presentation"]')!
       await user.click(overlay)
 
-      expect(dialog).toHaveClass('invisible')
+      expect(dialog).toHaveAttribute('data-state', 'closed')
     })
 
     it('should close sidebar on Escape key', async () => {
       const user = userEvent.setup()
-      render(<Header />)
+      renderWithRouter(<Header />)
 
       await user.click(screen.getByRole('button', { name: 'Abrir menu' }))
 
       const dialog = screen.getByRole('dialog', {
         name: 'Menu de navegação',
       })
-      expect(dialog).toHaveClass('visible')
+      expect(dialog).toHaveAttribute('data-state', 'open')
 
       await user.keyboard('{Escape}')
 
-      expect(dialog).toHaveClass('invisible')
+      expect(dialog).toHaveAttribute('data-state', 'closed')
     })
 
     it('should close sidebar when a nav link is clicked', async () => {
       const user = userEvent.setup()
-      render(<Header />)
+      renderWithRouter(<Header />)
 
       await user.click(screen.getByRole('button', { name: 'Abrir menu' }))
 
@@ -214,11 +220,11 @@ describe('Header', () => {
       const dialog = screen.getByRole('dialog', {
         name: 'Menu de navegação',
       })
-      expect(dialog).toHaveClass('invisible')
+      expect(dialog).toHaveAttribute('data-state', 'closed')
     })
 
     it('should render all nav items in mobile sidebar', () => {
-      render(<Header />)
+      renderWithRouter(<Header />)
       const mobileNav = screen.getByRole('navigation', {
         name: 'Links do menu',
       })
@@ -235,7 +241,7 @@ describe('Header', () => {
     })
 
     it('should render WhatsAppCTA inside mobile sidebar', () => {
-      render(<Header />)
+      renderWithRouter(<Header />)
       const dialog = screen.getByRole('dialog', {
         name: 'Menu de navegação',
       })
@@ -243,7 +249,7 @@ describe('Header', () => {
     })
 
     it('should render logo inside mobile sidebar', () => {
-      render(<Header />)
+      renderWithRouter(<Header />)
       const dialog = screen.getByRole('dialog', {
         name: 'Menu de navegação',
       })
@@ -257,7 +263,7 @@ describe('Header', () => {
       const onSidebarToggle = vi.fn()
       const user = userEvent.setup()
 
-      render(<Header onSidebarToggle={onSidebarToggle} />)
+      renderWithRouter(<Header onSidebarToggle={onSidebarToggle} />)
 
       await user.click(screen.getByRole('button', { name: 'Abrir menu' }))
 
@@ -268,7 +274,7 @@ describe('Header', () => {
       const onSidebarToggle = vi.fn()
       const user = userEvent.setup()
 
-      render(<Header onSidebarToggle={onSidebarToggle} />)
+      renderWithRouter(<Header onSidebarToggle={onSidebarToggle} />)
 
       await user.click(screen.getByRole('button', { name: 'Abrir menu' }))
       await user.click(screen.getByRole('button', { name: 'Fechar menu' }))

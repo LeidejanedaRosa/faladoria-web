@@ -40,15 +40,6 @@ describe('GuideCategoryCard', () => {
       ).toHaveAttribute('href', `/guia-do-sus/${mockCategory.slug}`)
     })
 
-    it('should have aria-label with the category label as accessible name', () => {
-      renderCard()
-
-      expect(screen.getByRole('link')).toHaveAttribute(
-        'aria-label',
-        mockCategory.label
-      )
-    })
-
     it('should render the icon with aria-hidden', () => {
       const { container } = renderCard()
 

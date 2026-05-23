@@ -12,14 +12,10 @@ test.describe('Performance & Core Web Vitals Tests', () => {
       const url = page.url()
       const isLocalDev = url.includes('localhost') || url.includes('127.0.0.1')
 
-      // Skip strict LCP testing in local dev - performance metrics are unreliable
-      if (isLocalDev) {
-        // Just verify the page loaded and has visible content
-        await page.waitForLoadState('domcontentloaded')
-        const hasContent = page.locator('main')
-        await expect(hasContent).toBeVisible()
-        return
-      }
+      test.skip(
+        isLocalDev,
+        'LCP metrics are unreliable in local dev — run against a deployed URL'
+      )
 
       const lcp = await page.evaluate(() => {
         return new Promise<number>(resolve => {
@@ -87,13 +83,10 @@ test.describe('Performance & Core Web Vitals Tests', () => {
       const url = page.url()
       const isLocalDev = url.includes('localhost') || url.includes('127.0.0.1')
 
-      // Skip strict FCP testing in local dev - performance metrics are unreliable
-      if (isLocalDev) {
-        await page.waitForLoadState('domcontentloaded')
-        const hasContent = page.locator('body')
-        await expect(hasContent).toBeVisible()
-        return
-      }
+      test.skip(
+        isLocalDev,
+        'FCP metrics are unreliable in local dev — run against a deployed URL'
+      )
 
       const fcp = await page.evaluate(() => {
         const fcpEntry = performance
