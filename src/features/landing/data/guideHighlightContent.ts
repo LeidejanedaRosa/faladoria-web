@@ -13,12 +13,6 @@ export const GUIDE_HIGHLIGHT_CONTENT = {
     href: '/guia-do-sus',
   },
 
-  highlightedCategories: [
-    'seus-direitos',
-    'como-conseguir',
-    'vacinacao',
-  ] as const,
-
   screenReaderDescription:
     'Seção de destaque do guia do SUS com as principais categorias de conteúdo sobre saúde pública.',
 } as const

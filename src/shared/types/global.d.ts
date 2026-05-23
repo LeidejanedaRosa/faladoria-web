@@ -3,14 +3,12 @@
 declare module '@fontsource-variable/inter'
 
 interface ImportMetaEnv {
-  readonly VITE_APP_NAME: string
-  readonly VITE_APP_ENV: string
-  readonly VITE_API_URL: string
   readonly VITE_SENTRY_DSN: string
   readonly VITE_SENTRY_ENVIRONMENT: string
+  readonly VITE_SENTRY_TRACES_SAMPLE_RATE: string
+  readonly VITE_SENTRY_REPLAYS_SESSION_SAMPLE_RATE: string
+  readonly VITE_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE: string
   readonly VITE_GA_MEASUREMENT_ID: string
-  readonly VITE_FEATURE_NEW_UI: string
-  readonly VITE_FEATURE_BETA: string
 }
 
 interface ImportMeta {
