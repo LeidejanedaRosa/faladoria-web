@@ -1,9 +1,7 @@
-export {
-  SkipLink,
-  MainContent,
-  ScreenReaderOnly,
-  AccessibleLink,
-} from './Accessibility'
+export { SkipLink } from './SkipLink'
+export { MainContent } from './MainContent'
+export { ScreenReaderOnly } from './ScreenReaderOnly'
+export { AccessibleLink } from './AccessibleLink'
 export { WhatsAppCTA } from './WhatsAppCTA'
 
 export {
