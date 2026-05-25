@@ -1,3 +1,4 @@
+import { GUIDE_ROUTES } from '@shared/data'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
@@ -47,14 +48,14 @@ vi.mock('../../data', () => ({
 
 function renderWithSlug(slug: string) {
   return render(
-    <MemoryRouter initialEntries={[`/comoconseguirpelosus/${slug}`]}>
+    <MemoryRouter initialEntries={[GUIDE_ROUTES.category(slug)]}>
       <Routes>
         <Route
-          path='/comoconseguirpelosus/:categorySlug'
+          path={`${GUIDE_ROUTES.root}/:categorySlug`}
           element={<GuideCategoryPage />}
         />
         <Route
-          path='/comoconseguirpelosus'
+          path={GUIDE_ROUTES.root}
           element={<div data-testid='guide-page' />}
         />
       </Routes>
@@ -69,7 +70,7 @@ describe('GuideCategoryPage', () => {
     expect(screen.getByText('Seus Direitos')).toBeInTheDocument()
   })
 
-  it('redirects to /comoconseguirpelosus when slug is unknown', () => {
+  it('redirects to /como-conseguir-pelo-sus when slug is unknown', () => {
     renderWithSlug('categoria-inexistente')
     expect(screen.getByTestId('guide-page')).toBeInTheDocument()
     expect(
