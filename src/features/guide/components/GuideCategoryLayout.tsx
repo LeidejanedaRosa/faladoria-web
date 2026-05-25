@@ -1,4 +1,5 @@
 import { Container } from '@shared/components/layout'
+import { GUIDE_ROUTES } from '@shared/data'
 import { Link } from 'react-router-dom'
 
 import { GUIDE_CONTENT, type GuideCategory } from '../data'
@@ -25,7 +26,7 @@ export const GuideCategoryLayout = ({ category }: GuideCategoryLayoutProps) => {
           </li>
           <li>
             <Link
-              to='/guia-do-sus'
+              to={GUIDE_ROUTES.root}
               className='text-purple-dark hover:text-purple-medium transition-colors'
             >
               Guia do SUS

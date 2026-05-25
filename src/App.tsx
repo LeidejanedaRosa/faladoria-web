@@ -7,6 +7,7 @@ import {
   TermsOfUsePage,
 } from '@features/landing/pages'
 import { ErrorBoundary } from '@shared/components/error'
+import { GUIDE_ROUTES } from '@shared/data'
 import { Route, Routes } from 'react-router-dom'
 
 // Intentional: imports from internal feature paths to enable per-page code splitting.
@@ -30,9 +31,9 @@ function App() {
       <Suspense fallback={<div className='min-h-screen' />}>
         <Routes>
           <Route path='/' element={<HomePage />} />
-          <Route path='/guia-do-sus' element={<GuidePage />} />
+          <Route path={GUIDE_ROUTES.root} element={<GuidePage />} />
           <Route
-            path='/guia-do-sus/:categorySlug'
+            path={`${GUIDE_ROUTES.root}/:categorySlug`}
             element={<GuideCategoryPage />}
           />
           <Route

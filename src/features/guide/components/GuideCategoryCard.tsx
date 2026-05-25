@@ -1,3 +1,4 @@
+import { GUIDE_ROUTES } from '@shared/data'
 import { cn } from '@shared/utils/cn'
 import { Link } from 'react-router-dom'
 
@@ -53,8 +54,7 @@ export const GuideCategoryCard = ({ category }: GuideCategoryCardProps) => {
 
   return (
     <Link
-      to={`/guia-do-sus/${category.slug}`}
-      aria-label={category.label}
+      to={GUIDE_ROUTES.category(category.slug)}
       className={cn(
         'group flex flex-col items-center gap-4 rounded-2xl p-6 text-center',
         'transition-all duration-200 hover:-translate-y-1 hover:shadow-lg',

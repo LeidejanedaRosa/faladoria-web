@@ -1,11 +1,12 @@
 import { COMPANY_INFO } from '@shared/data/companyInfo'
+import { GUIDE_ROUTES } from '@shared/data/routes'
 
 export const GUIDE_HEADING_ID = 'guide-heading'
 export const GUIDE_CATEGORIES_HEADING_ID = 'guide-categories-heading'
 
 export const GUIDE_CONTENT = {
   seo: {
-    title: 'Guia do SUS',
+    title: 'Como conseguir pelo SUS',
     description:
       'Guia completo para navegar o SUS: seus direitos, como conseguir consultas, exames, cirurgias, vacinação e muito mais.',
   },
@@ -35,7 +36,7 @@ export const GUIDE_COLLECTION_PAGE_STRUCTURED_DATA = {
   '@type': 'CollectionPage',
   name: GUIDE_CONTENT.seo.title,
   description: GUIDE_CONTENT.seo.description,
-  url: `${COMPANY_INFO.url}/guia-do-sus`,
+  url: `${COMPANY_INFO.url}${GUIDE_ROUTES.root}`,
   isPartOf: {
     '@id': `${COMPANY_INFO.url}/#website`,
   },
