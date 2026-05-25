@@ -26,68 +26,42 @@
 
 ## Project Structure
 
-### Current Structure (Landing Phase)
+### Current Structure
 
-```
-src/
-├── components/
-│   ├── data/          # Static data and constants
-│   ├── error/         # Error boundaries and fallbacks
-│   ├── layout/        # Layout components (Container, etc.)
-│   ├── seo/           # SEO components (JsonLd, schemas)
-│   └── ui/            # Reusable UI components
-│       ├── icons/     # Icon components
-│       └── __tests__/ # Component tests
-├── features/
-│   └── guide/         # Guia do SUS — multi-page feature with its own components, data and pages
-├── hooks/             # Custom hooks (useDocumentMeta, useScrollToTop, etc.)
-├── lib/               # External service configurations (Sentry, etc.)
-├── test/              # Test utilities and setup
-├── types/             # TypeScript type definitions
-└── utils/             # Utility functions
-```
-
-**Rule for `features/`**: Use for any multi-page, multi-component domain that has its own routing, data and internal state — even during the landing phase. Each feature must expose a clean public API through its `index.ts`; other modules must never import from internal paths.
-
-### Target Structure (Before Dashboard Development Begins)
-
-Migrate to feature-based architecture **before** starting auth/dashboard implementation, so the codebase is consistent from the start:
+The feature-based architecture with `shared/` is already in place and must be maintained going forward:
 
 ```
 src/
 ├── features/
-│   ├── landing/
+│   ├── landing/           # Public landing page
 │   │   ├── components/
-│   │   │   └── sections/
+│   │   │   └── sections/  # Page sections (Hero, Problem, Solution, etc.)
+│   │   ├── data/          # Section content (heroContent, faqContent, etc.)
+│   │   └── pages/         # HomePage, LegalPageLayout, NotFoundPage
+│   ├── guide/             # Guia do SUS feature
+│   │   ├── components/
 │   │   ├── data/
 │   │   └── pages/
-│   ├── guide/              # already exists
-│   │   ├── components/
-│   │   ├── data/
-│   │   └── pages/
-│   ├── auth/               # future
+│   ├── auth/              # future
 │   │   ├── components/
 │   │   ├── hooks/
 │   │   └── pages/
-│   └── dashboard/          # future
+│   └── dashboard/         # future
 │       ├── components/
 │       ├── hooks/
 │       └── pages/
-├── shared/
-│   ├── components/
-│   │   ├── ui/             # Buttons, inputs, icons, etc.
-│   │   ├── layout/         # Container, etc.
-│   │   ├── error/          # Error boundaries
-│   │   └── seo/            # JsonLd, schemas
-│   ├── data/               # Global constants (COMPANY_INFO, etc.)
-│   ├── hooks/              # Shared hooks
-│   ├── lib/                # Sentry, etc.
-│   ├── types/
-│   └── utils/
-└── test/
+└── shared/
+    ├── components/
+    │   ├── ui/            # Reusable UI (icons, AccessibleLink, WhatsAppCTA, etc.)
+    │   ├── layout/        # Header, Footer, Container, PageShell
+    │   ├── error/         # ErrorBoundary, SectionErrorFallback
+    │   └── seo/           # JsonLdScript, BreadcrumbSchema
+    ├── data/              # Global constants (COMPANY_INFO, structuredData, etc.)
+    ├── hooks/             # Shared hooks (useDocumentMeta, useFocusTrap, etc.)
+    ├── lib/               # Sentry
+    ├── types/
+    └── utils/             # cn, slugify, formatPercentage, reportWebVitals
 ```
-
-**Migration trigger**: Before writing the first auth or dashboard component. The migration is a dedicated task — not done alongside feature development.
 
 **Splitting criterion**: If only one feature uses it → goes into that feature. If two or more features use it → goes into `shared/`.
 
@@ -217,6 +191,37 @@ test.describe('ComponentName', () => {
    - `chore:` Maintenance tasks
    - `perf:` Performance improvements
 3. **Short messages in English**: Concise, clear messages in imperative mood
+
+## Documentation Maintenance
+
+Every decision and every resolved error must be documented **before committing** the related code. This keeps context alive across conversations and avoids re-deriving the same reasoning later.
+
+### When to update `docs/DECISIONS.md`
+
+Document any tooling, configuration, or architecture decision where the **why** is not obvious from the code itself:
+
+- Choosing one tool, library, or approach over alternatives
+- Changing a configuration file (tsconfig, ESLint, Vite, Husky, etc.)
+- Defining a project-wide convention or structural rule
+- Upgrading a major dependency with behavioral changes
+
+Format: date, context, decision, alternatives rejected, rationale.
+
+### When to update `docs/TROUBLESHOOTING.md`
+
+Document any error or conflict that required investigation to solve:
+
+- TypeScript compiler errors that required non-obvious fixes
+- Test failures caused by jsdom limitations or environment differences
+- Dependency conflicts or version incompatibilities
+- Build or tooling errors with a non-obvious root cause
+- Any bug where the symptom masked the real cause
+
+Format: symptom, root cause, solution. Cross-link to DECISIONS.md if the fix also drove an architectural decision.
+
+### Rule
+
+If the fix or decision is commit-worthy, the documentation is commit-worthy. They go together.
 
 ## Assistance Approach
 
