@@ -17,7 +17,7 @@ export const GUIDE_HIGHLIGHT_CONTENT = {
 
   urlIndicator: {
     label: 'Acesse em:',
-    url: 'faladoria.com.br/comoconseguirpelosus',
+    url: 'faladoria.com.br/como-conseguir-pelo-sus',
   },
 
   bannerAlt:
