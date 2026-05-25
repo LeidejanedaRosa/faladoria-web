@@ -163,35 +163,35 @@ Baseado em: [Google Core Web Vitals](https://web.dev/articles/vitals) e [Lightho
 ### Todos os testes SEO/Acessibilidade:
 
 ```bash
-npm run test:e2e -- tests/seo
+pnpm test:seo
 ```
 
 ### Testes específicos:
 
 ```bash
 # Metadados SEO
-npm run test:e2e -- tests/seo/metadata.spec.ts
+pnpm exec playwright test tests/seo/metadata.spec.ts
 
 # HTML Semântico
-npm run test:e2e -- tests/seo/semantic-html.spec.ts
+pnpm exec playwright test tests/seo/semantic-html.spec.ts
 
 # Acessibilidade WCAG 2.1
-npm run test:e2e -- tests/seo/accessibility.spec.ts
+pnpm exec playwright test tests/seo/accessibility.spec.ts
 
 # Performance e Keywords
-npm run test:e2e -- tests/seo/performance-keywords.spec.ts
+pnpm exec playwright test tests/seo/performance-keywords.spec.ts
 ```
 
 ### Modo UI (visualizar testes):
 
 ```bash
-npm run test:e2e:ui -- tests/seo
+pnpm test:e2e:ui
 ```
 
 ### Modo headed (ver navegador):
 
 ```bash
-npm run test:e2e:headed -- tests/seo
+pnpm test:e2e:headed -- tests/seo
 ```
 
 ---
@@ -202,8 +202,8 @@ Os testes geram relatórios detalhados em `playwright-report/`:
 
 ```bash
 # Executar testes e ver relatório
-npm run test:e2e -- tests/seo
-npx playwright show-report
+pnpm test:seo
+pnpm exec playwright show-report
 ```
 
 ---
@@ -212,9 +212,8 @@ npx playwright show-report
 
 Os testes são executados automaticamente:
 
-- ✅ Em cada commit (via Husky pre-commit hook)
-- ✅ Em cada pull request (via GitHub Actions)
-- ✅ Antes do deploy (via pre-deploy script)
+- ✅ Manualmente a qualquer momento (`pnpm test:seo`)
+- ✅ Obrigatório antes do deploy (`pnpm test:e2e`)
 
 ---
 
