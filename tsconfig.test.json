@@ -7,19 +7,5 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false
   },
-  "references": [{ "path": "./tsconfig.app.json" }],
-  "include": [
-    "src/types/**/*.d.ts",
-    "src/**/*.test.ts",
-    "src/**/*.test.tsx",
-    "src/**/*.spec.ts",
-    "src/**/*.spec.tsx",
-    "src/**/__tests__/**/*.ts",
-    "src/**/__tests__/**/*.tsx",
-    "src/test/**/*.ts",
-    "src/test/**/*.tsx",
-    "tests/**/*.ts",
-    "tests/**/*.tsx"
-  ],
-  "exclude": []
+  "include": ["src", "tests"]
 }
