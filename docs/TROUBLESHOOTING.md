@@ -4,6 +4,34 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## `tsc --noEmit` passa mas o erro real existe — cache do build composto
+
+**Data**: 2026-05-25
+
+**Sintoma**:
+
+`tsc --noEmit` retorna saída vazia (zero erros), mas o código tem um `TS2304: Cannot find name 'GUIDE_ROUTES'` real. O import estava faltando em `guideHighlightContent.ts`, mas nenhum alerta aparecia.
+
+**Causa raiz**:
+
+`tsc --noEmit` sem flag `-p` usa o `tsconfig.json` raiz, que declara apenas `references` para os projetos compostos. Neste modo, o TypeScript reutiliza o cache de build anterior (`.tsbuildinfo`) em vez de recompilar os arquivos. Se o arquivo foi editado após o último build bem-sucedido mas o cache não foi invalidado corretamente, o erro fica mascarado.
+
+`tsc -p tsconfig.app.json --noEmit` compila diretamente, sem cache, e expõe o erro real.
+
+**Solução**:
+
+```bash
+# NÃO usar para validação — pode usar cache stale:
+npx tsc --noEmit
+
+# USAR para validação confiável:
+npx tsc -p tsconfig.app.json --noEmit
+```
+
+**Regra**: sempre usar `tsc -p tsconfig.app.json --noEmit` para verificar erros de tipo no código da aplicação. O `tsc --noEmit` simples é adequado apenas para validar referências entre projetos compostos, não para checar erros de compilação do código-fonte.
+
+---
+
 ## TS6310: Referenced project may not disable emit
 
 **Data**: 2026-05-25

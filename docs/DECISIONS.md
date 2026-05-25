@@ -175,6 +175,29 @@ export const slugify = (text: string): string =>
 
 ---
 
+## 2026-05-25 — Constante `GUIDE_ROUTES` em `shared/data/routes.ts`
+
+**Contexto**: A string `/comoconseguirpelosus` estava duplicada como literal em 9+ arquivos (`App.tsx`, `navigation.ts`, `GuideCategoryCard`, `GuideCategoryLayout`, `GuideCategoryPage`, `guideContent.ts`, `guideHighlightContent.ts` e os respectivos testes). Uma mudança de rota exigiu atualização manual em todos eles — o que já ocorreu uma vez neste projeto.
+
+**Decisão**: `src/shared/data/routes.ts` exporta `GUIDE_ROUTES` com `root` e `category(slug)`. Exportado pelo barrel `shared/data/index.ts`.
+
+```ts
+export const GUIDE_ROUTES = {
+  root: '/comoconseguirpelosus',
+  category: (slug: string) => `/comoconseguirpelosus/${slug}`,
+} as const
+```
+
+**Por que em `shared/data/` e não em `features/guide/`**:
+
+A rota é consumida por duas features distintas (`guide/` e `landing/`) além de código de nível de aplicação (`App.tsx`, `navigation.ts`). A regra do projeto é clara: se dois ou mais módulos usam → vai para `shared/`. Colocar em `features/guide/` criaria uma dependência `landing → guide` e `shared → guide`, violando o isolamento de features.
+
+**Alternativas rejeitadas**: manter as strings literais (já demonstrou ser um problema de manutenção); colocar em `features/guide/routes.ts` (causaria dependência `shared/ → features/`, proibida pela arquitetura em camadas).
+
+**Padrão para novas features**: ao criar uma feature com rotas próprias, definir as constantes de rota em `shared/data/routes.ts` se a rota for referenciada por mais de uma feature ou por código compartilhado.
+
+---
+
 ## 2026-05-25 — `tsconfig.test.json` sem project references
 
 **Contexto**: Ver [TROUBLESHOOTING.md](TROUBLESHOOTING.md#ts6310-referenced-project-may-not-disable-emit) para o histórico completo do erro.
