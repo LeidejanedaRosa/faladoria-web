@@ -452,11 +452,13 @@ pnpm build:analyze
 
 ## Documentação Adicional
 
-| Documento                                  | Conteúdo                                                                                 |
-| ------------------------------------------ | ---------------------------------------------------------------------------------------- |
-| [CLAUDE.md](CLAUDE.md)                     | Diretrizes completas para o agente Claude Code — stack, padrões, arquitetura, convenções |
-| [docs/TESTES.md](docs/TESTES.md)           | Estratégia de testes, suites cobertas e quando cada camada executa                       |
-| [tests/seo/README.md](tests/seo/README.md) | Documentação detalhada das suites de teste SEO e acessibilidade — critérios e fontes     |
+| Documento                                          | Conteúdo                                                                                         |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| [CLAUDE.md](CLAUDE.md)                             | Diretrizes completas para o agente Claude Code — stack, padrões, arquitetura, convenções         |
+| [docs/DECISIONS.md](docs/DECISIONS.md)             | Decisões de tooling, configuração e arquitetura — contexto, alternativas rejeitadas e raciocínio |
+| [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Log de erros e conflitos encontrados — causa raiz e solução                                      |
+| [docs/TESTES.md](docs/TESTES.md)                   | Estratégia de testes, suites cobertas e quando cada camada executa                               |
+| [tests/seo/README.md](tests/seo/README.md)         | Documentação detalhada das suites de teste SEO e acessibilidade — critérios e fontes             |
 
 ---
 
