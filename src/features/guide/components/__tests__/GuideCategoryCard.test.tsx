@@ -1,3 +1,4 @@
+import { GUIDE_ROUTES } from '@shared/data'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
@@ -37,7 +38,7 @@ describe('GuideCategoryCard', () => {
 
       expect(
         screen.getByRole('link', { name: mockCategory.label })
-      ).toHaveAttribute('href', `/guia-do-sus/${mockCategory.slug}`)
+      ).toHaveAttribute('href', GUIDE_ROUTES.category(mockCategory.slug))
     })
 
     it('should render the icon with aria-hidden', () => {

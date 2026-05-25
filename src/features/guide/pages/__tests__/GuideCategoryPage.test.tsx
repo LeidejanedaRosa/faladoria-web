@@ -19,10 +19,15 @@ vi.mock('@shared/components/seo', () => ({
   BreadcrumbSchema: () => null,
   JsonLdScript: () => null,
 }))
-vi.mock('@shared/data', () => ({
-  createBreadcrumb: vi.fn(() => []),
-  ORGANIZATION_STRUCTURED_DATA: {},
-}))
+vi.mock('@shared/data', async () => {
+  const actual =
+    await vi.importActual<typeof import('@shared/data')>('@shared/data')
+  return {
+    ...actual,
+    createBreadcrumb: vi.fn(() => []),
+    ORGANIZATION_STRUCTURED_DATA: {},
+  }
+})
 vi.mock('../../components', () => ({
   GuideCategoryLayout: ({ category }: { category: { label: string } }) => (
     <div data-testid='guide-category-layout'>{category.label}</div>
@@ -42,13 +47,16 @@ vi.mock('../../data', () => ({
 
 function renderWithSlug(slug: string) {
   return render(
-    <MemoryRouter initialEntries={[`/guia-do-sus/${slug}`]}>
+    <MemoryRouter initialEntries={[`/comoconseguirpelosus/${slug}`]}>
       <Routes>
         <Route
-          path='/guia-do-sus/:categorySlug'
+          path='/comoconseguirpelosus/:categorySlug'
           element={<GuideCategoryPage />}
         />
-        <Route path='/guia-do-sus' element={<div data-testid='guide-page' />} />
+        <Route
+          path='/comoconseguirpelosus'
+          element={<div data-testid='guide-page' />}
+        />
       </Routes>
     </MemoryRouter>
   )
@@ -61,7 +69,7 @@ describe('GuideCategoryPage', () => {
     expect(screen.getByText('Seus Direitos')).toBeInTheDocument()
   })
 
-  it('redirects to /guia-do-sus when slug is unknown', () => {
+  it('redirects to /comoconseguirpelosus when slug is unknown', () => {
     renderWithSlug('categoria-inexistente')
     expect(screen.getByTestId('guide-page')).toBeInTheDocument()
     expect(
