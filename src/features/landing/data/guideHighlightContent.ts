@@ -1,3 +1,5 @@
+import { GUIDE_ROUTES } from '@shared/data'
+
 export const GUIDE_HIGHLIGHT_HEADING_ID = 'guide-highlight-heading'
 
 export const GUIDE_HIGHLIGHT_CONTENT = {
@@ -10,8 +12,16 @@ export const GUIDE_HIGHLIGHT_CONTENT = {
     label: 'Explorar o Guia',
     ariaLabel:
       'Explorar o Guia do SUS — página com conteúdo completo sobre o Sistema Único de Saúde',
-    href: '/guia-do-sus',
+    href: GUIDE_ROUTES.root,
   },
+
+  urlIndicator: {
+    label: 'Acesse em:',
+    url: 'faladoria.com.br/comoconseguirpelosus',
+  },
+
+  bannerAlt:
+    'Mulher com megafone representando o poder da informação no acesso ao SUS',
 
   screenReaderDescription:
     'Seção de destaque do guia do SUS com as principais categorias de conteúdo sobre saúde pública.',
