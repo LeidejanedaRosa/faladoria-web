@@ -1,3 +1,5 @@
+import { slugify } from '@shared/utils/slugify'
+
 import { COMPANY_INFO } from './companyInfo'
 
 const {
@@ -74,16 +76,6 @@ export interface BreadcrumbItem {
 export const HOMEPAGE_BREADCRUMB: BreadcrumbItem[] = [
   { name: 'Início', url: url },
 ]
-
-function slugify(str: string): string {
-  return str
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
-    .toLowerCase()
-    .replace(/[^\da-z]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .replace(/--+/g, '-')
-}
 
 export const createBreadcrumb = (items: BreadcrumbItem[]): BreadcrumbItem[] => {
   return items.map((item, index) => {

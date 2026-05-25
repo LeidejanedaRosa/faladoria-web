@@ -1,19 +1,9 @@
 import { COMPANY_INFO } from '@shared/data/companyInfo'
+import { slugify } from '@shared/utils/slugify'
 
 import { JsonLdScript } from './JsonLdScript'
 
 const SCHEMA_CONTEXT = 'https://schema.org'
-
-const slugify = (text: string): string =>
-  text
-    .trim()
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^\d\sa-z-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-+|-+$/g, '')
 
 interface BreadcrumbItem {
   name: string
