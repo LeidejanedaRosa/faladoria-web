@@ -12,8 +12,8 @@ export const GuideCategoryLayout = ({ category }: GuideCategoryLayoutProps) => {
   return (
     <Container className='py-12 sm:py-16 lg:py-20'>
       <nav aria-label='Breadcrumb' className='mb-8'>
-        <ol className='flex items-center gap-2 text-sm'>
-          <li>
+        <ol className='flex items-center text-sm'>
+          <li className='flex items-center after:mx-2 after:text-gray-400 after:content-["/"]'>
             <Link
               to='/'
               className='text-purple-dark hover:text-purple-medium transition-colors'
@@ -21,19 +21,13 @@ export const GuideCategoryLayout = ({ category }: GuideCategoryLayoutProps) => {
               Início
             </Link>
           </li>
-          <li aria-hidden='true' className='text-gray-400'>
-            /
-          </li>
-          <li>
+          <li className='flex items-center after:mx-2 after:text-gray-400 after:content-["/"]'>
             <Link
               to={GUIDE_ROUTES.root}
               className='text-purple-dark hover:text-purple-medium transition-colors'
             >
               Guia do SUS
             </Link>
-          </li>
-          <li aria-hidden='true' className='text-gray-400'>
-            /
           </li>
           <li>
             <span className='text-gray-600' aria-current='page'>

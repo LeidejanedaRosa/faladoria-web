@@ -3,6 +3,16 @@ import { GUIDE_ROUTES } from '@shared/data/routes'
 
 export const GUIDE_HEADING_ID = 'guide-heading'
 export const GUIDE_CATEGORIES_HEADING_ID = 'guide-categories-heading'
+export const GUIDE_CATEGORIES_SECTION_ID = 'guide-categories'
+
+export type HeroTrustIconName = 'users' | 'heart' | 'check'
+export type HeroTrustCircleColor = 'purple' | 'rose' | 'teal'
+
+export interface HeroTrustSignal {
+  label: string
+  iconName: HeroTrustIconName
+  circleColor: HeroTrustCircleColor
+}
 
 export const GUIDE_CONTENT = {
   seo: {
@@ -13,9 +23,28 @@ export const GUIDE_CONTENT = {
 
   hero: {
     badge: 'Guia completo e gratuito',
-    headline: 'Como conseguir pelo SUS',
+    headline: {
+      base: 'Você tem direito à',
+      highlight: 'saúde pública.',
+    },
     description:
-      'Tudo o que você precisa saber para acessar seus direitos na saúde pública. Um guia prático, claro e atualizado.',
+      'Tudo o que você precisa saber para conseguir consultas, exames, cirurgias, medicamentos e muito mais pelo SUS.',
+    trustSignals: [
+      { label: 'Para todos', iconName: 'users', circleColor: 'purple' },
+      { label: 'Gratuito', iconName: 'heart', circleColor: 'rose' },
+      { label: 'Simples', iconName: 'check', circleColor: 'teal' },
+    ] satisfies HeroTrustSignal[],
+    cta: 'Explorar o guia',
+    image: {
+      alt: 'Três brasileiros sorridentes — uma senhora, uma jovem e um adulto — representando os usuários do SUS de todas as idades',
+      width: 1536,
+      height: 1024,
+    },
+    infoBar: {
+      message:
+        'Informação clara, linguagem simples e conteúdo sempre atualizado para ajudar você.',
+      badge: '100% gratuito e feito para todos.',
+    },
   },
 
   intro: {

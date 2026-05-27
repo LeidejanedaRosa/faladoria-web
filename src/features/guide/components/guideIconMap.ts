@@ -12,7 +12,7 @@ import type { IconProps } from '@shared/types/icon'
 
 import type { GuideCategory } from '../data'
 
-type IconComponent = (props: IconProps) => ReactElement
+export type IconComponent = (props: IconProps) => ReactElement
 
 export const GUIDE_ICON_MAP: Record<GuideCategory['iconName'], IconComponent> =
   {
