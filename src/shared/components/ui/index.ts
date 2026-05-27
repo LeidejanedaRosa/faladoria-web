@@ -6,9 +6,11 @@ export { WhatsAppCTA } from './WhatsAppCTA'
 
 export {
   ActivityIcon,
+  BookOpenIcon,
   BuildingIcon,
   ChartIcon,
   ChatIcon,
+  CheckIcon,
   ChevronRightIcon,
   ClipboardIcon,
   CloseIcon,
