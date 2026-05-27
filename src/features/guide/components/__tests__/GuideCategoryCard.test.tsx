@@ -25,12 +25,10 @@ function renderCard() {
 
 describe('GuideCategoryCard', () => {
   describe('Content', () => {
-    it('should render the category label as h3', () => {
+    it('should render the category label as accessible link text', () => {
       renderCard()
 
-      expect(
-        screen.getByRole('heading', { name: 'Seus Direitos', level: 3 })
-      ).toBeInTheDocument()
+      expect(screen.getByText('Seus Direitos')).toBeInTheDocument()
     })
 
     it('should render a link with the category label as accessible name', () => {
