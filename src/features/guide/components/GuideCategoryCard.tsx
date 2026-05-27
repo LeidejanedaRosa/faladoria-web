@@ -58,6 +58,7 @@ export const GuideCategoryCard = ({ category }: GuideCategoryCardProps) => {
       className={cn(
         'group flex flex-col items-center gap-4 rounded-2xl p-6 text-center',
         'transition-all duration-200 hover:-translate-y-1 hover:shadow-lg',
+        'focus-visible:ring-purple-dark focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
         colors.card
       )}
     >
@@ -66,9 +67,9 @@ export const GuideCategoryCard = ({ category }: GuideCategoryCardProps) => {
       >
         <Icon className={cn('h-12 w-12 transition-colors', colors.icon)} />
       </div>
-      <h3 className={cn('text-base leading-snug font-bold', colors.label)}>
+      <span className={cn('text-base leading-snug font-bold', colors.label)}>
         {category.label}
-      </h3>
+      </span>
     </Link>
   )
 }
