@@ -60,6 +60,27 @@ export const GUIDE_CONTENT = {
   },
 } as const
 
+export function createArticleStructuredData(
+  title: string,
+  description: string,
+  articleUrl: string
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: title,
+    description,
+    url: `${COMPANY_INFO.url}${articleUrl}`,
+    inLanguage: 'pt-BR',
+    isPartOf: {
+      '@id': `${COMPANY_INFO.url}/#website`,
+    },
+    publisher: {
+      '@id': `${COMPANY_INFO.url}/#organization`,
+    },
+  } as const
+}
+
 export const GUIDE_COLLECTION_PAGE_STRUCTURED_DATA = {
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',
