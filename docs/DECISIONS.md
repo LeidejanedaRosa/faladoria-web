@@ -219,9 +219,12 @@ A rota é consumida por duas features distintas (`guide/` e `landing/`) além de
 ```
 features/guide/data/
 ├── guideCategories.ts   → GuideCategory[] (6 categorias)
-├── guideArticles.ts     → GuideArticle[] (15 artigos placeholder)
-├── guideUtils.ts        → getCategoryBySlug, getArticlesByCategory, getArticleBySlug
-└── guideContent.ts      → conteúdo de UI e createArticleStructuredData
+├── categoryGroups.ts    → CategoryGroup interface e CATEGORY_GROUPS (metadados de grupos de categoria por camada)
+├── guideArticles.ts     → tipos ArticleBlock e GuideArticle; re-exporta GUIDE_ARTICLES de articles/
+├── articles/            → 17 módulos de artigos individuais + articles/index.ts (barrel export)
+├── guideUtils.ts        → getCategoryBySlug, getArticlesByCategory, getArticleBySlug, getCategoriesByGroup
+├── guideContent.ts      → GUIDE_CONTENT (conteúdo de UI), createCategoryStructuredData, createArticleStructuredData, GUIDE_COLLECTION_PAGE_STRUCTURED_DATA
+└── index.ts             → barrel export da feature
 ```
 
 **Padrão para slugs repetidos em dados estáticos**: quando um `categorySlug` aparece 4+ vezes no mesmo arquivo, extrair para uma constante interna (`const C = { ... } as const`) para satisfazer a regra `sonarjs/no-duplicate-string` sem exportar a constante (é detalhe de implementação do arquivo).
