@@ -205,6 +205,77 @@ Substituir `<a href="...">` por `<Link to="...">` (React Router DOM) em todos os
 
 ---
 
+## `GuideArticlePage` renderizava artigo com categoria errada
+
+**Data**: 2026-05-28
+
+**Sintoma**: Visitar `/como-conseguir-pelo-sus/consulta/como-solicitar-exames-pelo-sus` (categoria incorreta para o artigo) renderizava a página sem redirecionar. O breadcrumb mostrava "Consulta" e a canonical URL tinha o slug errado, gerando conteúdo duplicado para o Google.
+
+**Causa raiz**:
+
+`getArticleBySlug` busca em todos os artigos independentemente do `categorySlug` da URL. A validação anterior verificava apenas `!article || !category`, não a relação entre os dois:
+
+```ts
+// antes
+if (!article || !category) {
+  return <Navigate to={GUIDE_ROUTES.root} replace />
+}
+```
+
+Um artigo de exame existia, uma categoria "consulta" existia — a condição passava. O artigo era renderizado sob a categoria errada.
+
+**Solução**:
+
+Adicionar a verificação de propriedade do artigo:
+
+```ts
+if (!article || !category || article.categorySlug !== category.slug) {
+  return <Navigate to={GUIDE_ROUTES.root} replace />
+}
+```
+
+**Regra**: em qualquer lookup que envolva dois parâmetros de URL interdependentes (`categorySlug` + `articleSlug`), validar não apenas a existência de cada entidade, mas a relação entre elas.
+
+---
+
+## `GuideCategoryLayout.test.tsx` falhava após adicionar constante ao barrel
+
+**Data**: 2026-05-28
+
+**Sintoma**:
+
+```
+Error: [vitest] No "GUIDE_CATEGORY_HEADING_ID" export is defined on the "../../data" mock.
+Did you forget to return it from "vi.mock"?
+```
+
+Todos os 8 testes do `GuideCategoryLayout.test.tsx` falharam após `GUIDE_CATEGORY_HEADING_ID` ser adicionado a `guideContent.ts`.
+
+**Causa raiz**:
+
+O teste mocava `../../data` com `vi.mock('../../data', async () => { const actual = await vi.importActual(...); return { ...actual, getArticlesByCategory: vi.fn() } })`. O `...actual` deveria incluir a nova constante — mas o barrel `data/index.ts` não re-exportava `GUIDE_CATEGORY_HEADING_ID`. O Vitest tentava acessar a exportação via o módulo mockado e não a encontrava.
+
+A causa real não era o mock em si, mas a constante não estar no barrel.
+
+**Solução**:
+
+Adicionar a constante ao barrel `features/guide/data/index.ts`:
+
+```ts
+export {
+  GUIDE_HEADING_ID,
+  GUIDE_CATEGORIES_HEADING_ID,
+  GUIDE_CATEGORIES_SECTION_ID,
+  GUIDE_CATEGORY_HEADING_ID,  // ← adicionado
+  GUIDE_ARTICLE_HEADING_ID,   // ← adicionado
+  ...
+} from './guideContent'
+```
+
+**Regra**: toda constante, tipo ou função adicionada a um arquivo dentro de `features/guide/data/` deve ser re-exportada pelo barrel `data/index.ts` antes de ser importada por qualquer componente via `'../data'`.
+
+---
+
 ## Função `slugify` duplicada com implementações divergentes
 
 **Data**: 2026-05-25
