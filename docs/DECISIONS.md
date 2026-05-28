@@ -198,6 +198,51 @@ A rota é consumida por duas features distintas (`guide/` e `landing/`) além de
 
 ---
 
+## 2026-05-27 — Dados estáticos (TypeScript) para o conteúdo do Guide
+
+**Contexto**: O milestone Guide Content exige alimentar a `GuidePage` com categorias e artigos. Três estratégias foram consideradas para armazenar e servir esse conteúdo.
+
+**Decisão**: Dados estáticos em arquivos TypeScript (`guideArticles.ts`, `guideCategories.ts`), sem CMS nem backend.
+
+**Alternativas avaliadas:**
+
+| Opção                                 | Descrição                              | Rejeitada porque                                                  |
+| ------------------------------------- | -------------------------------------- | ----------------------------------------------------------------- |
+| A — Dados estáticos (escolhida)       | Arrays TypeScript com tipos explícitos | —                                                                 |
+| B — CMS headless (Contentful, Sanity) | Conteúdo editável sem deploy           | Custo e dependência externa desnecessários nesta fase             |
+| C — Backend próprio                   | API REST com banco de dados            | O backend ainda não existe; bloquearia a entrega do Guide Content |
+
+**Raciocínio**: O Guide Content é conteúdo informativo sobre o SUS — atualizado raramente e sem necessidade de edição por não-desenvolvedores nesta fase. Dados estáticos permitem entregar valor ao usuário público imediatamente, enquanto Auth, Dashboard e Chatbot (que exigem backend) são construídos em paralelo. A migração para backend próprio ou CMS, quando necessária, é direta: os tipos TypeScript já existentes definem o contrato de dados.
+
+**Estrutura adotada:**
+
+```
+features/guide/data/
+├── guideCategories.ts   → GuideCategory[] (6 categorias)
+├── guideArticles.ts     → GuideArticle[] (15 artigos placeholder)
+├── guideUtils.ts        → getCategoryBySlug, getArticlesByCategory, getArticleBySlug
+└── guideContent.ts      → conteúdo de UI e createArticleStructuredData
+```
+
+**Padrão para slugs repetidos em dados estáticos**: quando um `categorySlug` aparece 4+ vezes no mesmo arquivo, extrair para uma constante interna (`const C = { ... } as const`) para satisfazer a regra `sonarjs/no-duplicate-string` sem exportar a constante (é detalhe de implementação do arquivo).
+
+---
+
+## 2026-05-27 — Rota de artigo individual no Guide
+
+**Contexto**: Extensão da decisão `GUIDE_ROUTES` (2026-05-25). Com artigos individuais, a rota de categoria precisava de um nível adicional.
+
+**Decisão**: `article(categorySlug, articleSlug)` adicionado ao objeto `GUIDE_ROUTES` em `shared/data/routes.ts`.
+
+```ts
+article: (categorySlug: string, articleSlug: string) =>
+  `/como-conseguir-pelo-sus/${categorySlug}/${articleSlug}`
+```
+
+**Por que manter no mesmo objeto**: a rota de artigo é semanticamente parte do namespace do Guide, consumida tanto em `GuideArticleCard` (link) quanto em `App.tsx` (rota) e `GuideArticlePage` (SEO). Manter as três rotas (`root`, `category`, `article`) no mesmo objeto garante que uma mudança de prefixo (`/como-conseguir-pelo-sus`) seja feita em um único lugar.
+
+---
+
 ## 2026-05-25 — `tsconfig.test.json` sem project references
 
 **Contexto**: Ver [TROUBLESHOOTING.md](TROUBLESHOOTING.md#ts6310-referenced-project-may-not-disable-emit) para o histórico completo do erro.
