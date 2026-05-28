@@ -24,7 +24,7 @@ export const saudeDoHomemArticles: GuideArticle[] = [
           'Exame de próstata (PSA e toque retal) — recomendado a partir dos 50 anos (ou 45 para negros e quem tem histórico familiar)',
           'Acompanhamento de hipertensão e diabetes',
           'Saúde sexual e reprodutiva — vasectomia e planejamento familiar',
-          'Tratamento de doenças sexualmente transmissíveis (DSTs)',
+          'Tratamento de infecções sexualmente transmissíveis (ISTs)',
           'Saúde mental — acesso a psicólogo e psiquiatra pelo SUS',
           'Tratamento de alcoolismo e dependência química (CAPS AD)',
         ],

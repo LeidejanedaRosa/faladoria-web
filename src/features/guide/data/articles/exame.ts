@@ -91,7 +91,7 @@ export const exameArticles: GuideArticle[] = [
       },
       {
         type: 'paragraph',
-        text: 'A Lei nº 12.732/2012 define prazos máximos para tratamento de câncer — mas para exames em geral, o prazo varia por município e tipo de exame. Uma espera superior a 30 dias para exames comuns já pode ser questionada.',
+        text: 'Não existe um prazo único definido em lei para todos os exames. O tempo varia por município, tipo de exame e demanda local. Se a espera estiver prejudicando sua saúde ou o médico indicou urgência, você tem caminhos para agir.',
       },
       {
         type: 'heading',

@@ -21,7 +21,7 @@ export const saudeDaMulherArticles: GuideArticle[] = [
         type: 'list',
         items: [
           'Consulta ginecológica anual',
-          'Colposcopia preventiva (Papanicolau) — a partir dos 25 anos',
+          'Papanicolau (exame preventivo do colo do útero) — a partir dos 25 anos',
           'Mamografia — a partir dos 50 anos (ou antes, com indicação médica)',
           'Pré-natal completo (consultas, exames e vacinas)',
           'Planejamento familiar e contracepção gratuita',

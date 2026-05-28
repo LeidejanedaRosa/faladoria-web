@@ -84,7 +84,7 @@ export const vacinacaoArticles: GuideArticle[] = [
           'Febre Amarela — dose única válida para toda a vida (residentes ou viajantes de áreas de risco)',
           'Tríplice Viral — para quem não tomou na infância',
           'dT (difteria e tétano) — reforço a cada 10 anos',
-          'HPV — para mulheres até 45 anos e homens até 26 anos (grupos específicos)',
+          'HPV — de rotina para meninas de 9 a 14 anos e meninos de 11 a 14 anos; pergunte na UBS sobre sua situação específica',
           'Pneumocócica — para idosos a partir de 60 anos',
           'Covid-19 — conforme calendário vigente',
         ],
