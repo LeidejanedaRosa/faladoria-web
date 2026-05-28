@@ -158,9 +158,9 @@ export const GUIDE_CATEGORIES: GuideCategory[] = [
   },
   {
     slug: 'judicializacao',
-    label: 'Judicialização',
+    label: 'Recorrer na Justiça',
     description:
-      'Quando e como recorrer à Justiça para garantir seu direito ao atendimento pelo SUS.',
+      'Quando e como acionar a Justiça para garantir seu direito ao atendimento pelo SUS.',
     iconName: 'fist',
     color: 'purple',
   },

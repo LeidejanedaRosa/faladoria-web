@@ -48,9 +48,9 @@ export const GUIDE_CONTENT = {
   },
 
   intro: {
-    heading: 'Escolha um tema para começar',
+    heading: 'Encontre o serviço que você precisa',
     description:
-      'Navegue pelas categorias abaixo e descubra como acessar os serviços do SUS de forma correta e mais fácil.',
+      'Escolha uma categoria abaixo e veja como o SUS pode te ajudar.',
   },
 
   comingSoon: {
