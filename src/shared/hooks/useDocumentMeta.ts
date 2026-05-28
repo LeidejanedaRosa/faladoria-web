@@ -7,6 +7,7 @@ interface DocumentMeta {
   description?: string
   canonical?: string
   ogType?: 'website' | 'article'
+  twitterCard?: 'summary' | 'summary_large_image'
 }
 
 function setMetaName(name: string, content: string) {
@@ -46,6 +47,7 @@ export const useDocumentMeta = ({
   description,
   canonical,
   ogType = 'website',
+  twitterCard = 'summary',
 }: DocumentMeta) => {
   useEffect(() => {
     const fullTitle = COMPANY_INFO.seo.titleTemplate.replace('%s', title)
@@ -63,6 +65,7 @@ export const useDocumentMeta = ({
 
     setMetaProperty('og:title', fullTitle)
     setMetaProperty('og:type', ogType)
+    setMetaName('twitter:card', twitterCard)
     setMetaName('twitter:title', fullTitle)
 
     if (canonical) {
@@ -75,5 +78,5 @@ export const useDocumentMeta = ({
       setMetaProperty('og:description', description)
       setMetaName('twitter:description', description)
     }
-  }, [title, description, canonical, ogType])
+  }, [title, description, canonical, ogType, twitterCard])
 }
