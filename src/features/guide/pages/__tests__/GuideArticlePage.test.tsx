@@ -42,17 +42,25 @@ vi.mock('../../data', () => ({
         }
       : undefined
   ),
-  getCategoryBySlug: vi.fn((slug: string) =>
-    slug === 'seus-direitos'
-      ? {
-          slug: 'seus-direitos',
-          label: 'Seus Direitos',
-          description: 'Descrição',
-          iconName: 'shield',
-          color: 'purple',
-        }
-      : undefined
-  ),
+  getCategoryBySlug: vi.fn((slug: string) => {
+    const categories: Record<string, object> = {
+      'seus-direitos': {
+        slug: 'seus-direitos',
+        label: 'Seus Direitos',
+        description: 'Descrição',
+        iconName: 'shield',
+        color: 'purple',
+      },
+      consulta: {
+        slug: 'consulta',
+        label: 'Consulta',
+        description: 'Descrição consulta',
+        iconName: 'clipboard',
+        color: 'blue',
+      },
+    }
+    return categories[slug]
+  }),
   createArticleStructuredData: vi.fn(() => ({})),
 }))
 
@@ -89,6 +97,14 @@ describe('GuideArticlePage', () => {
 
   it('redireciona para /como-conseguir-pelo-sus quando categoria não existe', () => {
     renderWithSlugs('categoria-invalida', 'direito-a-saude')
+    expect(screen.getByTestId('guide-page')).toBeInTheDocument()
+    expect(screen.queryByTestId('guide-article-layout')).not.toBeInTheDocument()
+  })
+
+  it('redireciona quando artigo não pertence à categoria da URL', () => {
+    // article exists (categorySlug: 'seus-direitos'), category 'consulta' exists,
+    // but they don't match → redirect
+    renderWithSlugs('consulta', 'direito-a-saude')
     expect(screen.getByTestId('guide-page')).toBeInTheDocument()
     expect(screen.queryByTestId('guide-article-layout')).not.toBeInTheDocument()
   })

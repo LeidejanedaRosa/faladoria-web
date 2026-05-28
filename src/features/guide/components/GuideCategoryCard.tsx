@@ -63,7 +63,6 @@ export const GuideCategoryCard = ({ category }: GuideCategoryCardProps) => {
       )}
     >
       <div
-        aria-hidden='true'
         className={cn('rounded-2xl p-4 transition-colors', colors.iconWrapper)}
       >
         <Icon className={cn('h-12 w-12 transition-colors', colors.icon)} />

@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
+import { CATEGORY_GROUPS } from '../categoryGroups'
 import { GUIDE_ARTICLES } from '../guideArticles'
 import { GUIDE_CATEGORIES } from '../guideCategories'
 import {
   getArticleBySlug,
   getArticlesByCategory,
+  getCategoriesByGroup,
   getCategoryBySlug,
 } from '../guideUtils'
 
@@ -39,6 +41,35 @@ describe('getArticlesByCategory', () => {
     GUIDE_CATEGORIES.forEach(category => {
       const articles = getArticlesByCategory(category.slug)
       articles.forEach(a => expect(a.categorySlug).toBe(category.slug))
+    })
+  })
+})
+
+describe('getCategoriesByGroup', () => {
+  it('returns the categories for a valid group slug', () => {
+    const result = getCategoriesByGroup('acesso-servicos')
+    expect(result.length).toBeGreaterThan(0)
+  })
+
+  it('returns empty array for an unknown group slug', () => {
+    expect(getCategoriesByGroup('grupo-inexistente')).toEqual([])
+  })
+
+  it('returned categories match the slugs declared in the group', () => {
+    CATEGORY_GROUPS.forEach(group => {
+      const categories = getCategoriesByGroup(group.slug)
+      const returnedSlugs = categories.map(c => c.slug)
+      group.categorySlugs.forEach(slug => {
+        expect(returnedSlugs).toContain(slug)
+      })
+    })
+  })
+
+  it('preserves the order declared in categorySlugs', () => {
+    const group = CATEGORY_GROUPS[0]
+    const categories = getCategoriesByGroup(group.slug)
+    categories.forEach((cat, i) => {
+      expect(cat.slug).toBe(group.categorySlugs[i])
     })
   })
 })
