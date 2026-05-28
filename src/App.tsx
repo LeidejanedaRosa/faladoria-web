@@ -25,6 +25,12 @@ const GuideCategoryPage = lazy(() =>
   }))
 )
 
+const GuideArticlePage = lazy(() =>
+  import('./features/guide/pages/GuideArticlePage').then(m => ({
+    default: m.GuideArticlePage,
+  }))
+)
+
 function App() {
   return (
     <ErrorBoundary>
@@ -35,6 +41,10 @@ function App() {
           <Route
             path={`${GUIDE_ROUTES.root}/:categorySlug`}
             element={<GuideCategoryPage />}
+          />
+          <Route
+            path={`${GUIDE_ROUTES.root}/:categorySlug/:articleSlug`}
+            element={<GuideArticlePage />}
           />
           <Route
             path='/politica-de-privacidade'
