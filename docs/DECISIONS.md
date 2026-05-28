@@ -183,8 +183,8 @@ export const slugify = (text: string): string =>
 
 ```ts
 export const GUIDE_ROUTES = {
-  root: '/comoconseguirpelosus',
-  category: (slug: string) => `/comoconseguirpelosus/${slug}`,
+  root: '/como-conseguir-pelo-sus',
+  category: (slug: string) => `/como-conseguir-pelo-sus/${slug}`,
 } as const
 ```
 
