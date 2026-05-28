@@ -1,3 +1,4 @@
+import type { BreadcrumbItem } from '@shared/data'
 import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
@@ -36,13 +37,22 @@ const mockArticles: GuideArticle[] = [
   },
 ]
 
+const mockBreadcrumbItems: BreadcrumbItem[] = [
+  { name: 'Início', url: '/' },
+  { name: 'Guia do SUS', url: '/como-conseguir-pelo-sus' },
+  { name: mockCategory.label },
+]
+
 async function setup(articles: GuideArticle[]) {
   const { getArticlesByCategory } = await import('../../data')
   vi.mocked(getArticlesByCategory).mockReturnValue(articles)
 
   return render(
     <MemoryRouter>
-      <GuideCategoryLayout category={mockCategory} />
+      <GuideCategoryLayout
+        category={mockCategory}
+        breadcrumbItems={mockBreadcrumbItems}
+      />
     </MemoryRouter>
   )
 }

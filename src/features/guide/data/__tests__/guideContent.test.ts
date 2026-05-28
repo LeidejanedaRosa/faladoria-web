@@ -32,6 +32,14 @@ describe('createArticleStructuredData', () => {
     expect(result.inLanguage).toBe('pt-BR')
   })
 
+  it('sets datePublished', () => {
+    expect(result.datePublished).toBeDefined()
+  })
+
+  it('links author to the organization node', () => {
+    expect(result.author['@id']).toBe(`${COMPANY_INFO.url}/#organization`)
+  })
+
   it('links isPartOf to the website node', () => {
     expect(result.isPartOf['@id']).toBe(`${COMPANY_INFO.url}/#website`)
   })

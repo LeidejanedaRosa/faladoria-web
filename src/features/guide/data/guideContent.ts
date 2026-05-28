@@ -4,6 +4,8 @@ import { GUIDE_ROUTES } from '@shared/data/routes'
 export const GUIDE_HEADING_ID = 'guide-heading'
 export const GUIDE_CATEGORIES_HEADING_ID = 'guide-categories-heading'
 export const GUIDE_CATEGORIES_SECTION_ID = 'guide-categories'
+export const GUIDE_CATEGORY_HEADING_ID = 'category-heading'
+export const GUIDE_ARTICLE_HEADING_ID = 'article-heading'
 
 export type HeroTrustIconName = 'users' | 'heart' | 'check'
 export type HeroTrustCircleColor = 'purple' | 'rose' | 'teal'
@@ -92,6 +94,10 @@ export function createArticleStructuredData(
     description,
     url: `${COMPANY_INFO.url}${articleUrl}`,
     inLanguage: 'pt-BR',
+    datePublished: '2026-05-01',
+    author: {
+      '@id': `${COMPANY_INFO.url}/#organization`,
+    },
     isPartOf: {
       '@id': `${COMPANY_INFO.url}/#website`,
     },
@@ -107,6 +113,7 @@ export const GUIDE_COLLECTION_PAGE_STRUCTURED_DATA = {
   name: GUIDE_CONTENT.seo.title,
   description: GUIDE_CONTENT.seo.description,
   url: `${COMPANY_INFO.url}${GUIDE_ROUTES.root}`,
+  inLanguage: 'pt-BR',
   isPartOf: {
     '@id': `${COMPANY_INFO.url}/#website`,
   },

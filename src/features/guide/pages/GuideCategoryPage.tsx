@@ -54,7 +54,10 @@ export function GuideCategoryPage() {
         </>
       }
     >
-      <GuideCategoryLayout category={category} />
+      <GuideCategoryLayout
+        category={category}
+        breadcrumbItems={breadcrumbItems}
+      />
     </PageShell>
   )
 }

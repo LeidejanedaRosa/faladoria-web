@@ -98,7 +98,7 @@ const GuideHeroContent = () => (
 )
 
 const GuideHeroImage = () => (
-  <figure className='flex items-end overflow-hidden rounded-2xl lg:rounded-none'>
+  <div className='flex items-end overflow-hidden rounded-2xl lg:rounded-none'>
     <img
       src={heroPng}
       alt={GUIDE_CONTENT.hero.image.alt}
@@ -109,7 +109,7 @@ const GuideHeroImage = () => (
       fetchPriority='high'
       className='h-auto w-full'
     />
-  </figure>
+  </div>
 )
 
 const GuideHeroInfoBar = () => (

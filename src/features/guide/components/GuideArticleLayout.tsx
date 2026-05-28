@@ -1,12 +1,16 @@
 import { Container } from '@shared/components/layout'
-import { GUIDE_ROUTES } from '@shared/data'
+import type { BreadcrumbItem } from '@shared/data'
 
-import type { ArticleBlock, GuideArticle, GuideCategory } from '../data'
+import {
+  type ArticleBlock,
+  GUIDE_ARTICLE_HEADING_ID,
+  type GuideArticle,
+} from '../data'
 import { GuideBreadcrumb } from './GuideBreadcrumb'
 
 interface GuideArticleLayoutProps {
   article: GuideArticle
-  category: GuideCategory
+  breadcrumbItems: BreadcrumbItem[]
 }
 
 const ArticleBlockRenderer = ({ block }: { block: ArticleBlock }) => {
@@ -29,7 +33,10 @@ const ArticleBlockRenderer = ({ block }: { block: ArticleBlock }) => {
       return (
         <ul className='space-y-2 pl-5'>
           {block.items.map((item, index) => (
-            <li key={index} className='list-disc leading-relaxed text-gray-700'>
+            <li
+              key={`list-item-${index}`}
+              className='list-disc leading-relaxed text-gray-700'
+            >
               {item}
             </li>
           ))}
@@ -49,23 +56,19 @@ const ArticleBlockRenderer = ({ block }: { block: ArticleBlock }) => {
 
 export const GuideArticleLayout = ({
   article,
-  category,
+  breadcrumbItems,
 }: GuideArticleLayoutProps) => {
-  const breadcrumbItems = [
-    { name: 'Início', url: '/' },
-    { name: 'Guia do SUS', url: GUIDE_ROUTES.root },
-    { name: category.label, url: GUIDE_ROUTES.category(category.slug) },
-    { name: article.title },
-  ]
-
   return (
     <Container className='py-12 sm:py-16 lg:py-20'>
       <GuideBreadcrumb items={breadcrumbItems} />
 
-      <article aria-labelledby='article-heading' className='mx-auto max-w-3xl'>
+      <article
+        aria-labelledby={GUIDE_ARTICLE_HEADING_ID}
+        className='mx-auto max-w-3xl'
+      >
         <header className='mb-10'>
           <h1
-            id='article-heading'
+            id={GUIDE_ARTICLE_HEADING_ID}
             className='text-purple-deepest text-3xl font-bold sm:text-4xl'
           >
             {article.title}
@@ -78,7 +81,10 @@ export const GuideArticleLayout = ({
         {article.content.length > 0 ? (
           <div className='space-y-6'>
             {article.content.map((block, index) => (
-              <ArticleBlockRenderer key={index} block={block} />
+              <ArticleBlockRenderer
+                key={`${block.type}-${index}`}
+                block={block}
+              />
             ))}
           </div>
         ) : (
