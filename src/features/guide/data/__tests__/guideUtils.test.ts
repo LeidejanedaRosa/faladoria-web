@@ -26,9 +26,9 @@ describe('getCategoryBySlug', () => {
 
 describe('getArticlesByCategory', () => {
   it('returns articles for a valid category slug', () => {
-    const result = getArticlesByCategory('como-conseguir')
+    const result = getArticlesByCategory('consulta')
     expect(result.length).toBeGreaterThan(0)
-    result.forEach(a => expect(a.categorySlug).toBe('como-conseguir'))
+    result.forEach(a => expect(a.categorySlug).toBe('consulta'))
   })
 
   it('returns an empty array for a category with no articles', () => {
