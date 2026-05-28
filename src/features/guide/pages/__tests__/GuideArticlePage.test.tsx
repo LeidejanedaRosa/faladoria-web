@@ -38,7 +38,7 @@ vi.mock('../../data', () => ({
           categorySlug: 'seus-direitos',
           title: 'Direito à saúde',
           summary: 'A saúde é um direito de todos.',
-          content: '',
+          content: [],
         }
       : undefined
   ),

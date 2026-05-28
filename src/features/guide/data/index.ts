@@ -2,7 +2,7 @@ export { GUIDE_CATEGORIES } from './guideCategories'
 export type { GuideCategory } from './guideCategories'
 
 export { GUIDE_ARTICLES } from './guideArticles'
-export type { GuideArticle } from './guideArticles'
+export type { GuideArticle, ArticleBlock } from './guideArticles'
 
 export {
   getCategoryBySlug,

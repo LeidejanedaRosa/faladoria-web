@@ -1,8 +1,14 @@
+export type ArticleBlock =
+  | { type: 'paragraph'; text: string }
+  | { type: 'heading'; level: 2 | 3; text: string }
+  | { type: 'list'; items: string[] }
+  | { type: 'callout'; text: string }
+
 export interface GuideArticle {
   slug: string
   title: string
   summary: string
-  content: string
+  content: ArticleBlock[]
   categorySlug: string
 }
 
@@ -23,7 +29,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: 'Direito à saúde',
     summary:
       'A saúde é um direito de todos e dever do Estado, garantido pela Constituição Federal de 1988.',
-    content: '',
+    content: [],
   },
   {
     slug: 'como-exigir-seus-direitos',
@@ -31,7 +37,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: 'Como exigir seus direitos',
     summary:
       'Saiba quais canais acionar quando o atendimento no SUS for negado ou demorar além do prazo.',
-    content: '',
+    content: [],
   },
 
   // como-funciona-o-sus
@@ -41,7 +47,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: 'O que é o SUS',
     summary:
       'Entenda o que é o Sistema Único de Saúde, seus princípios e como ele está organizado no Brasil.',
-    content: '',
+    content: [],
   },
   {
     slug: 'niveis-de-atendimento',
@@ -49,7 +55,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: 'Níveis de atendimento',
     summary:
       'Conheça a diferença entre atenção básica, média e alta complexidade e saiba onde buscar cada tipo de cuidado.',
-    content: '',
+    content: [],
   },
 
   // como-conseguir
@@ -59,7 +65,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: 'Consultas médicas',
     summary:
       'Veja como agendar consultas pelo SUS, quais especialidades estão disponíveis e quais são os prazos.',
-    content: '',
+    content: [],
   },
   {
     slug: 'exames',
@@ -67,7 +73,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: 'Exames',
     summary:
       'Saiba como solicitar exames laboratoriais e de imagem pelo SUS e o que fazer se a espera for longa.',
-    content: '',
+    content: [],
   },
   {
     slug: 'cirurgias',
@@ -75,7 +81,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: 'Cirurgias',
     summary:
       'Entenda como funciona a fila de cirurgias eletivas no SUS e como acompanhar sua posição.',
-    content: '',
+    content: [],
   },
   {
     slug: 'medicamentos',
@@ -83,7 +89,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: 'Medicamentos',
     summary:
       'Descubra como retirar medicamentos gratuitos pelo SUS, Farmácia Popular e programas estaduais.',
-    content: '',
+    content: [],
   },
 
   // vacinacao
@@ -93,7 +99,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: 'Calendário infantil',
     summary:
       'Todas as vacinas obrigatórias para crianças de 0 a 9 anos disponíveis gratuitamente no SUS.',
-    content: '',
+    content: [],
   },
   {
     slug: 'calendario-adulto',
@@ -101,7 +107,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: 'Calendário do adulto',
     summary:
       'Vacinas recomendadas para adultos e idosos, incluindo gripe, febre amarela e hepatite.',
-    content: '',
+    content: [],
   },
 
   // prevencao
@@ -111,7 +117,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: 'Saúde da mulher',
     summary:
       'Exames preventivos, pré-natal e acompanhamento ginecológico disponíveis gratuitamente pelo SUS.',
-    content: '',
+    content: [],
   },
   {
     slug: 'saude-do-homem',
@@ -119,7 +125,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: 'Saúde do homem',
     summary:
       'Exames de prevenção e programas de saúde masculina oferecidos pelo SUS.',
-    content: '',
+    content: [],
   },
   {
     slug: 'saude-da-crianca',
@@ -127,7 +133,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: 'Saúde da criança',
     summary:
       'Acompanhamento do crescimento, desenvolvimento e vacinação das crianças pelo SUS.',
-    content: '',
+    content: [],
   },
 
   // denuncie
@@ -137,7 +143,7 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: 'Canais de denúncia',
     summary:
       'Conheça os canais oficiais para denunciar irregularidades no atendimento do SUS.',
-    content: '',
+    content: [],
   },
   {
     slug: 'ouvidoria-do-sus',
@@ -145,6 +151,6 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     title: 'Ouvidoria do SUS',
     summary:
       'Saiba como acionar a ouvidoria do SUS e o que esperar após registrar sua reclamação.',
-    content: '',
+    content: [],
   },
 ]

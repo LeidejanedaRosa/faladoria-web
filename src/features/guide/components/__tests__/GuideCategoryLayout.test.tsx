@@ -25,14 +25,14 @@ const mockArticles: GuideArticle[] = [
     categorySlug: 'seus-direitos',
     title: 'Direito à saúde',
     summary: 'A saúde é um direito de todos.',
-    content: '',
+    content: [],
   },
   {
     slug: 'como-exigir',
     categorySlug: 'seus-direitos',
     title: 'Como exigir seus direitos',
     summary: 'Saiba como acionar os canais corretos.',
-    content: '',
+    content: [],
   },
 ]
 
