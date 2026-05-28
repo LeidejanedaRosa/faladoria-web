@@ -1,45 +1,37 @@
 import { Container } from '@shared/components/layout'
 import { GUIDE_ROUTES } from '@shared/data'
-import { Link } from 'react-router-dom'
 
-import { GUIDE_CONTENT, type GuideCategory } from '../data'
+import {
+  getArticlesByCategory,
+  GUIDE_CONTENT,
+  type GuideCategory,
+} from '../data'
+import { GuideArticleCard } from './GuideArticleCard'
+import { GuideBreadcrumb } from './GuideBreadcrumb'
 
 interface GuideCategoryLayoutProps {
   category: GuideCategory
 }
 
 export const GuideCategoryLayout = ({ category }: GuideCategoryLayoutProps) => {
+  const articles = getArticlesByCategory(category.slug)
+
+  const breadcrumbItems = [
+    { name: 'Início', url: '/' },
+    { name: 'Guia do SUS', url: GUIDE_ROUTES.root },
+    { name: category.label },
+  ]
+
   return (
     <Container className='py-12 sm:py-16 lg:py-20'>
-      <nav aria-label='Breadcrumb' className='mb-8'>
-        <ol className='flex items-center text-sm'>
-          <li className='flex items-center after:mx-2 after:text-gray-400 after:content-["/"]'>
-            <Link
-              to='/'
-              className='text-purple-dark hover:text-purple-medium transition-colors'
-            >
-              Início
-            </Link>
-          </li>
-          <li className='flex items-center after:mx-2 after:text-gray-400 after:content-["/"]'>
-            <Link
-              to={GUIDE_ROUTES.root}
-              className='text-purple-dark hover:text-purple-medium transition-colors'
-            >
-              Guia do SUS
-            </Link>
-          </li>
-          <li>
-            <span className='text-gray-600' aria-current='page'>
-              {category.label}
-            </span>
-          </li>
-        </ol>
-      </nav>
+      <GuideBreadcrumb items={breadcrumbItems} />
 
-      <article className='mx-auto max-w-3xl'>
+      <section aria-labelledby='category-heading' className='mx-auto max-w-3xl'>
         <header className='mb-10'>
-          <h1 className='text-purple-deepest text-3xl font-bold sm:text-4xl'>
+          <h1
+            id='category-heading'
+            className='text-purple-deepest text-3xl font-bold sm:text-4xl'
+          >
             {category.label}
           </h1>
           <p className='mt-3 text-lg leading-relaxed text-gray-600'>
@@ -47,15 +39,28 @@ export const GuideCategoryLayout = ({ category }: GuideCategoryLayoutProps) => {
           </p>
         </header>
 
-        <div className='rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-6 py-16 text-center'>
-          <p className='text-lg font-medium text-gray-500'>
-            {GUIDE_CONTENT.comingSoon.heading}
-          </p>
-          <p className='mt-2 text-sm text-gray-400'>
-            {GUIDE_CONTENT.comingSoon.description}
-          </p>
-        </div>
-      </article>
+        {articles.length > 0 ? (
+          <ul
+            className='flex flex-col gap-4'
+            aria-label={`Artigos de ${category.label}`}
+          >
+            {articles.map(article => (
+              <li key={article.slug}>
+                <GuideArticleCard article={article} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className='rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-6 py-16 text-center'>
+            <p className='text-lg font-medium text-gray-500'>
+              {GUIDE_CONTENT.comingSoon.heading}
+            </p>
+            <p className='mt-2 text-sm text-gray-400'>
+              {GUIDE_CONTENT.comingSoon.description}
+            </p>
+          </div>
+        )}
+      </section>
     </Container>
   )
 }

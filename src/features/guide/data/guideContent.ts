@@ -48,9 +48,9 @@ export const GUIDE_CONTENT = {
   },
 
   intro: {
-    heading: 'Escolha um tema para começar',
+    heading: 'Encontre o serviço que você precisa',
     description:
-      'Navegue pelas categorias abaixo e descubra como acessar os serviços do SUS de forma correta e mais fácil.',
+      'Escolha uma categoria abaixo e veja como o SUS pode te ajudar.',
   },
 
   comingSoon: {
@@ -59,6 +59,27 @@ export const GUIDE_CONTENT = {
       'Esta seção está sendo preparada com todo o cuidado que você merece.',
   },
 } as const
+
+export function createArticleStructuredData(
+  title: string,
+  description: string,
+  articleUrl: string
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: title,
+    description,
+    url: `${COMPANY_INFO.url}${articleUrl}`,
+    inLanguage: 'pt-BR',
+    isPartOf: {
+      '@id': `${COMPANY_INFO.url}/#website`,
+    },
+    publisher: {
+      '@id': `${COMPANY_INFO.url}/#organization`,
+    },
+  } as const
+}
 
 export const GUIDE_COLLECTION_PAGE_STRUCTURED_DATA = {
   '@context': 'https://schema.org',
