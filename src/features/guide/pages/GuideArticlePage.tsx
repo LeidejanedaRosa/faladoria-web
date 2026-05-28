@@ -37,7 +37,7 @@ export function GuideArticlePage() {
   })
   useScrollToTop()
 
-  if (!article || !category) {
+  if (!article || !category || article.categorySlug !== category.slug) {
     return <Navigate to={GUIDE_ROUTES.root} replace />
   }
 
@@ -65,7 +65,7 @@ export function GuideArticlePage() {
         </>
       }
     >
-      <GuideArticleLayout article={article} category={category} />
+      <GuideArticleLayout article={article} breadcrumbItems={breadcrumbItems} />
     </PageShell>
   )
 }
