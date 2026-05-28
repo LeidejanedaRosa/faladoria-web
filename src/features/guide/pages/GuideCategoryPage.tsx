@@ -1,6 +1,7 @@
 import { PageShell } from '@shared/components/layout'
 import { BreadcrumbSchema, JsonLdScript } from '@shared/components/seo'
 import {
+  COMPANY_INFO,
   createBreadcrumb,
   GUIDE_ROUTES,
   ORGANIZATION_STRUCTURED_DATA,
@@ -10,7 +11,7 @@ import { useScrollToTop } from '@shared/hooks/useScrollToTop'
 import { Navigate, useParams } from 'react-router-dom'
 
 import { GuideCategoryLayout } from '../components'
-import { GUIDE_CATEGORIES } from '../data'
+import { createCategoryStructuredData, GUIDE_CATEGORIES } from '../data'
 
 export function GuideCategoryPage() {
   const { categorySlug } = useParams<{ categorySlug: string }>()
@@ -20,6 +21,9 @@ export function GuideCategoryPage() {
   useDocumentMeta({
     title: category ? `${category.label} — Guia do SUS` : 'Guia do SUS',
     description: category?.description,
+    canonical: category
+      ? `${COMPANY_INFO.url}${GUIDE_ROUTES.category(category.slug)}`
+      : undefined,
   })
   useScrollToTop()
 
@@ -39,6 +43,13 @@ export function GuideCategoryPage() {
       schemas={
         <>
           <JsonLdScript data={ORGANIZATION_STRUCTURED_DATA} />
+          <JsonLdScript
+            data={createCategoryStructuredData(
+              category.label,
+              category.description,
+              GUIDE_ROUTES.category(category.slug)
+            )}
+          />
           <BreadcrumbSchema items={breadcrumbItems} />
         </>
       }

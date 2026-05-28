@@ -20,6 +20,7 @@ export {
   GUIDE_CATEGORIES_SECTION_ID,
   GUIDE_CONTENT,
   GUIDE_COLLECTION_PAGE_STRUCTURED_DATA,
+  createCategoryStructuredData,
   createArticleStructuredData,
 } from './guideContent'
 export type {

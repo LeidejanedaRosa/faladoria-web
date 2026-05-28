@@ -60,13 +60,33 @@ export const GUIDE_CONTENT = {
   },
 } as const
 
+const SCHEMA_ORG = 'https://schema.org'
+
+export function createCategoryStructuredData(
+  label: string,
+  description: string,
+  categoryUrl: string
+) {
+  return {
+    '@context': SCHEMA_ORG,
+    '@type': 'CollectionPage',
+    name: label,
+    description,
+    url: `${COMPANY_INFO.url}${categoryUrl}`,
+    inLanguage: 'pt-BR',
+    isPartOf: {
+      '@id': `${COMPANY_INFO.url}/#website`,
+    },
+  } as const
+}
+
 export function createArticleStructuredData(
   title: string,
   description: string,
   articleUrl: string
 ) {
   return {
-    '@context': 'https://schema.org',
+    '@context': SCHEMA_ORG,
     '@type': 'Article',
     headline: title,
     description,

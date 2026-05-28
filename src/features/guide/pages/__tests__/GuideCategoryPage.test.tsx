@@ -44,6 +44,7 @@ vi.mock('../../data', () => ({
       color: 'purple',
     },
   ],
+  createCategoryStructuredData: vi.fn(() => ({})),
 }))
 
 function renderWithSlug(slug: string) {

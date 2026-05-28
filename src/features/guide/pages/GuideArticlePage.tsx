@@ -1,6 +1,7 @@
 import { PageShell } from '@shared/components/layout'
 import { BreadcrumbSchema, JsonLdScript } from '@shared/components/seo'
 import {
+  COMPANY_INFO,
   createBreadcrumb,
   GUIDE_ROUTES,
   ORGANIZATION_STRUCTURED_DATA,
@@ -28,6 +29,11 @@ export function GuideArticlePage() {
   useDocumentMeta({
     title: article ? `${article.title} — Guia do SUS` : 'Guia do SUS',
     description: article?.summary,
+    canonical:
+      article && category
+        ? `${COMPANY_INFO.url}${GUIDE_ROUTES.article(category.slug, article.slug)}`
+        : undefined,
+    ogType: 'article',
   })
   useScrollToTop()
 

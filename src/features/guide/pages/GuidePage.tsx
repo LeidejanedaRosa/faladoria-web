@@ -1,6 +1,11 @@
 import { PageShell } from '@shared/components/layout'
 import { BreadcrumbSchema, JsonLdScript } from '@shared/components/seo'
-import { createBreadcrumb, ORGANIZATION_STRUCTURED_DATA } from '@shared/data'
+import {
+  COMPANY_INFO,
+  createBreadcrumb,
+  GUIDE_ROUTES,
+  ORGANIZATION_STRUCTURED_DATA,
+} from '@shared/data'
 import { useDocumentMeta } from '@shared/hooks/useDocumentMeta'
 import { useScrollToTop } from '@shared/hooks/useScrollToTop'
 
@@ -16,6 +21,7 @@ export function GuidePage() {
   useDocumentMeta({
     title: GUIDE_CONTENT.seo.title,
     description: GUIDE_CONTENT.seo.description,
+    canonical: `${COMPANY_INFO.url}${GUIDE_ROUTES.root}`,
   })
   useScrollToTop()
 
