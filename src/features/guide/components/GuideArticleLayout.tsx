@@ -28,8 +28,8 @@ const ArticleBlockRenderer = ({ block }: { block: ArticleBlock }) => {
     case 'list':
       return (
         <ul className='space-y-2 pl-5'>
-          {block.items.map(item => (
-            <li key={item} className='list-disc leading-relaxed text-gray-700'>
+          {block.items.map((item, index) => (
+            <li key={index} className='list-disc leading-relaxed text-gray-700'>
               {item}
             </li>
           ))}
