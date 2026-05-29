@@ -171,20 +171,17 @@ describe('useDocumentMeta', () => {
       ).toBe('Descrição OG')
     })
 
-    it('should clear existing og:url when navigating to a page without canonical', () => {
+    it('should remove existing og:url when navigating to a page without canonical', () => {
       const meta = document.createElement('meta')
       meta.setAttribute('property', 'og:url')
       meta.content = `${BASE_URL}/previous-page`
       document.head.appendChild(meta)
 
       renderHook(() => useDocumentMeta({ title: 'Test' }))
-      expect(
-        document.querySelector<HTMLMetaElement>('meta[property="og:url"]')
-          ?.content
-      ).toBe('')
+      expect(document.querySelector('meta[property="og:url"]')).toBeNull()
     })
 
-    it('should clear existing og:description when navigating to a page without description', () => {
+    it('should remove existing og:description when navigating to a page without description', () => {
       const meta = document.createElement('meta')
       meta.setAttribute('property', 'og:description')
       meta.content = 'Previous description'
@@ -192,10 +189,8 @@ describe('useDocumentMeta', () => {
 
       renderHook(() => useDocumentMeta({ title: 'Test' }))
       expect(
-        document.querySelector<HTMLMetaElement>(
-          'meta[property="og:description"]'
-        )?.content
-      ).toBe('')
+        document.querySelector('meta[property="og:description"]')
+      ).toBeNull()
     })
   })
 
@@ -230,20 +225,17 @@ describe('useDocumentMeta', () => {
       ).toBe('Descrição Twitter')
     })
 
-    it('should clear existing twitter:url when navigating to a page without canonical', () => {
+    it('should remove existing twitter:url when navigating to a page without canonical', () => {
       const meta = document.createElement('meta')
       meta.name = 'twitter:url'
       meta.content = `${BASE_URL}/previous-page`
       document.head.appendChild(meta)
 
       renderHook(() => useDocumentMeta({ title: 'Test' }))
-      expect(
-        document.querySelector<HTMLMetaElement>('meta[name="twitter:url"]')
-          ?.content
-      ).toBe('')
+      expect(document.querySelector('meta[name="twitter:url"]')).toBeNull()
     })
 
-    it('should clear existing twitter:description when navigating to a page without description', () => {
+    it('should remove existing twitter:description when navigating to a page without description', () => {
       const meta = document.createElement('meta')
       meta.name = 'twitter:description'
       meta.content = 'Previous description'
@@ -251,10 +243,8 @@ describe('useDocumentMeta', () => {
 
       renderHook(() => useDocumentMeta({ title: 'Test' }))
       expect(
-        document.querySelector<HTMLMetaElement>(
-          'meta[name="twitter:description"]'
-        )?.content
-      ).toBe('')
+        document.querySelector('meta[name="twitter:description"]')
+      ).toBeNull()
     })
   })
 })

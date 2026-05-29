@@ -74,16 +74,16 @@ export const useDocumentMeta = ({
       setMetaName('twitter:url', canonical)
     } else {
       document.querySelector('link[rel="canonical"]')?.remove()
-      setMetaProperty('og:url', '')
-      setMetaName('twitter:url', '')
+      document.querySelector('meta[property="og:url"]')?.remove()
+      document.querySelector('meta[name="twitter:url"]')?.remove()
     }
 
     if (description) {
       setMetaProperty('og:description', description)
       setMetaName('twitter:description', description)
     } else {
-      setMetaProperty('og:description', '')
-      setMetaName('twitter:description', '')
+      document.querySelector('meta[property="og:description"]')?.remove()
+      document.querySelector('meta[name="twitter:description"]')?.remove()
     }
   }, [title, description, canonical, ogType, twitterCard])
 }
