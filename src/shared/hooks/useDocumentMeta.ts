@@ -72,11 +72,18 @@ export const useDocumentMeta = ({
       setCanonical(canonical)
       setMetaProperty('og:url', canonical)
       setMetaName('twitter:url', canonical)
+    } else {
+      document.querySelector('link[rel="canonical"]')?.remove()
+      setMetaProperty('og:url', '')
+      setMetaName('twitter:url', '')
     }
 
     if (description) {
       setMetaProperty('og:description', description)
       setMetaName('twitter:description', description)
+    } else {
+      setMetaProperty('og:description', '')
+      setMetaName('twitter:description', '')
     }
   }, [title, description, canonical, ogType, twitterCard])
 }
