@@ -7,6 +7,7 @@ export const consultaArticles: GuideArticle[] = [
     title: 'Como agendar uma consulta',
     summary:
       'Veja como agendar consultas pelo SUS, quais especialidades estão disponíveis e quais são os prazos.',
+    datePublished: '2026-05-01',
     content: [
       { type: 'heading', level: 2, text: 'Onde ir primeiro' },
       {
@@ -77,6 +78,7 @@ export const consultaArticles: GuideArticle[] = [
     title: 'Como conseguir consulta com especialista',
     summary:
       'Para consultar um especialista pelo SUS é preciso passar por uma etapa antes. Entenda como funciona.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',

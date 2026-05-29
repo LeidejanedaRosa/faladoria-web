@@ -7,6 +7,7 @@ export const transporteSanitarioArticles: GuideArticle[] = [
     title: 'Como solicitar transporte sanitário',
     summary:
       'Se você não consegue se deslocar para consultas ou tratamentos, o SUS pode garantir transporte.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',

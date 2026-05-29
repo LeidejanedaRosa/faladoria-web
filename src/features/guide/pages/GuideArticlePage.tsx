@@ -58,7 +58,8 @@ export function GuideArticlePage() {
             data={createArticleStructuredData(
               article.title,
               article.summary,
-              GUIDE_ROUTES.article(category.slug, article.slug)
+              GUIDE_ROUTES.article(category.slug, article.slug),
+              article.datePublished
             )}
           />
           <BreadcrumbSchema items={breadcrumbItems} />

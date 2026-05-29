@@ -7,6 +7,7 @@ export const saudeDaMulherArticles: GuideArticle[] = [
     title: 'Saúde da mulher pelo SUS',
     summary:
       'Exames preventivos, pré-natal e acompanhamento ginecológico disponíveis gratuitamente pelo SUS.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',

@@ -7,6 +7,7 @@ export const saudeDaCriancaArticles: GuideArticle[] = [
     title: 'Saúde da criança pelo SUS',
     summary:
       'Acompanhamento do crescimento, desenvolvimento e vacinação das crianças pelo SUS.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',

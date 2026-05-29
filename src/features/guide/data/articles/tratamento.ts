@@ -7,6 +7,7 @@ export const tratamentoArticles: GuideArticle[] = [
     title: 'Como conseguir tratamento pelo SUS',
     summary:
       'Fisioterapia, quimioterapia, reabilitação e outros tratamentos disponíveis gratuitamente.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',

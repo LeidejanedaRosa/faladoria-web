@@ -8,6 +8,7 @@ export interface GuideArticle {
   slug: string
   title: string
   summary: string
+  datePublished: string
   content: ArticleBlock[]
   categorySlug: string
 }

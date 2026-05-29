@@ -7,6 +7,7 @@ export const saudeDoHomemArticles: GuideArticle[] = [
     title: 'Saúde do homem pelo SUS',
     summary:
       'Exames de prevenção e programas de saúde masculina oferecidos pelo SUS.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',

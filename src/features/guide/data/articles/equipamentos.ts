@@ -7,6 +7,7 @@ export const equipamentosArticles: GuideArticle[] = [
     title: 'Como solicitar equipamentos pelo SUS',
     summary:
       'Cadeiras de rodas, muletas, órteses, próteses e respiradores podem ser solicitados gratuitamente.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',

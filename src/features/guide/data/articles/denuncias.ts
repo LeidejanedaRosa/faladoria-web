@@ -7,6 +7,7 @@ export const denunciasArticles: GuideArticle[] = [
     title: 'Canais de denúncia',
     summary:
       'Conheça os canais oficiais para denunciar irregularidades no atendimento do SUS.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',
@@ -66,6 +67,7 @@ export const denunciasArticles: GuideArticle[] = [
     title: 'Ouvidoria do SUS',
     summary:
       'Saiba como acionar a ouvidoria do SUS e o que esperar após registrar sua reclamação.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',

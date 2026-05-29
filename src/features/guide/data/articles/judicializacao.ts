@@ -7,6 +7,7 @@ export const judicializacaoArticles: GuideArticle[] = [
     title: 'Quando e como recorrer à Justiça',
     summary:
       'A judicialização é o último recurso. Entenda quando ela é necessária e como funciona o processo.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',
