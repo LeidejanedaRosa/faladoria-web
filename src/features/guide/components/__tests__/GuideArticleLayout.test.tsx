@@ -18,6 +18,7 @@ function makeArticle(overrides: Partial<GuideArticle> = {}): GuideArticle {
     categorySlug: 'seus-direitos',
     title: 'Direito à saúde',
     summary: 'A saúde é um direito de todos.',
+    datePublished: '2026-05-01',
     content: [],
     ...overrides,
   }
@@ -37,6 +38,13 @@ describe('GuideArticleLayout', () => {
       renderLayout(makeArticle())
       expect(
         screen.getByRole('heading', { level: 1, name: 'Direito à saúde' })
+      ).toBeInTheDocument()
+    })
+
+    it('renderiza o landmark article com nome acessível derivado do h1', () => {
+      renderLayout(makeArticle())
+      expect(
+        screen.getByRole('article', { name: 'Direito à saúde' })
       ).toBeInTheDocument()
     })
 

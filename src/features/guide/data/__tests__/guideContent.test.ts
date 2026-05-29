@@ -63,7 +63,8 @@ describe('createArticleStructuredData', () => {
   const result = createArticleStructuredData(
     'Direito à saúde',
     'A saúde é um direito de todos.',
-    '/como-conseguir-pelo-sus/seus-direitos/direito-a-saude'
+    '/como-conseguir-pelo-sus/seus-direitos/direito-a-saude',
+    '2026-05-01'
   )
 
   it('returns @type Article', () => {

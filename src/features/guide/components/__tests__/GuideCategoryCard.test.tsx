@@ -31,11 +31,13 @@ describe('GuideCategoryCard', () => {
       expect(screen.getByText('Seus Direitos')).toBeInTheDocument()
     })
 
-    it('should render a link with the category label as accessible name', () => {
+    it('should render a link whose accessible name includes label and description', () => {
       renderCard()
 
       expect(
-        screen.getByRole('link', { name: mockCategory.label })
+        screen.getByRole('link', {
+          name: `${mockCategory.label} ${mockCategory.description}`,
+        })
       ).toHaveAttribute('href', GUIDE_ROUTES.category(mockCategory.slug))
     })
 
@@ -44,6 +46,12 @@ describe('GuideCategoryCard', () => {
 
       const icon = container.querySelector('svg')
       expect(icon).toHaveAttribute('aria-hidden', 'true')
+    })
+
+    it('should render the category description', () => {
+      renderCard()
+
+      expect(screen.getByText(mockCategory.description)).toBeInTheDocument()
     })
   })
 })

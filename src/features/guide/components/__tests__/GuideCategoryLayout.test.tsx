@@ -26,6 +26,7 @@ const mockArticles: GuideArticle[] = [
     categorySlug: 'seus-direitos',
     title: 'Direito à saúde',
     summary: 'A saúde é um direito de todos.',
+    datePublished: '2026-05-01',
     content: [],
   },
   {
@@ -33,6 +34,7 @@ const mockArticles: GuideArticle[] = [
     categorySlug: 'seus-direitos',
     title: 'Como exigir seus direitos',
     summary: 'Saiba como acionar os canais corretos.',
+    datePublished: '2026-05-01',
     content: [],
   },
 ]
