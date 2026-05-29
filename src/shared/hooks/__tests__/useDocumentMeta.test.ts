@@ -110,6 +110,16 @@ describe('useDocumentMeta', () => {
       renderHook(() => useDocumentMeta({ title: 'Test' }))
       expect(document.querySelector('link[rel="canonical"]')).toBeNull()
     })
+
+    it('should remove existing canonical when navigating to a page without one', () => {
+      const link = document.createElement('link')
+      link.rel = 'canonical'
+      link.href = `${BASE_URL}/`
+      document.head.appendChild(link)
+
+      renderHook(() => useDocumentMeta({ title: 'Test' }))
+      expect(document.querySelector('link[rel="canonical"]')).toBeNull()
+    })
   })
 
   describe('Open Graph tags', () => {
@@ -160,6 +170,33 @@ describe('useDocumentMeta', () => {
           ?.getAttribute('content')
       ).toBe('Descrição OG')
     })
+
+    it('should clear existing og:url when navigating to a page without canonical', () => {
+      const meta = document.createElement('meta')
+      meta.setAttribute('property', 'og:url')
+      meta.content = `${BASE_URL}/previous-page`
+      document.head.appendChild(meta)
+
+      renderHook(() => useDocumentMeta({ title: 'Test' }))
+      expect(
+        document.querySelector<HTMLMetaElement>('meta[property="og:url"]')
+          ?.content
+      ).toBe('')
+    })
+
+    it('should clear existing og:description when navigating to a page without description', () => {
+      const meta = document.createElement('meta')
+      meta.setAttribute('property', 'og:description')
+      meta.content = 'Previous description'
+      document.head.appendChild(meta)
+
+      renderHook(() => useDocumentMeta({ title: 'Test' }))
+      expect(
+        document.querySelector<HTMLMetaElement>(
+          'meta[property="og:description"]'
+        )?.content
+      ).toBe('')
+    })
   })
 
   describe('Twitter Card tags', () => {
@@ -191,6 +228,33 @@ describe('useDocumentMeta', () => {
           .querySelector('meta[name="twitter:description"]')
           ?.getAttribute('content')
       ).toBe('Descrição Twitter')
+    })
+
+    it('should clear existing twitter:url when navigating to a page without canonical', () => {
+      const meta = document.createElement('meta')
+      meta.name = 'twitter:url'
+      meta.content = `${BASE_URL}/previous-page`
+      document.head.appendChild(meta)
+
+      renderHook(() => useDocumentMeta({ title: 'Test' }))
+      expect(
+        document.querySelector<HTMLMetaElement>('meta[name="twitter:url"]')
+          ?.content
+      ).toBe('')
+    })
+
+    it('should clear existing twitter:description when navigating to a page without description', () => {
+      const meta = document.createElement('meta')
+      meta.name = 'twitter:description'
+      meta.content = 'Previous description'
+      document.head.appendChild(meta)
+
+      renderHook(() => useDocumentMeta({ title: 'Test' }))
+      expect(
+        document.querySelector<HTMLMetaElement>(
+          'meta[name="twitter:description"]'
+        )?.content
+      ).toBe('')
     })
   })
 })
