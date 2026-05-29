@@ -11,12 +11,12 @@ import { useScrollToTop } from '@shared/hooks/useScrollToTop'
 import { Navigate, useParams } from 'react-router-dom'
 
 import { GuideCategoryLayout } from '../components'
-import { createCategoryStructuredData, GUIDE_CATEGORIES } from '../data'
+import { createCategoryStructuredData, getCategoryBySlug } from '../data'
 
 export function GuideCategoryPage() {
   const { categorySlug } = useParams<{ categorySlug: string }>()
 
-  const category = GUIDE_CATEGORIES.find(c => c.slug === categorySlug)
+  const category = getCategoryBySlug(categorySlug ?? '')
 
   useDocumentMeta({
     title: category ? `${category.label} — Guia do SUS` : 'Guia do SUS',
