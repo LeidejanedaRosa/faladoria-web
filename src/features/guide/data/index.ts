@@ -2,7 +2,7 @@ export { GUIDE_CATEGORIES } from './guideCategories'
 export type { GuideCategory } from './guideCategories'
 
 export { CATEGORY_GROUPS } from './categoryGroups'
-export type { CategoryGroup } from './categoryGroups'
+export type { CategoryGroup, CategoryGroupColor } from './categoryGroups'
 
 export { GUIDE_ARTICLES } from './guideArticles'
 export type { GuideArticle, ArticleBlock } from './guideArticles'
@@ -20,6 +20,7 @@ export {
   GUIDE_CATEGORIES_SECTION_ID,
   GUIDE_CATEGORY_HEADING_ID,
   GUIDE_ARTICLE_HEADING_ID,
+  GUIDE_WHY_HEADING_ID,
   GUIDE_CONTENT,
   GUIDE_COLLECTION_PAGE_STRUCTURED_DATA,
   createCategoryStructuredData,
@@ -29,4 +30,8 @@ export type {
   HeroTrustCircleColor,
   HeroTrustIconName,
   HeroTrustSignal,
+  WhyIconName,
+  WhyIconColor,
+  WhyIconShape,
+  WhyItem,
 } from './guideContent'
