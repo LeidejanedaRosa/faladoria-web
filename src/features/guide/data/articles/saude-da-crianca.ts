@@ -7,6 +7,7 @@ export const saudeDaCriancaArticles: GuideArticle[] = [
     title: 'Saúde da criança pelo SUS',
     summary:
       'Acompanhamento do crescimento, desenvolvimento e vacinação das crianças pelo SUS.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',
@@ -57,7 +58,7 @@ export const saudeDaCriancaArticles: GuideArticle[] = [
       {
         type: 'list',
         items: [
-          'Teste do Pezinho — detecta até 50 doenças metabólicas e genéticas',
+          'Teste do Pezinho — a versão ampliada (Lei nº 14.154) visa detectar até ~50 doenças, implementada de forma gradual pelo Ministério da Saúde',
           'Teste do Olhinho — detecta problemas de visão',
           'Teste da Orelhinha — detecta perda auditiva',
           'Teste do Coraçãozinho — detecta problemas cardíacos',

@@ -7,6 +7,7 @@ export const saudeMentalArticles: GuideArticle[] = [
     title: 'Saúde mental pelo SUS',
     summary:
       'Conheça os Centros de Atenção Psicossocial e outros serviços de saúde mental disponíveis pelo SUS.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',

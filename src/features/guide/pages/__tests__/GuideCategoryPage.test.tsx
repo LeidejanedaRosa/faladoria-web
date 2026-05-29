@@ -35,15 +35,18 @@ vi.mock('../../components', () => ({
   ),
 }))
 vi.mock('../../data', () => ({
-  GUIDE_CATEGORIES: [
-    {
-      slug: 'seus-direitos',
-      label: 'Seus Direitos',
-      description: 'Descrição de direitos',
-      iconName: 'shield',
-      color: 'purple',
-    },
-  ],
+  getCategoryBySlug: vi.fn((slug: string) =>
+    slug === 'seus-direitos'
+      ? {
+          slug: 'seus-direitos',
+          label: 'Seus Direitos',
+          description: 'Descrição de direitos',
+          iconName: 'shield',
+          color: 'purple',
+        }
+      : undefined
+  ),
+  createCategoryStructuredData: vi.fn(() => ({})),
 }))
 
 function renderWithSlug(slug: string) {

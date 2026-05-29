@@ -1,8 +1,9 @@
 import { Container } from '@shared/components/layout'
-import { GUIDE_ROUTES } from '@shared/data'
+import type { BreadcrumbItem } from '@shared/data'
 
 import {
   getArticlesByCategory,
+  GUIDE_CATEGORY_HEADING_ID,
   GUIDE_CONTENT,
   type GuideCategory,
 } from '../data'
@@ -11,25 +12,26 @@ import { GuideBreadcrumb } from './GuideBreadcrumb'
 
 interface GuideCategoryLayoutProps {
   category: GuideCategory
+  breadcrumbItems: BreadcrumbItem[]
 }
 
-export const GuideCategoryLayout = ({ category }: GuideCategoryLayoutProps) => {
+export const GuideCategoryLayout = ({
+  category,
+  breadcrumbItems,
+}: GuideCategoryLayoutProps) => {
   const articles = getArticlesByCategory(category.slug)
-
-  const breadcrumbItems = [
-    { name: 'Início', url: '/' },
-    { name: 'Guia do SUS', url: GUIDE_ROUTES.root },
-    { name: category.label },
-  ]
 
   return (
     <Container className='py-12 sm:py-16 lg:py-20'>
       <GuideBreadcrumb items={breadcrumbItems} />
 
-      <section aria-labelledby='category-heading' className='mx-auto max-w-3xl'>
+      <section
+        aria-labelledby={GUIDE_CATEGORY_HEADING_ID}
+        className='mx-auto max-w-3xl'
+      >
         <header className='mb-10'>
           <h1
-            id='category-heading'
+            id={GUIDE_CATEGORY_HEADING_ID}
             className='text-purple-deepest text-3xl font-bold sm:text-4xl'
           >
             {category.label}

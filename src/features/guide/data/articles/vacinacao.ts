@@ -7,6 +7,7 @@ export const vacinacaoArticles: GuideArticle[] = [
     title: 'Calendário infantil',
     summary:
       'Todas as vacinas obrigatórias para crianças de 0 a 9 anos disponíveis gratuitamente no SUS.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',
@@ -66,6 +67,7 @@ export const vacinacaoArticles: GuideArticle[] = [
     title: 'Calendário do adulto',
     summary:
       'Vacinas recomendadas para adultos e idosos, incluindo gripe, febre amarela e hepatite.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',

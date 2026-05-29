@@ -219,9 +219,12 @@ A rota é consumida por duas features distintas (`guide/` e `landing/`) além de
 ```
 features/guide/data/
 ├── guideCategories.ts   → GuideCategory[] (6 categorias)
-├── guideArticles.ts     → GuideArticle[] (15 artigos placeholder)
-├── guideUtils.ts        → getCategoryBySlug, getArticlesByCategory, getArticleBySlug
-└── guideContent.ts      → conteúdo de UI e createArticleStructuredData
+├── categoryGroups.ts    → CategoryGroup interface e CATEGORY_GROUPS (metadados de grupos de categoria por camada)
+├── guideArticles.ts     → tipos ArticleBlock e GuideArticle; re-exporta GUIDE_ARTICLES de articles/
+├── articles/            → 17 módulos de artigos individuais + articles/index.ts (barrel export)
+├── guideUtils.ts        → getCategoryBySlug, getArticlesByCategory, getArticleBySlug, getCategoriesByGroup
+├── guideContent.ts      → GUIDE_CONTENT (conteúdo de UI), createCategoryStructuredData, createArticleStructuredData, GUIDE_COLLECTION_PAGE_STRUCTURED_DATA
+└── index.ts             → barrel export da feature
 ```
 
 **Padrão para slugs repetidos em dados estáticos**: quando um `categorySlug` aparece 4+ vezes no mesmo arquivo, extrair para uma constante interna (`const C = { ... } as const`) para satisfazer a regra `sonarjs/no-duplicate-string` sem exportar a constante (é detalhe de implementação do arquivo).
@@ -240,6 +243,71 @@ article: (categorySlug: string, articleSlug: string) =>
 ```
 
 **Por que manter no mesmo objeto**: a rota de artigo é semanticamente parte do namespace do Guide, consumida tanto em `GuideArticleCard` (link) quanto em `App.tsx` (rota) e `GuideArticlePage` (SEO). Manter as três rotas (`root`, `category`, `article`) no mesmo objeto garante que uma mudança de prefixo (`/como-conseguir-pelo-sus`) seja feita em um único lugar.
+
+---
+
+## 2026-05-28 — Breadcrumb passado como prop da page para o layout no Guide
+
+**Contexto**: `GuideCategoryLayout` e `GuideArticleLayout` construíam seus próprios arrays de breadcrumb internamente. As pages (`GuideCategoryPage`, `GuideArticlePage`) também construíam o mesmo array para alimentar o `BreadcrumbSchema` (Schema.org). Os dados eram idênticos, mas produzidos em dois lugares.
+
+**Decisão**: Os layouts recebem `breadcrumbItems: BreadcrumbItem[]` como prop. A page computa o array uma vez e o passa tanto para o `BreadcrumbSchema` (SEO) quanto para o componente visual `GuideBreadcrumb`.
+
+**Por que não manter a construção interna nos layouts:**
+
+- O array é construído com dados da URL (category slug, article slug) que a page já tem. Repassar para o layout via prop é mais barato e explícito do que fazer o layout redescobrir as mesmas informações.
+- Qualquer mudança nos itens de breadcrumb (nome, URL, ordem) precisaria ser feita em dois lugares. Com a prop, há uma única fonte da verdade por página.
+- O `BreadcrumbItem` de `@shared/data` é o mesmo tipo aceito por `GuideBreadcrumb` — sem conversão necessária.
+
+**Alternativa rejeitada**: extrair um hook `useGuideBreadcrumb(category, article?)` que centralizasse a construção. Descartado porque a lógica é trivial (3–4 linhas) e o hook criaria uma abstração sem ganho real de clareza.
+
+---
+
+## 2026-05-28 — Constantes nomeadas para todos os IDs do Guide
+
+**Contexto**: `GuideArticleLayout` e `GuideCategoryLayout` usavam strings literais `'article-heading'` e `'category-heading'` tanto no atributo `id` quanto em `aria-labelledby`. O projeto já exportava `GUIDE_HEADING_ID`, `GUIDE_CATEGORIES_HEADING_ID` e `GUIDE_CATEGORIES_SECTION_ID` de `guideContent.ts` — mas as novas constantes não foram adicionadas ao arquivo ao ser criado.
+
+**Decisão**: Todos os IDs de DOM do Guide vivem como constantes nomeadas em `guideContent.ts` e são exportados pelo barrel `data/index.ts`.
+
+```ts
+export const GUIDE_CATEGORY_HEADING_ID = 'category-heading'
+export const GUIDE_ARTICLE_HEADING_ID = 'article-heading'
+```
+
+**Por que constantes e não strings literais:**
+
+- Um typo em uma string literal (`'artcle-heading'`) quebra silenciosamente o vínculo `aria-labelledby` sem erro de compilação. Uma constante com typo quebra no build.
+- Mudanças de ID — raras mas possíveis — são feitas em um lugar, não em todos os componentes que usam o ID.
+
+**Regra para o Guide**: qualquer `id` referenciado em mais de um atributo (ou mais de um componente) deve ser uma constante em `guideContent.ts`.
+
+---
+
+## 2026-05-28 — `useScrollToTop` move foco para `#main-content` em mudança de rota
+
+**Contexto**: Em SPAs com React Router, a mudança de rota não move o foco do browser automaticamente. O `useScrollToTop` resetava o scroll para o topo, mas o foco permanecia no último elemento interativo da página anterior — invisível e sem feedback para usuários de teclado ou leitor de tela.
+
+**Decisão**: `useScrollToTop` chama `document.getElementById('main-content')?.focus({ preventScroll: true })` imediatamente após o scroll.
+
+**Por que `#main-content` e não `<h1>`:**
+
+- O `MainContent` (`<main id="main-content" tabIndex={-1}>`) já estava preparado para receber foco: tem `tabIndex={-1}` e `id` estáveis em todas as páginas.
+- Focar o `<h1>` exigiria adicionar `tabIndex={-1}` em cada layout individualmente, e o ID do `<h1>` varia entre páginas.
+- `preventScroll: true` evita que o browser tente rolar o elemento para a área visível — o scroll já foi feito manualmente para `(0, 0)`.
+
+**Comportamento para usuários de tecnologia assistiva**: ao navegar entre páginas, o leitor de tela anuncia o label do `<main>` (`mainContentLabel` passado pelo `PageShell`) em vez de continuar lendo o conteúdo da página anterior.
+
+---
+
+## 2026-05-28 — Schema Article com `datePublished` e `author` estáticos
+
+**Contexto**: O `createArticleStructuredData` gerava um schema `Article` válido mas inelegível para rich results no Google: faltavam `datePublished` e `author`, que o Google exige para o tipo `Article`.
+
+**Decisão**: `datePublished: '2026-05-01'` (data de lançamento da feature Guide Content) e `author: { '@id': '.../#organization' }` (referência ao nó de organização já no grafo) são adicionados ao schema. O campo `image` foi omitido intencionalmente — não há imagens por artigo; inventar uma URL quebraria a semântica.
+
+**Por que data estática em vez de campo por artigo:**
+
+- Os artigos são conteúdo informativo sobre o SUS com baixíssima taxa de atualização. Uma data de publicação por artigo traria overhead de manutenção desproporcionalmente alto para o valor.
+- Quando artigos individuais passarem a ter datas de criação/atualização relevantes (ex.: conteúdo com vigência legal), o campo `datePublished` deve ser adicionado à interface `GuideArticle` e passado como parâmetro para `createArticleStructuredData`.
 
 ---
 

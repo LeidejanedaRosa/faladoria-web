@@ -7,6 +7,7 @@ export const seusDireitosArticles: GuideArticle[] = [
     title: 'Direito à saúde',
     summary:
       'A saúde é um direito de todos e dever do Estado, garantido pela Constituição Federal de 1988.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'callout',
@@ -74,6 +75,7 @@ export const seusDireitosArticles: GuideArticle[] = [
     title: 'Como exigir seus direitos',
     summary:
       'Saiba quais canais acionar quando o atendimento no SUS for negado ou demorar além do prazo.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',

@@ -7,6 +7,7 @@ export const cirurgiaArticles: GuideArticle[] = [
     title: 'Como funciona a fila de cirurgia',
     summary:
       'Entenda como funciona a lista de espera para cirurgias eletivas no SUS e como acompanhar sua posição.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',
@@ -74,6 +75,7 @@ export const cirurgiaArticles: GuideArticle[] = [
     title: 'O que fazer quando a cirurgia é negada',
     summary:
       'Se o SUS negar sua cirurgia, você tem direitos. Saiba quais são e como agir.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',

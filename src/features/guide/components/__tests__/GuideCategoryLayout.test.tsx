@@ -1,3 +1,4 @@
+import type { BreadcrumbItem } from '@shared/data'
 import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
@@ -25,6 +26,7 @@ const mockArticles: GuideArticle[] = [
     categorySlug: 'seus-direitos',
     title: 'Direito à saúde',
     summary: 'A saúde é um direito de todos.',
+    datePublished: '2026-05-01',
     content: [],
   },
   {
@@ -32,8 +34,15 @@ const mockArticles: GuideArticle[] = [
     categorySlug: 'seus-direitos',
     title: 'Como exigir seus direitos',
     summary: 'Saiba como acionar os canais corretos.',
+    datePublished: '2026-05-01',
     content: [],
   },
+]
+
+const mockBreadcrumbItems: BreadcrumbItem[] = [
+  { name: 'Início', url: '/' },
+  { name: 'Guia do SUS', url: '/como-conseguir-pelo-sus' },
+  { name: mockCategory.label },
 ]
 
 async function setup(articles: GuideArticle[]) {
@@ -42,7 +51,10 @@ async function setup(articles: GuideArticle[]) {
 
   return render(
     <MemoryRouter>
-      <GuideCategoryLayout category={mockCategory} />
+      <GuideCategoryLayout
+        category={mockCategory}
+        breadcrumbItems={mockBreadcrumbItems}
+      />
     </MemoryRouter>
   )
 }

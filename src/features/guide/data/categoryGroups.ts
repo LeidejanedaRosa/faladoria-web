@@ -1,11 +1,13 @@
 import type { GuideCategory } from './guideCategories'
 
+export type CategoryGroupColor = 'amber' | 'green' | 'teal' | 'purple'
+
 export interface CategoryGroup {
   slug: string
   label: string
   description: string
   iconName: GuideCategory['iconName']
-  color: GuideCategory['color']
+  color: CategoryGroupColor
   categorySlugs: readonly string[]
 }
 

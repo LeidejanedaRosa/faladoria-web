@@ -7,6 +7,7 @@ export const atendimentoDomiciliarArticles: GuideArticle[] = [
     title: 'Como solicitar atendimento domiciliar',
     summary:
       'Saiba quem tem direito ao atendimento em casa pelo SUS e como fazer a solicitação.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',

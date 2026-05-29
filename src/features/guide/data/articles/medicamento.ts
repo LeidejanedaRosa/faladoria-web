@@ -7,6 +7,7 @@ export const medicamentoArticles: GuideArticle[] = [
     title: 'Medicamentos da farmácia básica',
     summary:
       'Como retirar medicamentos gratuitos nas unidades de saúde e o que está disponível na lista básica.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',
@@ -74,6 +75,7 @@ export const medicamentoArticles: GuideArticle[] = [
     title: 'Medicamentos de alto custo',
     summary:
       'Descubra como solicitar medicamentos de alto custo pelo componente especializado da assistência farmacêutica.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',

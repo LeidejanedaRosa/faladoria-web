@@ -7,6 +7,7 @@ export const comoFuncionaOSusArticles: GuideArticle[] = [
     title: 'O que é o SUS',
     summary:
       'Entenda o que é o Sistema Único de Saúde, seus princípios e como ele está organizado no Brasil.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',
@@ -70,6 +71,7 @@ export const comoFuncionaOSusArticles: GuideArticle[] = [
     title: 'Níveis de atendimento',
     summary:
       'Conheça a diferença entre atenção básica, média e alta complexidade e saiba onde buscar cada tipo de cuidado.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',

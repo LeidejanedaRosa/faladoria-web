@@ -7,6 +7,7 @@ export const exameArticles: GuideArticle[] = [
     title: 'Como solicitar exames pelo SUS',
     summary:
       'Saiba como solicitar exames laboratoriais e de imagem pelo SUS e o que fazer se a espera for longa.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',
@@ -79,6 +80,7 @@ export const exameArticles: GuideArticle[] = [
     title: 'O que fazer quando o exame demora muito',
     summary:
       'Conheça seus direitos e os caminhos para acelerar a realização de exames com prazo vencido.',
+    datePublished: '2026-05-01',
     content: [
       {
         type: 'paragraph',

@@ -1,9 +1,5 @@
+import type { BreadcrumbItem } from '@shared/data'
 import { Link } from 'react-router-dom'
-
-interface BreadcrumbItem {
-  name: string
-  url?: string
-}
 
 interface GuideBreadcrumbProps {
   items: BreadcrumbItem[]
