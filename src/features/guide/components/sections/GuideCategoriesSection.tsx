@@ -3,6 +3,8 @@ import { cn } from '@shared/utils/cn'
 
 import {
   CATEGORY_GROUPS,
+  type CategoryGroup,
+  type CategoryGroupColor,
   getCategoriesByGroup,
   GUIDE_CATEGORIES_HEADING_ID,
   GUIDE_CATEGORIES_SECTION_ID,
@@ -11,50 +13,96 @@ import {
 import { GuideCategoryCard } from '../GuideCategoryCard'
 import { GUIDE_ICON_MAP } from '../guideIconMap'
 
-const GROUP_COLORS = {
-  purple: {
-    iconWrapper: 'bg-purple-100',
-    icon: 'text-purple-600',
-    label: 'text-purple-900',
-  },
-  blue: {
-    iconWrapper: 'bg-blue-100',
-    icon: 'text-blue-600',
-    label: 'text-blue-900',
-  },
+const GROUP_COLORS: Record<
+  CategoryGroupColor,
+  { topBorder: string; iconBg: string; label: string }
+> = {
   amber: {
-    iconWrapper: 'bg-amber-100',
-    icon: 'text-amber-600',
-    label: 'text-amber-900',
-  },
-  teal: {
-    iconWrapper: 'bg-teal-100',
-    icon: 'text-teal-600',
-    label: 'text-teal-900',
+    topBorder: 'border-t-4 border-amber-400',
+    iconBg: 'bg-amber-500',
+    label: 'text-amber-700',
   },
   green: {
-    iconWrapper: 'bg-green-100',
-    icon: 'text-green-600',
-    label: 'text-green-900',
+    topBorder: 'border-t-4 border-green-400',
+    iconBg: 'bg-green-500',
+    label: 'text-green-700',
   },
-  rose: {
-    iconWrapper: 'bg-rose-100',
-    icon: 'text-rose-600',
-    label: 'text-rose-900',
+  teal: {
+    topBorder: 'border-t-4 border-teal-400',
+    iconBg: 'bg-teal-500',
+    label: 'text-teal-700',
   },
-} as const
+  purple: {
+    topBorder: 'border-t-4 border-purple-400',
+    iconBg: 'bg-purple-500',
+    label: 'text-purple-700',
+  },
+}
+
+const GuideCategoryGroup = ({ group }: { group: CategoryGroup }) => {
+  const categories = getCategoriesByGroup(group.slug)
+  const Icon = GUIDE_ICON_MAP[group.iconName]
+  const colors = GROUP_COLORS[group.color]
+
+  return (
+    <div className={cn('rounded-2xl bg-gray-50 p-5 sm:p-6', colors.topBorder)}>
+      <div className='mb-5 flex items-center gap-2.5'>
+        <div
+          className={cn('shrink-0 rounded-lg p-2', colors.iconBg)}
+          aria-hidden='true'
+        >
+          <Icon className='h-5 w-5 text-white' />
+        </div>
+        <div>
+          <h3 className={cn('text-sm leading-snug font-bold', colors.label)}>
+            {group.label}
+          </h3>
+          <p className='text-xs text-gray-500'>{group.description}</p>
+        </div>
+      </div>
+
+      <ul className='grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4'>
+        {categories.map(category => (
+          <li key={category.slug}>
+            <GuideCategoryCard category={category} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
 
 export const GuideCategoriesSection = () => (
   <section
     id={GUIDE_CATEGORIES_SECTION_ID}
-    className='py-12 sm:py-16 lg:py-20'
+    className='pt-16 pb-12 sm:pt-20 sm:pb-16 lg:pt-24 lg:pb-20'
     aria-labelledby={GUIDE_CATEGORIES_HEADING_ID}
   >
     <Container>
       <header className='mb-10 text-center'>
+        <div className='mb-3 inline-flex items-center gap-1.5 rounded-full border border-purple-200 bg-purple-50 px-3 py-1'>
+          <svg
+            width='12'
+            height='10'
+            viewBox='0 0 12 10'
+            fill='currentColor'
+            className='text-purple-500'
+            aria-hidden='true'
+          >
+            <circle cx='1.5' cy='1.5' r='1.5' />
+            <circle cx='6' cy='1.5' r='1.5' />
+            <circle cx='10.5' cy='1.5' r='1.5' />
+            <circle cx='1.5' cy='8.5' r='1.5' />
+            <circle cx='6' cy='8.5' r='1.5' />
+            <circle cx='10.5' cy='8.5' r='1.5' />
+          </svg>
+          <span className='text-xs font-semibold tracking-widest text-purple-700 uppercase'>
+            {GUIDE_CONTENT.intro.badge}
+          </span>
+        </div>
         <h2
           id={GUIDE_CATEGORIES_HEADING_ID}
-          className='text-purple-deepest text-2xl font-bold sm:text-3xl'
+          className='text-purple-deepest text-3xl font-bold sm:text-4xl lg:text-5xl'
         >
           {GUIDE_CONTENT.intro.heading}
         </h2>
@@ -63,52 +111,10 @@ export const GuideCategoriesSection = () => (
         </p>
       </header>
 
-      <div className='space-y-4 sm:space-y-6'>
-        {CATEGORY_GROUPS.map(group => {
-          const categories = getCategoriesByGroup(group.slug)
-          const Icon = GUIDE_ICON_MAP[group.iconName]
-          const colors = GROUP_COLORS[group.color]
-
-          return (
-            <div
-              key={group.slug}
-              className='rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6'
-            >
-              <div className='mb-5 flex items-center gap-3 border-b border-gray-100 pb-4'>
-                <div
-                  className={cn(
-                    'shrink-0 rounded-xl p-2.5',
-                    colors.iconWrapper
-                  )}
-                  aria-hidden='true'
-                >
-                  <Icon className={cn('h-6 w-6', colors.icon)} />
-                </div>
-                <div>
-                  <h3
-                    className={cn(
-                      'text-base leading-snug font-bold',
-                      colors.label
-                    )}
-                  >
-                    {group.label}
-                  </h3>
-                  <p className='mt-0.5 text-sm text-gray-500'>
-                    {group.description}
-                  </p>
-                </div>
-              </div>
-
-              <ul className='grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4'>
-                {categories.map(category => (
-                  <li key={category.slug}>
-                    <GuideCategoryCard category={category} />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )
-        })}
+      <div className='space-y-8 sm:space-y-10'>
+        {CATEGORY_GROUPS.map(group => (
+          <GuideCategoryGroup key={group.slug} group={group} />
+        ))}
       </div>
     </Container>
   </section>

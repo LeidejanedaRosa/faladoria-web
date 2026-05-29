@@ -17,151 +17,148 @@ export interface GuideCategory {
     | 'syringe'
     | 'target'
     | 'users'
-  color: 'purple' | 'blue' | 'amber' | 'teal' | 'green' | 'rose'
+  color:
+    | 'purple'
+    | 'violet'
+    | 'indigo'
+    | 'blue'
+    | 'sky'
+    | 'cyan'
+    | 'teal'
+    | 'emerald'
+    | 'green'
+    | 'amber'
+    | 'orange'
+    | 'rose'
+    | 'pink'
+    | 'fuchsia'
 }
 
 export const GUIDE_CATEGORIES: GuideCategory[] = [
-  // Acesso a serviços
+  // Acesso a serviços — arco-íris completo: rose→orange→amber→green→teal→sky→blue→violet
   {
     slug: 'consulta',
     label: 'Consulta',
-    description:
-      'Como agendar consultas médicas pelo SUS, quais especialidades estão disponíveis e os prazos de atendimento.',
+    description: 'Como agendar, especialidades disponíveis e prazos.',
     iconName: 'clipboard',
-    color: 'amber',
+    color: 'rose',
   },
   {
     slug: 'exame',
     label: 'Exame',
-    description:
-      'Como solicitar exames laboratoriais e de imagem pelo SUS e o que fazer quando a espera for longa.',
+    description: 'Laboratoriais, de imagem e como solicitar.',
     iconName: 'search',
-    color: 'blue',
+    color: 'orange',
   },
   {
     slug: 'cirurgia',
     label: 'Cirurgia',
-    description:
-      'Como funciona a fila de cirurgias eletivas no SUS e como acompanhar sua posição na lista de espera.',
+    description: 'Fila de espera e como acompanhar.',
     iconName: 'activity',
-    color: 'rose',
+    color: 'amber',
   },
   {
     slug: 'tratamento',
     label: 'Tratamento',
-    description:
-      'Fisioterapia, quimioterapia, reabilitação e outros tratamentos disponíveis pelo SUS.',
+    description: 'Fisioterapia, quimioterapia e reabilitação.',
     iconName: 'heart',
-    color: 'teal',
+    color: 'green',
   },
   {
     slug: 'medicamento',
     label: 'Medicamento',
-    description:
-      'Como retirar medicamentos gratuitos pelo SUS, Farmácia Popular e programas de medicamentos de alto custo.',
+    description: 'Farmácia básica, Popular e alto custo.',
     iconName: 'syringe',
     color: 'teal',
   },
   {
     slug: 'atendimento-domiciliar',
     label: 'Atendimento domiciliar',
-    description:
-      'Saiba quem tem direito ao atendimento em casa e como solicitar esse serviço pelo SUS.',
+    description: 'Quem tem direito e como solicitar.',
     iconName: 'person',
-    color: 'green',
+    color: 'sky',
   },
   {
     slug: 'transporte-sanitario',
     label: 'Transporte sanitário',
-    description:
-      'Como solicitar transporte para consultas e tratamentos quando não é possível se deslocar por conta própria.',
+    description: 'Como solicitar e quem tem direito.',
     iconName: 'location',
-    color: 'amber',
+    color: 'blue',
   },
   {
     slug: 'equipamentos',
     label: 'Equipamentos',
-    description:
-      'Como solicitar cadeiras de rodas, muletas, órteses, próteses e respiradores pelo SUS.',
+    description: 'Cadeiras de rodas, muletas e próteses.',
     iconName: 'target',
-    color: 'amber',
+    color: 'violet',
   },
 
-  // Saúde por público
+  // Saúde por público — pink, indigo, emerald (continua o espectro)
   {
     slug: 'saude-da-mulher',
     label: 'Saúde da mulher',
-    description:
-      'Pré-natal, preventivo, mamografia e outros serviços de saúde feminina disponíveis gratuitamente pelo SUS.',
+    description: 'Pré-natal, preventivo e mamografia.',
     iconName: 'heart',
-    color: 'rose',
+    color: 'pink',
   },
   {
     slug: 'saude-do-homem',
     label: 'Saúde do homem',
-    description:
-      'Exames preventivos e programas de saúde masculina oferecidos gratuitamente pelo SUS.',
+    description: 'Exames preventivos e saúde masculina.',
     iconName: 'person',
-    color: 'blue',
+    color: 'indigo',
   },
   {
     slug: 'saude-da-crianca',
     label: 'Saúde da criança',
-    description:
-      'Acompanhamento do crescimento, desenvolvimento e vacinação das crianças pelo SUS.',
+    description: 'Crescimento, vacinas e desenvolvimento.',
     iconName: 'users',
-    color: 'green',
+    color: 'emerald',
   },
 
-  // Prevenção e saúde mental
+  // Prevenção e saúde mental — cyan, purple
   {
     slug: 'vacinacao',
     label: 'Vacinação',
-    description:
-      'Calendário vacinal completo por faixa etária para crianças, adultos e idosos.',
+    description: 'Calendário para crianças, adultos e idosos.',
     iconName: 'syringe',
-    color: 'teal',
+    color: 'cyan',
   },
   {
     slug: 'saude-mental',
     label: 'Saúde mental',
-    description:
-      'CAPS, CRAS, prevenção ao suicídio e outros serviços de saúde mental disponíveis pelo SUS.',
+    description: 'CAPS, CRAS e prevenção ao suicídio.',
     iconName: 'chat',
     color: 'purple',
   },
 
-  // Direitos e ação
+  // Direitos e ação — fuchsia, blue, rose, amber (distintos dentro do grupo)
   {
     slug: 'seus-direitos',
     label: 'Seus direitos',
-    description:
-      'Conheça seus direitos como usuário do SUS e saiba como exigi-los quando o atendimento for negado.',
+    description: 'Seus direitos e como exigi-los.',
     iconName: 'shield',
-    color: 'purple',
+    color: 'fuchsia',
   },
   {
     slug: 'como-funciona-o-sus',
     label: 'Como funciona o SUS',
-    description:
-      'Entenda a estrutura do Sistema Único de Saúde, seus princípios e como ele está organizado no Brasil.',
+    description: 'Estrutura, princípios e organização.',
     iconName: 'building',
     color: 'blue',
   },
   {
     slug: 'denuncias',
     label: 'Denúncias',
-    description:
-      'Canais oficiais para denunciar irregularidades no atendimento do SUS e como utilizá-los.',
+    description: 'Canais para denunciar irregularidades.',
     iconName: 'megaphone',
     color: 'rose',
   },
   {
     slug: 'judicializacao',
     label: 'Recorrer na Justiça',
-    description:
-      'Quando e como acionar a Justiça para garantir seu direito ao atendimento pelo SUS.',
+    description: 'Quando e como acionar a Justiça.',
     iconName: 'fist',
-    color: 'purple',
+    color: 'amber',
   },
 ]

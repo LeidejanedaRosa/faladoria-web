@@ -88,7 +88,7 @@ const GuideHeroCTA = () => (
 )
 
 const GuideHeroContent = () => (
-  <div className='flex flex-col items-start gap-6'>
+  <div className='flex flex-col items-start gap-6 lg:py-8'>
     <GuideHeroBadge />
     <GuideHeroHeadline />
     <GuideHeroDescription />
@@ -113,7 +113,7 @@ const GuideHeroImage = () => (
 )
 
 const GuideHeroInfoBar = () => (
-  <div className='border-lavender border-t bg-white/60'>
+  <div className='bg-lavender-light border-lavender border-y'>
     <Container className='py-4'>
       <footer className='flex flex-col items-center gap-2 text-center text-xs text-gray-500 sm:flex-row sm:justify-center sm:gap-6'>
         <p className='flex items-center gap-2'>
@@ -139,7 +139,7 @@ export const GuideHeroSection = () => (
     className='bg-lavender-light flex flex-col lg:h-[calc(100dvh-var(--header-height))]'
     aria-labelledby={GUIDE_HEADING_ID}
   >
-    <div className='flex flex-1 py-12 sm:py-16 lg:py-0'>
+    <div className='bg-lavender-light flex flex-1 pt-16 pb-10 sm:pt-20 sm:pb-14 lg:py-0'>
       <Container className='flex h-full'>
         <div className='grid h-full w-full grid-cols-1 items-center gap-10 lg:grid-cols-[2fr_3fr] lg:items-stretch lg:gap-12'>
           <div className='flex flex-col justify-center'>

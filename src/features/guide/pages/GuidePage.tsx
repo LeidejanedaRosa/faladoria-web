@@ -9,7 +9,11 @@ import {
 import { useDocumentMeta } from '@shared/hooks/useDocumentMeta'
 import { useScrollToTop } from '@shared/hooks/useScrollToTop'
 
-import { GuideCategoriesSection, GuideHeroSection } from '../components'
+import {
+  GuideCategoriesSection,
+  GuideHeroSection,
+  GuideWhySection,
+} from '../components'
 import { GUIDE_COLLECTION_PAGE_STRUCTURED_DATA, GUIDE_CONTENT } from '../data'
 
 const breadcrumbItems = createBreadcrumb([
@@ -38,6 +42,7 @@ export function GuidePage() {
     >
       <GuideHeroSection />
       <GuideCategoriesSection />
+      <GuideWhySection />
     </PageShell>
   )
 }
