@@ -29,6 +29,16 @@ export interface WhyItem {
   description: string
 }
 
+export type ArticleFooterTrustIconName = 'shield' | 'heart' | 'users' | 'check'
+export type ArticleFooterTrustIconBg = 'purple' | 'rose' | 'indigo' | 'green'
+
+export interface ArticleFooterTrustSignal {
+  iconName: ArticleFooterTrustIconName
+  iconBg: ArticleFooterTrustIconBg
+  title: string
+  description: string
+}
+
 export const GUIDE_CONTENT = {
   seo: {
     title: 'Como conseguir pelo SUS',
@@ -107,6 +117,55 @@ export const GUIDE_CONTENT = {
     heading: 'Conteúdo em breve',
     description:
       'Esta seção está sendo preparada com todo o cuidado que você merece.',
+  },
+
+  categoryPage: {
+    infoBanner: 'O SUS garante esse serviço de forma gratuita para todos.',
+    tip: {
+      title: 'Dica importante',
+      description:
+        'Mantenha seu cadastro no posto de saúde sempre atualizado. Isso ajuda a não perder sua vez na fila.',
+    },
+    help: {
+      title: 'Precisa de ajuda?',
+      description: 'Fale com a equipe do seu posto de saúde.',
+      cta: 'Ver canais de atendimento',
+    },
+  },
+
+  articlePage: {
+    help: {
+      title: 'Precisa de ajuda?',
+      description:
+        'Fale com a equipe da sua unidade de saúde ou use nossos canais de atendimento.',
+      cta: 'Ver canais de atendimento',
+    },
+    trustSignals: [
+      {
+        iconName: 'shield',
+        iconBg: 'purple',
+        title: 'Informação confiável',
+        description: 'Conteúdo verificado e atualizado',
+      },
+      {
+        iconName: 'heart',
+        iconBg: 'rose',
+        title: 'Gratuito',
+        description: 'Tudo o que você precisa, sem custo',
+      },
+      {
+        iconName: 'users',
+        iconBg: 'indigo',
+        title: 'Para todos',
+        description: 'Linguagem simples e fácil de entender',
+      },
+      {
+        iconName: 'check',
+        iconBg: 'green',
+        title: '100% SUS',
+        description: 'Feito para ajudar você',
+      },
+    ] satisfies ArticleFooterTrustSignal[],
   },
 } as const
 

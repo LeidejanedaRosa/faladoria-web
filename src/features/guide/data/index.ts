@@ -27,11 +27,14 @@ export {
   createArticleStructuredData,
 } from './guideContent'
 export type {
+  ArticleFooterTrustIconBg,
+  ArticleFooterTrustIconName,
+  ArticleFooterTrustSignal,
   HeroTrustCircleColor,
   HeroTrustIconName,
   HeroTrustSignal,
-  WhyIconName,
   WhyIconColor,
+  WhyIconName,
   WhyIconShape,
   WhyItem,
 } from './guideContent'
