@@ -1,5 +1,7 @@
 export { ActivityIcon } from './ActivityIcon'
 export { BookOpenIcon } from './BookOpenIcon'
+export { InfoCircleIcon } from './InfoCircleIcon'
+export { LightbulbIcon } from './LightbulbIcon'
 export { BuildingIcon } from './BuildingIcon'
 export { ChartIcon } from './ChartIcon'
 export { ChatIcon } from './ChatIcon'

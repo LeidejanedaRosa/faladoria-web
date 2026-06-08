@@ -9,31 +9,41 @@ export const consultaArticles: GuideArticle[] = [
       'Veja como agendar consultas pelo SUS, quais especialidades estão disponíveis e quais são os prazos.',
     datePublished: '2026-05-01',
     content: [
-      { type: 'heading', level: 2, text: 'Onde ir primeiro' },
+      { type: 'heading', level: 2, text: 'Onde ir primeiro', icon: 'location' },
       {
         type: 'paragraph',
         text: 'A Unidade Básica de Saúde (UBS) — também chamada de "postinho" — é o lugar certo para começar. Lá você agenda consultas, recebe encaminhamentos e tem acesso à maioria dos serviços do SUS.',
       },
-      { type: 'heading', level: 2, text: 'O que levar' },
+      {
+        type: 'callout',
+        variant: 'tip',
+        title: 'Dica',
+        text: 'Não sabe onde fica a UBS mais próxima? Pergunte na sua comunidade ou ligue 136.',
+      },
+
+      { type: 'heading', level: 2, text: 'O que levar', icon: 'clipboard' },
       {
         type: 'list',
         items: [
-          'Cartão do SUS — se não tiver, o próprio postinho emite na hora',
+          'Cartão do SUS — se não tiver, o próprio postinho emite na hora.',
           'Documento com foto (RG, CNH ou Carteira de Trabalho)',
         ],
       },
-      { type: 'heading', level: 2, text: 'Como agendar' },
+      {
+        type: 'image',
+        imageKey: 'cartao-sus',
+        alt: 'Cartão do SUS e documento com foto',
+      },
+
+      { type: 'heading', level: 2, text: 'Como agendar', icon: 'chat' },
       {
         type: 'paragraph',
-        text: 'Chegue na UBS e informe que quer agendar uma consulta. O atendente vai verificar a disponibilidade e marcar o horário.',
+        text: 'Chegue na UBS e informe que quer agendar uma consulta. O atendente vai verificar a disponibilidade e marcar o horário para você.',
       },
       {
-        type: 'heading',
-        level: 2,
-        text: 'Perguntas para fazer na hora do agendamento',
-      },
-      {
-        type: 'list',
+        type: 'callout',
+        variant: 'checklist',
+        title: 'Perguntas para fazer na hora do agendamento',
         items: [
           'Qual é o endereço e horário exato da consulta?',
           'Preciso levar exames anteriores?',
@@ -41,11 +51,21 @@ export const consultaArticles: GuideArticle[] = [
           'O município oferece transporte para o local?',
         ],
       },
+
       {
-        type: 'callout',
-        text: 'Não sabe qual especialidade precisa? Sem problema. Marque uma consulta com o médico da UBS. Ele vai te avaliar e, se necessário, te encaminhar para o especialista certo — tudo pelo SUS.',
+        type: 'info-panel',
+        title: 'Não sabe qual especialidade precisa?',
+        text: 'Sem problema. Marque uma consulta com o médico da UBS. Ele vai te avaliar e, se necessário, te encaminhar para o especialista certo — tudo pelo SUS.',
+        icon: 'question',
+        variant: 'purple',
       },
-      { type: 'heading', level: 2, text: 'O que fazer em caso de urgência' },
+
+      {
+        type: 'heading',
+        level: 2,
+        text: 'O que fazer em caso de urgência',
+        icon: 'phone',
+      },
       {
         type: 'paragraph',
         text: 'Se a situação for grave — dor intensa, dificuldade para respirar ou risco de vida — não espere agendamento.',
@@ -58,9 +78,18 @@ export const consultaArticles: GuideArticle[] = [
         ],
       },
       {
+        type: 'callout',
+        variant: 'emergency',
+        title: 'SAMU',
+        highlight: '192',
+        text: 'Em caso de emergência, ligue para o 192.',
+      },
+
+      {
         type: 'heading',
         level: 2,
         text: 'Checklist antes de ir para a consulta',
+        icon: 'check',
       },
       {
         type: 'list',
@@ -68,8 +97,10 @@ export const consultaArticles: GuideArticle[] = [
           'Separe exames e resultados anteriores',
           'Confirme o endereço com antecedência',
           'Leve o cartão SUS e o documento com foto',
+          'Chegue com 15 minutos de antecedência',
         ],
       },
+      { type: 'image', imageKey: 'checklist', alt: 'Checklist para consulta' },
     ],
   },
   {
@@ -84,29 +115,41 @@ export const consultaArticles: GuideArticle[] = [
         type: 'paragraph',
         text: 'No SUS, para consultar um especialista — cardiologista, ortopedista, dermatologista, entre outros — normalmente é preciso passar primeiro pelo médico da UBS (postinho de saúde).',
       },
-      { type: 'heading', level: 2, text: 'O caminho passo a passo' },
+      {
+        type: 'heading',
+        level: 2,
+        text: 'O caminho passo a passo',
+        icon: 'target',
+      },
       {
         type: 'list',
         items: [
-          '1. Vá à UBS e marque uma consulta com o médico de família ou clínico geral',
-          '2. O médico faz a avaliação e, se necessário, emite um encaminhamento',
-          '3. Com o encaminhamento em mãos, você agenda a consulta com o especialista',
+          'Vá à UBS e marque uma consulta com o médico de família ou clínico geral',
+          'O médico faz a avaliação e, se necessário, emite um encaminhamento',
+          'Com o encaminhamento em mãos, você agenda a consulta com o especialista',
         ],
       },
       {
         type: 'callout',
+        variant: 'tip',
         text: 'O SUS oferece atendimento em todas as especialidades médicas, de forma gratuita. O encaminhamento existe para organizar o fluxo — não para te impedir de ser atendido.',
       },
       {
         type: 'heading',
         level: 2,
         text: 'Onde agendar a consulta com o especialista',
+        icon: 'location',
       },
       {
         type: 'paragraph',
         text: 'O próprio médico da UBS vai informar onde agendar. Pode ser na Secretaria de Saúde do seu município, em um ambulatório de especialidades ou em um hospital conveniado.',
       },
-      { type: 'heading', level: 2, text: 'E se a espera for muito longa?' },
+      {
+        type: 'heading',
+        level: 2,
+        text: 'E se a espera for muito longa?',
+        icon: 'shield',
+      },
       {
         type: 'paragraph',
         text: 'Filas longas para especialistas são comuns. Se o prazo estiver muito além do razoável, você tem caminhos:',
@@ -123,6 +166,7 @@ export const consultaArticles: GuideArticle[] = [
         type: 'heading',
         level: 2,
         text: 'Especialidades disponíveis pelo SUS',
+        icon: 'activity',
       },
       {
         type: 'list',
@@ -134,6 +178,7 @@ export const consultaArticles: GuideArticle[] = [
       },
       {
         type: 'callout',
+        variant: 'tip',
         text: 'Você não precisa de comprovante de residência para ser atendido. O SUS é para todos os brasileiros, em qualquer município do país.',
       },
     ],

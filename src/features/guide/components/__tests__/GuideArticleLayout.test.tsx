@@ -87,13 +87,13 @@ describe('GuideArticleLayout', () => {
   })
 
   describe('Bloco: heading', () => {
-    it('renderiza nível 2 como h2', () => {
+    it('renderiza nível 2 como passo numerado h2', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Seção principal' },
       ]
       renderLayout(makeArticle({ content }))
       expect(
-        screen.getByRole('heading', { level: 2, name: 'Seção principal' })
+        screen.getByRole('heading', { level: 2, name: '1. Seção principal' })
       ).toBeInTheDocument()
     })
 
@@ -122,12 +122,126 @@ describe('GuideArticleLayout', () => {
   })
 
   describe('Bloco: callout', () => {
-    it('renderiza o texto do callout', () => {
+    it('renderiza o texto de um callout dentro de um passo', () => {
       const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Passo' },
         { type: 'callout', text: 'Atenção: leia com cuidado.' },
       ]
       renderLayout(makeArticle({ content }))
       expect(screen.getByText('Atenção: leia com cuidado.')).toBeInTheDocument()
+    })
+
+    it('renderiza o título de um callout quando informado', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Passo' },
+        {
+          type: 'callout',
+          variant: 'tip',
+          title: 'Dica importante',
+          text: 'Texto da dica.',
+        },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(screen.getByText('Dica importante')).toBeInTheDocument()
+      expect(screen.getByText('Texto da dica.')).toBeInTheDocument()
+    })
+
+    it('renderiza o número de emergência no callout de emergência', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Urgência' },
+        {
+          type: 'callout',
+          variant: 'emergency',
+          title: 'SAMU',
+          highlight: '192',
+        },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(screen.getByText('SAMU')).toBeInTheDocument()
+      expect(screen.getByText('192')).toBeInTheDocument()
+    })
+
+    it('renderiza o texto de um callout de warning', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Passo' },
+        {
+          type: 'callout',
+          variant: 'warning',
+          title: 'Atenção',
+          text: 'Fique alerta.',
+        },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(screen.getByText('Atenção')).toBeInTheDocument()
+      expect(screen.getByText('Fique alerta.')).toBeInTheDocument()
+    })
+
+    it('renderiza os itens de um callout de checklist', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Passo' },
+        {
+          type: 'callout',
+          variant: 'checklist',
+          title: 'O que levar',
+          items: ['Cartão SUS', 'Documento com foto'],
+        },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(screen.getByText('O que levar')).toBeInTheDocument()
+      expect(screen.getByText('Cartão SUS')).toBeInTheDocument()
+      expect(screen.getByText('Documento com foto')).toBeInTheDocument()
+    })
+  })
+
+  describe('Bloco: info-panel', () => {
+    it('renderiza o título e o texto de um info-panel', () => {
+      const content: ArticleBlock[] = [
+        {
+          type: 'info-panel',
+          title: 'Você sabia?',
+          text: 'O SUS é gratuito para todos.',
+        },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(screen.getByText('Você sabia?')).toBeInTheDocument()
+      expect(
+        screen.getByText('O SUS é gratuito para todos.')
+      ).toBeInTheDocument()
+    })
+  })
+
+  describe('Numeração de passos', () => {
+    it('numera múltiplos passos sequencialmente', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Primeiro' },
+        { type: 'heading', level: 2, text: 'Segundo' },
+        { type: 'heading', level: 2, text: 'Terceiro' },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(
+        screen.getByRole('heading', { level: 2, name: '1. Primeiro' })
+      ).toBeInTheDocument()
+      expect(
+        screen.getByRole('heading', { level: 2, name: '2. Segundo' })
+      ).toBeInTheDocument()
+      expect(
+        screen.getByRole('heading', { level: 2, name: '3. Terceiro' })
+      ).toBeInTheDocument()
+    })
+
+    it('continua numeração após um info-panel intercalado', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Primeiro' },
+        { type: 'info-panel', title: 'Info', text: 'Nota.' },
+        { type: 'heading', level: 2, text: 'Segundo' },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(
+        screen.getByRole('heading', { level: 2, name: '1. Primeiro' })
+      ).toBeInTheDocument()
+      expect(
+        screen.getByRole('heading', { level: 2, name: '2. Segundo' })
+      ).toBeInTheDocument()
     })
   })
 })
