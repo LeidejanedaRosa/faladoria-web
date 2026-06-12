@@ -52,7 +52,7 @@ export const GuideArticleHeader = ({ article }: GuideArticleHeaderProps) => {
               src={headerImage}
               alt=''
               aria-hidden='true'
-              className='w-full max-w-52 self-end object-contain sm:max-w-7xl'
+              className='w-full max-w-52 self-end object-contain sm:max-w-xs'
               width={220}
               height={200}
               loading='eager'

@@ -5,6 +5,7 @@ import {
   LightbulbIcon,
   PhoneIcon,
   QuestionIcon,
+  WarningIcon,
 } from '@shared/components/ui'
 import type { BreadcrumbItem } from '@shared/data'
 import { cn } from '@shared/utils/cn'
@@ -82,30 +83,6 @@ function groupIntoSteps(blocks: ArticleBlock[]): {
   return { preamble, items }
 }
 
-const WarningIcon = () => (
-  <svg
-    width='18'
-    height='18'
-    viewBox='0 0 20 20'
-    fill='none'
-    aria-hidden='true'
-    className='shrink-0'
-  >
-    <path
-      d='M10 3L2 17h16L10 3z'
-      stroke='currentColor'
-      strokeWidth='1.5'
-      strokeLinejoin='round'
-    />
-    <path
-      d='M10 10v3M10 14.5v.01'
-      stroke='currentColor'
-      strokeWidth='1.5'
-      strokeLinecap='round'
-    />
-  </svg>
-)
-
 const TipCallout = ({ block }: { block: CalloutData }) => (
   <div className='flex items-start gap-3 rounded-xl border border-purple-200 bg-purple-50 px-5 py-4 text-purple-900'>
     <span className='shrink-0 text-purple-600'>
@@ -123,9 +100,9 @@ const TipCallout = ({ block }: { block: CalloutData }) => (
 )
 
 const WarningCallout = ({ block }: { block: CalloutData }) => (
-  <div className='flex items-start gap-3 rounded-xl border border-purple-200 bg-purple-50 px-5 py-4 text-purple-900'>
-    <span className='shrink-0 text-purple-600'>
-      <WarningIcon />
+  <div className='flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-amber-900'>
+    <span className='shrink-0 text-amber-600'>
+      <WarningIcon className='h-4.5 w-4.5' />
     </span>
     <div>
       {block.title && <p className='text-sm font-semibold'>{block.title}</p>}
@@ -139,7 +116,10 @@ const WarningCallout = ({ block }: { block: CalloutData }) => (
 )
 
 const EmergencyCallout = ({ block }: { block: CalloutData }) => (
-  <div className='flex items-center justify-center gap-4 rounded-xl border border-red-200 bg-red-50 px-5 py-4'>
+  <div
+    role='alert'
+    className='flex items-center justify-center gap-4 rounded-xl border border-red-200 bg-red-50 px-5 py-4'
+  >
     <span className='shrink-0 text-red-400'>
       <PhoneIcon className='h-10 w-10' />
     </span>
@@ -235,7 +215,10 @@ const StepImage = ({ imageKey, alt }: { imageKey: string; alt: string }) => {
 }
 
 const InfoPanel = ({ block }: { block: InfoPanelData }) => (
-  <div className='flex items-start gap-4 rounded-2xl border border-purple-200 bg-purple-50 px-5 py-4'>
+  <div
+    role='note'
+    className='flex items-start gap-4 rounded-2xl border border-purple-200 bg-purple-50 px-5 py-4'
+  >
     <span className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-100'>
       <QuestionIcon className='h-5 w-5 text-purple-600' />
     </span>
