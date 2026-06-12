@@ -16,8 +16,6 @@ export type ArticleBlock =
       type: 'info-panel'
       title: string
       text: string
-      icon?: string
-      variant?: 'purple'
     }
 
 export interface GuideArticle {
@@ -27,6 +25,7 @@ export interface GuideArticle {
   datePublished: string
   content: ArticleBlock[]
   categorySlug: string
+  highlights?: readonly string[]
 }
 
 export { GUIDE_ARTICLES } from './articles'
