@@ -2,6 +2,7 @@ export interface GuideCategory {
   slug: string
   label: string
   description: string
+  infoPoints?: readonly string[]
   iconName:
     | 'activity'
     | 'building'
@@ -49,6 +50,11 @@ export const GUIDE_CATEGORIES: GuideCategory[] = [
     description: 'Laboratoriais, de imagem e como solicitar.',
     iconName: 'search',
     color: 'orange',
+    infoPoints: [
+      'O SUS é gratuito para todos.',
+      'Somente médico ou profissional de saúde autorizado pode pedir exame.',
+      'Sem o pedido médico, não é possível agendar o exame.',
+    ],
   },
   {
     slug: 'cirurgia',

@@ -48,7 +48,10 @@ export const GuideCategoryHeader = ({ category }: GuideCategoryHeaderProps) => {
               theme.text
             )}
           >
-            <InfoCircleIcon className='h-4.5 w-4.5 shrink-0' />
+            <InfoCircleIcon
+              className='h-4.5 w-4.5 shrink-0'
+              aria-hidden='true'
+            />
             <p className='text-sm'>{infoBanner}</p>
           </div>
         </div>
@@ -58,8 +61,8 @@ export const GuideCategoryHeader = ({ category }: GuideCategoryHeaderProps) => {
             alt=''
             aria-hidden='true'
             className='w-full max-w-xs self-end object-contain lg:max-w-xl'
-            width={400}
-            height={320}
+            width={576}
+            height={384}
             loading='eager'
           />
         )}

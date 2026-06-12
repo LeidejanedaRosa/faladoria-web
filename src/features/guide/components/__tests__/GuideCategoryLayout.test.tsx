@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 
 import type { GuideArticle, GuideCategory } from '../../data'
+import { GUIDE_CONTENT } from '../../data'
 import { GuideCategoryLayout } from '../GuideCategoryLayout'
 
 vi.mock('../../data', async () => {
@@ -45,14 +46,14 @@ const mockBreadcrumbItems: BreadcrumbItem[] = [
   { name: mockCategory.label },
 ]
 
-async function setup(articles: GuideArticle[]) {
+async function setup(articles: GuideArticle[], category = mockCategory) {
   const { getArticlesByCategory } = await import('../../data')
   vi.mocked(getArticlesByCategory).mockReturnValue(articles)
 
   return render(
     <MemoryRouter>
       <GuideCategoryLayout
-        category={mockCategory}
+        category={category}
         breadcrumbItems={mockBreadcrumbItems}
       />
     </MemoryRouter>
@@ -109,6 +110,54 @@ describe('GuideCategoryLayout', () => {
       expect(
         screen.queryByRole('list', { name: /artigos/i })
       ).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Painel de ajuda', () => {
+    it('renderiza o título do painel de ajuda', async () => {
+      await setup(mockArticles)
+      expect(
+        screen.getByText(GUIDE_CONTENT.categoryPage.help.title)
+      ).toBeInTheDocument()
+    })
+
+    it('renderiza o link do WhatsApp no painel de ajuda', async () => {
+      await setup(mockArticles)
+      const helpLink = screen.getByRole('link', {
+        name: new RegExp(GUIDE_CONTENT.categoryPage.help.title),
+      })
+      expect(helpLink).toHaveAttribute('href', expect.stringContaining('wa.me'))
+      expect(helpLink).toHaveAttribute('target', '_blank')
+      expect(helpLink).toHaveAttribute('rel', 'noopener noreferrer')
+    })
+  })
+
+  describe('Painel de informações importantes', () => {
+    it('não renderiza o painel quando a categoria não tem infoPoints', async () => {
+      await setup(mockArticles)
+      expect(
+        screen.queryByRole('region', { name: /informações importantes/i })
+      ).not.toBeInTheDocument()
+    })
+
+    it('renderiza o painel quando a categoria tem infoPoints', async () => {
+      const categoryWithInfoPoints: GuideCategory = {
+        ...mockCategory,
+        infoPoints: [
+          'O SUS é gratuito para todos.',
+          'Sem pedido médico não há exame.',
+        ],
+      }
+      await setup(mockArticles, categoryWithInfoPoints)
+      expect(
+        screen.getByRole('region', { name: /informações importantes/i })
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText('O SUS é gratuito para todos.')
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText('Sem pedido médico não há exame.')
+      ).toBeInTheDocument()
     })
   })
 

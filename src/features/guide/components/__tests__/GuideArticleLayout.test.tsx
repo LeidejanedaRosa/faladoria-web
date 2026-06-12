@@ -1,9 +1,15 @@
 import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import type { ArticleBlock, GuideArticle } from '../../data'
 import { GuideArticleLayout } from '../GuideArticleLayout'
+
+vi.mock('../guideImageMap', () => ({
+  GUIDE_ARTICLE_IMAGES: {},
+  GUIDE_CATEGORY_IMAGES: {},
+  GUIDE_STEP_IMAGES: { 'imagem-teste': '/fake-step.png' },
+}))
 
 const breadcrumbItems = [
   { name: 'Início', url: '/' },
@@ -142,7 +148,10 @@ describe('GuideArticleLayout', () => {
         },
       ]
       renderLayout(makeArticle({ content }))
-      expect(screen.getByText('Dica importante')).toBeInTheDocument()
+      const article = screen.getByRole('article')
+      expect(within(article).getAllByText('Dica importante')).not.toHaveLength(
+        0
+      )
       expect(screen.getByText('Texto da dica.')).toBeInTheDocument()
     })
 
@@ -159,6 +168,30 @@ describe('GuideArticleLayout', () => {
       renderLayout(makeArticle({ content }))
       expect(screen.getByText('SAMU')).toBeInTheDocument()
       expect(screen.getByText('192')).toBeInTheDocument()
+    })
+
+    it('callout de emergência tem role="alert"', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Urgência' },
+        {
+          type: 'callout',
+          variant: 'emergency',
+          title: 'SAMU',
+          highlight: '192',
+        },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(screen.getByRole('alert')).toBeInTheDocument()
+    })
+
+    it('renderiza callout sem variante (padrão) com título e texto', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Passo' },
+        { type: 'callout', title: 'Aviso geral', text: 'Texto sem variante.' },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(screen.getByText('Aviso geral')).toBeInTheDocument()
+      expect(screen.getByText('Texto sem variante.')).toBeInTheDocument()
     })
 
     it('renderiza o texto de um callout de warning', () => {
@@ -190,6 +223,26 @@ describe('GuideArticleLayout', () => {
       expect(screen.getByText('O que levar')).toBeInTheDocument()
       expect(screen.getByText('Cartão SUS')).toBeInTheDocument()
       expect(screen.getByText('Documento com foto')).toBeInTheDocument()
+    })
+  })
+
+  describe('Bloco: image', () => {
+    it('renderiza a imagem quando a chave existe no mapa', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Passo com imagem' },
+        { type: 'image', imageKey: 'imagem-teste', alt: 'Imagem de teste' },
+      ]
+      const { container } = renderLayout(makeArticle({ content }))
+      expect(container.querySelector('img')).toBeInTheDocument()
+    })
+
+    it('não renderiza imagem quando a chave não está no mapa', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Passo sem imagem' },
+        { type: 'image', imageKey: 'inexistente', alt: 'Nada' },
+      ]
+      const { container } = renderLayout(makeArticle({ content }))
+      expect(container.querySelector('img')).not.toBeInTheDocument()
     })
   })
 

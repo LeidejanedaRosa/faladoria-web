@@ -32,5 +32,6 @@ export {
   SyringeIcon,
   TargetIcon,
   UsersIcon,
+  WarningIcon,
   WhatsAppIcon,
 } from './icons'

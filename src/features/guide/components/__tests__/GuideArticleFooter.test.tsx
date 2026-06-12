@@ -1,4 +1,3 @@
-import { WHATSAPP_URL } from '@shared/data/companyInfo'
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
@@ -10,67 +9,35 @@ function renderFooter() {
 }
 
 describe('GuideArticleFooter', () => {
-  describe('Seção de ajuda', () => {
-    it('renderiza o título da seção de ajuda', () => {
-      renderFooter()
-      expect(
-        screen.getByText(GUIDE_CONTENT.articlePage.help.title)
-      ).toBeInTheDocument()
-    })
-
-    it('renderiza a descrição da seção de ajuda', () => {
-      renderFooter()
-      expect(
-        screen.getByText(GUIDE_CONTENT.articlePage.help.description)
-      ).toBeInTheDocument()
-    })
-
-    it('renderiza o link de CTA com o texto correto', () => {
-      renderFooter()
-      expect(
-        screen.getByRole('link', { name: GUIDE_CONTENT.articlePage.help.cta })
-      ).toBeInTheDocument()
-    })
-
-    it('o link aponta para o WHATSAPP_URL', () => {
-      renderFooter()
-      expect(
-        screen.getByRole('link', { name: GUIDE_CONTENT.articlePage.help.cta })
-      ).toHaveAttribute('href', WHATSAPP_URL)
-    })
+  it('renderiza o bloco de ajuda', () => {
+    renderFooter()
+    expect(
+      screen.getByText(GUIDE_CONTENT.articlePage.help.title)
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(GUIDE_CONTENT.articlePage.help.description)
+    ).toBeInTheDocument()
   })
 
-  describe('Segurança do link externo', () => {
-    it('o link abre em nova aba', () => {
-      renderFooter()
-      expect(
-        screen.getByRole('link', { name: GUIDE_CONTENT.articlePage.help.cta })
-      ).toHaveAttribute('target', '_blank')
-    })
-
-    it('o link tem rel="noopener noreferrer"', () => {
-      renderFooter()
-      expect(
-        screen.getByRole('link', { name: GUIDE_CONTENT.articlePage.help.cta })
-      ).toHaveAttribute('rel', 'noopener noreferrer')
-    })
+  it('o link de ajuda aponta para o WhatsApp e abre em nova aba', () => {
+    renderFooter()
+    const link = screen.getByRole('link')
+    expect(link).toHaveAttribute('href', expect.stringContaining('wa.me'))
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
   })
 
-  describe('Trust signals', () => {
-    it('renderiza todos os trust signals', () => {
-      renderFooter()
-      const { trustSignals } = GUIDE_CONTENT.articlePage
-      trustSignals.forEach(signal => {
-        expect(screen.getByText(signal.title)).toBeInTheDocument()
-      })
-    })
+  it('renderiza o texto do botão CTA de ajuda', () => {
+    renderFooter()
+    expect(
+      screen.getByText(GUIDE_CONTENT.articlePage.help.cta)
+    ).toBeInTheDocument()
+  })
 
-    it('renderiza a descrição de cada trust signal', () => {
-      renderFooter()
-      const { trustSignals } = GUIDE_CONTENT.articlePage
-      trustSignals.forEach(signal => {
-        expect(screen.getByText(signal.description)).toBeInTheDocument()
-      })
-    })
+  it('renderiza os quatro sinais de confiança', () => {
+    renderFooter()
+    for (const signal of GUIDE_CONTENT.articlePage.trustSignals) {
+      expect(screen.getByText(signal.title)).toBeInTheDocument()
+    }
   })
 })

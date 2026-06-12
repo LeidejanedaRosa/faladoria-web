@@ -56,8 +56,6 @@ export const consultaArticles: GuideArticle[] = [
         type: 'info-panel',
         title: 'Não sabe qual especialidade precisa?',
         text: 'Sem problema. Marque uma consulta com o médico da UBS. Ele vai te avaliar e, se necessário, te encaminhar para o especialista certo — tudo pelo SUS.',
-        icon: 'question',
-        variant: 'purple',
       },
 
       {
