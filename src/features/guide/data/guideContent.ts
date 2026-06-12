@@ -129,7 +129,11 @@ export const GUIDE_CONTENT = {
     help: {
       title: 'Precisa de ajuda?',
       description: 'Fale com a equipe do seu posto de saúde.',
-      cta: 'Ver canais de atendimento',
+    },
+    articles: {
+      infoPoints: {
+        heading: 'Informações importantes',
+      },
     },
   },
 
