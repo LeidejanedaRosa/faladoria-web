@@ -41,10 +41,10 @@ function renderCard(article: GuideArticle, category = mockCategory) {
 
 describe('GuideArticleCard', () => {
   describe('Conteúdo', () => {
-    it('renderiza o título do artigo como h3', () => {
+    it('renderiza o título do artigo como h2', () => {
       renderCard(makeArticle())
       expect(
-        screen.getByRole('heading', { level: 3, name: 'Artigo de teste' })
+        screen.getByRole('heading', { level: 2, name: 'Artigo de teste' })
       ).toBeInTheDocument()
     })
 
@@ -64,7 +64,31 @@ describe('GuideArticleCard', () => {
     it('o link engloba o título do artigo', () => {
       renderCard(makeArticle())
       const link = screen.getByRole('link')
-      expect(link).toContainElement(screen.getByRole('heading', { level: 3 }))
+      expect(link).toContainElement(screen.getByRole('heading', { level: 2 }))
+    })
+  })
+
+  describe('Highlights', () => {
+    it('renderiza a lista de tópicos quando o artigo tem highlights', () => {
+      renderCard(makeArticle({ highlights: ['Tópico 1', 'Tópico 2'] }))
+      const list = screen.getByRole('list', { name: 'Tópicos abordados' })
+      expect(list).toBeInTheDocument()
+      expect(screen.getByText('Tópico 1')).toBeInTheDocument()
+      expect(screen.getByText('Tópico 2')).toBeInTheDocument()
+    })
+
+    it('não renderiza a lista quando o artigo não tem highlights', () => {
+      renderCard(makeArticle())
+      expect(
+        screen.queryByRole('list', { name: 'Tópicos abordados' })
+      ).not.toBeInTheDocument()
+    })
+
+    it('não renderiza a lista quando highlights é um array vazio', () => {
+      renderCard(makeArticle({ highlights: [] }))
+      expect(
+        screen.queryByRole('list', { name: 'Tópicos abordados' })
+      ).not.toBeInTheDocument()
     })
   })
 
@@ -106,6 +130,14 @@ describe('GuideArticleCard', () => {
         makeArticle({ slug: 'artigo-com-imagem' })
       )
       expect(container.querySelector('img')).toHaveAttribute('loading', 'lazy')
+    })
+
+    it('o link tem aria-label que inclui o título do artigo', () => {
+      renderCard(makeArticle())
+      expect(screen.getByRole('link')).toHaveAttribute(
+        'aria-label',
+        'Ver artigo: Artigo de teste'
+      )
     })
   })
 })
