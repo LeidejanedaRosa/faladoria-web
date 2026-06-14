@@ -34,9 +34,9 @@ export const GuideCategoryCard = ({ category }: GuideCategoryCardProps) => {
         <Icon className='h-6 w-6 text-white' />
       </div>
       <div className='flex flex-col gap-0.5'>
-        <span className='text-sm leading-snug font-bold text-gray-900'>
+        <h4 className='text-sm leading-snug font-bold text-gray-900'>
           {category.label}
-        </span>
+        </h4>
         <p className='text-xs leading-snug text-gray-500'>
           {category.description}
         </p>
