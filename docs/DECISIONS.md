@@ -322,3 +322,52 @@ export const GUIDE_ARTICLE_HEADING_ID = 'article-heading'
 - O `tsconfig.test.json` já usa `extends: ./tsconfig.app.json` — herda todas as `compilerOptions` do app config
 - `references` é para builds compostos independentes (compilados separadamente com `tsc -b`). O config de testes não precisa ser compilado separadamente — o Vitest usa o pipeline do Vite
 - A combinação `allowImportingTsExtensions: true` + `emitDeclarationOnly: true` + `composite: true` no config referenciado dispara o `TS6310` quando o config de testes declara uma `reference` para ele
+
+---
+
+## 2026-06-14 — `ArticleStepIconName` na camada de dados, não na camada de componentes
+
+**Contexto**: O tipo `ArticleStepIconName` vivia em `components/guideIconMap.ts` (camada de componentes). A interface `GuideArticle` no arquivo `data/guideArticles.ts` usava `iconName?: string` em vez de `ArticleStepIconName` porque a camada de dados não pode importar da camada de componentes — isso violaria a direção de dependências.
+
+**Decisão**: `ArticleStepIconName` foi movido para `data/guideArticles.ts`. O `guideIconMap.ts` passa a importar e re-exportar o tipo de lá.
+
+**Por que na camada de dados:**
+
+- O tipo é uma restrição sobre um campo de dado (`GuideArticle.iconName`, `ArticleBlock.heading.icon`) — pertence ao contrato de dados, não à implementação visual.
+- Com o tipo em `guideIconMap.ts`, o mapa de ícones (componente) definia o que era válido no dado — inversão de dependência errada.
+- Agora a camada de dados define o contrato; a camada de componentes consome. Qualquer adição de ícone começa no tipo em `guideArticles.ts` — sem precisar tocar no componente para saber o que é permitido.
+
+**Efeito colateral resolvido**: `GuideArticle.iconName` e `StepGroup.icon` passam a usar `ArticleStepIconName` em vez de `string`, eliminando o `TS7053` que aparecia no `GuideArticleLayout`. Ver [TROUBLESHOOTING.md](#ts7053-stepgroupicon-tipado-como-string-em-vez-de-articlestepiconname).
+
+---
+
+## 2026-06-14 — `fetchPriority='high'` nas imagens hero do Guide
+
+**Contexto**: As imagens de cabeçalho de categoria (`GuideCategoryHeader`) e de artigo (`GuideArticleHeader`) são o maior elemento visual acima da dobra — candidatas diretas ao LCP (Largest Contentful Paint). Já tinham `loading='eager'` para evitar carregamento lazy desnecessário.
+
+**Decisão**: Adicionar `fetchPriority='high'` em ambas as imagens hero.
+
+**Por que `fetchPriority='high'` além de `loading='eager'`:**
+
+- `loading='eager'` desativa o lazy loading, mas não eleva a prioridade de rede da requisição — o browser ainda pode enfileirar a imagem atrás de scripts, stylesheets e outras imagens.
+- `fetchPriority='high'` sinaliza ao browser que esta imagem é crítica para a renderização e deve ser carregada com prioridade máxima.
+- A combinação dos dois é o padrão recomendado para imagens LCP: `loading='eager' fetchPriority='high'`.
+
+**Regra para o Guide**: toda imagem que é o maior elemento visual acima da dobra em qualquer página deve ter `loading='eager' fetchPriority='high'`.
+
+---
+
+## 2026-06-14 — Tokens de cor `red` e `yellow` no `guideCategoryTheme.ts`
+
+**Contexto**: O `guideCategoryTheme.ts` tinha 14 tokens de cor para 17 categorias — três pares de categorias com cor idêntica. Duas das três colisões eram problemáticas: `judicializacao` (âmbar) e `denuncias` (rose) compartilhavam cores próximas com outras categorias da mesma grade.
+
+**Decisão**: Adicionados dois novos tokens: `red` (para `judicializacao`) e `yellow` (para `denuncias`).
+
+**Por que essas cores:**
+
+- `judicializacao` — vermelho comunica urgência e seriedade legal. A cor âmbar anterior era ambígua (usada também em `saude-mental`).
+- `denuncias` — amarelo comunica alertas e avisos. Rose era próximo demais de vermelho, gerando contraste visual fraco entre as duas categorias.
+
+**Colisão restante**: `como-funciona-o-sus` e `transporte-sanitario` mantêm a mesma cor base (`blue`) mas são distinguíveis pelo ícone (`building` vs `location`). Aceito por enquanto — resolver exigiria adicionar um terceiro token azul que seria visualmente redundante.
+
+**Padrão de adição de tokens**: cada novo token deve ter os 7 campos obrigatórios (`iconBg`, `iconBgLight`, `softBg`, `border`, `borderHover`, `text`, `textAccent`) para manter consistência de aplicação nos componentes.

@@ -276,6 +276,43 @@ export {
 
 ---
 
+## `TS7053: StepGroup.icon` tipado como `string` em vez de `ArticleStepIconName`
+
+**Data**: 2026-06-14
+
+**Sintoma**:
+
+```
+src/features/guide/components/GuideArticleLayout.tsx(311,28): error TS7053:
+Element implicitly has an 'any' type because expression of type 'string'
+can't be used to index type 'Record<ArticleStepIconName, IconComponent>'.
+```
+
+**Causa raiz**:
+
+Quando `ArticleStepIconName` foi movido de `components/guideIconMap.ts` para `data/guideArticles.ts`, a interface interna `StepGroup` em `GuideArticleLayout.tsx` não foi atualizada. O campo `icon?: string` ainda usava o tipo primitivo, o que impedia o uso de `step.icon` como chave de `ARTICLE_STEP_ICON_MAP` (que aceita apenas `ArticleStepIconName`).
+
+**Solução**:
+
+1. Importar `ArticleStepIconName` de `'../data'` em `GuideArticleLayout.tsx`
+2. Atualizar `StepGroup.icon` de `string` para `ArticleStepIconName`
+
+```ts
+// antes
+interface StepGroup {
+  icon?: string
+}
+
+// depois
+interface StepGroup {
+  icon?: ArticleStepIconName
+}
+```
+
+**Regra**: ao mover um tipo de uma camada para outra, buscar por todas as interfaces internas que usavam o tipo primitivo correspondente (`string`, `number`) como substituto informal. Esses são os pontos que o compilador não detecta automaticamente durante a refatoração.
+
+---
+
 ## Função `slugify` duplicada com implementações divergentes
 
 **Data**: 2026-05-25
