@@ -137,4 +137,22 @@ export const CATEGORY_THEME: Record<GuideCategory['color'], CategoryTheme> = {
     text: 'text-fuchsia-700',
     textAccent: 'text-fuchsia-600',
   },
+  red: {
+    iconBg: 'bg-red-500',
+    iconBgLight: 'bg-red-100',
+    softBg: 'bg-red-50',
+    border: 'border-red-200',
+    borderHover: 'hover:border-red-300',
+    text: 'text-red-700',
+    textAccent: 'text-red-600',
+  },
+  yellow: {
+    iconBg: 'bg-yellow-500',
+    iconBgLight: 'bg-yellow-100',
+    softBg: 'bg-yellow-50',
+    border: 'border-yellow-200',
+    borderHover: 'hover:border-yellow-300',
+    text: 'text-yellow-700',
+    textAccent: 'text-yellow-600',
+  },
 }
