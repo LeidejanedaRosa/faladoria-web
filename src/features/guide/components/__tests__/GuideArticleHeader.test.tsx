@@ -90,6 +90,16 @@ describe('GuideArticleHeader', () => {
       )
       expect(container.querySelector('img')).toHaveAttribute('loading', 'eager')
     })
+
+    it('a imagem tem fetchPriority high para prioridade de carregamento LCP', () => {
+      const { container } = renderHeader(
+        makeArticle({ slug: 'artigo-com-imagem' })
+      )
+      expect(container.querySelector('img')).toHaveAttribute(
+        'fetchpriority',
+        'high'
+      )
+    })
   })
 
   describe('Ícone de categoria', () => {

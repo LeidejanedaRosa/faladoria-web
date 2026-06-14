@@ -81,6 +81,16 @@ describe('GuideCategoryHeader', () => {
       )
       expect(container.querySelector('img')).toHaveAttribute('loading', 'eager')
     })
+
+    it('a imagem tem fetchPriority high para prioridade de carregamento LCP', () => {
+      const { container } = render(
+        <GuideCategoryHeader category={mockCategoryWithImage} />
+      )
+      expect(container.querySelector('img')).toHaveAttribute(
+        'fetchpriority',
+        'high'
+      )
+    })
   })
 
   describe('Acessibilidade', () => {
