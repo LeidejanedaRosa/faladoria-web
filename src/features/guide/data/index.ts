@@ -5,7 +5,11 @@ export { CATEGORY_GROUPS } from './categoryGroups'
 export type { CategoryGroup, CategoryGroupColor } from './categoryGroups'
 
 export { GUIDE_ARTICLES } from './guideArticles'
-export type { GuideArticle, ArticleBlock } from './guideArticles'
+export type {
+  GuideArticle,
+  ArticleBlock,
+  ArticleStepIconName,
+} from './guideArticles'
 
 export {
   getCategoryBySlug,

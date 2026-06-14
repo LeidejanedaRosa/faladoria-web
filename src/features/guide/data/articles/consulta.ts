@@ -1,13 +1,17 @@
 import type { GuideArticle } from '../guideArticles'
 
+const CATEGORY_SLUG = 'consulta'
+const DATE_PUBLISHED = '2026-05-01'
+
 export const consultaArticles: GuideArticle[] = [
   {
     slug: 'como-agendar-consulta',
-    categorySlug: 'consulta',
+    categorySlug: CATEGORY_SLUG,
     title: 'Como agendar uma consulta',
     summary:
       'Veja como agendar consultas pelo SUS, quais especialidades estão disponíveis e quais são os prazos.',
-    datePublished: '2026-05-01',
+    datePublished: DATE_PUBLISHED,
+    iconName: 'clipboard',
     content: [
       { type: 'heading', level: 2, text: 'Onde ir primeiro', icon: 'location' },
       {
@@ -103,11 +107,12 @@ export const consultaArticles: GuideArticle[] = [
   },
   {
     slug: 'consulta-especialista',
-    categorySlug: 'consulta',
+    categorySlug: CATEGORY_SLUG,
     title: 'Como conseguir consulta com especialista',
     summary:
       'Para consultar um especialista pelo SUS é preciso passar por uma etapa antes. Entenda como funciona.',
-    datePublished: '2026-05-01',
+    datePublished: DATE_PUBLISHED,
+    iconName: 'person',
     content: [
       {
         type: 'paragraph',

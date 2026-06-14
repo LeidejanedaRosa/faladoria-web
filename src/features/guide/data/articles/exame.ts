@@ -11,12 +11,7 @@ export const exameArticles: GuideArticle[] = [
     summary:
       'Saiba como solicitar exames laboratoriais e de imagem pelo SUS, quais documentos levar e o que perguntar no agendamento.',
     datePublished: DATE_PUBLISHED,
-    highlights: [
-      'Quem pode pedir o exame',
-      'Documentos necessários para o agendamento',
-      'Onde e como agendar',
-      'O que fazer antes de comparecer',
-    ],
+    iconName: 'clipboard',
     content: [
       {
         type: 'paragraph',
@@ -136,12 +131,7 @@ export const exameArticles: GuideArticle[] = [
     summary:
       'Se você sente um incômodo mas não sabe qual exame fazer, entenda como o SUS pode te ajudar a descobrir.',
     datePublished: DATE_PUBLISHED,
-    highlights: [
-      'Como descobrir qual exame fazer',
-      'Quais exames o SUS realiza',
-      'O que fazer em casos urgentes',
-      'Exame realizado em outra cidade',
-    ],
+    iconName: 'question',
     content: [
       {
         type: 'paragraph',
@@ -222,12 +212,7 @@ export const exameArticles: GuideArticle[] = [
     summary:
       'Conheça seus direitos e os caminhos para agir quando o exame está demorando mais do que o aceitável.',
     datePublished: DATE_PUBLISHED,
-    highlights: [
-      'Quanto tempo é considerado uma longa espera',
-      'Como acionar o Disque Saúde (136)',
-      'Quando buscar a Defensoria Pública',
-      'Como usar a Justiça como último recurso',
-    ],
+    iconName: 'chart',
     content: [
       {
         type: 'paragraph',

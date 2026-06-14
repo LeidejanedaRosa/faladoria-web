@@ -33,6 +33,8 @@ export interface GuideCategory {
     | 'rose'
     | 'pink'
     | 'fuchsia'
+    | 'red'
+    | 'yellow'
 }
 
 export const GUIDE_CATEGORIES: GuideCategory[] = [
@@ -50,11 +52,6 @@ export const GUIDE_CATEGORIES: GuideCategory[] = [
     description: 'Laboratoriais, de imagem e como solicitar.',
     iconName: 'search',
     color: 'orange',
-    infoPoints: [
-      'O SUS é gratuito para todos.',
-      'Somente médico ou profissional de saúde autorizado pode pedir exame.',
-      'Sem o pedido médico, não é possível agendar o exame.',
-    ],
   },
   {
     slug: 'cirurgia',
@@ -158,13 +155,13 @@ export const GUIDE_CATEGORIES: GuideCategory[] = [
     label: 'Denúncias',
     description: 'Canais para denunciar irregularidades.',
     iconName: 'megaphone',
-    color: 'rose',
+    color: 'yellow',
   },
   {
     slug: 'judicializacao',
     label: 'Recorrer na Justiça',
     description: 'Quando e como acionar a Justiça.',
     iconName: 'fist',
-    color: 'amber',
+    color: 'red',
   },
 ]

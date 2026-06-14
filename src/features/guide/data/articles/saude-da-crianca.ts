@@ -1,13 +1,17 @@
 import type { GuideArticle } from '../guideArticles'
 
+const CATEGORY_SLUG = 'saude-da-crianca'
+const DATE_PUBLISHED = '2026-05-01'
+
 export const saudeDaCriancaArticles: GuideArticle[] = [
   {
     slug: 'acompanhamento-infantil',
-    categorySlug: 'saude-da-crianca',
+    categorySlug: CATEGORY_SLUG,
     title: 'Saúde da criança pelo SUS',
     summary:
       'Acompanhamento do crescimento, desenvolvimento e vacinação das crianças pelo SUS.',
-    datePublished: '2026-05-01',
+    datePublished: DATE_PUBLISHED,
+    iconName: 'users',
     content: [
       {
         type: 'paragraph',

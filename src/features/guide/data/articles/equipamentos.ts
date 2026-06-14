@@ -1,13 +1,17 @@
 import type { GuideArticle } from '../guideArticles'
 
+const CATEGORY_SLUG = 'equipamentos'
+const DATE_PUBLISHED = '2026-05-01'
+
 export const equipamentosArticles: GuideArticle[] = [
   {
     slug: 'como-solicitar-equipamentos',
-    categorySlug: 'equipamentos',
+    categorySlug: CATEGORY_SLUG,
     title: 'Como solicitar equipamentos pelo SUS',
     summary:
       'Cadeiras de rodas, muletas, órteses, próteses e respiradores podem ser solicitados gratuitamente.',
-    datePublished: '2026-05-01',
+    datePublished: DATE_PUBLISHED,
+    iconName: 'target',
     content: [
       {
         type: 'paragraph',

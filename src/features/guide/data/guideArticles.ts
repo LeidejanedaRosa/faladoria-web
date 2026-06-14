@@ -1,6 +1,26 @@
+export type ArticleStepIconName =
+  | 'activity'
+  | 'building'
+  | 'chart'
+  | 'chat'
+  | 'check'
+  | 'clipboard'
+  | 'fist'
+  | 'heart'
+  | 'location'
+  | 'megaphone'
+  | 'person'
+  | 'phone'
+  | 'question'
+  | 'search'
+  | 'shield'
+  | 'syringe'
+  | 'target'
+  | 'users'
+
 export type ArticleBlock =
   | { type: 'paragraph'; text: string }
-  | { type: 'heading'; level: 2; text: string; icon?: string }
+  | { type: 'heading'; level: 2; text: string; icon?: ArticleStepIconName }
   | { type: 'heading'; level: 3; text: string }
   | { type: 'list'; items: string[] }
   | {
@@ -25,7 +45,7 @@ export interface GuideArticle {
   datePublished: string
   content: ArticleBlock[]
   categorySlug: string
-  highlights?: readonly string[]
+  iconName?: ArticleStepIconName
 }
 
 export { GUIDE_ARTICLES } from './articles'

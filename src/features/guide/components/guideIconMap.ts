@@ -22,8 +22,9 @@ import {
 } from '@shared/components/ui'
 import type { IconProps } from '@shared/types/icon'
 
-import type { GuideCategory } from '../data'
+import type { ArticleStepIconName, GuideCategory } from '../data'
 
+export type { ArticleStepIconName }
 export type IconComponent = (props: IconProps) => ReactElement
 
 export const GUIDE_ICON_MAP: Record<GuideCategory['iconName'], IconComponent> =
@@ -43,26 +44,6 @@ export const GUIDE_ICON_MAP: Record<GuideCategory['iconName'], IconComponent> =
     target: TargetIcon,
     users: UsersIcon,
   } as const
-
-export type ArticleStepIconName =
-  | 'activity'
-  | 'building'
-  | 'chart'
-  | 'chat'
-  | 'check'
-  | 'clipboard'
-  | 'fist'
-  | 'heart'
-  | 'location'
-  | 'megaphone'
-  | 'person'
-  | 'phone'
-  | 'question'
-  | 'search'
-  | 'shield'
-  | 'syringe'
-  | 'target'
-  | 'users'
 
 export const ARTICLE_STEP_ICON_MAP: Record<ArticleStepIconName, IconComponent> =
   {

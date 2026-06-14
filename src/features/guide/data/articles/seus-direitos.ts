@@ -1,13 +1,17 @@
 import type { GuideArticle } from '../guideArticles'
 
+const CATEGORY_SLUG = 'seus-direitos'
+const DATE_PUBLISHED = '2026-05-01'
+
 export const seusDireitosArticles: GuideArticle[] = [
   {
     slug: 'direito-a-saude',
-    categorySlug: 'seus-direitos',
+    categorySlug: CATEGORY_SLUG,
     title: 'Direito à saúde',
     summary:
       'A saúde é um direito de todos e dever do Estado, garantido pela Constituição Federal de 1988.',
-    datePublished: '2026-05-01',
+    datePublished: DATE_PUBLISHED,
+    iconName: 'shield',
     content: [
       {
         type: 'callout',
@@ -71,11 +75,12 @@ export const seusDireitosArticles: GuideArticle[] = [
   },
   {
     slug: 'como-exigir-seus-direitos',
-    categorySlug: 'seus-direitos',
+    categorySlug: CATEGORY_SLUG,
     title: 'Como exigir seus direitos',
     summary:
       'Saiba quais canais acionar quando o atendimento no SUS for negado ou demorar além do prazo.',
-    datePublished: '2026-05-01',
+    datePublished: DATE_PUBLISHED,
+    iconName: 'fist',
     content: [
       {
         type: 'paragraph',

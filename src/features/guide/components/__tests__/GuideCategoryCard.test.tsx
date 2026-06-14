@@ -53,6 +53,15 @@ describe('GuideCategoryCard', () => {
     })
   })
 
+  describe('Semântica', () => {
+    it('o nome da categoria é renderizado como h4', () => {
+      renderCard()
+      expect(
+        screen.getByRole('heading', { level: 4, name: 'Seus Direitos' })
+      ).toBeInTheDocument()
+    })
+  })
+
   describe('Acessibilidade', () => {
     it('o ícone está oculto de leitores de tela', () => {
       const { container } = renderCard()

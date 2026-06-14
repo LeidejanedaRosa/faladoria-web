@@ -1,13 +1,17 @@
 import type { GuideArticle } from '../guideArticles'
 
+const CATEGORY_SLUG = 'judicializacao'
+const DATE_PUBLISHED = '2026-05-01'
+
 export const judicializacaoArticles: GuideArticle[] = [
   {
     slug: 'quando-judicializar',
-    categorySlug: 'judicializacao',
+    categorySlug: CATEGORY_SLUG,
     title: 'Quando e como recorrer à Justiça',
     summary:
       'A judicialização é o último recurso. Entenda quando ela é necessária e como funciona o processo.',
-    datePublished: '2026-05-01',
+    datePublished: DATE_PUBLISHED,
+    iconName: 'fist',
     content: [
       {
         type: 'paragraph',
