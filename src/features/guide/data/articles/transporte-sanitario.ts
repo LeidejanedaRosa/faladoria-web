@@ -1,13 +1,17 @@
 import type { GuideArticle } from '../guideArticles'
 
+const CATEGORY_SLUG = 'transporte-sanitario'
+const DATE_PUBLISHED = '2026-05-01'
+
 export const transporteSanitarioArticles: GuideArticle[] = [
   {
     slug: 'como-solicitar-transporte-sanitario',
-    categorySlug: 'transporte-sanitario',
+    categorySlug: CATEGORY_SLUG,
     title: 'Como solicitar transporte sanitário',
     summary:
       'Se você não consegue se deslocar para consultas ou tratamentos, o SUS pode garantir transporte.',
-    datePublished: '2026-05-01',
+    datePublished: DATE_PUBLISHED,
+    iconName: 'location',
     content: [
       {
         type: 'paragraph',

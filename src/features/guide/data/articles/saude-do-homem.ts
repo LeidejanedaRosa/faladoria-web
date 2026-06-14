@@ -1,13 +1,17 @@
 import type { GuideArticle } from '../guideArticles'
 
+const CATEGORY_SLUG = 'saude-do-homem'
+const DATE_PUBLISHED = '2026-05-01'
+
 export const saudeDoHomemArticles: GuideArticle[] = [
   {
     slug: 'saude-preventiva-homem',
-    categorySlug: 'saude-do-homem',
+    categorySlug: CATEGORY_SLUG,
     title: 'Saúde do homem pelo SUS',
     summary:
       'Exames de prevenção e programas de saúde masculina oferecidos pelo SUS.',
-    datePublished: '2026-05-01',
+    datePublished: DATE_PUBLISHED,
+    iconName: 'person',
     content: [
       {
         type: 'paragraph',

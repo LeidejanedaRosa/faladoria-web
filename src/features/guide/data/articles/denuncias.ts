@@ -1,13 +1,17 @@
 import type { GuideArticle } from '../guideArticles'
 
+const CATEGORY_SLUG = 'denuncias'
+const DATE_PUBLISHED = '2026-05-01'
+
 export const denunciasArticles: GuideArticle[] = [
   {
     slug: 'canais-de-denuncia',
-    categorySlug: 'denuncias',
+    categorySlug: CATEGORY_SLUG,
     title: 'Canais de denúncia',
     summary:
       'Conheça os canais oficiais para denunciar irregularidades no atendimento do SUS.',
-    datePublished: '2026-05-01',
+    datePublished: DATE_PUBLISHED,
+    iconName: 'megaphone',
     content: [
       {
         type: 'paragraph',
@@ -63,11 +67,12 @@ export const denunciasArticles: GuideArticle[] = [
   },
   {
     slug: 'ouvidoria-do-sus',
-    categorySlug: 'denuncias',
+    categorySlug: CATEGORY_SLUG,
     title: 'Ouvidoria do SUS',
     summary:
       'Saiba como acionar a ouvidoria do SUS e o que esperar após registrar sua reclamação.',
-    datePublished: '2026-05-01',
+    datePublished: DATE_PUBLISHED,
+    iconName: 'phone',
     content: [
       {
         type: 'paragraph',

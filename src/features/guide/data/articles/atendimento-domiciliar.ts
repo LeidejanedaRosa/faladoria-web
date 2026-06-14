@@ -1,13 +1,17 @@
 import type { GuideArticle } from '../guideArticles'
 
+const CATEGORY_SLUG = 'atendimento-domiciliar'
+const DATE_PUBLISHED = '2026-05-01'
+
 export const atendimentoDomiciliarArticles: GuideArticle[] = [
   {
     slug: 'como-solicitar-atendimento-domiciliar',
-    categorySlug: 'atendimento-domiciliar',
+    categorySlug: CATEGORY_SLUG,
     title: 'Como solicitar atendimento domiciliar',
     summary:
       'Saiba quem tem direito ao atendimento em casa pelo SUS e como fazer a solicitação.',
-    datePublished: '2026-05-01',
+    datePublished: DATE_PUBLISHED,
+    iconName: 'heart',
     content: [
       {
         type: 'paragraph',

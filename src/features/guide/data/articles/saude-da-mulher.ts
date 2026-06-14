@@ -1,13 +1,17 @@
 import type { GuideArticle } from '../guideArticles'
 
+const CATEGORY_SLUG = 'saude-da-mulher'
+const DATE_PUBLISHED = '2026-05-01'
+
 export const saudeDaMulherArticles: GuideArticle[] = [
   {
     slug: 'pre-natal',
-    categorySlug: 'saude-da-mulher',
+    categorySlug: CATEGORY_SLUG,
     title: 'Saúde da mulher pelo SUS',
     summary:
       'Exames preventivos, pré-natal e acompanhamento ginecológico disponíveis gratuitamente pelo SUS.',
-    datePublished: '2026-05-01',
+    datePublished: DATE_PUBLISHED,
+    iconName: 'heart',
     content: [
       {
         type: 'paragraph',

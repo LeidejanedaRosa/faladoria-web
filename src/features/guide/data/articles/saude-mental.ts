@@ -1,13 +1,17 @@
 import type { GuideArticle } from '../guideArticles'
 
+const CATEGORY_SLUG = 'saude-mental'
+const DATE_PUBLISHED = '2026-05-01'
+
 export const saudeMentalArticles: GuideArticle[] = [
   {
     slug: 'caps-e-servicos-de-saude-mental',
-    categorySlug: 'saude-mental',
+    categorySlug: CATEGORY_SLUG,
     title: 'Saúde mental pelo SUS',
     summary:
       'Conheça os Centros de Atenção Psicossocial e outros serviços de saúde mental disponíveis pelo SUS.',
-    datePublished: '2026-05-01',
+    datePublished: DATE_PUBLISHED,
+    iconName: 'chat',
     content: [
       {
         type: 'paragraph',

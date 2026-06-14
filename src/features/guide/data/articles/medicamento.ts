@@ -1,13 +1,17 @@
 import type { GuideArticle } from '../guideArticles'
 
+const CATEGORY_SLUG = 'medicamento'
+const DATE_PUBLISHED = '2026-05-01'
+
 export const medicamentoArticles: GuideArticle[] = [
   {
     slug: 'farmacia-basica',
-    categorySlug: 'medicamento',
+    categorySlug: CATEGORY_SLUG,
     title: 'Medicamentos da farmácia básica',
     summary:
       'Como retirar medicamentos gratuitos nas unidades de saúde e o que está disponível na lista básica.',
-    datePublished: '2026-05-01',
+    datePublished: DATE_PUBLISHED,
+    iconName: 'syringe',
     content: [
       {
         type: 'paragraph',
@@ -71,11 +75,12 @@ export const medicamentoArticles: GuideArticle[] = [
   },
   {
     slug: 'medicamentos-alto-custo',
-    categorySlug: 'medicamento',
+    categorySlug: CATEGORY_SLUG,
     title: 'Medicamentos de alto custo',
     summary:
       'Descubra como solicitar medicamentos de alto custo pelo componente especializado da assistência farmacêutica.',
-    datePublished: '2026-05-01',
+    datePublished: DATE_PUBLISHED,
+    iconName: 'shield',
     content: [
       {
         type: 'paragraph',

@@ -1,13 +1,17 @@
 import type { GuideArticle } from '../guideArticles'
 
+const CATEGORY_SLUG = 'como-funciona-o-sus'
+const DATE_PUBLISHED = '2026-05-01'
+
 export const comoFuncionaOSusArticles: GuideArticle[] = [
   {
     slug: 'o-que-e-o-sus',
-    categorySlug: 'como-funciona-o-sus',
+    categorySlug: CATEGORY_SLUG,
     title: 'O que é o SUS',
     summary:
       'Entenda o que é o Sistema Único de Saúde, seus princípios e como ele está organizado no Brasil.',
-    datePublished: '2026-05-01',
+    datePublished: DATE_PUBLISHED,
+    iconName: 'building',
     content: [
       {
         type: 'paragraph',
@@ -67,11 +71,12 @@ export const comoFuncionaOSusArticles: GuideArticle[] = [
   },
   {
     slug: 'niveis-de-atendimento',
-    categorySlug: 'como-funciona-o-sus',
+    categorySlug: CATEGORY_SLUG,
     title: 'Níveis de atendimento',
     summary:
       'Conheça a diferença entre atenção básica, média e alta complexidade e saiba onde buscar cada tipo de cuidado.',
-    datePublished: '2026-05-01',
+    datePublished: DATE_PUBLISHED,
+    iconName: 'chart',
     content: [
       {
         type: 'paragraph',

@@ -1,13 +1,17 @@
 import type { GuideArticle } from '../guideArticles'
 
+const CATEGORY_SLUG = 'tratamento'
+const DATE_PUBLISHED = '2026-05-01'
+
 export const tratamentoArticles: GuideArticle[] = [
   {
     slug: 'como-conseguir-tratamento',
-    categorySlug: 'tratamento',
+    categorySlug: CATEGORY_SLUG,
     title: 'Como conseguir tratamento pelo SUS',
     summary:
       'Fisioterapia, quimioterapia, reabilitação e outros tratamentos disponíveis gratuitamente.',
-    datePublished: '2026-05-01',
+    datePublished: DATE_PUBLISHED,
+    iconName: 'activity',
     content: [
       {
         type: 'paragraph',
