@@ -64,6 +64,7 @@ export const GuideCategoryHeader = ({ category }: GuideCategoryHeaderProps) => {
             width={576}
             height={384}
             loading='eager'
+            fetchPriority='high'
           />
         )}
       </div>
