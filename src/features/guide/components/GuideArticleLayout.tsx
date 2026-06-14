@@ -12,6 +12,7 @@ import { cn } from '@shared/utils/cn'
 
 import {
   type ArticleBlock,
+  type ArticleStepIconName,
   getCategoryBySlug,
   GUIDE_ARTICLE_HEADING_ID,
   GUIDE_CONTENT,
@@ -21,7 +22,7 @@ import { GuideArticleFooter } from './GuideArticleFooter'
 import { GuideArticleHeader } from './GuideArticleHeader'
 import { GuideBreadcrumb } from './GuideBreadcrumb'
 import { CATEGORY_THEME, type CategoryTheme } from './guideCategoryTheme'
-import { ARTICLE_STEP_ICON_MAP, type ArticleStepIconName } from './guideIconMap'
+import { ARTICLE_STEP_ICON_MAP } from './guideIconMap'
 import { GUIDE_STEP_IMAGES } from './guideImageMap'
 
 interface GuideArticleLayoutProps {
@@ -32,7 +33,7 @@ interface GuideArticleLayoutProps {
 interface StepGroup {
   heading: string
   stepNumber: number
-  icon?: string
+  icon?: ArticleStepIconName
   blocks: ArticleBlock[]
 }
 
@@ -308,10 +309,7 @@ const StepCard = ({
   step: StepGroup
   theme: CategoryTheme
 }) => {
-  const Icon =
-    step.icon && step.icon in ARTICLE_STEP_ICON_MAP
-      ? ARTICLE_STEP_ICON_MAP[step.icon as ArticleStepIconName]
-      : null
+  const Icon = step.icon ? ARTICLE_STEP_ICON_MAP[step.icon] : null
 
   const rightBlocks = step.blocks.filter(
     b => b.type === 'callout' || b.type === 'image'
@@ -376,10 +374,7 @@ export const GuideArticleLayout = ({
     <Container className='py-6 sm:py-8 lg:py-10'>
       <GuideBreadcrumb items={breadcrumbItems} />
 
-      <article
-        aria-labelledby={GUIDE_ARTICLE_HEADING_ID}
-        className='mx-auto max-w-5xl'
-      >
+      <article aria-labelledby={GUIDE_ARTICLE_HEADING_ID}>
         <GuideArticleHeader article={article} />
 
         {preamble.length > 0 && (

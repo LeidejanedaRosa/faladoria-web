@@ -1,11 +1,11 @@
-import { CheckIcon, ChevronRightIcon } from '@shared/components/ui'
+import { ChevronRightIcon } from '@shared/components/ui'
 import { GUIDE_ROUTES } from '@shared/data'
 import { cn } from '@shared/utils/cn'
 import { Link } from 'react-router-dom'
 
 import type { GuideArticle, GuideCategory } from '../data'
 import { CATEGORY_THEME } from './guideCategoryTheme'
-import { GUIDE_ICON_MAP } from './guideIconMap'
+import { ARTICLE_STEP_ICON_MAP, GUIDE_ICON_MAP } from './guideIconMap'
 import { GUIDE_ARTICLE_IMAGES } from './guideImageMap'
 
 interface GuideArticleCardProps {
@@ -27,41 +27,19 @@ const ArticleCardImage = ({ src }: { src: string }) => (
   </div>
 )
 
-const ArticleCardHighlights = ({
-  highlights,
-  textAccent,
-}: {
-  highlights: readonly string[]
-  textAccent: string
-}) => (
-  <ul className='flex flex-col gap-2' aria-label='Tópicos abordados'>
-    {highlights.map(highlight => (
-      <li
-        key={highlight}
-        className='flex items-start gap-2 text-sm text-gray-600'
-      >
-        <CheckIcon
-          className={cn('mt-0.5 h-4 w-4 shrink-0', textAccent)}
-          aria-hidden='true'
-        />
-        {highlight}
-      </li>
-    ))}
-  </ul>
-)
-
 export const GuideArticleCard = ({
   article,
   category,
 }: GuideArticleCardProps) => {
-  const Icon = GUIDE_ICON_MAP[category.iconName]
+  const Icon = article.iconName
+    ? ARTICLE_STEP_ICON_MAP[article.iconName]
+    : GUIDE_ICON_MAP[category.iconName]
   const theme = CATEGORY_THEME[category.color]
   const articleImage = GUIDE_ARTICLE_IMAGES[article.slug]
 
   return (
     <Link
       to={GUIDE_ROUTES.article(article.categorySlug, article.slug)}
-      aria-label={`Ver artigo: ${article.title}`}
       className={cn(
         'group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white',
         'transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md',
@@ -93,13 +71,6 @@ export const GuideArticleCard = ({
             </p>
           </div>
         </div>
-
-        {article.highlights && article.highlights.length > 0 && (
-          <ArticleCardHighlights
-            highlights={article.highlights}
-            textAccent={theme.textAccent}
-          />
-        )}
 
         <div className='mt-auto flex items-center justify-end'>
           <span
