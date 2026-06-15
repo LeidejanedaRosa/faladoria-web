@@ -40,10 +40,10 @@ export const judicializacaoArticles: GuideArticle[] = [
         type: 'list',
         ordered: true,
         items: [
-          '1. Procure a Defensoria Pública do seu estado — o atendimento é gratuito',
-          '2. Leve todos os documentos: laudos, receitas, pedidos negados, exames',
-          '3. O defensor analisa o caso e entra com a ação judicial',
-          '4. Em casos urgentes, o juiz pode determinar o atendimento em até 72 horas (liminar)',
+          'Procure a Defensoria Pública do seu estado — o atendimento é gratuito',
+          'Leve todos os documentos: laudos, receitas, pedidos negados, exames',
+          'O defensor analisa o caso e entra com a ação judicial',
+          'Em casos urgentes, o juiz pode determinar o atendimento em até 72 horas (liminar)',
         ],
       },
       {

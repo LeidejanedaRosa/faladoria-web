@@ -28,10 +28,10 @@ export const tratamentoArticles: GuideArticle[] = [
         type: 'list',
         ordered: true,
         items: [
-          '1. Vá à UBS e consulte um médico — só um profissional de saúde pode prescrever o tratamento',
-          '2. Com a prescrição em mãos, vá à Secretaria de Saúde ou ao local indicado',
-          '3. Agende informando que o atendimento será pelo SUS',
-          '4. Compareça no dia e horário marcados com todos os documentos',
+          'Vá à UBS e consulte um médico — só um profissional de saúde pode prescrever o tratamento',
+          'Com a prescrição em mãos, vá à Secretaria de Saúde ou ao local indicado',
+          'Agende informando que o atendimento será pelo SUS',
+          'Compareça no dia e horário marcados com todos os documentos',
         ],
       },
       {
@@ -170,10 +170,10 @@ export const tratamentoArticles: GuideArticle[] = [
         type: 'list',
         ordered: true,
         items: [
-          '1. Secretaria de Saúde Municipal — explique que seu direito à saúde está sendo desrespeitado e que o município tem obrigação legal de fornecer o tratamento',
-          '2. Ouvidoria Municipal da prefeitura — registre a reclamação e exija o número de protocolo',
-          '3. Ouvidoria Nacional do SUS — ligue 136 (gratuito, 24h) com o protocolo da etapa anterior em mãos',
-          '4. Ministério Público — leve todos os documentos e os protocolos das tentativas anteriores',
+          'Secretaria de Saúde Municipal — explique que seu direito à saúde está sendo desrespeitado e que o município tem obrigação legal de fornecer o tratamento',
+          'Ouvidoria Municipal da prefeitura — registre a reclamação e exija o número de protocolo',
+          'Ouvidoria Nacional do SUS — ligue 136 (gratuito, 24h) com o protocolo da etapa anterior em mãos',
+          'Ministério Público — leve todos os documentos e os protocolos das tentativas anteriores',
         ],
       },
       {

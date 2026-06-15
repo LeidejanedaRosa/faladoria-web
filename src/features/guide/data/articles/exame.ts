@@ -143,9 +143,9 @@ export const exameArticles: GuideArticle[] = [
         type: 'list',
         ordered: true,
         items: [
-          '1. Agende e realize uma consulta na UBS (postinho de saúde)',
-          '2. O médico ou profissional de saúde avalia seu caso',
-          '3. Se necessário, ele emite o pedido do exame adequado',
+          'Agende e realize uma consulta na UBS (postinho de saúde)',
+          'O médico ou profissional de saúde avalia seu caso',
+          'Se necessário, ele emite o pedido do exame adequado',
         ],
       },
       {
@@ -241,10 +241,10 @@ export const exameArticles: GuideArticle[] = [
         type: 'list',
         ordered: true,
         items: [
-          '1. Volte à UBS e pergunte a previsão — peça para registrar sua reclamação por escrito',
-          '2. Vá à Secretaria de Saúde do município com o pedido e explique a urgência',
-          '3. Acione o Disque Saúde: 136 (gratuito, 24h) para registrar a demora',
-          '4. Procure a Defensoria Pública se o exame for urgente — o atendimento é gratuito',
+          'Volte à UBS e pergunte a previsão — peça para registrar sua reclamação por escrito',
+          'Vá à Secretaria de Saúde do município com o pedido e explique a urgência',
+          'Acione o Disque Saúde: 136 (gratuito, 24h) para registrar a demora',
+          'Procure a Defensoria Pública se o exame for urgente — o atendimento é gratuito',
         ],
       },
 

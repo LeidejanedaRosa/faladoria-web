@@ -28,9 +28,9 @@ export const cirurgiaArticles: GuideArticle[] = [
         type: 'list',
         ordered: true,
         items: [
-          '1. Vá à UBS e consulte um médico — apenas um profissional de saúde pode solicitar a cirurgia',
-          '2. Com o pedido em mãos, vá à Secretaria de Saúde ou ao local indicado para agendar',
-          '3. Informe que o atendimento será pelo SUS e esclareça todas as dúvidas',
+          'Vá à UBS e consulte um médico — apenas um profissional de saúde pode solicitar a cirurgia',
+          'Com o pedido em mãos, vá à Secretaria de Saúde ou ao local indicado para agendar',
+          'Informe que o atendimento será pelo SUS e esclareça todas as dúvidas',
         ],
       },
 
@@ -152,10 +152,10 @@ export const cirurgiaArticles: GuideArticle[] = [
         type: 'list',
         ordered: true,
         items: [
-          '1. Secretaria de Saúde Municipal — explique que seu direito à saúde está sendo desrespeitado e que o município tem obrigação legal de fornecer acesso',
-          '2. Ouvidoria Municipal da prefeitura — registre a reclamação e exija o número de protocolo',
-          '3. Ouvidoria Nacional do SUS — ligue 136 (gratuito, 24h) com o protocolo da etapa anterior em mãos',
-          '4. Ministério Público — leve todos os documentos e os protocolos das tentativas anteriores',
+          'Secretaria de Saúde Municipal — explique que seu direito à saúde está sendo desrespeitado e que o município tem obrigação legal de fornecer acesso',
+          'Ouvidoria Municipal da prefeitura — registre a reclamação e exija o número de protocolo',
+          'Ouvidoria Nacional do SUS — ligue 136 (gratuito, 24h) com o protocolo da etapa anterior em mãos',
+          'Ministério Público — leve todos os documentos e os protocolos das tentativas anteriores',
         ],
       },
       {
