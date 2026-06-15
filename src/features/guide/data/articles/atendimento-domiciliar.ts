@@ -39,10 +39,11 @@ export const atendimentoDomiciliarArticles: GuideArticle[] = [
       },
       {
         type: 'list',
+        ordered: true,
         items: [
-          '1. Vá à UBS e explique a situação — leve laudos ou documentos que comprovem a necessidade',
-          '2. O médico avalia e indica o tipo de atenção domiciliar necessária',
-          '3. O serviço é acionado pela própria UBS ou pela Secretaria de Saúde',
+          'Vá à UBS e explique a situação — leve laudos ou documentos que comprovem a necessidade',
+          'O médico avalia e indica o tipo de atenção domiciliar necessária',
+          'O serviço é acionado pela própria UBS ou pela Secretaria de Saúde',
         ],
       },
       {

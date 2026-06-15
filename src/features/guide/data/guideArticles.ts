@@ -22,7 +22,7 @@ export type ArticleBlock =
   | { type: 'paragraph'; text: string }
   | { type: 'heading'; level: 2; text: string; icon?: ArticleStepIconName }
   | { type: 'heading'; level: 3; text: string }
-  | { type: 'list'; items: string[] }
+  | { type: 'list'; items: string[]; ordered?: boolean }
   | {
       type: 'callout'
       variant?: 'tip' | 'warning' | 'emergency' | 'checklist'

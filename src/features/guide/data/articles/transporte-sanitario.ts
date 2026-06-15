@@ -37,10 +37,11 @@ export const transporteSanitarioArticles: GuideArticle[] = [
       },
       {
         type: 'list',
+        ordered: true,
         items: [
-          '1. Vá à UBS com o pedido médico da consulta, exame ou cirurgia em outro município',
-          '2. Peça informações sobre o TFD (Tratamento Fora do Domicílio)',
-          '3. A Secretaria de Saúde do município analisa e organiza o transporte',
+          'Vá à UBS com o pedido médico da consulta, exame ou cirurgia em outro município',
+          'Peça informações sobre o TFD (Tratamento Fora do Domicílio)',
+          'A Secretaria de Saúde do município analisa e organiza o transporte',
         ],
       },
       {

@@ -6,6 +6,42 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-06-15 — `role='note'` + `aria-label` para callout de emergência estático
+
+**Contexto**: O `EmergencyCallout` usava `role='alert'`, que é uma live region do ARIA projetada para conteúdo que aparece dinamicamente no DOM. Esse callout é conteúdo estático presente na página ao carregar.
+
+**Decisão**: Substituir `role='alert'` por `role='note'` com `aria-label={block.title ?? 'Atenção'}`.
+
+**Por quê**: `role='alert'` em conteúdo estático tem comportamento imprevisível entre leitores de tela — alguns ignoram, outros interrompem a leitura ao carregar a página. `role='note'` é a semântica correta para conteúdo suplementar importante e estático. O `aria-label` garante que o bloco tenha um nome acessível disponível para tecnologias assistivas.
+
+**Alternativa rejeitada**: Manter `role='alert'` — semânticamente incorreto para conteúdo estático segundo a spec WAI-ARIA.
+
+---
+
+## 2026-06-15 — `SimpleCallout` como base compartilhada para callouts
+
+**Contexto**: `TipCallout`, `WarningCallout` e `DefaultCallout` tinham ~85% do código idêntico — mesma estrutura JSX, mesma lógica condicional, mesmas classes base. Apenas ícone e cores variavam.
+
+**Decisão**: Extrair `SimpleCallout` interno que recebe `containerClassName`, `iconClassName` e `icon` como props. As três variantes tornaram-se wrappers de 5 linhas.
+
+**Por quê**: Elimina duplicação concreta (DRY), centraliza qualquer ajuste visual futuro num único lugar e mantém o mapa `CALLOUT_VARIANTS` intacto (OCP — adicionar variante nova não toca no código existente).
+
+**Alternativa rejeitada**: Manter os três componentes separados — mudança visual precisaria ser replicada em três lugares.
+
+---
+
+## 2026-06-15 — Campo `ordered` no tipo `list` de `ArticleBlock`
+
+**Contexto**: Listas de passos numerados ("1. ...", "2. ...") eram renderizadas como `<ul>` com bullet CSS. O resultado era marcador visual + prefixo numérico no texto — semanticamente incorreto (`<ul>` implica itens sem ordem relevante).
+
+**Decisão**: Adicionar `ordered?: boolean` ao tipo `{ type: 'list' }` em `ArticleBlock`. Quando `true`, `StepBlockRenderer` renderiza `<ol>` sem bullet CSS; o prefixo "N." no texto provê a numeração visual. Não usar `list-style` automático do browser para manter controle total de estilo.
+
+**Por quê**: `<ol>` é o elemento HTML semântico correto para sequências ordenadas. Leitores de tela anunciam itens de `<ol>` diferente de `<ul>`, o que importa para instruções passo a passo.
+
+**Alternativa rejeitada**: Auto-detectar listas ordenadas pelo conteúdo (`item.startsWith('1.')`) — frágil e acoplado ao formato do texto.
+
+---
+
 ## 2026-01-19 — pnpm como gerenciador de pacotes
 
 **Contexto**: O projeto foi iniciado a partir do `react-vite-template`, que usa `npm`. Na configuração do Faladoria, foi feita a migração.

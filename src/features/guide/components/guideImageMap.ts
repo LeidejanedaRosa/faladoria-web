@@ -9,12 +9,15 @@ import consultaEspecialistaImg from '@assets/guide/consulta/consulta-especialist
 import exameCategoryImg from '@assets/guide/exame/category.webp'
 import comoSolicitarExameImg from '@assets/guide/exame/como-solicitar-exame-pelo-sus.webp'
 import naoSeiQueExameImg from '@assets/guide/exame/nao-sei-que-exame-preciso.webp'
-import exameDemorou from '@assets/guide/exame/o-que-fazer-quando-o-exame-demora-muito.webp'
+import exameDemorouImg from '@assets/guide/exame/o-que-fazer-quando-o-exame-demora-muito.webp'
+import tratamentoCategoryImg from '@assets/guide/tratamento/category.webp'
+import tratamentoImg from '@assets/guide/tratamento/tratamento.webp'
 
 export const GUIDE_CATEGORY_IMAGES: Partial<Record<string, string>> = {
   consulta: consultaCategoryImg,
   exame: exameCategoryImg,
   cirurgia: cirurgiaCategoryImg,
+  tratamento: tratamentoCategoryImg,
 }
 
 export const GUIDE_ARTICLE_IMAGES: Partial<Record<string, string>> = {
@@ -22,9 +25,10 @@ export const GUIDE_ARTICLE_IMAGES: Partial<Record<string, string>> = {
   'consulta-especialista': consultaEspecialistaImg,
   'como-solicitar-exame': comoSolicitarExameImg,
   'nao-sei-que-exame-preciso': naoSeiQueExameImg,
-  'exame-demorou-muito': exameDemorou,
+  'exame-demorou-muito': exameDemorouImg,
   'fila-de-cirurgia': filaDeCirurgiaImg,
   'cirurgia-negada': cirurgiaNegadaImg,
+  'como-conseguir-tratamento': tratamentoImg,
 }
 
 export const GUIDE_STEP_IMAGES: Partial<Record<string, string>> = {

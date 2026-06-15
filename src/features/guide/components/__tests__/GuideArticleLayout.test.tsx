@@ -125,6 +125,30 @@ describe('GuideArticleLayout', () => {
       expect(within(list).getAllByRole('listitem')).toHaveLength(3)
       expect(within(list).getByText('Item A')).toBeInTheDocument()
     })
+
+    it('lista não ordenada renderiza como ul', () => {
+      const content: ArticleBlock[] = [
+        { type: 'list', items: ['Item A', 'Item B'] },
+      ]
+      renderLayout(makeArticle({ content }))
+      const item = screen.getByText('Item A')
+      expect(item.closest('ul')).toBeInTheDocument()
+      expect(item.closest('ol')).not.toBeInTheDocument()
+    })
+
+    it('lista ordenada renderiza como ol', () => {
+      const content: ArticleBlock[] = [
+        {
+          type: 'list',
+          ordered: true,
+          items: ['1. Primeiro passo', '2. Segundo passo'],
+        },
+      ]
+      renderLayout(makeArticle({ content }))
+      const item = screen.getByText('1. Primeiro passo')
+      expect(item.closest('ol')).toBeInTheDocument()
+      expect(item.closest('ul')).not.toBeInTheDocument()
+    })
   })
 
   describe('Bloco: callout', () => {
@@ -148,10 +172,7 @@ describe('GuideArticleLayout', () => {
         },
       ]
       renderLayout(makeArticle({ content }))
-      const article = screen.getByRole('article')
-      expect(within(article).getAllByText('Dica importante')).not.toHaveLength(
-        0
-      )
+      expect(screen.getByText('Dica importante')).toBeInTheDocument()
       expect(screen.getByText('Texto da dica.')).toBeInTheDocument()
     })
 
@@ -170,7 +191,7 @@ describe('GuideArticleLayout', () => {
       expect(screen.getByText('192')).toBeInTheDocument()
     })
 
-    it('callout de emergência tem role="alert"', () => {
+    it('callout de emergência tem role="note" e aria-label com o título', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Urgência' },
         {
@@ -181,7 +202,20 @@ describe('GuideArticleLayout', () => {
         },
       ]
       renderLayout(makeArticle({ content }))
-      expect(screen.getByRole('alert')).toBeInTheDocument()
+      expect(screen.getByRole('note', { name: 'SAMU' })).toBeInTheDocument()
+    })
+
+    it('callout de emergência sem título usa aria-label padrão "Atenção"', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Urgência' },
+        {
+          type: 'callout',
+          variant: 'emergency',
+          text: 'Vá ao hospital mais próximo.',
+        },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(screen.getByRole('note', { name: 'Atenção' })).toBeInTheDocument()
     })
 
     it('renderiza callout sem variante (padrão) com título e texto', () => {
@@ -260,6 +294,18 @@ describe('GuideArticleLayout', () => {
       expect(
         screen.getByText('O SUS é gratuito para todos.')
       ).toBeInTheDocument()
+    })
+
+    it('info-panel tem role="note"', () => {
+      const content: ArticleBlock[] = [
+        {
+          type: 'info-panel',
+          title: 'Você sabia?',
+          text: 'O SUS é gratuito para todos.',
+        },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(screen.getByRole('note')).toBeInTheDocument()
     })
   })
 
