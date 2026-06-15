@@ -141,6 +141,7 @@ export const exameArticles: GuideArticle[] = [
       { type: 'heading', level: 2, text: 'O que fazer', icon: 'target' },
       {
         type: 'list',
+        ordered: true,
         items: [
           '1. Agende e realize uma consulta na UBS (postinho de saúde)',
           '2. O médico ou profissional de saúde avalia seu caso',
@@ -238,6 +239,7 @@ export const exameArticles: GuideArticle[] = [
       },
       {
         type: 'list',
+        ordered: true,
         items: [
           '1. Volte à UBS e pergunte a previsão — peça para registrar sua reclamação por escrito',
           '2. Vá à Secretaria de Saúde do município com o pedido e explique a urgência',

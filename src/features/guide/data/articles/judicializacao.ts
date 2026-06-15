@@ -38,6 +38,7 @@ export const judicializacaoArticles: GuideArticle[] = [
       },
       {
         type: 'list',
+        ordered: true,
         items: [
           '1. Procure a Defensoria Pública do seu estado — o atendimento é gratuito',
           '2. Leve todos os documentos: laudos, receitas, pedidos negados, exames',

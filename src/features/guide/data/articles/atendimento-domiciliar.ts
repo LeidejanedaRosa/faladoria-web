@@ -39,6 +39,7 @@ export const atendimentoDomiciliarArticles: GuideArticle[] = [
       },
       {
         type: 'list',
+        ordered: true,
         items: [
           '1. Vá à UBS e explique a situação — leve laudos ou documentos que comprovem a necessidade',
           '2. O médico avalia e indica o tipo de atenção domiciliar necessária',

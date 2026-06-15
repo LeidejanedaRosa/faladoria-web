@@ -26,6 +26,7 @@ export const cirurgiaArticles: GuideArticle[] = [
       },
       {
         type: 'list',
+        ordered: true,
         items: [
           '1. Vá à UBS e consulte um médico — apenas um profissional de saúde pode solicitar a cirurgia',
           '2. Com o pedido em mãos, vá à Secretaria de Saúde ou ao local indicado para agendar',
@@ -149,6 +150,7 @@ export const cirurgiaArticles: GuideArticle[] = [
       },
       {
         type: 'list',
+        ordered: true,
         items: [
           '1. Secretaria de Saúde Municipal — explique que seu direito à saúde está sendo desrespeitado e que o município tem obrigação legal de fornecer acesso',
           '2. Ouvidoria Municipal da prefeitura — registre a reclamação e exija o número de protocolo',

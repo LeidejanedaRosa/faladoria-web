@@ -40,6 +40,7 @@ export const equipamentosArticles: GuideArticle[] = [
       },
       {
         type: 'list',
+        ordered: true,
         items: [
           '1. Consulte um médico especialista (ortopedista, fisiatra, neurologista) no SUS',
           '2. O médico emite um laudo indicando o equipamento necessário',

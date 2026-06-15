@@ -101,6 +101,7 @@ export const medicamentoArticles: GuideArticle[] = [
       { type: 'heading', level: 2, text: 'Como solicitar' },
       {
         type: 'list',
+        ordered: true,
         items: [
           '1. Consulte um médico especialista no SUS e obtenha a receita e o laudo médico',
           '2. Vá à Secretaria de Saúde do seu estado com os documentos',
