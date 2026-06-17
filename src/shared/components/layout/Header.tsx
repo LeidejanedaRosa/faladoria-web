@@ -4,16 +4,13 @@ import { createPortal } from 'react-dom'
 
 import logoFaladoria from '@assets/logo_faladoria.svg'
 import { CloseIcon, MenuIcon, WhatsAppCTA } from '@shared/components/ui'
-import { COMPANY_INFO } from '@shared/data/companyInfo'
+import { COMPANY_INFO, LOGO_HEIGHT, LOGO_WIDTH } from '@shared/data/companyInfo'
 import { NAV_ITEMS } from '@shared/data/navigation'
 import { useSidebar } from '@shared/hooks/useSidebar'
 import { cn } from '@shared/utils/cn'
 import { Link } from 'react-router-dom'
 
 const MOBILE_MENU_ID = 'mobile-menu'
-
-const LOGO_WIDTH = 600
-const LOGO_HEIGHT = 485
 
 interface HeaderProps {
   onSidebarToggle?: (isOpen: boolean) => void

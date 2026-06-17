@@ -2,6 +2,8 @@ import { slugify } from '@shared/utils/slugify'
 
 import { COMPANY_INFO } from './companyInfo'
 
+export const SCHEMA_ORG = 'https://schema.org'
+
 const {
   name,
   legalName,
@@ -18,7 +20,7 @@ const {
 const socialLinks = Object.values(social).filter(link => link !== '')
 
 export const ORGANIZATION_STRUCTURED_DATA = {
-  '@context': 'https://schema.org',
+  '@context': SCHEMA_ORG,
   '@graph': [
     {
       '@type': 'WebSite',
@@ -95,7 +97,7 @@ export function createFaqStructuredData(
   items: readonly { question: string; answer: string }[]
 ) {
   return {
-    '@context': 'https://schema.org',
+    '@context': SCHEMA_ORG,
     '@type': 'FAQPage',
     mainEntity: items.map(item => ({
       '@type': 'Question',

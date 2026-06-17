@@ -1,5 +1,6 @@
 import { COMPANY_INFO } from '@shared/data/companyInfo'
 import { GUIDE_ROUTES } from '@shared/data/routes'
+import { SCHEMA_ORG } from '@shared/data/structuredData'
 
 export const GUIDE_HEADING_ID = 'guide-heading'
 export const GUIDE_CATEGORIES_HEADING_ID = 'guide-categories-heading'
@@ -172,8 +173,6 @@ export const GUIDE_CONTENT = {
     ] satisfies ArticleFooterTrustSignal[],
   },
 } as const
-
-const SCHEMA_ORG = 'https://schema.org'
 
 export function createCategoryStructuredData(
   label: string,
