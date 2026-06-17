@@ -1,6 +1,6 @@
-import bannerImg from '@assets/guide/bn-para-quem-precisa.png'
+import bannerImg from '@assets/guide/for-those-who-need.png'
 import { Container } from '@shared/components/layout'
-import { ScreenReaderOnly } from '@shared/components/ui'
+import { GlobeIcon, LockIcon, ScreenReaderOnly } from '@shared/components/ui'
 import { Link } from 'react-router-dom'
 
 import {
@@ -96,37 +96,4 @@ const BrowserChrome = () => (
       </span>
     </div>
   </div>
-)
-
-const GlobeIcon = ({ className = 'h-5 w-5' }: { className?: string }) => (
-  <svg
-    className={className}
-    fill='none'
-    viewBox='0 0 24 24'
-    stroke='currentColor'
-    strokeWidth={2}
-    strokeLinecap='round'
-    strokeLinejoin='round'
-    aria-hidden='true'
-  >
-    <circle cx='12' cy='12' r='10' />
-    <line x1='2' y1='12' x2='22' y2='12' />
-    <path d='M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z' />
-  </svg>
-)
-
-const LockIcon = ({ className = 'h-4 w-4' }: { className?: string }) => (
-  <svg
-    className={className}
-    fill='none'
-    viewBox='0 0 24 24'
-    stroke='currentColor'
-    strokeWidth={2}
-    strokeLinecap='round'
-    strokeLinejoin='round'
-    aria-hidden='true'
-  >
-    <rect x='3' y='11' width='18' height='11' rx='2' ry='2' />
-    <path d='M7 11V7a5 5 0 0 1 10 0v4' />
-  </svg>
 )
