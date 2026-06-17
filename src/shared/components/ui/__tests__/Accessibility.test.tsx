@@ -1,8 +1,7 @@
 import { render, screen } from '@/test/test-utils'
 
+import { MainContent, ScreenReaderOnly, SkipLink } from '@shared/components/ui'
 import { describe, expect, it } from 'vitest'
-
-import { MainContent, ScreenReaderOnly, SkipLink } from '../Accessibility'
 
 describe('SkipLink', () => {
   it('should render skip link with correct href', () => {

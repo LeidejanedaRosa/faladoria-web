@@ -1,8 +1,7 @@
 import type { ComponentType } from 'react'
 
 import { Container } from '@shared/components/layout/Container'
-import { ChatIcon } from '@shared/components/ui'
-import { ScreenReaderOnly } from '@shared/components/ui/Accessibility'
+import { ChatIcon, ScreenReaderOnly } from '@shared/components/ui'
 import { SECTION_IDS } from '@shared/data/navigation'
 import type { IconProps } from '@shared/types/icon'
 

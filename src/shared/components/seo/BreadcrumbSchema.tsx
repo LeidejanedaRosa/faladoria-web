@@ -1,14 +1,9 @@
 import { COMPANY_INFO } from '@shared/data/companyInfo'
-import { slugify } from '@shared/utils/slugify'
+import type { BreadcrumbItem } from '@shared/data/structuredData'
 
 import { JsonLdScript } from './JsonLdScript'
 
 const SCHEMA_CONTEXT = 'https://schema.org'
-
-interface BreadcrumbItem {
-  name: string
-  url?: string
-}
 
 interface BreadcrumbSchemaProps {
   items: BreadcrumbItem[]
@@ -28,7 +23,7 @@ export function BreadcrumbSchema({ items }: BreadcrumbSchemaProps) {
         name: item.name,
       }
       if (!isLastItem) {
-        listItem.item = item.url || `${baseUrl}/#${slugify(item.name)}`
+        listItem.item = item.url ?? baseUrl
       }
       return listItem
     }),
