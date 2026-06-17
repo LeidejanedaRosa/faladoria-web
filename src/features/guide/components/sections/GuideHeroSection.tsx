@@ -1,4 +1,5 @@
 import heroPng from '@assets/guide/hero_section.png'
+import heroWebp from '@assets/guide/hero_section.webp'
 import { Container } from '@shared/components/layout'
 import {
   BookOpenIcon,
@@ -99,16 +100,19 @@ const GuideHeroContent = () => (
 
 const GuideHeroImage = () => (
   <div className='flex items-end overflow-hidden rounded-2xl lg:rounded-none'>
-    <img
-      src={heroPng}
-      alt={GUIDE_CONTENT.hero.image.alt}
-      width={GUIDE_CONTENT.hero.image.width}
-      height={GUIDE_CONTENT.hero.image.height}
-      loading='eager'
-      decoding='async'
-      fetchPriority='high'
-      className='h-auto w-full'
-    />
+    <picture>
+      <source srcSet={heroWebp} type='image/webp' />
+      <img
+        src={heroPng}
+        alt={GUIDE_CONTENT.hero.image.alt}
+        width={GUIDE_CONTENT.hero.image.width}
+        height={GUIDE_CONTENT.hero.image.height}
+        loading='eager'
+        decoding='async'
+        fetchPriority='high'
+        className='h-auto w-full'
+      />
+    </picture>
   </div>
 )
 

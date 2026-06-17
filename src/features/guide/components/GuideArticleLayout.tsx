@@ -1,14 +1,7 @@
-import type { ComponentType } from 'react'
+import type { ReactNode } from 'react'
 
 import { Container } from '@shared/components/layout'
-import {
-  CheckIcon,
-  InfoCircleIcon,
-  LightbulbIcon,
-  PhoneIcon,
-  QuestionIcon,
-  WarningIcon,
-} from '@shared/components/ui'
+import { QuestionIcon } from '@shared/components/ui'
 import type { BreadcrumbItem } from '@shared/data'
 import { cn } from '@shared/utils/cn'
 
@@ -20,6 +13,7 @@ import {
   GUIDE_CONTENT,
   type GuideArticle,
 } from '../data'
+import { Callout } from './GuideArticleCallouts'
 import { GuideArticleFooter } from './GuideArticleFooter'
 import { GuideArticleHeader } from './GuideArticleHeader'
 import { GuideBreadcrumb } from './GuideBreadcrumb'
@@ -40,9 +34,6 @@ interface StepGroup {
 }
 
 type InfoPanelData = Extract<ArticleBlock, { type: 'info-panel' }>
-type CalloutData = Extract<ArticleBlock, { type: 'callout' }>
-
-const RELAXED_TEXT = 'text-sm leading-relaxed'
 
 type StepOrPanelItem =
   | { kind: 'step'; step: StepGroup }
@@ -86,133 +77,6 @@ function groupIntoSteps(blocks: ArticleBlock[]): {
   return { preamble, items }
 }
 
-const SimpleCallout = ({
-  block,
-  containerClassName,
-  iconClassName,
-  icon: Icon,
-}: {
-  block: CalloutData
-  containerClassName: string
-  iconClassName: string
-  icon: ComponentType<{ className?: string }>
-}) => (
-  <div
-    className={cn(
-      'flex items-start gap-3 rounded-xl border px-5 py-4',
-      containerClassName
-    )}
-  >
-    <span className={cn('shrink-0', iconClassName)} aria-hidden='true'>
-      <Icon className='h-4.5 w-4.5' />
-    </span>
-    <div>
-      {block.title && <p className='text-sm font-semibold'>{block.title}</p>}
-      {block.text && (
-        <p className={cn(RELAXED_TEXT, block.title && 'mt-0.5')}>
-          {block.text}
-        </p>
-      )}
-    </div>
-  </div>
-)
-
-const TipCallout = ({ block }: { block: CalloutData }) => (
-  <SimpleCallout
-    block={block}
-    containerClassName='border-purple-200 bg-purple-50 text-purple-900'
-    iconClassName='text-purple-600'
-    icon={LightbulbIcon}
-  />
-)
-
-const WarningCallout = ({ block }: { block: CalloutData }) => (
-  <SimpleCallout
-    block={block}
-    containerClassName='border-amber-200 bg-amber-50 text-amber-900'
-    iconClassName='text-amber-600'
-    icon={WarningIcon}
-  />
-)
-
-const EmergencyCallout = ({ block }: { block: CalloutData }) => (
-  <div
-    role='note'
-    aria-label={block.title ?? 'Atenção'}
-    className='flex items-center justify-center gap-4 rounded-xl border border-red-200 bg-red-50 px-5 py-4'
-  >
-    <span className='shrink-0 text-red-400' aria-hidden='true'>
-      <PhoneIcon className='h-10 w-10' />
-    </span>
-    <div>
-      {block.title && (
-        <p className='text-sm font-bold text-red-700'>{block.title}</p>
-      )}
-      {block.highlight && (
-        <p className='text-4xl leading-none font-extrabold text-red-600'>
-          {block.highlight}
-        </p>
-      )}
-      {block.text && (
-        <p className='mt-1 text-sm leading-relaxed text-red-800'>
-          {block.text}
-        </p>
-      )}
-    </div>
-  </div>
-)
-
-const ChecklistCallout = ({ block }: { block: CalloutData }) => (
-  <div className='flex items-start gap-3 rounded-xl border border-green-200 bg-green-50 px-5 py-4'>
-    <span className='shrink-0 text-green-600' aria-hidden='true'>
-      <CheckIcon className='h-4.5 w-4.5' />
-    </span>
-    <div className='flex-1'>
-      {block.title && (
-        <p className='text-sm font-semibold text-green-800'>{block.title}</p>
-      )}
-      {block.items && block.items.length > 0 && (
-        <ul className='mt-2 space-y-1.5'>
-          {block.items.map((item, index) => (
-            <li key={`cl-item-${index}`} className='flex items-start gap-2'>
-              <span
-                className='mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-500'
-                aria-hidden='true'
-              />
-              <span className='text-sm leading-relaxed text-green-800'>
-                {item}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  </div>
-)
-
-const DefaultCallout = ({ block }: { block: CalloutData }) => (
-  <SimpleCallout
-    block={block}
-    containerClassName='border-purple-200 bg-purple-50 text-purple-900'
-    iconClassName='text-purple-600'
-    icon={InfoCircleIcon}
-  />
-)
-
-const CALLOUT_VARIANTS = {
-  tip: TipCallout,
-  warning: WarningCallout,
-  emergency: EmergencyCallout,
-  checklist: ChecklistCallout,
-  default: DefaultCallout,
-} as const
-
-const Callout = ({ block }: { block: CalloutData }) => {
-  const variant = block.variant ?? 'default'
-  const Component = CALLOUT_VARIANTS[variant]
-  return <Component block={block} />
-}
-
 const StepImage = ({ imageKey, alt }: { imageKey: string; alt: string }) => {
   const src = GUIDE_STEP_IMAGES[imageKey]
   if (!src) return null
@@ -245,6 +109,55 @@ const InfoPanel = ({ block }: { block: InfoPanelData }) => (
   </div>
 )
 
+type BlockRenderer = (block: ArticleBlock, theme?: CategoryTheme) => ReactNode
+
+const CONTENT_BLOCK_RENDERERS: Partial<
+  Record<ArticleBlock['type'], BlockRenderer>
+> = {
+  paragraph: block => (
+    <p className='text-sm leading-relaxed text-gray-700'>
+      {(block as Extract<ArticleBlock, { type: 'paragraph' }>).text}
+    </p>
+  ),
+  heading: (block, theme) => {
+    const { text } = block as Extract<ArticleBlock, { type: 'heading' }>
+    return (
+      <h3
+        className={cn(
+          'text-sm font-semibold',
+          theme ? theme.text : 'text-gray-800'
+        )}
+      >
+        {text}
+      </h3>
+    )
+  },
+  list: (block, theme) => {
+    const { ordered, items } = block as Extract<ArticleBlock, { type: 'list' }>
+    const Tag = ordered ? 'ol' : 'ul'
+    return (
+      <Tag className='space-y-2'>
+        {items.map((item, index) => (
+          <li key={`list-item-${index}`} className='flex items-start gap-2.5'>
+            {!ordered && (
+              <span
+                className={cn(
+                  'mt-2 h-1.5 w-1.5 shrink-0 rounded-full',
+                  theme ? theme.iconBg : 'bg-gray-400'
+                )}
+                aria-hidden='true'
+              />
+            )}
+            <span className='text-sm leading-relaxed text-gray-700'>
+              {item}
+            </span>
+          </li>
+        ))}
+      </Tag>
+    )
+  },
+}
+
 const StepBlockRenderer = ({
   block,
   theme,
@@ -252,51 +165,9 @@ const StepBlockRenderer = ({
   block: ArticleBlock
   theme?: CategoryTheme
 }) => {
-  switch (block.type) {
-    case 'paragraph':
-      return (
-        <p className='text-sm leading-relaxed text-gray-700'>{block.text}</p>
-      )
-
-    case 'heading':
-      return (
-        <h3
-          className={cn(
-            'text-sm font-semibold',
-            theme ? theme.text : 'text-gray-800'
-          )}
-        >
-          {block.text}
-        </h3>
-      )
-
-    case 'list': {
-      const Tag = block.ordered ? 'ol' : 'ul'
-      return (
-        <Tag className='space-y-2'>
-          {block.items.map((item, index) => (
-            <li key={`list-item-${index}`} className='flex items-start gap-2.5'>
-              {!block.ordered && (
-                <span
-                  className={cn(
-                    'mt-2 h-1.5 w-1.5 shrink-0 rounded-full',
-                    theme ? theme.iconBg : 'bg-gray-400'
-                  )}
-                  aria-hidden='true'
-                />
-              )}
-              <span className='text-sm leading-relaxed text-gray-700'>
-                {item}
-              </span>
-            </li>
-          ))}
-        </Tag>
-      )
-    }
-
-    default:
-      return null
-  }
+  const render = CONTENT_BLOCK_RENDERERS[block.type]
+  if (!render) return null
+  return <>{render(block, theme)}</>
 }
 
 const StepRightColumn = ({ blocks }: { blocks: ArticleBlock[] }) => (
