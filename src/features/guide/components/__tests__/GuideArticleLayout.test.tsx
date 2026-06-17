@@ -141,11 +141,11 @@ describe('GuideArticleLayout', () => {
         {
           type: 'list',
           ordered: true,
-          items: ['1. Primeiro passo', '2. Segundo passo'],
+          items: ['Primeiro passo', 'Segundo passo'],
         },
       ]
       renderLayout(makeArticle({ content }))
-      const item = screen.getByText('1. Primeiro passo')
+      const item = screen.getByText('Primeiro passo')
       expect(item.closest('ol')).toBeInTheDocument()
       expect(item.closest('ul')).not.toBeInTheDocument()
     })
@@ -277,6 +277,38 @@ describe('GuideArticleLayout', () => {
       ]
       const { container } = renderLayout(makeArticle({ content }))
       expect(container.querySelector('img')).not.toBeInTheDocument()
+    })
+
+    it('a imagem recebe o alt texto do bloco', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Passo com imagem' },
+        { type: 'image', imageKey: 'imagem-teste', alt: 'Cartão do SUS' },
+      ]
+      const { container } = renderLayout(makeArticle({ content }))
+      expect(container.querySelector('img')).toHaveAttribute(
+        'alt',
+        'Cartão do SUS'
+      )
+    })
+
+    it('a imagem é carregada com lazy loading', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Passo com imagem' },
+        { type: 'image', imageKey: 'imagem-teste', alt: 'Imagem de teste' },
+      ]
+      const { container } = renderLayout(makeArticle({ content }))
+      expect(container.querySelector('img')).toHaveAttribute('loading', 'lazy')
+    })
+
+    it('a imagem tem atributos de dimensão para prevenir CLS', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Passo com imagem' },
+        { type: 'image', imageKey: 'imagem-teste', alt: 'Imagem de teste' },
+      ]
+      const { container } = renderLayout(makeArticle({ content }))
+      const img = container.querySelector('img')
+      expect(Number(img?.getAttribute('width'))).toBeGreaterThan(0)
+      expect(Number(img?.getAttribute('height'))).toBeGreaterThan(0)
     })
   })
 
