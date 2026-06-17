@@ -1,7 +1,7 @@
-import stepCanalAberto from '@assets/step_canal_aberto.webp'
-import stepPonte from '@assets/step_ponte.webp'
-import stepPrioridade from '@assets/step_prioridade.webp'
-import stepSuaVozImporta from '@assets/step_sua_voz_importa.webp'
+import stepBridge from '@assets/step-bridge.webp'
+import stepOpenChannel from '@assets/step-open-channel.webp'
+import stepPriority from '@assets/step-priority.webp'
+import stepYourVoiceMatters from '@assets/step-your-voice-matters.webp'
 
 export const HOW_IT_WORKS_HEADING_ID = 'how-it-works-heading'
 
@@ -16,7 +16,7 @@ export const HOW_IT_WORKS_CONTENT = {
       number: 1,
       title: 'Conte seu problema',
       description: 'Mande uma mensagem pelo WhatsApp. É simples e rápido.',
-      image: stepSuaVozImporta,
+      image: stepYourVoiceMatters,
       imageAlt: 'Mulher sorrindo com a frase "Sua voz importa"',
     },
     {
@@ -24,7 +24,7 @@ export const HOW_IT_WORKS_CONTENT = {
       number: 2,
       title: 'A gente leva pra quem resolve',
       description: 'Encaminhamos sua demanda direto pra gestão de saúde.',
-      image: stepPonte,
+      image: stepBridge,
       imageAlt:
         'Logo da Faladoria com a frase "A gente não é ouvidoria. A gente é ponte."',
     },
@@ -34,7 +34,7 @@ export const HOW_IT_WORKS_CONTENT = {
       title: 'Acompanhe de perto',
       description:
         'Você fica sabendo de cada passo pelo WhatsApp até a resposta chegar.',
-      image: stepCanalAberto,
+      image: stepOpenChannel,
       imageAlt:
         'Mulher sorrindo com a frase "A Faladoria é um canal aberto para você ser ouvido de verdade"',
     },
@@ -43,7 +43,7 @@ export const HOW_IT_WORKS_CONTENT = {
       number: 4,
       title: 'Seu problema resolvido',
       description: 'A gestão pública responde e a saúde melhora pra todos.',
-      image: stepPrioridade,
+      image: stepPriority,
       imageAlt:
         'Duas pessoas se abraçando com a frase "Prioridade de atendimento"',
     },

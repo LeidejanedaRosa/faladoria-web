@@ -1,8 +1,8 @@
-import canalIndependente from '@assets/canal_independente.webp'
+import activeMediation from '@assets/active-mediation.webp'
+import independentChannel from '@assets/independent-channel.webp'
 import logoFaladoria from '@assets/logo_faladoria.svg'
-import mediacao from '@assets/medicacao.webp'
-import relatorios from '@assets/relatorios.webp'
-import transparencia from '@assets/transparencia.webp'
+import reports from '@assets/reports.webp'
+import transparency from '@assets/transparency.webp'
 
 export const SOLUTION_HEADING_ID = 'solution-heading'
 
@@ -19,7 +19,7 @@ export const SOLUTION_CONTENT = {
       id: 'total-independence',
       icon: {
         kind: 'image',
-        src: canalIndependente,
+        src: independentChannel,
         alt: 'Ícone representando independência — sem vínculo político ou institucional',
         width: 97,
         height: 92,
@@ -31,7 +31,7 @@ export const SOLUTION_CONTENT = {
       id: 'active-mediation',
       icon: {
         kind: 'image',
-        src: mediacao,
+        src: activeMediation,
         alt: 'Ícone representando mediação ativa entre usuários e gestores de saúde',
         width: 85,
         height: 88,
@@ -43,7 +43,7 @@ export const SOLUTION_CONTENT = {
       id: 'transparency',
       icon: {
         kind: 'image',
-        src: transparencia,
+        src: transparency,
         alt: 'Ícone representando transparência e dados abertos ao público',
         width: 84,
         height: 93,
@@ -55,7 +55,7 @@ export const SOLUTION_CONTENT = {
       id: 'solution-focus',
       icon: {
         kind: 'image',
-        src: relatorios,
+        src: reports,
         alt: 'Ícone representando foco na solução e busca por mudanças concretas',
         width: 89,
         height: 91,

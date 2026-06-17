@@ -3,7 +3,7 @@ import type { GuideArticle } from '../guideArticles'
 const CATEGORY_SLUG = 'transporte-sanitario'
 const DATE_PUBLISHED = '2026-05-01'
 
-export const transporteSanitarioArticles: GuideArticle[] = [
+export const medicalTransportArticles: GuideArticle[] = [
   {
     slug: 'como-solicitar-transporte-sanitario',
     categorySlug: CATEGORY_SLUG,

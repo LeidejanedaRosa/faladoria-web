@@ -3,7 +3,7 @@ import type { GuideArticle } from '../guideArticles'
 const CATEGORY_SLUG = 'atendimento-domiciliar'
 const DATE_PUBLISHED = '2026-05-01'
 
-export const atendimentoDomiciliarArticles: GuideArticle[] = [
+export const homeCareArticles: GuideArticle[] = [
   {
     slug: 'como-solicitar-atendimento-domiciliar',
     categorySlug: CATEGORY_SLUG,

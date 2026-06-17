@@ -3,7 +3,7 @@ import type { GuideArticle } from '../guideArticles'
 const CATEGORY_SLUG = 'consulta'
 const DATE_PUBLISHED = '2026-05-01'
 
-export const consultaArticles: GuideArticle[] = [
+export const appointmentArticles: GuideArticle[] = [
   {
     slug: 'como-agendar-consulta',
     categorySlug: CATEGORY_SLUG,

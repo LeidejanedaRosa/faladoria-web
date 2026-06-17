@@ -3,7 +3,7 @@ import type { GuideArticle } from '../guideArticles'
 const CATEGORY_SLUG = 'saude-do-homem'
 const DATE_PUBLISHED = '2026-05-01'
 
-export const saudeDoHomemArticles: GuideArticle[] = [
+export const mensHealthArticles: GuideArticle[] = [
   {
     slug: 'saude-preventiva-homem',
     categorySlug: CATEGORY_SLUG,

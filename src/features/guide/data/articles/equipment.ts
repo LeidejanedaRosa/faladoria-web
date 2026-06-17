@@ -3,7 +3,7 @@ import type { GuideArticle } from '../guideArticles'
 const CATEGORY_SLUG = 'equipamentos'
 const DATE_PUBLISHED = '2026-05-01'
 
-export const equipamentosArticles: GuideArticle[] = [
+export const equipmentArticles: GuideArticle[] = [
   {
     slug: 'como-solicitar-equipamentos',
     categorySlug: CATEGORY_SLUG,

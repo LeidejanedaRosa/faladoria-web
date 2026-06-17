@@ -4,7 +4,7 @@ const CATEGORY_SLUG = 'medicamento'
 const DATE_PUBLISHED = '2026-05-01'
 const INFO_PANEL = 'info-panel' as const
 
-export const medicamentoArticles: GuideArticle[] = [
+export const medicationArticles: GuideArticle[] = [
   {
     slug: 'farmacia-basica',
     categorySlug: CATEGORY_SLUG,

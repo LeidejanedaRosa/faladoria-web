@@ -1,38 +1,38 @@
 import type { GuideArticle } from '../guideArticles'
-import { atendimentoDomiciliarArticles } from './atendimento-domiciliar'
-import { cirurgiaArticles } from './cirurgia'
-import { comoFuncionaOSusArticles } from './como-funciona-o-sus'
-import { consultaArticles } from './consulta'
-import { denunciasArticles } from './denuncias'
-import { equipamentosArticles } from './equipamentos'
-import { exameArticles } from './exame'
-import { judicializacaoArticles } from './judicializacao'
-import { medicamentoArticles } from './medicamento'
-import { saudeDaCriancaArticles } from './saude-da-crianca'
-import { saudeDaMulherArticles } from './saude-da-mulher'
-import { saudeDoHomemArticles } from './saude-do-homem'
-import { saudeMentalArticles } from './saude-mental'
-import { seusDireitosArticles } from './seus-direitos'
-import { transporteSanitarioArticles } from './transporte-sanitario'
-import { tratamentoArticles } from './tratamento'
-import { vacinacaoArticles } from './vacinacao'
+import { appointmentArticles } from './appointment'
+import { childHealthArticles } from './child-health'
+import { complaintsArticles } from './complaints'
+import { equipmentArticles } from './equipment'
+import { examArticles } from './exam'
+import { homeCareArticles } from './home-care'
+import { howSusWorksArticles } from './how-sus-works'
+import { judicialActionArticles } from './judicial-action'
+import { medicalTransportArticles } from './medical-transport'
+import { medicationArticles } from './medication'
+import { mensHealthArticles } from './mens-health'
+import { mentalHealthArticles } from './mental-health'
+import { rightsArticles } from './rights'
+import { surgeryArticles } from './surgery'
+import { treatmentArticles } from './treatment'
+import { vaccinationArticles } from './vaccination'
+import { womensHealthArticles } from './womens-health'
 
 export const GUIDE_ARTICLES: GuideArticle[] = [
-  ...consultaArticles,
-  ...exameArticles,
-  ...cirurgiaArticles,
-  ...tratamentoArticles,
-  ...medicamentoArticles,
-  ...atendimentoDomiciliarArticles,
-  ...transporteSanitarioArticles,
-  ...equipamentosArticles,
-  ...saudeDaMulherArticles,
-  ...saudeDoHomemArticles,
-  ...saudeDaCriancaArticles,
-  ...vacinacaoArticles,
-  ...saudeMentalArticles,
-  ...seusDireitosArticles,
-  ...comoFuncionaOSusArticles,
-  ...denunciasArticles,
-  ...judicializacaoArticles,
+  ...appointmentArticles,
+  ...examArticles,
+  ...surgeryArticles,
+  ...treatmentArticles,
+  ...medicationArticles,
+  ...homeCareArticles,
+  ...medicalTransportArticles,
+  ...equipmentArticles,
+  ...womensHealthArticles,
+  ...mensHealthArticles,
+  ...childHealthArticles,
+  ...vaccinationArticles,
+  ...mentalHealthArticles,
+  ...rightsArticles,
+  ...howSusWorksArticles,
+  ...complaintsArticles,
+  ...judicialActionArticles,
 ]
