@@ -407,3 +407,82 @@ export const GUIDE_ARTICLE_HEADING_ID = 'article-heading'
 **Colisão restante**: `como-funciona-o-sus` e `transporte-sanitario` mantêm a mesma cor base (`blue`) mas são distinguíveis pelo ícone (`building` vs `location`). Aceito por enquanto — resolver exigiria adicionar um terceiro token azul que seria visualmente redundante.
 
 **Padrão de adição de tokens**: cada novo token deve ter os 7 campos obrigatórios (`iconBg`, `iconBgLight`, `softBg`, `border`, `borderHover`, `text`, `textAccent`) para manter consistência de aplicação nos componentes.
+
+---
+
+## 2026-06-17 — TODOs em `companyInfo.ts`, `privacyPolicyContent.ts` e `termsOfUseContent.ts` são intencionais
+
+**Contexto**: Auditoria de código de junho de 2026 identificou comentários `// TODO` em dados de empresa (CNPJ, endereço, URL real, cor de marca) e conteúdo legal (Política de Privacidade, Termos de Uso).
+
+**Decisão**: Manter todos os TODOs. Não são dívida técnica — são marcações de dados pendentes que dependem do cliente, não do desenvolvedor.
+
+**Por quê**: O projeto está em fase de desenvolvimento sem os dados reais do cliente ainda disponíveis. Remover os TODOs antes de ter os dados preenchidos geraria conteúdo falso em produção (pior que um placeholder visível). Os campos marcados incluem: `legalName`, `url`, `address`, `themeColor`, `cnpj`, e todas as seções da documentação legal.
+
+**Ação futura**: substituir cada TODO pelos dados reais do cliente quando disponíveis. A URL de produção real deve substituir `'https://faladoria-web.vercel.app'` em `COMPANY_INFO.url`. A cor da marca deve substituir `'#3b82f6'` em `COMPANY_INFO.seo.themeColor`.
+
+---
+
+## 2026-06-17 — Repetição estrutural em `guideCategoryTheme.ts` é esperada
+
+**Contexto**: Auditoria identificou que `guideCategoryTheme.ts` repete o mesmo padrão de 7 propriedades por cor (~16 entradas). Foi questionado se isso é uma violação do DRY.
+
+**Decisão**: Não aplicar abstração. O arquivo é um data file — mapeamento de 16 tokens de cor para 7 valores CSS cada. Repetição em dados é estruturalmente diferente de repetição em lógica.
+
+**Por quê**: Uma factory function (ex: `createTheme(base, accent, ...)`) economizaria linhas mas tornaria o arquivo ilegível para quem precisa ajustar uma cor específica — o leitor precisaria entender a factory para saber qual argumento corresponde ao `iconBgLight` de `purple`. O formato atual é autoexplicativo: ver a cor de uma linha, alterar a linha. DRY se aplica à lógica duplicada; dados tabulares são uma exceção deliberada.
+
+---
+
+## 2026-06-17 — Filtragem de blocos no `StepCard` é responsabilidade de view, não violação do SRP
+
+**Contexto**: Auditoria questionou se `StepCard` viola o Princípio de Responsabilidade Única ao filtrar `rightBlocks` e `contentBlocks` internamente além de renderizar.
+
+**Decisão**: Manter a filtragem dentro do componente. Não é uma violação de SRP.
+
+**Por quê**: A filtragem (`blocks.filter(b => b.type === 'callout' || b.type === 'image')`) é uma decisão de layout visual — "quais blocos vão na coluna direita" — e é indissociável do `StepCard`. Extrair isso para um hook `useArticleBlocks()` criaria uma abstração sem propósito: a função de transformação tem uma única chamada, é usada uma única vez, e não tem lógica reutilizável. A separação seria burocracia sem ganho de manutenibilidade.
+
+**Distinção relevante**: SRP no contexto de componentes React significa que um componente não deve misturar responsabilidades de _domínio_ distintas (ex.: buscar dados + renderizar + autenticar). Filtrar dados de layout para decidir onde renderizá-los é parte da responsabilidade de view do componente.
+
+---
+
+## 2026-06-17 — `GUIDE_STEP_IMAGES` como constante global não viola injeção de dependência
+
+**Contexto**: Auditoria questionou se `const src = GUIDE_STEP_IMAGES[imageKey]` deveria receber o mapa via prop ou contexto para facilitar testes.
+
+**Decisão**: Manter o acesso direto à constante. Não é violação do princípio de inversão de dependência (DIP).
+
+**Por quê**: `GUIDE_STEP_IMAGES` é uma constante pura — um `Record<string, string>` imutável de paths de assets. O DIP se aplica a dependências com comportamento: serviços, APIs, módulos com efeitos colaterais. Uma constante não tem comportamento e não precisa ser mockada ou substituída. Injetar via prop criaria boilerplate sem benefício: os testes de `StepImage` verificam se o `<img>` renderiza com o `src` correto — e o fazem com dados de teste suficientes sem precisar substituir o mapa.
+
+---
+
+## 2026-06-17 — Type assertions em `CONTENT_BLOCK_RENDERERS` são limitação do TypeScript, não má prática
+
+**Contexto**: Auditoria identificou 3 type assertions `as Extract<ArticleBlock, { type: 'X' }>` no mapa `CONTENT_BLOCK_RENDERERS` em `GuideArticleLayout.tsx`.
+
+**Decisão**: Manter as assertions. São a solução correta para a limitação conhecida do TypeScript com `Partial<Record>` e discriminated unions.
+
+**Por quê**: O tipo `Partial<Record<ArticleBlock['type'], BlockRenderer>>` declara que cada key do mapa aceita qualquer `ArticleBlock`, mas dentro de cada renderer o bloco é garantidamente do tipo correspondente à key. O TypeScript não consegue estreitar o tipo automaticamente neste padrão. As assertions são localizadas, documentam a invariante (o renderer de `'paragraph'` sempre recebe um bloco do tipo `paragraph`) e não escondem bugs — o mapa garante que apenas o renderer correto é chamado para cada tipo. Alternativa com `if`/`switch` explícito removeria o mapa e o benefício do OCP.
+
+---
+
+## 2026-06-17 — Type assertion em `Object.entries(STATUS_CONFIG)` é limitação conhecida do TypeScript
+
+**Contexto**: Auditoria identificou `as [InteractionStatus, ...][]` em `StatusLegend.tsx` para narrowing de `Object.entries`.
+
+**Decisão**: Manter a assertion. É a solução canônica para o comportamento deliberado do TypeScript com `Object.entries`.
+
+**Por quê**: O TypeScript infere o retorno de `Object.entries(obj)` como `[string, ValueType][]` mesmo quando as keys do objeto são um union type literal. Isso é intencional — o TypeScript não pode garantir em tempo de compilação que o objeto em runtime não tem keys extras. A assertion `as [InteractionStatus, Config][]` é segura porque `STATUS_CONFIG` é `as const` e o tipo de key é controlado. Alternativas como `Object.keys(STATUS_CONFIG).map(key => [key as InteractionStatus, STATUS_CONFIG[key as InteractionStatus]])` são mais verbosas e não mais seguras.
+
+---
+
+## 2026-06-17 — `cn.ts` e `reportWebVitals.ts` não precisam de testes unitários
+
+**Contexto**: Auditoria sugeriu adicionar testes unitários a `cn.ts` (wrapper de `clsx` + `tailwind-merge`) e `reportWebVitals.ts` (integração com `web-vitals`).
+
+**Decisão**: Não adicionar testes. Ambos estão fora do escopo de cobertura justificável.
+
+**Por quê**:
+
+- **`cn.ts`** tem uma linha de lógica: `return twMerge(clsx(inputs))`. Testar essa função é testar se `clsx` e `tailwind-merge` funcionam — e ambas as libs já têm suítes de testes próprias extensas. O único cenário de bug real seria a dependência quebrar, o que seria detectado instantaneamente ao usar qualquer componente.
+- **`reportWebVitals.ts`** é um adaptador de integração pura: chama callbacks de `web-vitals` sem lógica condicional, transformação de dados ou estado. Testar integrações com libs externas exige mockear a lib inteira — o teste verificaria apenas que o mock foi chamado, não que a integração funciona em produção.
+
+**Regra**: testar wrappers de uma linha e adaptadores de integração pura é sobrecarga de manutenção sem ganho de confiança. Focar cobertura em lógica própria do projeto.
