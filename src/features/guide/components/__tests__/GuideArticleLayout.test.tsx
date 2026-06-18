@@ -258,6 +258,92 @@ describe('GuideArticleLayout', () => {
       expect(screen.getByText('Cartão SUS')).toBeInTheDocument()
       expect(screen.getByText('Documento com foto')).toBeInTheDocument()
     })
+
+    it('callout de tip tem role="note" com aria-label derivado do título', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Passo' },
+        {
+          type: 'callout',
+          variant: 'tip',
+          title: 'Dica importante',
+          text: 'Texto.',
+        },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(
+        screen.getByRole('note', { name: 'Dica importante' })
+      ).toBeInTheDocument()
+    })
+
+    it('callout de tip sem título usa aria-label padrão "Dica"', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Passo' },
+        { type: 'callout', variant: 'tip', text: 'Alguma dica.' },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(screen.getByRole('note', { name: 'Dica' })).toBeInTheDocument()
+    })
+
+    it('callout de warning tem role="note" com aria-label derivado do título', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Passo' },
+        {
+          type: 'callout',
+          variant: 'warning',
+          title: 'Atenção',
+          text: 'Fique alerta.',
+        },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(screen.getByRole('note', { name: 'Atenção' })).toBeInTheDocument()
+    })
+
+    it('callout de warning sem título usa aria-label padrão "Atenção"', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Passo' },
+        { type: 'callout', variant: 'warning', text: 'Fique alerta.' },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(screen.getByRole('note', { name: 'Atenção' })).toBeInTheDocument()
+    })
+
+    it('callout de checklist tem role="note" com aria-label derivado do título', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Passo' },
+        {
+          type: 'callout',
+          variant: 'checklist',
+          title: 'O que levar',
+          items: ['Item A'],
+        },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(
+        screen.getByRole('note', { name: 'O que levar' })
+      ).toBeInTheDocument()
+    })
+
+    it('callout de checklist sem título usa aria-label padrão "Lista de verificação"', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Passo' },
+        { type: 'callout', variant: 'checklist', items: ['Item A', 'Item B'] },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(
+        screen.getByRole('note', { name: 'Lista de verificação' })
+      ).toBeInTheDocument()
+    })
+
+    it('callout padrão tem role="note" com aria-label derivado do título', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Passo' },
+        { type: 'callout', title: 'Aviso geral', text: 'Texto sem variante.' },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(
+        screen.getByRole('note', { name: 'Aviso geral' })
+      ).toBeInTheDocument()
+    })
   })
 
   describe('Bloco: image', () => {
