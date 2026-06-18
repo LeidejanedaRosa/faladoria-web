@@ -2,6 +2,7 @@ import type { ComponentType } from 'react'
 
 import {
   CheckIcon,
+  ClipboardIcon,
   InfoCircleIcon,
   LightbulbIcon,
   PhoneIcon,
@@ -12,8 +13,6 @@ import { cn } from '@shared/utils/cn'
 import type { ArticleBlock } from '../data'
 
 type CalloutData = Extract<ArticleBlock, { type: 'callout' }>
-
-const RELAXED_TEXT = 'text-sm leading-relaxed'
 
 const SimpleCallout = ({
   block,
@@ -38,7 +37,7 @@ const SimpleCallout = ({
     <div>
       {block.title && <p className='text-sm font-semibold'>{block.title}</p>}
       {block.text && (
-        <p className={cn(RELAXED_TEXT, block.title && 'mt-0.5')}>
+        <p className={cn('text-sm leading-relaxed', block.title && 'mt-0.5')}>
           {block.text}
         </p>
       )}
@@ -94,7 +93,7 @@ const EmergencyCallout = ({ block }: { block: CalloutData }) => (
 const ChecklistCallout = ({ block }: { block: CalloutData }) => (
   <div className='flex items-start gap-3 rounded-xl border border-green-200 bg-green-50 px-5 py-4'>
     <span className='shrink-0 text-green-600' aria-hidden='true'>
-      <CheckIcon className='h-4.5 w-4.5' />
+      <ClipboardIcon className='h-4.5 w-4.5' />
     </span>
     <div className='flex-1'>
       {block.title && (
@@ -104,8 +103,8 @@ const ChecklistCallout = ({ block }: { block: CalloutData }) => (
         <ul className='mt-2 space-y-1.5'>
           {block.items.map((item, index) => (
             <li key={`cl-item-${index}`} className='flex items-start gap-2'>
-              <span
-                className='mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-500'
+              <CheckIcon
+                className='mt-0.5 h-3.5 w-3.5 shrink-0 text-green-600'
                 aria-hidden='true'
               />
               <span className='text-sm leading-relaxed text-green-800'>
