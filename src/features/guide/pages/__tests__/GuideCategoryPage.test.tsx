@@ -67,13 +67,13 @@ function renderWithSlug(slug: string) {
 }
 
 describe('GuideCategoryPage', () => {
-  it('renders the category content when slug is valid', () => {
+  it('renderiza o conteúdo da categoria quando o slug é válido', () => {
     renderWithSlug('seus-direitos')
     expect(screen.getByTestId('guide-category-layout')).toBeInTheDocument()
     expect(screen.getByText('Seus Direitos')).toBeInTheDocument()
   })
 
-  it('redirects to /como-conseguir-pelo-sus when slug is unknown', () => {
+  it('redireciona para /como-conseguir-pelo-sus quando o slug é inválido', () => {
     renderWithSlug('categoria-inexistente')
     expect(screen.getByTestId('guide-page')).toBeInTheDocument()
     expect(
@@ -81,7 +81,7 @@ describe('GuideCategoryPage', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('calls useDocumentMeta with category label when slug is valid', async () => {
+  it('chama useDocumentMeta com o rótulo da categoria quando o slug é válido', async () => {
     const { useDocumentMeta } = await import('@shared/hooks/useDocumentMeta')
     renderWithSlug('seus-direitos')
     expect(useDocumentMeta).toHaveBeenCalledWith(
@@ -89,7 +89,7 @@ describe('GuideCategoryPage', () => {
     )
   })
 
-  it('calls useDocumentMeta with fallback title when slug is unknown', async () => {
+  it('chama useDocumentMeta com título genérico quando o slug não existe', async () => {
     const { useDocumentMeta } = await import('@shared/hooks/useDocumentMeta')
     renderWithSlug('nao-existe')
     expect(useDocumentMeta).toHaveBeenCalledWith(

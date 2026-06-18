@@ -19,13 +19,17 @@ const SimpleCallout = ({
   containerClassName,
   iconClassName,
   icon: Icon,
+  defaultLabel,
 }: {
   block: CalloutData
   containerClassName: string
   iconClassName: string
   icon: ComponentType<{ className?: string }>
+  defaultLabel: string
 }) => (
   <div
+    role='note'
+    aria-label={block.title ?? defaultLabel}
     className={cn(
       'flex items-start gap-3 rounded-xl border px-5 py-4',
       containerClassName
@@ -51,6 +55,7 @@ const TipCallout = ({ block }: { block: CalloutData }) => (
     containerClassName='border-purple-200 bg-purple-50 text-purple-900'
     iconClassName='text-purple-600'
     icon={LightbulbIcon}
+    defaultLabel='Dica'
   />
 )
 
@@ -60,6 +65,7 @@ const WarningCallout = ({ block }: { block: CalloutData }) => (
     containerClassName='border-amber-200 bg-amber-50 text-amber-900'
     iconClassName='text-amber-600'
     icon={WarningIcon}
+    defaultLabel='Atenção'
   />
 )
 
@@ -91,7 +97,11 @@ const EmergencyCallout = ({ block }: { block: CalloutData }) => (
 )
 
 const ChecklistCallout = ({ block }: { block: CalloutData }) => (
-  <div className='flex items-start gap-3 rounded-xl border border-green-200 bg-green-50 px-5 py-4'>
+  <div
+    role='note'
+    aria-label={block.title ?? 'Lista de verificação'}
+    className='flex items-start gap-3 rounded-xl border border-green-200 bg-green-50 px-5 py-4'
+  >
     <span className='shrink-0 text-green-600' aria-hidden='true'>
       <ClipboardIcon className='h-4.5 w-4.5' />
     </span>
@@ -124,6 +134,7 @@ const DefaultCallout = ({ block }: { block: CalloutData }) => (
     containerClassName='border-purple-200 bg-purple-50 text-purple-900'
     iconClassName='text-purple-600'
     icon={InfoCircleIcon}
+    defaultLabel='Informação'
   />
 )
 
