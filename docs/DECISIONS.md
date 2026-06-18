@@ -6,6 +6,20 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-06-17 — Reuso de `category.webp` como imagem de categoria e ilustração de step
+
+**Contexto**: O artigo "Como solicitar atendimento domiciliar" usa uma imagem inline dentro do StepCard "Quem tem direito" (via `GUIDE_STEP_IMAGES['home-care-illustration']`). O mesmo asset (`category.webp`) também aparece no header da página de categoria via `GUIDE_CATEGORY_IMAGES['atendimento-domiciliar']`.
+
+**Decisão**: Reutilizar o mesmo arquivo para ambos os slots, em vez de criar um asset separado.
+
+**Por quê**: A ilustração é semanticamente adequada nos dois contextos — representa um profissional de saúde atendendo um paciente em casa, que é exatamente o visual correto tanto para identificar a categoria quanto para reforçar o critério de elegibilidade no artigo. Criar um asset duplicado apenas para isolar os dois slots seria custo sem benefício visual real.
+
+**Risco documentado**: Se `category.webp` for substituído no futuro, a ilustração do step no artigo mudará junto silenciosamente. Ao trocar o asset, verificar ambos os usos: `GUIDE_CATEGORY_IMAGES['atendimento-domiciliar']` e `GUIDE_STEP_IMAGES['home-care-illustration']`.
+
+**Alternativa rejeitada**: Asset dedicado para o step — aumentaria o número de arquivos sem diferença visual.
+
+---
+
 ## 2026-06-15 — `role='note'` + `aria-label` para callout de emergência estático
 
 **Contexto**: O `EmergencyCallout` usava `role='alert'`, que é uma live region do ARIA projetada para conteúdo que aparece dinamicamente no DOM. Esse callout é conteúdo estático presente na página ao carregar.
