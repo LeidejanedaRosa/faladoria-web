@@ -30,11 +30,6 @@ export const homeCareArticles: GuideArticle[] = [
         ],
       },
       {
-        type: 'image',
-        imageKey: 'home-care-illustration',
-        alt: 'Profissional de saúde atendendo idosa em casa',
-      },
-      {
         type: 'heading',
         level: 2,
         text: 'O que a equipe faz na sua casa',

@@ -50,5 +50,4 @@ export const GUIDE_ARTICLE_IMAGES: Partial<Record<string, string>> = {
 export const GUIDE_STEP_IMAGES: Partial<Record<string, string>> = {
   'cartao-sus': susCardImg,
   checklist: checklistImg,
-  'home-care-illustration': homeCareCategoryImg,
 }
