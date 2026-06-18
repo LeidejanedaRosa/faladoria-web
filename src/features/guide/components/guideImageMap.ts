@@ -5,6 +5,8 @@ import examCategoryImg from '@assets/guide/exam/category.webp'
 import delayedExamImg from '@assets/guide/exam/delayed-exam.webp'
 import howToRequestExamImg from '@assets/guide/exam/how-to-request-exam.webp'
 import whatExamDoINeedImg from '@assets/guide/exam/what-exam-do-i-need.webp'
+import homeCareCategoryImg from '@assets/guide/home-care/category.webp'
+import homeCareHeroImg from '@assets/guide/home-care/home-care.webp'
 import medicationCategoryImg from '@assets/guide/medication/category.webp'
 import freeMedicationImg from '@assets/guide/medication/free-medication.webp'
 import highCostMedicationImg from '@assets/guide/medication/high-cost-medication.webp'
@@ -22,6 +24,7 @@ export const GUIDE_CATEGORY_IMAGES: Partial<Record<string, string>> = {
   cirurgia: surgeryCategoryImg,
   tratamento: treatmentCategoryImg,
   medicamento: medicationCategoryImg,
+  'atendimento-domiciliar': homeCareCategoryImg,
 }
 
 export const GUIDE_ARTICLE_IMAGES: Partial<Record<string, string>> = {
@@ -35,9 +38,11 @@ export const GUIDE_ARTICLE_IMAGES: Partial<Record<string, string>> = {
   'como-conseguir-tratamento': treatmentSessionImg,
   'farmacia-basica': freeMedicationImg,
   'medicamentos-alto-custo': highCostMedicationImg,
+  'como-solicitar-atendimento-domiciliar': homeCareHeroImg,
 }
 
 export const GUIDE_STEP_IMAGES: Partial<Record<string, string>> = {
   'cartao-sus': susCardImg,
   checklist: checklistImg,
+  'home-care-illustration': homeCareCategoryImg,
 }

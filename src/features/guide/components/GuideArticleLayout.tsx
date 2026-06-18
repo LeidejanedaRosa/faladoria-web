@@ -95,6 +95,7 @@ const StepImage = ({ imageKey, alt }: { imageKey: string; alt: string }) => {
 const InfoPanel = ({ block }: { block: InfoPanelData }) => (
   <div
     role='note'
+    aria-label={block.title}
     className='flex items-start gap-4 rounded-2xl border border-purple-200 bg-purple-50 px-5 py-4'
   >
     <span className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-100'>
@@ -139,7 +140,14 @@ const CONTENT_BLOCK_RENDERERS: Partial<
       <Tag className='space-y-2'>
         {items.map((item, index) => (
           <li key={`list-item-${index}`} className='flex items-start gap-2.5'>
-            {!ordered && (
+            {ordered ? (
+              <span
+                className='mt-0.5 w-5 shrink-0 text-sm font-semibold text-gray-500'
+                aria-hidden='true'
+              >
+                {index + 1}.
+              </span>
+            ) : (
               <span
                 className={cn(
                   'mt-2 h-1.5 w-1.5 shrink-0 rounded-full',
@@ -155,6 +163,13 @@ const CONTENT_BLOCK_RENDERERS: Partial<
         ))}
       </Tag>
     )
+  },
+  callout: block => (
+    <Callout block={block as Extract<ArticleBlock, { type: 'callout' }>} />
+  ),
+  image: block => {
+    const { imageKey, alt } = block as Extract<ArticleBlock, { type: 'image' }>
+    return <StepImage imageKey={imageKey} alt={alt} />
   },
 }
 
@@ -294,7 +309,7 @@ export const GuideArticleLayout = ({
             <p className='text-lg font-medium text-gray-500'>
               {GUIDE_CONTENT.comingSoon.heading}
             </p>
-            <p className='mt-2 text-sm text-gray-400'>
+            <p className='mt-2 text-sm text-gray-500'>
               {GUIDE_CONTENT.comingSoon.description}
             </p>
           </div>
