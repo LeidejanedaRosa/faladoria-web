@@ -328,7 +328,7 @@ describe('GuideArticleLayout', () => {
       ).toBeInTheDocument()
     })
 
-    it('info-panel tem role="note"', () => {
+    it('info-panel tem role="note" com aria-label derivado do título', () => {
       const content: ArticleBlock[] = [
         {
           type: 'info-panel',
@@ -337,7 +337,37 @@ describe('GuideArticleLayout', () => {
         },
       ]
       renderLayout(makeArticle({ content }))
-      expect(screen.getByRole('note')).toBeInTheDocument()
+      expect(
+        screen.getByRole('note', { name: 'Você sabia?' })
+      ).toBeInTheDocument()
+    })
+  })
+
+  describe('Preamble (blocos antes do primeiro h2)', () => {
+    it('renderiza callout no preamble', () => {
+      const content: ArticleBlock[] = [
+        {
+          type: 'callout',
+          variant: 'tip',
+          title: 'Dica inicial',
+          text: 'Leia antes de começar.',
+        },
+        { type: 'heading', level: 2, text: 'Passo 1' },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(screen.getByText('Dica inicial')).toBeInTheDocument()
+      expect(screen.getByText('Leia antes de começar.')).toBeInTheDocument()
+    })
+
+    it('renderiza imagem no preamble', () => {
+      const content: ArticleBlock[] = [
+        { type: 'image', imageKey: 'imagem-teste', alt: 'Imagem introdutória' },
+        { type: 'heading', level: 2, text: 'Passo 1' },
+      ]
+      const { container } = renderLayout(makeArticle({ content }))
+      const img = container.querySelector('img')
+      expect(img).toBeInTheDocument()
+      expect(img).toHaveAttribute('alt', 'Imagem introdutória')
     })
   })
 
