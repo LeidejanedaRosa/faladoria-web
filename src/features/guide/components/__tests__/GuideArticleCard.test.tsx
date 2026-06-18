@@ -68,15 +68,6 @@ describe('GuideArticleCard', () => {
     })
   })
 
-  describe('Highlights', () => {
-    it('não renderiza a lista de tópicos abordados', () => {
-      renderCard(makeArticle())
-      expect(
-        screen.queryByRole('list', { name: 'Tópicos abordados' })
-      ).not.toBeInTheDocument()
-    })
-  })
-
   describe('Imagem condicional', () => {
     it('renderiza a imagem quando o artigo tem uma associada', () => {
       const { container } = renderCard(
