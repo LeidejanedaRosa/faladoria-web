@@ -19,29 +19,29 @@ function renderBreadcrumb(overrideItems = items) {
 }
 
 describe('GuideBreadcrumb', () => {
-  describe('Estrutura e semântica', () => {
-    it('renderiza um landmark de navegação com label Breadcrumb', () => {
+  describe('Structure & Semantics', () => {
+    it('renders a navigation landmark with label Breadcrumb', () => {
       renderBreadcrumb()
       expect(
         screen.getByRole('navigation', { name: 'Breadcrumb' })
       ).toBeInTheDocument()
     })
 
-    it('renderiza todos os itens como elementos de lista', () => {
+    it('renders all items as list elements', () => {
       renderBreadcrumb()
       expect(screen.getAllByRole('listitem')).toHaveLength(items.length)
     })
   })
 
-  describe('Último item — página atual', () => {
-    it('renderiza o último item como texto, não como link', () => {
+  describe('Last item — current page', () => {
+    it('renders the last item as text, not a link', () => {
       renderBreadcrumb()
       const links = screen.getAllByRole('link')
       const linkNames = links.map(l => l.textContent)
       expect(linkNames).not.toContain('Seus Direitos')
     })
 
-    it('aplica aria-current="page" no último item', () => {
+    it('applies aria-current="page" to the last item', () => {
       renderBreadcrumb()
       expect(screen.getByText('Seus Direitos')).toHaveAttribute(
         'aria-current',
@@ -50,8 +50,8 @@ describe('GuideBreadcrumb', () => {
     })
   })
 
-  describe('Itens intermediários com URL', () => {
-    it('renderiza links para itens com URL que não são o último', () => {
+  describe('Middle items with URL', () => {
+    it('renders links for intermediate items with URL', () => {
       renderBreadcrumb()
       expect(screen.getByRole('link', { name: 'Início' })).toHaveAttribute(
         'href',
@@ -63,15 +63,15 @@ describe('GuideBreadcrumb', () => {
       )
     })
 
-    it('não aplica aria-current nos itens intermediários', () => {
+    it('does not apply aria-current to intermediate items', () => {
       renderBreadcrumb()
       const inicio = screen.getByRole('link', { name: 'Início' })
       expect(inicio).not.toHaveAttribute('aria-current')
     })
   })
 
-  describe('Item intermediário sem URL', () => {
-    it('renderiza como texto quando não há URL', () => {
+  describe('Intermediate item without URL', () => {
+    it('renders as text when there is no URL', () => {
       const itemsSemUrl = [
         { name: 'Início', url: '/' },
         { name: 'Sem link' },

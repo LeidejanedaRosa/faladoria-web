@@ -332,3 +332,80 @@ As duas abordagens funcionam para Latin, mas a segunda é mais robusta para outr
 Criado `src/shared/utils/slugify.ts` com implementação unificada (baseada na versão mais robusta) e 8 testes cobrindo diacríticos, espaços, caracteres especiais, números e strings vazias. As duas implementações inline foram removidas.
 
 Ver [DECISIONS.md](DECISIONS.md#2026-05-23--slugify-como-utilitário-compartilhado) para o raciocínio da implementação escolhida.
+
+---
+
+## `StepRightColumn` filtrava blocos já filtrados — branch de código morto com erro de tipo
+
+**Data**: 2026-06-22
+
+**Sintoma**: Nenhum erro visível em runtime. Identificado em revisão: `StepRightColumn` recebia `blocks: ArticleBlock[]` e fazia `block.type === 'callout'` internamente, com um `else return null`. O branch `null` nunca era atingido porque o caller passava apenas callouts.
+
+**Causa raiz**:
+
+Após refatorações anteriores, `InformationalStepCard` já filtrava `rightBlocks` antes de passar para `StepRightColumn`:
+
+```tsx
+// caller já filtrava:
+const rightBlocks = step.blocks.filter(b => b.type === 'callout')
+
+// mas StepRightColumn filtrava de novo:
+const StepRightColumn = ({ blocks }: { blocks: ArticleBlock[] }) => (
+  blocks.map(block => block.type === 'callout'
+    ? <Callout key={...} block={block} />
+    : null  // nunca atingido
+  )
+)
+```
+
+Além do código morto, o tipo `ArticleBlock[]` estava errado para o prop — `Callout` espera `Extract<ArticleBlock, { type: 'callout' }>`, não `ArticleBlock`.
+
+**Solução**:
+
+1. Definir `type CalloutBlock = Extract<ArticleBlock, { type: 'callout' }>` no escopo do módulo
+2. Retipar o prop de `StepRightColumn` para `{ blocks: CalloutBlock[] }`
+3. Retirar o check interno — o componente itera e renderiza diretamente
+4. Usar type predicate no caller: `step.blocks.filter((b): b is CalloutBlock => b.type === 'callout')`
+
+**Regra**: quando um componente recebe dados já filtrados por tipo, o prop deve refletir o tipo estreitado — não o tipo base. O type predicate no caller é o mecanismo correto para satisfazer o TypeScript sem assertion.
+
+---
+
+## `ActionStepBlock` exportado do módulo mas não adicionado ao barrel
+
+**Data**: 2026-06-22
+
+**Sintoma**: `tsc -p tsconfig.app.json --noEmit` reportou:
+
+```
+error TS2305: Module '"../data"' has no exported member 'ActionStepBlock'.
+```
+
+Três arquivos afetados: `GuideActionStepCard.tsx`, `GuideActionStepList.tsx`, `GuideArticleLayout.tsx`. O comando `tsc --noEmit` (sem `-p`) não reportou nenhum erro — o cache stale mascarou o problema.
+
+**Causa raiz**:
+
+`ActionStepBlock` foi adicionado como export em `data/guideArticles.ts`:
+
+```ts
+export type ActionStepBlock = Extract<ArticleBlock, { type: 'action-step' }>
+```
+
+Mas não foi adicionado ao barrel `data/index.ts`. Os componentes importam de `'../data'` (o barrel), não diretamente de `'../data/guideArticles'`.
+
+**Solução**:
+
+Adicionar ao `data/index.ts`:
+
+```ts
+export type {
+  GuideArticle,
+  ArticleBlock,
+  ActionStepBlock, // ← adicionado
+  ArticleStepIconName,
+} from './guideArticles'
+```
+
+**Conexão com TROUBLESHOOTING existente**: este é outro caso do problema documentado em ["`tsc --noEmit` passa mas o erro real existe"](#tsc---noemit-passa-mas-o-erro-real-existe--cache-do-build-composto). Usar `tsc -p tsconfig.app.json --noEmit` é obrigatório para validação confiável.
+
+**Regra (reforço)**: toda exportação nova em qualquer arquivo de `features/guide/data/` deve ser adicionada ao barrel `data/index.ts` imediatamente. A ausência não gera erro no arquivo fonte — só no consumidor.

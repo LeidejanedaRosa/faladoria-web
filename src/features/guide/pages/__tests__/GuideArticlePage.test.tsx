@@ -84,25 +84,25 @@ function renderWithSlugs(categorySlug: string, articleSlug: string) {
 }
 
 describe('GuideArticlePage', () => {
-  it('renderiza o layout do artigo quando slugs são válidos', () => {
+  it('renders the article layout when slugs are valid', () => {
     renderWithSlugs('seus-direitos', 'direito-a-saude')
     expect(screen.getByTestId('guide-article-layout')).toBeInTheDocument()
     expect(screen.getByText('Direito à saúde')).toBeInTheDocument()
   })
 
-  it('redireciona para /como-conseguir-pelo-sus quando artigo não existe', () => {
+  it('redirects to /como-conseguir-pelo-sus when article does not exist', () => {
     renderWithSlugs('seus-direitos', 'nao-existe')
     expect(screen.getByTestId('guide-page')).toBeInTheDocument()
     expect(screen.queryByTestId('guide-article-layout')).not.toBeInTheDocument()
   })
 
-  it('redireciona para /como-conseguir-pelo-sus quando categoria não existe', () => {
+  it('redirects to /como-conseguir-pelo-sus when category does not exist', () => {
     renderWithSlugs('categoria-invalida', 'direito-a-saude')
     expect(screen.getByTestId('guide-page')).toBeInTheDocument()
     expect(screen.queryByTestId('guide-article-layout')).not.toBeInTheDocument()
   })
 
-  it('redireciona quando artigo não pertence à categoria da URL', () => {
+  it('redirects when article does not belong to the URL category', () => {
     // article exists (categorySlug: 'seus-direitos'), category 'consulta' exists,
     // but they don't match → redirect
     renderWithSlugs('consulta', 'direito-a-saude')
@@ -110,7 +110,7 @@ describe('GuideArticlePage', () => {
     expect(screen.queryByTestId('guide-article-layout')).not.toBeInTheDocument()
   })
 
-  it('chama useDocumentMeta com título do artigo quando slugs são válidos', async () => {
+  it('calls useDocumentMeta with the article title when slugs are valid', async () => {
     const { useDocumentMeta } = await import('@shared/hooks/useDocumentMeta')
     renderWithSlugs('seus-direitos', 'direito-a-saude')
     expect(useDocumentMeta).toHaveBeenCalledWith(
@@ -118,7 +118,7 @@ describe('GuideArticlePage', () => {
     )
   })
 
-  it('chama useDocumentMeta com título genérico quando artigo não existe', async () => {
+  it('calls useDocumentMeta with a generic title when the article does not exist', async () => {
     const { useDocumentMeta } = await import('@shared/hooks/useDocumentMeta')
     renderWithSlugs('seus-direitos', 'nao-existe')
     expect(useDocumentMeta).toHaveBeenCalledWith(

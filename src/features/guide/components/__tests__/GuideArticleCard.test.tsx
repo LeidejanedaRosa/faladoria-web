@@ -7,8 +7,8 @@ import { GuideArticleCard } from '../GuideArticleCard'
 
 vi.mock('../guideImageMap', () => ({
   GUIDE_ARTICLE_IMAGES: { 'artigo-com-imagem': '/fake-article.png' },
-  GUIDE_CATEGORY_IMAGES: {},
-  GUIDE_STEP_IMAGES: {},
+  GUIDE_CATEGORY_IMAGES: { consulta: '/fake-category.png' },
+  SHARED_STEP_IMAGES: {},
 }))
 
 const mockCategory: GuideCategory = {
@@ -40,20 +40,20 @@ function renderCard(article: GuideArticle, category = mockCategory) {
 }
 
 describe('GuideArticleCard', () => {
-  describe('Conteúdo', () => {
-    it('renderiza o título do artigo como h2', () => {
+  describe('Content', () => {
+    it('renders the article title as h2', () => {
       renderCard(makeArticle())
       expect(
         screen.getByRole('heading', { level: 2, name: 'Artigo de teste' })
       ).toBeInTheDocument()
     })
 
-    it('renderiza o resumo do artigo', () => {
+    it('renders the article summary', () => {
       renderCard(makeArticle())
       expect(screen.getByText('Resumo do artigo de teste.')).toBeInTheDocument()
     })
 
-    it('renderiza o link com href correto para o artigo', () => {
+    it('renders the link with the correct href for the article', () => {
       renderCard(makeArticle())
       expect(screen.getByRole('link')).toHaveAttribute(
         'href',
@@ -61,29 +61,47 @@ describe('GuideArticleCard', () => {
       )
     })
 
-    it('o link engloba o título do artigo', () => {
+    it('the link wraps the article title', () => {
       renderCard(makeArticle())
       const link = screen.getByRole('link')
       expect(link).toContainElement(screen.getByRole('heading', { level: 2 }))
     })
   })
 
-  describe('Imagem condicional', () => {
-    it('renderiza a imagem quando o artigo tem uma associada', () => {
+  describe('Conditional image', () => {
+    it('renders the article image when one is associated', () => {
       const { container } = renderCard(
         makeArticle({ slug: 'artigo-com-imagem' })
       )
       expect(container.querySelector('img')).toBeInTheDocument()
     })
 
-    it('não renderiza imagem quando o artigo não tem uma associada', () => {
+    it('renders the category image as fallback when the article has no specific image', () => {
       const { container } = renderCard(makeArticle({ slug: 'sem-imagem' }))
+      expect(container.querySelector('img')).toHaveAttribute(
+        'src',
+        '/fake-category.png'
+      )
+    })
+
+    it('renders no image when neither article nor category has one', () => {
+      const categoryWithoutImage: GuideCategory = {
+        ...mockCategory,
+        slug: 'sem-categoria-imagem',
+      }
+      const { container } = renderCard(
+        makeArticle({
+          slug: 'sem-imagem',
+          categorySlug: 'sem-categoria-imagem',
+        }),
+        categoryWithoutImage
+      )
       expect(container.querySelector('img')).not.toBeInTheDocument()
     })
   })
 
-  describe('Acessibilidade', () => {
-    it('a imagem é decorativa e oculta de leitores de tela', () => {
+  describe('Accessibility', () => {
+    it('the image is decorative and hidden from screen readers', () => {
       const { container } = renderCard(
         makeArticle({ slug: 'artigo-com-imagem' })
       )
@@ -92,7 +110,7 @@ describe('GuideArticleCard', () => {
       expect(img).toHaveAttribute('aria-hidden', 'true')
     })
 
-    it('a imagem tem atributos de dimensão para prevenir CLS', () => {
+    it('the image has dimension attributes to prevent CLS', () => {
       const { container } = renderCard(
         makeArticle({ slug: 'artigo-com-imagem' })
       )
@@ -101,14 +119,14 @@ describe('GuideArticleCard', () => {
       expect(Number(img?.getAttribute('height'))).toBeGreaterThan(0)
     })
 
-    it('a imagem é carregada com lazy loading', () => {
+    it('the image is loaded with lazy loading', () => {
       const { container } = renderCard(
         makeArticle({ slug: 'artigo-com-imagem' })
       )
       expect(container.querySelector('img')).toHaveAttribute('loading', 'lazy')
     })
 
-    it('o link é acessível pelo título do artigo', () => {
+    it('the link is accessible by the article title', () => {
       renderCard(makeArticle())
       expect(
         screen.getByRole('link', { name: /Artigo de teste/i })

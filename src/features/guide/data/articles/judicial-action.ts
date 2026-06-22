@@ -14,45 +14,47 @@ export const judicialActionArticles: GuideArticle[] = [
     iconName: 'fist',
     content: [
       {
-        type: 'paragraph',
-        text: 'Recorrer à Justiça é o último passo — mas em muitos casos é o mais eficaz. Quando o SUS nega um medicamento, cirurgia ou tratamento necessário, a Justiça pode obrigar o Estado a fornecer em dias.',
-      },
-      {
-        type: 'heading',
-        level: 2,
-        text: 'Quando judicializar',
-      },
-      {
-        type: 'list',
-        items: [
-          'O SUS negou o atendimento e você já acionou a Secretaria de Saúde e a Ouvidoria sem resultado',
-          'A espera está prejudicando gravemente sua saúde',
-          'O medicamento ou tratamento foi negado sem justificativa médica',
-          'Há urgência — risco de morte ou dano irreversível à saúde',
-        ],
+        type: 'callout',
+        variant: 'tip',
+        title: 'Quando judicializar',
+        text: 'Quando o SUS negou o atendimento, você já acionou a Secretaria e a Ouvidoria sem resultado, a demora está prejudicando sua saúde ou há urgência — risco de morte ou dano irreversível.',
       },
       {
         type: 'heading',
         level: 2,
         text: 'Como funciona o processo',
+        icon: 'target',
       },
       {
-        type: 'list',
-        ordered: true,
-        items: [
-          'Procure a Defensoria Pública do seu estado — o atendimento é gratuito',
-          'Leve todos os documentos: laudos, receitas, pedidos negados, exames',
-          'O defensor analisa o caso e entra com a ação judicial',
-          'Em casos urgentes, o juiz pode determinar o atendimento em até 72 horas (liminar)',
-        ],
+        type: 'action-step',
+        action: 'Procure a Defensoria Pública do seu estado',
+        imageKey: 'patient-rights',
+        detail: 'O atendimento é gratuito para quem não pode pagar advogado.',
       },
       {
-        type: 'heading',
-        level: 2,
-        text: 'O que levar para a Defensoria Pública',
+        type: 'action-step',
+        action: 'Leve todos os documentos',
+        imageKey: 'checklist',
+        detail:
+          'Laudos, receitas, pedidos negados, exames e qualquer papel relacionado.',
       },
       {
-        type: 'list',
+        type: 'action-step',
+        action: 'O defensor analisa e entra com a ação',
+        detail:
+          'Você não precisa de advogado particular — o defensor cuida de tudo.',
+      },
+      {
+        type: 'action-step',
+        action: 'Em casos urgentes, o juiz decide em até 72h',
+        imageKey: 'clock',
+        detail:
+          'A liminar é uma decisão judicial de urgência que obriga o Estado a agir.',
+      },
+      {
+        type: 'callout',
+        variant: 'checklist',
+        title: 'O que levar para a Defensoria',
         items: [
           'Laudo ou receita médica indicando o medicamento, tratamento ou cirurgia',
           'Documentos que comprovem a negativa do SUS (por escrito, se possível)',
@@ -63,16 +65,7 @@ export const judicialActionArticles: GuideArticle[] = [
       },
       {
         type: 'callout',
-        text: 'Você não precisa pagar nada. A Defensoria Pública é gratuita para quem não tem condições de pagar advogado. Para encontrar a unidade mais próxima, ligue para o Disque Saúde: 136 ou pesquise "Defensoria Pública" + o nome do seu estado.',
-      },
-      {
-        type: 'heading',
-        level: 2,
-        text: 'Casos de urgência extrema',
-      },
-      {
-        type: 'paragraph',
-        text: 'Se houver risco imediato de vida, vá diretamente ao hospital. O hospital não pode negar atendimento emergencial. Depois, com a situação estabilizada, acione a Defensoria para garantir a continuidade do tratamento.',
+        text: 'Você não precisa pagar nada. A Defensoria Pública é gratuita para quem não tem condições de pagar advogado. Para encontrar a unidade mais próxima, ligue para o Disque Saúde: 136.',
       },
     ],
   },

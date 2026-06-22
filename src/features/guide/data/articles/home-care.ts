@@ -14,90 +14,60 @@ export const homeCareArticles: GuideArticle[] = [
     iconName: 'heart',
     content: [
       {
-        type: 'heading',
-        level: 2,
-        text: 'Quem tem direito',
-        icon: 'users',
-      },
-      {
-        type: 'list',
-        items: [
-          'Pessoas com dificuldade de se locomover por doença grave ou crônica',
-          'Pacientes se recuperando de cirurgia ou internação hospitalar',
-          'Idosos com limitação severa de mobilidade',
-          'Pessoas com deficiência que impeça o deslocamento',
-          'Pacientes em cuidados paliativos (doenças sem perspectiva de cura)',
-        ],
-      },
-      {
-        type: 'heading',
-        level: 2,
-        text: 'O que a equipe faz na sua casa',
-        icon: 'heart',
-      },
-      {
-        type: 'list',
-        items: [
-          'Consultas médicas e de enfermagem',
-          'Curativos e procedimentos simples',
-          'Acompanhamento de medicamentos e tratamentos',
-          'Orientações para quem cuida do paciente em casa',
-          'Fisioterapia domiciliar (em alguns municípios)',
-        ],
-      },
-      {
         type: 'callout',
         variant: 'tip',
-        title: 'Nem todo município oferece tudo',
-        text: 'Os serviços variam conforme a estrutura do seu município. A UBS informa o que está disponível na sua cidade.',
+        title: 'Quem pode pedir',
+        text: 'Pessoas com dificuldade severa de locomoção, em recuperação de cirurgia ou internação, idosos com limitação grave, pessoas com deficiência ou em cuidados paliativos.',
       },
       {
         type: 'heading',
         level: 2,
-        text: 'Como pedir o atendimento',
+        text: 'Como pedir',
         icon: 'clipboard',
       },
       {
-        type: 'list',
-        ordered: true,
-        items: [
-          'Vá ao posto de saúde (UBS) e explique a situação',
-          'Leve laudos ou documentos que comprovem a dificuldade de locomoção',
-          'O médico avalia e faz o encaminhamento para o serviço domiciliar',
-          'A própria UBS ou a Secretaria de Saúde aciona a equipe',
-        ],
+        type: 'action-step',
+        action: 'Vá ao posto de saúde (UBS)',
+        imageKey: 'ubs',
+        detail:
+          'Explique que a pessoa não consegue se locomover até a unidade.',
+      },
+      {
+        type: 'action-step',
+        action: 'Leve laudos ou documentos médicos',
+        imageKey: 'checklist',
+        detail: 'Qualquer papel que comprove a dificuldade de locomoção.',
+      },
+      {
+        type: 'action-step',
+        action: 'O médico faz o encaminhamento',
+        imageKey: 'doctor-patient',
+        detail:
+          'Ele avalia e registra por escrito a necessidade do atendimento em casa.',
+      },
+      {
+        type: 'action-step',
+        action: 'A UBS aciona a equipe domiciliar',
+        imageKey: 'home-care',
+        detail:
+          'Ou a Secretaria de Saúde entra em contato para agendar a visita.',
       },
       {
         type: 'callout',
         variant: 'checklist',
-        title: 'Documentos para levar',
+        title: 'O que levar à UBS',
         items: [
           'Cartão do SUS',
           'Documento com foto (RG ou CPF)',
-          'Laudo ou receita médica com a justificativa do médico',
+          'Laudo ou receita médica com justificativa',
           'Exames recentes (se tiver)',
         ],
       },
       {
-        type: 'info-panel',
-        title: 'Precisa de encaminhamento médico?',
-        text: 'Sim. Um médico precisa avaliar e registrar por escrito que o paciente não consegue se deslocar até a unidade de saúde. Se você ainda não tem esse documento, comece indo à UBS — o próprio médico de lá pode fazer essa avaliação.',
-      },
-      {
-        type: 'heading',
-        level: 2,
-        text: 'Se a UBS disser que não tem o serviço',
-        icon: 'megaphone',
-      },
-      {
-        type: 'paragraph',
-        text: 'Não desista. Vá à Secretaria de Saúde do seu município e solicite formalmente o atendimento domiciliar. O SUS tem obrigação de garantir esse serviço — mesmo que precise acionar outra equipe ou outro município.',
-      },
-      {
         type: 'callout',
         variant: 'warning',
-        title: 'Negaram mesmo assim?',
-        text: 'Registre uma reclamação na Ouvidoria do SUS pelo número 136 ou na ouvidoria da prefeitura. Se não resolver, você pode buscar orientação jurídica para garantir seu direito.',
+        title: 'A UBS disse que não tem o serviço?',
+        text: 'Não desista. Vá à Secretaria de Saúde do município. Se a negativa persistir, registre no Disque Saúde: 136.',
       },
     ],
   },

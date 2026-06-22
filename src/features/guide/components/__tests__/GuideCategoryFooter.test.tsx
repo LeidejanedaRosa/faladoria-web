@@ -9,7 +9,7 @@ function renderFooter() {
 }
 
 describe('GuideCategoryFooter', () => {
-  it('renderiza o bloco de dica', () => {
+  it('renders the tip block', () => {
     renderFooter()
     expect(
       screen.getByText(GUIDE_CONTENT.categoryPage.tip.title)
@@ -19,7 +19,7 @@ describe('GuideCategoryFooter', () => {
     ).toBeInTheDocument()
   })
 
-  it('renderiza o bloco de ajuda', () => {
+  it('renders the help block', () => {
     renderFooter()
     expect(
       screen.getByText(GUIDE_CONTENT.categoryPage.help.title)
@@ -29,7 +29,7 @@ describe('GuideCategoryFooter', () => {
     ).toBeInTheDocument()
   })
 
-  it('o link de ajuda aponta para o WhatsApp e abre em nova aba', () => {
+  it('the help link points to WhatsApp and opens in a new tab', () => {
     renderFooter()
     const link = screen.getByRole('link')
     expect(link).toHaveAttribute('href', expect.stringContaining('wa.me'))

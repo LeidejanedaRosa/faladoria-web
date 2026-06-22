@@ -15,21 +15,12 @@ export const vaccinationArticles: GuideArticle[] = [
     content: [
       {
         type: 'paragraph',
-        text: 'O Brasil tem um dos melhores calendários de vacinação infantil do mundo — e todas as vacinas são gratuitas nas UBSs. Manter a caderneta em dia protege seu filho e toda a comunidade.',
+        text: 'O Brasil tem um dos melhores calendários de vacinação infantil do mundo — e todas as vacinas são gratuitas na UBS. Leve a caderneta de vacinação e compareça sem precisar de agendamento.',
       },
       {
         type: 'heading',
         level: 2,
-        text: 'Onde vacinar',
-      },
-      {
-        type: 'paragraph',
-        text: 'Leve seu filho à UBS (postinho) mais próxima com a caderneta de vacinação. Não é necessário agendamento para a maioria das vacinas — basta comparecer durante o horário de funcionamento.',
-      },
-      {
-        type: 'heading',
-        level: 2,
-        text: 'Principais vacinas do calendário infantil',
+        text: 'Vacinas por idade',
       },
       {
         type: 'list',
@@ -41,26 +32,23 @@ export const vaccinationArticles: GuideArticle[] = [
           '5 meses: Meningocócica C',
           '6 meses: Pentavalente, VIP, Influenza (anual)',
           '9 meses: Febre Amarela',
-          '12 meses: Tríplice viral (sarampo, caxumba, rubéola), Meningocócica C, Pneumocócica',
+          '12 meses: Tríplice viral, Meningocócica C, Pneumocócica',
           '15 meses: DTP, VOP, Varicela, Hepatite A',
           '4 anos: DTP, VOP, Tríplice viral, Varicela',
         ],
       },
       {
         type: 'callout',
-        text: 'Perdeu alguma vacina? Não precisa começar do zero. Leve a caderneta ao postinho e o profissional vai indicar quais vacinas estão em atraso. O esquema pode ser completado a qualquer momento.',
+        text: 'Perdeu alguma vacina? Não precisa começar do zero. Leve a caderneta ao postinho e o profissional indica quais estão em atraso.',
       },
       {
-        type: 'heading',
-        level: 2,
-        text: 'O que levar',
-      },
-      {
-        type: 'list',
+        type: 'callout',
+        variant: 'checklist',
+        title: 'O que levar',
         items: [
           'Caderneta de vacinação da criança',
           'Cartão do SUS da criança',
-          'Documento da criança (certidão de nascimento)',
+          'Certidão de nascimento',
         ],
       },
     ],
@@ -76,7 +64,7 @@ export const vaccinationArticles: GuideArticle[] = [
     content: [
       {
         type: 'paragraph',
-        text: 'Adultos e idosos também têm vacinas gratuitas disponíveis pelo SUS. A vacinação na fase adulta protege contra doenças graves e reforça a imunidade de quem ficou sem vacinar na infância.',
+        text: 'Adultos e idosos também têm vacinas gratuitas disponíveis pelo SUS. A vacinação protege contra doenças graves e reforça a imunidade de quem ficou sem vacinar na infância.',
       },
       {
         type: 'heading',
@@ -86,43 +74,24 @@ export const vaccinationArticles: GuideArticle[] = [
       {
         type: 'list',
         items: [
-          'Influenza (gripe) — anual, para todos os adultos com prioridade para grupos de risco',
+          'Influenza (gripe) — anual, para todos os adultos',
           'Hepatite B — 3 doses para quem não foi vacinado',
-          'Febre Amarela — dose única válida para toda a vida (residentes ou viajantes de áreas de risco)',
+          'Febre Amarela — dose única válida para toda a vida',
           'Tríplice Viral — para quem não tomou na infância',
           'dT (difteria e tétano) — reforço a cada 10 anos',
-          'HPV — de rotina para meninas de 9 a 14 anos e meninos de 11 a 14 anos; pergunte na UBS sobre sua situação específica',
+          'HPV — meninas de 9 a 14 anos e meninos de 11 a 14 anos',
           'Pneumocócica — para idosos a partir de 60 anos',
           'Covid-19 — conforme calendário vigente',
         ],
       },
       {
-        type: 'heading',
-        level: 2,
-        text: 'Grupos com prioridade no SUS',
-      },
-      {
-        type: 'list',
-        items: [
-          'Idosos (60 anos ou mais)',
-          'Gestantes e puérperas',
-          'Crianças e adolescentes',
-          'Professores e profissionais de saúde',
-          'Pessoas com doenças crônicas',
-          'Povos indígenas e quilombolas',
-        ],
+        type: 'callout',
+        text: 'Adultos sem caderneta de vacinação podem começar a qualquer momento. Procure a UBS, informe o que já tomou e o profissional monta um esquema de atualização.',
       },
       {
         type: 'callout',
-        text: 'Adultos que não têm caderneta de vacinação podem começar a qualquer momento. Procure a UBS, informe o que já tomou que se lembra, e o profissional vai montar um esquema de atualização.',
-      },
-      {
-        type: 'heading',
-        level: 2,
-        text: 'O que levar',
-      },
-      {
-        type: 'list',
+        variant: 'checklist',
+        title: 'O que levar',
         items: [
           'Caderneta de vacinação (se tiver)',
           'Cartão do SUS',

@@ -8,7 +8,7 @@ import { GuideArticleLayout } from '../GuideArticleLayout'
 vi.mock('../guideImageMap', () => ({
   GUIDE_ARTICLE_IMAGES: {},
   GUIDE_CATEGORY_IMAGES: {},
-  GUIDE_STEP_IMAGES: { 'imagem-teste': '/fake-step.png' },
+  SHARED_STEP_IMAGES: {},
 }))
 
 const breadcrumbItems = [
@@ -39,29 +39,29 @@ function renderLayout(article: GuideArticle) {
 }
 
 describe('GuideArticleLayout', () => {
-  describe('Estrutura e semântica', () => {
-    it('renderiza o título do artigo como h1', () => {
+  describe('Structure & Semantics', () => {
+    it('renders the article title as h1', () => {
       renderLayout(makeArticle())
       expect(
         screen.getByRole('heading', { level: 1, name: 'Direito à saúde' })
       ).toBeInTheDocument()
     })
 
-    it('renderiza o landmark article com nome acessível derivado do h1', () => {
+    it('renders the article landmark with accessible name from h1', () => {
       renderLayout(makeArticle())
       expect(
         screen.getByRole('article', { name: 'Direito à saúde' })
       ).toBeInTheDocument()
     })
 
-    it('renderiza o resumo do artigo', () => {
+    it('renders the article summary', () => {
       renderLayout(makeArticle())
       expect(
         screen.getByText('A saúde é um direito de todos.')
       ).toBeInTheDocument()
     })
 
-    it('renderiza a navegação de breadcrumb', () => {
+    it('renders breadcrumb navigation', () => {
       renderLayout(makeArticle())
       expect(
         screen.getByRole('navigation', { name: 'Breadcrumb' })
@@ -69,21 +69,21 @@ describe('GuideArticleLayout', () => {
     })
   })
 
-  describe('Conteúdo em breve', () => {
-    it('exibe placeholder quando o artigo não tem conteúdo', () => {
+  describe('Coming soon placeholder', () => {
+    it('shows placeholder when article has no content', () => {
       renderLayout(makeArticle({ content: [] }))
       expect(screen.getByText('Conteúdo em breve')).toBeInTheDocument()
     })
 
-    it('não exibe placeholder quando o artigo tem conteúdo', () => {
+    it('hides placeholder when article has content', () => {
       const content: ArticleBlock[] = [{ type: 'paragraph', text: 'Texto.' }]
       renderLayout(makeArticle({ content }))
       expect(screen.queryByText('Conteúdo em breve')).not.toBeInTheDocument()
     })
   })
 
-  describe('Bloco: paragraph', () => {
-    it('renderiza o texto como parágrafo', () => {
+  describe('Block: paragraph', () => {
+    it('renders text as a paragraph', () => {
       const content: ArticleBlock[] = [
         { type: 'paragraph', text: 'Parágrafo de teste.' },
       ]
@@ -92,8 +92,8 @@ describe('GuideArticleLayout', () => {
     })
   })
 
-  describe('Bloco: heading', () => {
-    it('renderiza nível 2 como passo numerado h2', () => {
+  describe('Block: heading', () => {
+    it('renders level 2 as a numbered h2 step', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Seção principal' },
       ]
@@ -103,19 +103,20 @@ describe('GuideArticleLayout', () => {
       ).toBeInTheDocument()
     })
 
-    it('renderiza nível 3 como h3', () => {
+    it('wraps each informational step in a labeled region', () => {
       const content: ArticleBlock[] = [
-        { type: 'heading', level: 3, text: 'Subseção' },
+        { type: 'heading', level: 2, text: 'Seção principal' },
+        { type: 'paragraph', text: 'Conteúdo.' },
       ]
       renderLayout(makeArticle({ content }))
       expect(
-        screen.getByRole('heading', { level: 3, name: 'Subseção' })
+        screen.getByRole('region', { name: '1. Seção principal' })
       ).toBeInTheDocument()
     })
   })
 
-  describe('Bloco: list', () => {
-    it('renderiza cada item da lista', () => {
+  describe('Block: list', () => {
+    it('renders each list item', () => {
       const content: ArticleBlock[] = [
         { type: 'list', items: ['Item A', 'Item B', 'Item C'] },
       ]
@@ -126,7 +127,7 @@ describe('GuideArticleLayout', () => {
       expect(within(list).getByText('Item A')).toBeInTheDocument()
     })
 
-    it('lista não ordenada renderiza como ul', () => {
+    it('renders an unordered list as ul', () => {
       const content: ArticleBlock[] = [
         { type: 'list', items: ['Item A', 'Item B'] },
       ]
@@ -136,7 +137,7 @@ describe('GuideArticleLayout', () => {
       expect(item.closest('ol')).not.toBeInTheDocument()
     })
 
-    it('lista ordenada renderiza como ol', () => {
+    it('renders an ordered list as ol', () => {
       const content: ArticleBlock[] = [
         {
           type: 'list',
@@ -151,8 +152,8 @@ describe('GuideArticleLayout', () => {
     })
   })
 
-  describe('Bloco: callout', () => {
-    it('renderiza o texto de um callout dentro de um passo', () => {
+  describe('Block: callout', () => {
+    it('renders callout text inside a step', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Passo' },
         { type: 'callout', text: 'Atenção: leia com cuidado.' },
@@ -161,7 +162,7 @@ describe('GuideArticleLayout', () => {
       expect(screen.getByText('Atenção: leia com cuidado.')).toBeInTheDocument()
     })
 
-    it('renderiza o título de um callout quando informado', () => {
+    it('renders callout title when provided', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Passo' },
         {
@@ -176,7 +177,7 @@ describe('GuideArticleLayout', () => {
       expect(screen.getByText('Texto da dica.')).toBeInTheDocument()
     })
 
-    it('renderiza o número de emergência no callout de emergência', () => {
+    it('renders the emergency number in an emergency callout', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Urgência' },
         {
@@ -191,7 +192,24 @@ describe('GuideArticleLayout', () => {
       expect(screen.getByText('192')).toBeInTheDocument()
     })
 
-    it('callout de emergência tem role="note" e aria-label com o título', () => {
+    it('emergency callout highlight has aria-label with phone context', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Urgência' },
+        {
+          type: 'callout',
+          variant: 'emergency',
+          title: 'SAMU',
+          highlight: '192',
+        },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(screen.getByText('192')).toHaveAttribute(
+        'aria-label',
+        'Ligue para 192'
+      )
+    })
+
+    it('emergency callout has role="note" with aria-label from title', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Urgência' },
         {
@@ -205,7 +223,7 @@ describe('GuideArticleLayout', () => {
       expect(screen.getByRole('note', { name: 'SAMU' })).toBeInTheDocument()
     })
 
-    it('callout de emergência sem título usa aria-label padrão "Atenção"', () => {
+    it('emergency callout without title uses default aria-label "Atenção"', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Urgência' },
         {
@@ -218,7 +236,7 @@ describe('GuideArticleLayout', () => {
       expect(screen.getByRole('note', { name: 'Atenção' })).toBeInTheDocument()
     })
 
-    it('renderiza callout sem variante (padrão) com título e texto', () => {
+    it('renders default callout with title and text', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Passo' },
         { type: 'callout', title: 'Aviso geral', text: 'Texto sem variante.' },
@@ -228,7 +246,7 @@ describe('GuideArticleLayout', () => {
       expect(screen.getByText('Texto sem variante.')).toBeInTheDocument()
     })
 
-    it('renderiza o texto de um callout de warning', () => {
+    it('renders warning callout text', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Passo' },
         {
@@ -243,7 +261,7 @@ describe('GuideArticleLayout', () => {
       expect(screen.getByText('Fique alerta.')).toBeInTheDocument()
     })
 
-    it('renderiza os itens de um callout de checklist', () => {
+    it('renders checklist callout items', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Passo' },
         {
@@ -259,7 +277,7 @@ describe('GuideArticleLayout', () => {
       expect(screen.getByText('Documento com foto')).toBeInTheDocument()
     })
 
-    it('callout de tip tem role="note" com aria-label derivado do título', () => {
+    it('tip callout has role="note" with aria-label from title', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Passo' },
         {
@@ -275,7 +293,7 @@ describe('GuideArticleLayout', () => {
       ).toBeInTheDocument()
     })
 
-    it('callout de tip sem título usa aria-label padrão "Dica"', () => {
+    it('tip callout without title uses default aria-label "Dica"', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Passo' },
         { type: 'callout', variant: 'tip', text: 'Alguma dica.' },
@@ -284,7 +302,7 @@ describe('GuideArticleLayout', () => {
       expect(screen.getByRole('note', { name: 'Dica' })).toBeInTheDocument()
     })
 
-    it('callout de warning tem role="note" com aria-label derivado do título', () => {
+    it('warning callout has role="note" with aria-label from title', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Passo' },
         {
@@ -298,7 +316,7 @@ describe('GuideArticleLayout', () => {
       expect(screen.getByRole('note', { name: 'Atenção' })).toBeInTheDocument()
     })
 
-    it('callout de warning sem título usa aria-label padrão "Atenção"', () => {
+    it('warning callout without title uses default aria-label "Atenção"', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Passo' },
         { type: 'callout', variant: 'warning', text: 'Fique alerta.' },
@@ -307,7 +325,7 @@ describe('GuideArticleLayout', () => {
       expect(screen.getByRole('note', { name: 'Atenção' })).toBeInTheDocument()
     })
 
-    it('callout de checklist tem role="note" com aria-label derivado do título', () => {
+    it('checklist callout has role="note" with aria-label from title', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Passo' },
         {
@@ -323,7 +341,7 @@ describe('GuideArticleLayout', () => {
       ).toBeInTheDocument()
     })
 
-    it('callout de checklist sem título usa aria-label padrão "Lista de verificação"', () => {
+    it('checklist callout without title uses default aria-label "Lista de verificação"', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Passo' },
         { type: 'callout', variant: 'checklist', items: ['Item A', 'Item B'] },
@@ -334,7 +352,7 @@ describe('GuideArticleLayout', () => {
       ).toBeInTheDocument()
     })
 
-    it('callout padrão tem role="note" com aria-label derivado do título', () => {
+    it('default callout has role="note" with aria-label from title', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Passo' },
         { type: 'callout', title: 'Aviso geral', text: 'Texto sem variante.' },
@@ -346,91 +364,80 @@ describe('GuideArticleLayout', () => {
     })
   })
 
-  describe('Bloco: image', () => {
-    it('renderiza a imagem quando a chave existe no mapa', () => {
+  describe('Block: action-step', () => {
+    it('renders action text and detail inside a step', () => {
       const content: ArticleBlock[] = [
-        { type: 'heading', level: 2, text: 'Passo com imagem' },
-        { type: 'image', imageKey: 'imagem-teste', alt: 'Imagem de teste' },
+        { type: 'heading', level: 2, text: 'Como solicitar' },
+        {
+          type: 'action-step',
+          action: 'Vá à UBS',
+          detail: 'Leve seu cartão SUS.',
+        },
       ]
-      const { container } = renderLayout(makeArticle({ content }))
-      expect(container.querySelector('img')).toBeInTheDocument()
+      renderLayout(makeArticle({ content }))
+      expect(screen.getByText('Vá à UBS')).toBeInTheDocument()
+      expect(screen.getByText('Leve seu cartão SUS.')).toBeInTheDocument()
     })
 
-    it('não renderiza imagem quando a chave não está no mapa', () => {
+    it('renders action-steps inside an ordered list', () => {
       const content: ArticleBlock[] = [
-        { type: 'heading', level: 2, text: 'Passo sem imagem' },
-        { type: 'image', imageKey: 'inexistente', alt: 'Nada' },
+        { type: 'heading', level: 2, text: 'Como solicitar' },
+        { type: 'action-step', action: 'Primeiro passo' },
+        { type: 'action-step', action: 'Segundo passo' },
+      ]
+      renderLayout(makeArticle({ content }))
+      const article = screen.getByRole('article')
+      const list = within(article).getByRole('list')
+      expect(list.tagName).toBe('OL')
+    })
+
+    it('renders one list item per action-step', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Como solicitar' },
+        { type: 'action-step', action: 'Passo um' },
+        { type: 'action-step', action: 'Passo dois' },
+        { type: 'action-step', action: 'Passo três' },
+      ]
+      renderLayout(makeArticle({ content }))
+      const article = screen.getByRole('article')
+      const list = within(article).getByRole('list')
+      expect(within(list).getAllByRole('listitem')).toHaveLength(3)
+    })
+
+    it('wraps the action-step section in a labeled region', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Como solicitar' },
+        { type: 'action-step', action: 'Vá à UBS' },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(
+        screen.getByRole('region', { name: 'Como solicitar' })
+      ).toBeInTheDocument()
+    })
+
+    it('renders the step heading without the step number prefix', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Como solicitar' },
+        { type: 'action-step', action: 'Vá à UBS' },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(
+        screen.getByRole('heading', { level: 2, name: 'Como solicitar' })
+      ).toBeInTheDocument()
+    })
+
+    it('renders no image when action-step has no imageKey', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Como solicitar' },
+        { type: 'action-step', action: 'Vá à UBS' },
       ]
       const { container } = renderLayout(makeArticle({ content }))
       expect(container.querySelector('img')).not.toBeInTheDocument()
     })
-
-    it('a imagem recebe o alt texto do bloco', () => {
-      const content: ArticleBlock[] = [
-        { type: 'heading', level: 2, text: 'Passo com imagem' },
-        { type: 'image', imageKey: 'imagem-teste', alt: 'Cartão do SUS' },
-      ]
-      const { container } = renderLayout(makeArticle({ content }))
-      expect(container.querySelector('img')).toHaveAttribute(
-        'alt',
-        'Cartão do SUS'
-      )
-    })
-
-    it('a imagem é carregada com lazy loading', () => {
-      const content: ArticleBlock[] = [
-        { type: 'heading', level: 2, text: 'Passo com imagem' },
-        { type: 'image', imageKey: 'imagem-teste', alt: 'Imagem de teste' },
-      ]
-      const { container } = renderLayout(makeArticle({ content }))
-      expect(container.querySelector('img')).toHaveAttribute('loading', 'lazy')
-    })
-
-    it('a imagem tem atributos de dimensão para prevenir CLS', () => {
-      const content: ArticleBlock[] = [
-        { type: 'heading', level: 2, text: 'Passo com imagem' },
-        { type: 'image', imageKey: 'imagem-teste', alt: 'Imagem de teste' },
-      ]
-      const { container } = renderLayout(makeArticle({ content }))
-      const img = container.querySelector('img')
-      expect(Number(img?.getAttribute('width'))).toBeGreaterThan(0)
-      expect(Number(img?.getAttribute('height'))).toBeGreaterThan(0)
-    })
   })
 
-  describe('Bloco: info-panel', () => {
-    it('renderiza o título e o texto de um info-panel', () => {
-      const content: ArticleBlock[] = [
-        {
-          type: 'info-panel',
-          title: 'Você sabia?',
-          text: 'O SUS é gratuito para todos.',
-        },
-      ]
-      renderLayout(makeArticle({ content }))
-      expect(screen.getByText('Você sabia?')).toBeInTheDocument()
-      expect(
-        screen.getByText('O SUS é gratuito para todos.')
-      ).toBeInTheDocument()
-    })
-
-    it('info-panel tem role="note" com aria-label derivado do título', () => {
-      const content: ArticleBlock[] = [
-        {
-          type: 'info-panel',
-          title: 'Você sabia?',
-          text: 'O SUS é gratuito para todos.',
-        },
-      ]
-      renderLayout(makeArticle({ content }))
-      expect(
-        screen.getByRole('note', { name: 'Você sabia?' })
-      ).toBeInTheDocument()
-    })
-  })
-
-  describe('Preamble (blocos antes do primeiro h2)', () => {
-    it('renderiza callout no preamble', () => {
+  describe('Preamble blocks (before first h2)', () => {
+    it('renders a callout in the preamble', () => {
       const content: ArticleBlock[] = [
         {
           type: 'callout',
@@ -444,21 +451,10 @@ describe('GuideArticleLayout', () => {
       expect(screen.getByText('Dica inicial')).toBeInTheDocument()
       expect(screen.getByText('Leia antes de começar.')).toBeInTheDocument()
     })
-
-    it('renderiza imagem no preamble', () => {
-      const content: ArticleBlock[] = [
-        { type: 'image', imageKey: 'imagem-teste', alt: 'Imagem introdutória' },
-        { type: 'heading', level: 2, text: 'Passo 1' },
-      ]
-      const { container } = renderLayout(makeArticle({ content }))
-      const img = container.querySelector('img')
-      expect(img).toBeInTheDocument()
-      expect(img).toHaveAttribute('alt', 'Imagem introdutória')
-    })
   })
 
-  describe('Numeração de passos', () => {
-    it('numera múltiplos passos sequencialmente', () => {
+  describe('Step numbering', () => {
+    it('numbers multiple informational steps sequentially', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Primeiro' },
         { type: 'heading', level: 2, text: 'Segundo' },
@@ -473,21 +469,6 @@ describe('GuideArticleLayout', () => {
       ).toBeInTheDocument()
       expect(
         screen.getByRole('heading', { level: 2, name: '3. Terceiro' })
-      ).toBeInTheDocument()
-    })
-
-    it('continua numeração após um info-panel intercalado', () => {
-      const content: ArticleBlock[] = [
-        { type: 'heading', level: 2, text: 'Primeiro' },
-        { type: 'info-panel', title: 'Info', text: 'Nota.' },
-        { type: 'heading', level: 2, text: 'Segundo' },
-      ]
-      renderLayout(makeArticle({ content }))
-      expect(
-        screen.getByRole('heading', { level: 2, name: '1. Primeiro' })
-      ).toBeInTheDocument()
-      expect(
-        screen.getByRole('heading', { level: 2, name: '2. Segundo' })
       ).toBeInTheDocument()
     })
   })

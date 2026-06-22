@@ -20,50 +20,48 @@ export const womensHealthArticles: GuideArticle[] = [
       {
         type: 'heading',
         level: 2,
-        text: 'Serviços disponíveis para mulheres no SUS',
+        text: 'Pré-natal: como começar',
+        icon: 'target',
+      },
+      {
+        type: 'action-step',
+        action: 'Vá à UBS assim que descobrir a gravidez',
+        imageKey: 'ubs',
+        detail:
+          'O ideal é começar antes das 12 semanas. Informe que está grávida — gestantes têm prioridade.',
+      },
+      {
+        type: 'action-step',
+        action: 'Solicite a caderneta da gestante',
+        imageKey: 'checklist',
+        detail:
+          'Registre todas as consultas. O SUS garante no mínimo 6 consultas durante a gestação.',
+      },
+      {
+        type: 'callout',
+        variant: 'checklist',
+        title: 'O que levar',
+        items: ['Documento com foto', 'Cartão do SUS'],
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: 'Outros serviços disponíveis',
       },
       {
         type: 'list',
         items: [
           'Consulta ginecológica anual',
-          'Papanicolau (exame preventivo do colo do útero) — a partir dos 25 anos',
+          'Papanicolau (preventivo do colo do útero) — a partir dos 25 anos',
           'Mamografia — a partir dos 50 anos (ou antes, com indicação médica)',
-          'Pré-natal completo (consultas, exames e vacinas)',
           'Planejamento familiar e contracepção gratuita',
           'Parto normal e cesárea pelo SUS',
-          'Acompanhamento pós-parto',
           'Tratamento de câncer de mama e colo do útero',
         ],
       },
       {
-        type: 'heading',
-        level: 2,
-        text: 'Pré-natal: como funciona',
-      },
-      {
-        type: 'paragraph',
-        text: 'Assim que descobrir a gravidez, vá à UBS para iniciar o pré-natal. O ideal é começar antes das 12 semanas. O SUS garante no mínimo 6 consultas durante a gestação, exames de rotina, vacinas e acompanhamento até o parto.',
-      },
-      {
-        type: 'list',
-        items: [
-          'Leve documento com foto e Cartão do SUS',
-          'Informe que está grávida — a UBS tem prioridade de atendimento para gestantes',
-          'Solicite a caderneta da gestante para registrar todas as consultas',
-        ],
-      },
-      {
-        type: 'heading',
-        level: 2,
-        text: 'Preventivo e mamografia',
-      },
-      {
-        type: 'paragraph',
-        text: 'O exame preventivo (Papanicolau) é realizado na própria UBS, sem agendamento prévio em muitos municípios. A mamografia é agendada pela UBS com encaminhamento médico.',
-      },
-      {
         type: 'callout',
-        text: 'Não deixe os exames preventivos em atraso. O câncer de colo do útero e o câncer de mama têm altas chances de cura quando detectados cedo. O SUS oferece diagnóstico e tratamento completo, gratuitamente.',
+        text: 'Não deixe os exames preventivos em atraso. O câncer de colo do útero e o câncer de mama têm altas chances de cura quando detectados cedo.',
       },
     ],
   },

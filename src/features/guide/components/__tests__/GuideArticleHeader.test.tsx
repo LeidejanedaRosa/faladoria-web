@@ -8,7 +8,7 @@ import { GuideArticleHeader } from '../GuideArticleHeader'
 vi.mock('../guideImageMap', () => ({
   GUIDE_ARTICLE_IMAGES: { 'artigo-com-imagem': '/fake-article.png' },
   GUIDE_CATEGORY_IMAGES: { consulta: '/fake-category.png' },
-  GUIDE_STEP_IMAGES: {},
+  SHARED_STEP_IMAGES: {},
 }))
 
 function makeArticle(overrides: Partial<GuideArticle> = {}): GuideArticle {
@@ -28,8 +28,8 @@ function renderHeader(article: GuideArticle) {
 }
 
 describe('GuideArticleHeader', () => {
-  describe('Conteúdo', () => {
-    it('renderiza o título do artigo como h1', () => {
+  describe('Content', () => {
+    it('renders the article title as h1', () => {
       renderHeader(makeArticle())
       expect(
         screen.getByRole('heading', {
@@ -39,13 +39,13 @@ describe('GuideArticleHeader', () => {
       ).toBeInTheDocument()
     })
 
-    it('o h1 tem o id correto para aria-labelledby', () => {
+    it('the h1 has the correct id for aria-labelledby', () => {
       renderHeader(makeArticle())
       const heading = screen.getByRole('heading', { level: 1 })
       expect(heading).toHaveAttribute('id', GUIDE_ARTICLE_HEADING_ID)
     })
 
-    it('renderiza o resumo do artigo', () => {
+    it('renders the article summary', () => {
       renderHeader(makeArticle())
       expect(
         screen.getByText('Veja como agendar consultas pelo SUS.')
@@ -53,8 +53,8 @@ describe('GuideArticleHeader', () => {
     })
   })
 
-  describe('Imagem condicional', () => {
-    it('renderiza a imagem do artigo quando disponível', () => {
+  describe('Conditional image', () => {
+    it('renders the article image when available', () => {
       const { container } = renderHeader(
         makeArticle({ slug: 'artigo-com-imagem' })
       )
@@ -64,7 +64,7 @@ describe('GuideArticleHeader', () => {
       )
     })
 
-    it('usa a imagem da categoria como fallback quando o artigo não tem imagem própria', () => {
+    it('uses the category image as fallback when the article has no specific image', () => {
       const { container } = renderHeader(
         makeArticle({ slug: 'sem-imagem', categorySlug: 'consulta' })
       )
@@ -74,7 +74,7 @@ describe('GuideArticleHeader', () => {
       )
     })
 
-    it('não renderiza imagem quando nem o artigo nem a categoria têm uma', () => {
+    it('renders no image when neither article nor category has one', () => {
       const { container } = renderHeader(
         makeArticle({
           slug: 'sem-imagem',
@@ -84,14 +84,14 @@ describe('GuideArticleHeader', () => {
       expect(container.querySelector('img')).not.toBeInTheDocument()
     })
 
-    it('a imagem é carregada com eager para evitar LCP tardio', () => {
+    it('loads the image eagerly to avoid late LCP', () => {
       const { container } = renderHeader(
         makeArticle({ slug: 'artigo-com-imagem' })
       )
       expect(container.querySelector('img')).toHaveAttribute('loading', 'eager')
     })
 
-    it('a imagem tem fetchPriority high para prioridade de carregamento LCP', () => {
+    it('the image has fetchPriority high for LCP loading priority', () => {
       const { container } = renderHeader(
         makeArticle({ slug: 'artigo-com-imagem' })
       )
@@ -102,8 +102,8 @@ describe('GuideArticleHeader', () => {
     })
   })
 
-  describe('Ícone de categoria', () => {
-    it('não renderiza imagem quando a categoria não existe', () => {
+  describe('Category icon', () => {
+    it('renders no image when the category does not exist', () => {
       const { container } = renderHeader(
         makeArticle({ categorySlug: 'categoria-inexistente' })
       )
@@ -111,8 +111,8 @@ describe('GuideArticleHeader', () => {
     })
   })
 
-  describe('Acessibilidade', () => {
-    it('a imagem é decorativa e oculta de leitores de tela', () => {
+  describe('Accessibility', () => {
+    it('the image is decorative and hidden from screen readers', () => {
       const { container } = renderHeader(
         makeArticle({ slug: 'artigo-com-imagem' })
       )
@@ -121,7 +121,7 @@ describe('GuideArticleHeader', () => {
       expect(img).toHaveAttribute('aria-hidden', 'true')
     })
 
-    it('a imagem tem atributos de dimensão para prevenir CLS', () => {
+    it('the image has dimension attributes to prevent CLS', () => {
       const { container } = renderHeader(
         makeArticle({ slug: 'artigo-com-imagem' })
       )

@@ -24,18 +24,18 @@ function renderCard() {
 }
 
 describe('GuideCategoryCard', () => {
-  describe('Conteúdo', () => {
-    it('renderiza o nome da categoria', () => {
+  describe('Content', () => {
+    it('renders the category name', () => {
       renderCard()
       expect(screen.getByText('Seus Direitos')).toBeInTheDocument()
     })
 
-    it('renderiza a descrição da categoria', () => {
+    it('renders the category description', () => {
       renderCard()
       expect(screen.getByText(mockCategory.description)).toBeInTheDocument()
     })
 
-    it('renderiza o link com href correto para a categoria', () => {
+    it('renders the link with the correct href for the category', () => {
       renderCard()
       expect(screen.getByRole('link')).toHaveAttribute(
         'href',
@@ -43,7 +43,7 @@ describe('GuideCategoryCard', () => {
       )
     })
 
-    it('o nome e a descrição compõem o nome acessível do link', () => {
+    it('the name and description compose the accessible name of the link', () => {
       renderCard()
       expect(
         screen.getByRole('link', {
@@ -53,8 +53,8 @@ describe('GuideCategoryCard', () => {
     })
   })
 
-  describe('Semântica', () => {
-    it('o nome da categoria é renderizado como h4', () => {
+  describe('Semantics', () => {
+    it('renders the category name as h4', () => {
       renderCard()
       expect(
         screen.getByRole('heading', { level: 4, name: 'Seus Direitos' })
@@ -62,8 +62,8 @@ describe('GuideCategoryCard', () => {
     })
   })
 
-  describe('Acessibilidade', () => {
-    it('o ícone está oculto de leitores de tela', () => {
+  describe('Accessibility', () => {
+    it('the icon is hidden from screen readers', () => {
       const { container } = renderCard()
       const icon = container.querySelector('svg')
       expect(icon).toHaveAttribute('aria-hidden', 'true')

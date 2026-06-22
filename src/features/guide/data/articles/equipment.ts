@@ -14,47 +14,47 @@ export const equipmentArticles: GuideArticle[] = [
     iconName: 'target',
     content: [
       {
-        type: 'paragraph',
-        text: 'O SUS fornece equipamentos de saúde gratuitamente para pessoas que precisam — cadeiras de rodas, muletas, bengalas, órteses (aparelhos que apoiam o corpo), próteses (substituição de membros) e equipamentos respiratórios.',
-      },
-      {
-        type: 'heading',
-        level: 2,
-        text: 'Equipamentos disponíveis pelo SUS',
-      },
-      {
-        type: 'list',
-        items: [
-          'Cadeiras de rodas (manuais e motorizadas, conforme necessidade)',
-          'Muletas, bengalas e andadores',
-          'Órteses — talas, coletes, palmilhas ortopédicas',
-          'Próteses — membros artificiais após amputação',
-          'Equipamentos respiratórios — CPAP, BiPAP, concentrador de oxigênio',
-          'Aparelhos auditivos (em alguns casos)',
-        ],
+        type: 'callout',
+        variant: 'tip',
+        title: 'O que o SUS fornece',
+        text: 'Cadeiras de rodas, muletas, bengalas, andadores, órteses, próteses, equipamentos respiratórios (CPAP, BiPAP) e aparelhos auditivos (em alguns casos).',
       },
       {
         type: 'heading',
         level: 2,
         text: 'Como solicitar',
+        icon: 'target',
       },
       {
-        type: 'list',
-        ordered: true,
-        items: [
-          'Consulte um médico especialista (ortopedista, fisiatra, neurologista) no SUS',
-          'O médico emite um laudo indicando o equipamento necessário',
-          'Vá à Secretaria de Saúde do município com o laudo e documentos',
-          'O pedido é analisado e, se aprovado, o equipamento é disponibilizado',
-        ],
+        type: 'action-step',
+        action: 'Consulte um médico especialista no SUS',
+        imageKey: 'doctor-patient',
+        detail:
+          'Ortopedista, fisiatra ou neurologista — conforme sua necessidade.',
       },
       {
-        type: 'heading',
-        level: 2,
-        text: 'Documentos necessários',
+        type: 'action-step',
+        action: 'O médico emite o laudo',
+        detail:
+          'O laudo deve indicar o equipamento necessário — é obrigatório para a solicitação.',
       },
       {
-        type: 'list',
+        type: 'action-step',
+        action: 'Vá à Secretaria de Saúde com o laudo',
+        imageKey: 'equipment',
+        detail: 'Leve Cartão do SUS, RG, CPF e comprovante de residência.',
+      },
+      {
+        type: 'action-step',
+        action: 'Aguarde a aprovação',
+        imageKey: 'calendar',
+        detail:
+          'Se negado ou com longa espera, a Defensoria Pública pode ajudar gratuitamente.',
+      },
+      {
+        type: 'callout',
+        variant: 'checklist',
+        title: 'Documentos necessários',
         items: [
           'Laudo médico descrevendo a necessidade e o equipamento indicado',
           'Cartão do SUS',
@@ -65,7 +65,7 @@ export const equipmentArticles: GuideArticle[] = [
       },
       {
         type: 'callout',
-        text: 'Se o pedido for negado ou a espera for muito longa, procure a Defensoria Pública. Equipamentos essenciais para a saúde e mobilidade são direito garantido — e a Justiça frequentemente determina o fornecimento em caráter de urgência.',
+        text: 'Se o pedido for negado ou a espera for muito longa, procure a Defensoria Pública. Equipamentos essenciais são direito garantido — e a Justiça frequentemente determina o fornecimento em caráter de urgência.',
       },
     ],
   },

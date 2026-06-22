@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import type { GuideArticle, GuideCategory } from '../data'
 import { CATEGORY_THEME } from './guideCategoryTheme'
 import { ARTICLE_STEP_ICON_MAP, GUIDE_ICON_MAP } from './guideIconMap'
-import { GUIDE_ARTICLE_IMAGES } from './guideImageMap'
+import { GUIDE_ARTICLE_IMAGES, GUIDE_CATEGORY_IMAGES } from './guideImageMap'
 
 interface GuideArticleCardProps {
   article: GuideArticle
@@ -35,7 +35,9 @@ export const GuideArticleCard = ({
     ? ARTICLE_STEP_ICON_MAP[article.iconName]
     : GUIDE_ICON_MAP[category.iconName]
   const theme = CATEGORY_THEME[category.color]
-  const articleImage = GUIDE_ARTICLE_IMAGES[article.slug]
+  const articleImage =
+    GUIDE_ARTICLE_IMAGES[article.slug] ??
+    GUIDE_CATEGORY_IMAGES[article.categorySlug]
 
   return (
     <Link
