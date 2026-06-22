@@ -18,10 +18,23 @@ export type ArticleStepIconName =
   | 'target'
   | 'users'
 
+export type SharedStepImageKey =
+  | 'ambulance'
+  | 'calendar'
+  | 'cartao-sus'
+  | 'checklist'
+  | 'clock'
+  | 'doctor-patient'
+  | 'equipment'
+  | 'home-care'
+  | 'medications'
+  | 'patient-rights'
+  | 'phone'
+  | 'ubs'
+
 export type ArticleBlock =
   | { type: 'paragraph'; text: string }
   | { type: 'heading'; level: 2; text: string; icon?: ArticleStepIconName }
-  | { type: 'heading'; level: 3; text: string }
   | { type: 'list'; items: string[]; ordered?: boolean }
   | {
       type: 'callout'
@@ -31,12 +44,14 @@ export type ArticleBlock =
       highlight?: string
       items?: string[]
     }
-  | { type: 'image'; imageKey: string; alt: string }
   | {
-      type: 'info-panel'
-      title: string
-      text: string
+      type: 'action-step'
+      action: string
+      imageKey?: SharedStepImageKey
+      detail?: string
     }
+
+export type ActionStepBlock = Extract<ArticleBlock, { type: 'action-step' }>
 
 export interface GuideArticle {
   slug: string

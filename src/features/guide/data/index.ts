@@ -8,6 +8,7 @@ export { GUIDE_ARTICLES } from './guideArticles'
 export type {
   GuideArticle,
   ArticleBlock,
+  ActionStepBlock,
   ArticleStepIconName,
 } from './guideArticles'
 

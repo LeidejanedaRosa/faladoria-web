@@ -13,13 +13,25 @@ import repaymentImg from '@assets/guide/medical-transport/repayment.webp'
 import medicationCategoryImg from '@assets/guide/medication/category.webp'
 import freeMedicationImg from '@assets/guide/medication/free-medication.webp'
 import highCostMedicationImg from '@assets/guide/medication/high-cost-medication.webp'
+import ambulanceImg from '@assets/guide/shared/ambulance.webp'
+import calendarImg from '@assets/guide/shared/calendar.webp'
 import susCardImg from '@assets/guide/shared/cartao-sus.webp'
 import checklistImg from '@assets/guide/shared/checklist.webp'
+import clockImg from '@assets/guide/shared/clock.webp'
+import doctorPatientImg from '@assets/guide/shared/doctor-patient.webp'
+import equipmentImg from '@assets/guide/shared/equipment.webp'
+import sharedHomeCareImg from '@assets/guide/shared/home-care.webp'
+import medicationsImg from '@assets/guide/shared/medications.webp'
+import patientRightsImg from '@assets/guide/shared/patient-rights.webp'
+import phoneImg from '@assets/guide/shared/phone.webp'
+import ubsImg from '@assets/guide/shared/ubs.webp'
 import surgeryCategoryImg from '@assets/guide/surgery/category.webp'
 import deniedSurgeryImg from '@assets/guide/surgery/denied-surgery.webp'
 import surgeryQueueImg from '@assets/guide/surgery/surgery-queue.webp'
 import treatmentCategoryImg from '@assets/guide/treatment/category.webp'
 import treatmentSessionImg from '@assets/guide/treatment/treatment-session.webp'
+
+import type { SharedStepImageKey } from '../data/guideArticles'
 
 export const GUIDE_CATEGORY_IMAGES: Partial<Record<string, string>> = {
   consulta: appointmentCategoryImg,
@@ -47,7 +59,17 @@ export const GUIDE_ARTICLE_IMAGES: Partial<Record<string, string>> = {
   'reembolso-tfd': repaymentImg,
 }
 
-export const GUIDE_STEP_IMAGES: Partial<Record<string, string>> = {
+export const SHARED_STEP_IMAGES: Record<SharedStepImageKey, string> = {
+  ambulance: ambulanceImg,
+  calendar: calendarImg,
   'cartao-sus': susCardImg,
   checklist: checklistImg,
+  clock: clockImg,
+  'doctor-patient': doctorPatientImg,
+  equipment: equipmentImg,
+  'home-care': sharedHomeCareImg,
+  medications: medicationsImg,
+  'patient-rights': patientRightsImg,
+  phone: phoneImg,
+  ubs: ubsImg,
 }
