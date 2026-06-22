@@ -1,6 +1,10 @@
 import appointmentCategoryImg from '@assets/guide/appointment/category.webp'
 import howToScheduleImg from '@assets/guide/appointment/how-to-schedule.webp'
 import specialistAppointmentImg from '@assets/guide/appointment/specialist-appointment.webp'
+import equipmentCategoryImg from '@assets/guide/equipment/category.webp'
+import cpapBipapImg from '@assets/guide/equipment/cpap-bipap.webp'
+import hearingAidImg from '@assets/guide/equipment/hearing-aid.webp'
+import howToObtainEquipmentImg from '@assets/guide/equipment/how-to-obtain-equipment-through-the-sus.webp'
 import examCategoryImg from '@assets/guide/exam/category.webp'
 import delayedExamImg from '@assets/guide/exam/delayed-exam.webp'
 import howToRequestExamImg from '@assets/guide/exam/how-to-request-exam.webp'
@@ -41,6 +45,7 @@ export const GUIDE_CATEGORY_IMAGES: Partial<Record<string, string>> = {
   medicamento: medicationCategoryImg,
   'atendimento-domiciliar': homeCareCategoryImg,
   'transporte-sanitario': medicalTransportCategoryImg,
+  equipamentos: equipmentCategoryImg,
 }
 
 export const GUIDE_ARTICLE_IMAGES: Partial<Record<string, string>> = {
@@ -57,6 +62,9 @@ export const GUIDE_ARTICLE_IMAGES: Partial<Record<string, string>> = {
   'como-solicitar-atendimento-domiciliar': homeCareHeroImg,
   'como-solicitar-transporte-sanitario': medicalTransportHeroImg,
   'reembolso-tfd': repaymentImg,
+  'como-solicitar-equipamentos': howToObtainEquipmentImg,
+  'cpap-bipap-sus': cpapBipapImg,
+  'aparelho-auditivo-sus': hearingAidImg,
 }
 
 export const SHARED_STEP_IMAGES: Record<SharedStepImageKey, string> = {
