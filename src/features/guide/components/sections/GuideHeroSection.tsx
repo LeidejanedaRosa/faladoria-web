@@ -9,6 +9,7 @@ import {
   ShieldIcon,
   UsersIcon,
 } from '@shared/components/ui'
+import { cn } from '@shared/utils/cn'
 
 import {
   GUIDE_CATEGORIES_SECTION_ID,
@@ -64,7 +65,10 @@ const GuideHeroTrustList = () => (
       return (
         <li key={signal.label} className='flex items-center gap-3'>
           <div
-            className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${circleClass}`}
+            className={cn(
+              'flex h-12 w-12 shrink-0 items-center justify-center rounded-full',
+              circleClass
+            )}
             aria-hidden='true'
           >
             <Icon className='h-5 w-5 text-white' />

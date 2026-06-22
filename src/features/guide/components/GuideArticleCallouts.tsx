@@ -83,7 +83,10 @@ const EmergencyCallout = ({ block }: { block: CalloutData }) => (
         <p className='text-sm font-bold text-red-700'>{block.title}</p>
       )}
       {block.highlight && (
-        <p className='text-4xl leading-none font-extrabold text-red-600'>
+        <p
+          className='text-4xl leading-none font-extrabold text-red-600'
+          aria-label={`Ligue para ${block.highlight}`}
+        >
           {block.highlight}
         </p>
       )}
