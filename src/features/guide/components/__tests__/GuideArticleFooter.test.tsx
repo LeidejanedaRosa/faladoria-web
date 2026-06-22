@@ -9,7 +9,7 @@ function renderFooter() {
 }
 
 describe('GuideArticleFooter', () => {
-  it('renderiza o bloco de ajuda', () => {
+  it('renders the help block', () => {
     renderFooter()
     expect(
       screen.getByText(GUIDE_CONTENT.articlePage.help.title)
@@ -19,7 +19,7 @@ describe('GuideArticleFooter', () => {
     ).toBeInTheDocument()
   })
 
-  it('o link de ajuda aponta para o WhatsApp e abre em nova aba', () => {
+  it('the help link points to WhatsApp and opens in a new tab', () => {
     renderFooter()
     const link = screen.getByRole('link')
     expect(link).toHaveAttribute('href', expect.stringContaining('wa.me'))
@@ -27,14 +27,14 @@ describe('GuideArticleFooter', () => {
     expect(link).toHaveAttribute('rel', 'noopener noreferrer')
   })
 
-  it('renderiza o texto do botão CTA de ajuda', () => {
+  it('renders the help CTA button text', () => {
     renderFooter()
     expect(
       screen.getByText(GUIDE_CONTENT.articlePage.help.cta)
     ).toBeInTheDocument()
   })
 
-  it('renderiza os quatro sinais de confiança', () => {
+  it('renders all four trust signals', () => {
     renderFooter()
     for (const signal of GUIDE_CONTENT.articlePage.trustSignals) {
       expect(screen.getByText(signal.title)).toBeInTheDocument()

@@ -8,7 +8,7 @@ import { GuideCategoryHeader } from '../GuideCategoryHeader'
 vi.mock('../guideImageMap', () => ({
   GUIDE_ARTICLE_IMAGES: {},
   GUIDE_CATEGORY_IMAGES: { consulta: '/fake-category.png' },
-  GUIDE_STEP_IMAGES: {},
+  SHARED_STEP_IMAGES: {},
 }))
 
 const mockCategoryWithImage: GuideCategory = {
@@ -28,28 +28,28 @@ const mockCategoryWithoutImage: GuideCategory = {
 }
 
 describe('GuideCategoryHeader', () => {
-  describe('Conteúdo', () => {
-    it('renderiza o nome da categoria como h1', () => {
+  describe('Content', () => {
+    it('renders the category name as h1', () => {
       render(<GuideCategoryHeader category={mockCategoryWithImage} />)
       expect(
         screen.getByRole('heading', { level: 1, name: 'Consultas' })
       ).toBeInTheDocument()
     })
 
-    it('o h1 tem o id correto para aria-labelledby', () => {
+    it('the h1 has the correct id for aria-labelledby', () => {
       render(<GuideCategoryHeader category={mockCategoryWithImage} />)
       const heading = screen.getByRole('heading', { level: 1 })
       expect(heading).toHaveAttribute('id', GUIDE_CATEGORY_HEADING_ID)
     })
 
-    it('renderiza a descrição da categoria', () => {
+    it('renders the category description', () => {
       render(<GuideCategoryHeader category={mockCategoryWithImage} />)
       expect(
         screen.getByText('Saiba como agendar consultas pelo SUS.')
       ).toBeInTheDocument()
     })
 
-    it('renderiza o banner informativo da página de categoria', () => {
+    it('renders the info banner for the category page', () => {
       render(<GuideCategoryHeader category={mockCategoryWithImage} />)
       expect(
         screen.getByText(GUIDE_CONTENT.categoryPage.infoBanner)
@@ -57,8 +57,8 @@ describe('GuideCategoryHeader', () => {
     })
   })
 
-  describe('Imagem condicional', () => {
-    it('renderiza a imagem quando a categoria tem uma associada', () => {
+  describe('Conditional image', () => {
+    it('renders the image when the category has one associated', () => {
       const { container } = render(
         <GuideCategoryHeader category={mockCategoryWithImage} />
       )
@@ -68,21 +68,21 @@ describe('GuideCategoryHeader', () => {
       )
     })
 
-    it('não renderiza imagem quando a categoria não tem uma associada', () => {
+    it('renders no image when the category has no associated image', () => {
       const { container } = render(
         <GuideCategoryHeader category={mockCategoryWithoutImage} />
       )
       expect(container.querySelector('img')).not.toBeInTheDocument()
     })
 
-    it('a imagem é carregada com eager para evitar LCP tardio', () => {
+    it('loads the image eagerly to avoid late LCP', () => {
       const { container } = render(
         <GuideCategoryHeader category={mockCategoryWithImage} />
       )
       expect(container.querySelector('img')).toHaveAttribute('loading', 'eager')
     })
 
-    it('a imagem tem fetchPriority high para prioridade de carregamento LCP', () => {
+    it('the image has fetchPriority high for LCP loading priority', () => {
       const { container } = render(
         <GuideCategoryHeader category={mockCategoryWithImage} />
       )
@@ -93,8 +93,8 @@ describe('GuideCategoryHeader', () => {
     })
   })
 
-  describe('Acessibilidade', () => {
-    it('a imagem é decorativa e oculta de leitores de tela', () => {
+  describe('Accessibility', () => {
+    it('the image is decorative and hidden from screen readers', () => {
       const { container } = render(
         <GuideCategoryHeader category={mockCategoryWithImage} />
       )
@@ -103,7 +103,7 @@ describe('GuideCategoryHeader', () => {
       expect(img).toHaveAttribute('aria-hidden', 'true')
     })
 
-    it('a imagem tem atributos de dimensão para prevenir CLS', () => {
+    it('the image has dimension attributes to prevent CLS', () => {
       const { container } = render(
         <GuideCategoryHeader category={mockCategoryWithImage} />
       )

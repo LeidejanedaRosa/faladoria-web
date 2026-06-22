@@ -61,8 +61,8 @@ async function setup(articles: GuideArticle[], category = mockCategory) {
 }
 
 describe('GuideCategoryLayout', () => {
-  describe('Quando há artigos na categoria', () => {
-    it('renderiza o título e a descrição da categoria', async () => {
+  describe('When the category has articles', () => {
+    it('renders the category title and description', async () => {
       await setup(mockArticles)
       expect(
         screen.getByRole('heading', { level: 1, name: 'Seus Direitos' })
@@ -70,14 +70,14 @@ describe('GuideCategoryLayout', () => {
       expect(screen.getByText(mockCategory.description)).toBeInTheDocument()
     })
 
-    it('renderiza a lista de artigos', async () => {
+    it('renders the article list', async () => {
       await setup(mockArticles)
       expect(
         screen.getByRole('list', { name: 'Artigos de Seus Direitos' })
       ).toBeInTheDocument()
     })
 
-    it('renderiza um item por artigo', async () => {
+    it('renders one item per article', async () => {
       await setup(mockArticles)
       const list = screen.getByRole('list', {
         name: 'Artigos de Seus Direitos',
@@ -87,25 +87,25 @@ describe('GuideCategoryLayout', () => {
       )
     })
 
-    it('renderiza o título de cada artigo', async () => {
+    it('renders the title of each article', async () => {
       await setup(mockArticles)
       expect(screen.getByText('Direito à saúde')).toBeInTheDocument()
       expect(screen.getByText('Como exigir seus direitos')).toBeInTheDocument()
     })
 
-    it('não renderiza o placeholder "em breve"', async () => {
+    it('does not render the coming soon placeholder', async () => {
       await setup(mockArticles)
       expect(screen.queryByText('Conteúdo em breve')).not.toBeInTheDocument()
     })
   })
 
-  describe('Quando não há artigos na categoria', () => {
-    it('renderiza o placeholder "em breve"', async () => {
+  describe('When the category has no articles', () => {
+    it('renders the coming soon placeholder', async () => {
       await setup([])
       expect(screen.getByText('Conteúdo em breve')).toBeInTheDocument()
     })
 
-    it('não renderiza a lista de artigos', async () => {
+    it('does not render the article list', async () => {
       await setup([])
       expect(
         screen.queryByRole('list', { name: /artigos/i })
@@ -113,15 +113,15 @@ describe('GuideCategoryLayout', () => {
     })
   })
 
-  describe('Painel de ajuda', () => {
-    it('renderiza o título do painel de ajuda', async () => {
+  describe('Help panel', () => {
+    it('renders the help panel title', async () => {
       await setup(mockArticles)
       expect(
         screen.getByText(GUIDE_CONTENT.categoryPage.help.title)
       ).toBeInTheDocument()
     })
 
-    it('renderiza o link do WhatsApp no painel de ajuda', async () => {
+    it('renders the WhatsApp link in the help panel', async () => {
       await setup(mockArticles)
       const helpLink = screen.getByRole('link', {
         name: new RegExp(GUIDE_CONTENT.categoryPage.help.title),
@@ -132,15 +132,15 @@ describe('GuideCategoryLayout', () => {
     })
   })
 
-  describe('Painel de informações importantes', () => {
-    it('não renderiza o painel quando a categoria não tem infoPoints', async () => {
+  describe('Important information panel', () => {
+    it('does not render the panel when the category has no infoPoints', async () => {
       await setup(mockArticles)
       expect(
         screen.queryByRole('region', { name: /informações importantes/i })
       ).not.toBeInTheDocument()
     })
 
-    it('renderiza o painel quando a categoria tem infoPoints', async () => {
+    it('renders the panel when the category has infoPoints', async () => {
       const categoryWithInfoPoints: GuideCategory = {
         ...mockCategory,
         infoPoints: [
@@ -162,7 +162,7 @@ describe('GuideCategoryLayout', () => {
   })
 
   describe('Breadcrumb', () => {
-    it('renderiza navegação de breadcrumb', async () => {
+    it('renders breadcrumb navigation', async () => {
       await setup(mockArticles)
       expect(
         screen.getByRole('navigation', { name: 'Breadcrumb' })
