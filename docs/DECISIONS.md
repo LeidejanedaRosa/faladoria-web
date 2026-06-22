@@ -434,23 +434,15 @@ export const GUIDE_ARTICLE_HEADING_ID = 'article-heading'
 
 ## 2026-06-17 — Filtragem de blocos no `StepCard` é responsabilidade de view, não violação do SRP
 
-**Contexto**: Auditoria questionou se `StepCard` viola o Princípio de Responsabilidade Única ao filtrar `rightBlocks` e `contentBlocks` internamente além de renderizar.
+**Contexto**: Auditoria questionou se `StepCard` viola o Princípio de Responsabilidade Única ao filtrar blocos internamente além de renderizar.
 
 **Decisão**: Manter a filtragem dentro do componente. Não é uma violação de SRP.
 
-**Por quê**: A filtragem (`blocks.filter(b => b.type === 'callout' || b.type === 'image')`) é uma decisão de layout visual — "quais blocos vão na coluna direita" — e é indissociável do `StepCard`. Extrair isso para um hook `useArticleBlocks()` criaria uma abstração sem propósito: a função de transformação tem uma única chamada, é usada uma única vez, e não tem lógica reutilizável. A separação seria burocracia sem ganho de manutenibilidade.
+**Por quê**: A decisão de "quais blocos vão para qual sub-componente" é indissociável do `StepCard` — é uma decisão de layout visual. Extrair isso para um hook `useArticleBlocks()` criaria uma abstração sem propósito: a função de transformação tem uma única chamada, é usada uma única vez, e não tem lógica reutilizável. A separação seria burocracia sem ganho de manutenibilidade.
 
 **Distinção relevante**: SRP no contexto de componentes React significa que um componente não deve misturar responsabilidades de _domínio_ distintas (ex.: buscar dados + renderizar + autenticar). Filtrar dados de layout para decidir onde renderizá-los é parte da responsabilidade de view do componente.
 
----
-
-## 2026-06-17 — `GUIDE_STEP_IMAGES` como constante global não viola injeção de dependência
-
-**Contexto**: Auditoria questionou se `const src = GUIDE_STEP_IMAGES[imageKey]` deveria receber o mapa via prop ou contexto para facilitar testes.
-
-**Decisão**: Manter o acesso direto à constante. Não é violação do princípio de inversão de dependência (DIP).
-
-**Por quê**: `GUIDE_STEP_IMAGES` é uma constante pura — um `Record<string, string>` imutável de paths de assets. O DIP se aplica a dependências com comportamento: serviços, APIs, módulos com efeitos colaterais. Uma constante não tem comportamento e não precisa ser mockada ou substituída. Injetar via prop criaria boilerplate sem benefício: os testes de `StepImage` verificam se o `<img>` renderiza com o `src` correto — e o fazem com dados de teste suficientes sem precisar substituir o mapa.
+**Nota (2026-06-22)**: após o redesign do Guide, `StepCard` tornou-se um dispatcher de dois caminhos: se o step tem blocos `action-step` → renderiza `ProceduralStepSection`; caso contrário → `InformationalStepCard`. A filtragem `rightBlocks` / `contentBlocks` agora ocorre dentro de `InformationalStepCard` (callouts para a coluna direita, demais para o corpo). O princípio se mantém — filtragem de layout é responsabilidade do componente de view.
 
 ---
 
@@ -486,3 +478,59 @@ export const GUIDE_ARTICLE_HEADING_ID = 'article-heading'
 - **`reportWebVitals.ts`** é um adaptador de integração pura: chama callbacks de `web-vitals` sem lógica condicional, transformação de dados ou estado. Testar integrações com libs externas exige mockear a lib inteira — o teste verificaria apenas que o mock foi chamado, não que a integração funciona em produção.
 
 **Regra**: testar wrappers de uma linha e adaptadores de integração pura é sobrecarga de manutenção sem ganho de confiança. Focar cobertura em lógica própria do projeto.
+
+---
+
+## 2026-06-22 — Redesign do conteúdo do Guide: modelo "Mostrar primeiro. Explicar depois."
+
+**Contexto**: Os artigos do Guide usavam um modelo expositivo — parágrafos de texto seguidos de callouts e listas. Usuários em situação de stress (aguardando cirurgia, precisando de medicamento) precisam de ação imediata, não de explicação. O modelo anterior priorizava completude sobre utilidade.
+
+**Decisão**: Adotar o modelo "Mostrar primeiro. Explicar depois." — cada seção processual começa com os passos de ação (`action-step`) e depois oferece contexto (callouts, listas) para quem quiser se aprofundar.
+
+**Implementação**:
+
+- Novo tipo `action-step` na union `ArticleBlock` com campos `action` (obrigatório), `detail` (opcional) e `imageKey` (opcional, referência a `SharedStepImageKey`)
+- `groupIntoSteps()` segmenta o conteúdo em `preamble` (blocos antes do primeiro `<h2>`) e `steps` (grupos iniciados por `<h2>`)
+- `StepCard` é um dispatcher: detecta se o step tem blocos `action-step` → rota para `ProceduralStepSection`; caso contrário → `InformationalStepCard`
+- `ProceduralStepSection`: `<section aria-labelledby>` + `<h2>` sem prefixo numérico + `GuideActionStepList` + blocos complementares
+- `InformationalStepCard`: `<section aria-labelledby>` + `<h2>` com prefixo `{N}. ` + conteúdo + callouts na coluna direita
+
+**Regra de numeração**: apenas `InformationalStepCard` exibe prefixo numérico. `ProceduralStepSection` não usa número — é auto-explicativa pelo heading e pela lista de passos.
+
+**Alternativa rejeitada**: manter o modelo expositivo com listas ordenadas de ação. O problema não era a ausência de listas — era a hierarquia de informação: contexto antes de ação. O `action-step` força a inversão estrutural.
+
+---
+
+## 2026-06-22 — `ActionStepBlock` exportado pela camada de dados
+
+**Contexto**: Três componentes (`GuideActionStepCard`, `GuideActionStepList`, `GuideArticleLayout`) precisavam do tipo `ActionStepBlock = Extract<ArticleBlock, { type: 'action-step' }>`. Antes da decisão, o tipo estava duplicado nesses três arquivos.
+
+**Decisão**: Exportar `ActionStepBlock` de `data/guideArticles.ts` e re-exportar pelo barrel `data/index.ts`. Os componentes importam de `'../data'`.
+
+**Por quê**: `ActionStepBlock` é uma restrição sobre um campo de dado — pertence ao contrato de dados, não à implementação visual. Além disso, duplicar um tipo derivado por `Extract` é um code smell: qualquer mudança na union `ArticleBlock` precisaria ser propagada manualmente para todos os lugares que repetem o `Extract`.
+
+**Regra**: tipos derivados de `ArticleBlock` por `Extract` devem ser exportados pelo barrel de dados e importados pelos componentes. Não definir o mesmo `Extract` em mais de um arquivo.
+
+---
+
+## 2026-06-22 — Fallback em dois níveis para imagens de artigo
+
+**Contexto**: `GuideArticleCard` e `GuideArticleHeader` precisavam exibir uma imagem para cada artigo. Nem todo artigo tem uma imagem própria — mas toda categoria tem. A ausência de imagem causava um layout vazio para artigos sem imagem específica.
+
+**Decisão**: Lookup em dois níveis: `GUIDE_ARTICLE_IMAGES[slug] ?? GUIDE_CATEGORY_IMAGES[categorySlug]`. Se nenhum dos dois existir, o componente não renderiza a tag `<img>`.
+
+**Por quê**: A imagem de categoria já cumpre a função visual para artigos que não a têm. Adicionar imagem ao `GUIDE_ARTICLE_IMAGES` por artigo seria necessário apenas quando a imagem for semanticamente distinta da categoria — não por ausência de alternativa.
+
+**Alternativa rejeitada**: adicionar manualmente a imagem de categoria ao `GUIDE_ARTICLE_IMAGES` para cada artigo que não tem imagem própria. Além de redundante, cria manutenção duplicada: trocar a imagem da categoria exigiria trocar em dois lugares.
+
+---
+
+## 2026-06-22 — Remoção de tipos mortos da union `ArticleBlock`
+
+**Contexto**: Revisão pós-redesign identificou três tipos na union `ArticleBlock` com zero usos em todos os arquivos de dados de artigos: `image`, `info-panel`, `heading level: 3`. Os componentes correspondentes (`StepImage`, `InfoPanel`) e os renderers no mapa `CONTENT_BLOCK_RENDERERS` também eram código morto.
+
+**Decisão**: Remover `image`, `info-panel` e `heading level: 3` da union `ArticleBlock`. Remover os componentes `StepImage` e `InfoPanel` e seus renderers. Remover a constante `GUIDE_STEP_IMAGES` (usada apenas por `StepImage`, com 2 entradas que duplicavam `SHARED_STEP_IMAGES`).
+
+**Como foi verificado**: `grep -r "type: 'image'" src/features/guide/data/` e equivalentes para `info-panel` e `heading.*level.*3` retornaram zero resultados em todos os arquivos de artigos.
+
+**Alternativa rejeitada**: manter os tipos como "reserva para uso futuro". Código não utilizado tem custo de manutenção real: qualquer desenvolvedor que ler o código vai tentar entender para que serve. Se necessário no futuro, o tipo pode ser reintroduzido — o git preserva o histórico.
