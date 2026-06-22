@@ -142,7 +142,10 @@ export default [
 
       // Code Quality (SonarJS)
       'sonarjs/cognitive-complexity': ['error', 10],
-      'sonarjs/no-duplicate-string': ['error', { threshold: 3 }],
+      'sonarjs/no-duplicate-string': [
+        'error',
+        { threshold: 3, ignoreStrings: 'action-step' },
+      ],
       'sonarjs/no-identical-expressions': 'error',
       'sonarjs/prefer-immediate-return': 'error',
       'sonarjs/no-redundant-boolean': 'error',

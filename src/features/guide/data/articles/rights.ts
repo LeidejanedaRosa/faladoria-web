@@ -23,33 +23,16 @@ export const rightsArticles: GuideArticle[] = [
         text: 'O que isso significa na prática',
       },
       {
-        type: 'paragraph',
-        text: 'Todo brasileiro tem direito ao atendimento pelo SUS, independente de renda, raça, religião ou onde mora. Você não precisa ter plano de saúde, não precisa pagar nada e não precisa comprovar pobreza.',
-      },
-      {
-        type: 'heading',
-        level: 2,
-        text: 'Seus seis direitos fundamentais no SUS',
-      },
-      {
         type: 'list',
         items: [
-          'Acesso ao atendimento de saúde de forma organizada e sem discriminação',
-          'Tratamento adequado e efetivo para sua condição',
-          'Atendimento humanizado, com respeito e sem preconceito',
-          'Ser tratado com dignidade, tendo seus valores e crenças respeitados',
-          'Receber informações claras sobre seu diagnóstico e tratamento',
-          'Ter sua privacidade e sigilo médico protegidos',
+          'Todo brasileiro tem direito ao atendimento pelo SUS, independente de renda, raça ou onde mora',
+          'Você não precisa ter plano de saúde, não precisa pagar nada e não precisa comprovar pobreza',
+          'Acesso organizado e sem discriminação',
+          'Tratamento adequado para sua condição',
+          'Atendimento humanizado, com respeito e dignidade',
+          'Informações claras sobre diagnóstico e tratamento',
+          'Privacidade e sigilo médico protegidos',
         ],
-      },
-      {
-        type: 'heading',
-        level: 2,
-        text: 'O que diz a lei',
-      },
-      {
-        type: 'paragraph',
-        text: 'Além da Constituição, a Lei nº 8.080/1990 reforça que "a saúde é direito fundamental do ser humano, devendo o Estado prover as condições indispensáveis ao seu pleno exercício". Essa lei organiza como o SUS deve funcionar em todo o país.',
       },
       {
         type: 'heading',
@@ -89,61 +72,44 @@ export const rightsArticles: GuideArticle[] = [
       {
         type: 'heading',
         level: 2,
-        text: 'Passo 1 — Tente resolver na unidade de saúde',
+        text: 'O que fazer, passo a passo',
+        icon: 'target',
       },
       {
-        type: 'paragraph',
-        text: 'Comece pelo atendente e, se necessário, peça para falar com o responsável da unidade (diretor ou coordenador). Muitos problemas se resolvem aqui, sem precisar ir mais longe.',
+        type: 'action-step',
+        action: 'Tente resolver na unidade de saúde',
+        imageKey: 'ubs',
+        detail:
+          'Explique o problema com calma, peça o prazo para resolver e anote o nome de quem te atendeu.',
       },
       {
-        type: 'list',
+        type: 'action-step',
+        action: 'Procure a Secretaria de Saúde do município',
+        detail:
+          'Leve documentos que comprovem o problema: receitas, laudos ou pedidos de exame.',
+      },
+      {
+        type: 'action-step',
+        action: 'Acione a Ouvidoria do SUS: 136',
+        imageKey: 'phone',
+        detail:
+          'Gratuito, funciona 24h. Exija o número de protocolo em cada etapa.',
+      },
+      {
+        type: 'action-step',
+        action: 'Procure a Defensoria Pública',
+        imageKey: 'patient-rights',
+        detail:
+          'O serviço é gratuito. Em muitos casos, um juiz pode obrigar o Estado a agir em dias.',
+      },
+      {
+        type: 'callout',
+        variant: 'checklist',
+        title: 'O que levar em cada etapa',
         items: [
-          'Explique o problema com calma e clareza',
-          'Pergunte qual é o prazo para resolver',
-          'Anote o nome de quem te atendeu e a data',
-        ],
-      },
-      {
-        type: 'heading',
-        level: 2,
-        text: 'Passo 2 — Procure a Secretaria de Saúde do município',
-      },
-      {
-        type: 'paragraph',
-        text: 'Se a unidade não resolver, vá à Secretaria Municipal de Saúde. Leve documentos que comprovem o problema: receitas, laudos, pedidos de exame ou qualquer papel relacionado.',
-      },
-      {
-        type: 'heading',
-        level: 2,
-        text: 'Passo 3 — Acione a Ouvidoria do SUS',
-      },
-      {
-        type: 'paragraph',
-        text: 'A Ouvidoria do SUS existe para registrar reclamações, sugestões e denúncias. Você pode acionar pelo telefone, presencialmente ou pela internet.',
-      },
-      {
-        type: 'list',
-        items: [
-          'Disque Saúde: 136 (gratuito, funciona 24h)',
-          'Ouvidoria estadual do SUS do seu estado',
-          'Portal do governo federal: ouvidoria.saude.gov.br',
-        ],
-      },
-      {
-        type: 'heading',
-        level: 2,
-        text: 'Passo 4 — Judicialização (último recurso)',
-      },
-      {
-        type: 'paragraph',
-        text: 'Se nenhuma das etapas anteriores funcionar, você pode recorrer à Justiça. Em muitos casos, um juiz pode obrigar o Estado a fornecer o medicamento ou o atendimento em dias.',
-      },
-      {
-        type: 'list',
-        items: [
-          'Procure a Defensoria Pública do seu estado — o serviço é gratuito',
-          'Leve todos os documentos que comprovam a necessidade',
-          'Em emergências, o juiz pode determinar o atendimento em horas',
+          'Cartão do SUS e documento com foto',
+          'Receitas, laudos e pedidos de exame',
+          'Número de protocolo de cada tentativa anterior',
         ],
       },
       {

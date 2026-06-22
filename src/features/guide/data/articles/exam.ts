@@ -14,111 +14,50 @@ export const examArticles: GuideArticle[] = [
     iconName: 'clipboard',
     content: [
       {
-        type: 'paragraph',
-        text: 'O SUS realiza exames laboratoriais, de imagem e outros procedimentos diagnósticos gratuitamente. O caminho começa sempre pela consulta médica e pelo pedido de um profissional de saúde.',
-      },
-
-      {
-        type: 'heading',
-        level: 2,
-        text: 'Onde realizar o exame',
-        icon: 'location',
-      },
-      {
-        type: 'paragraph',
-        text: 'Os exames podem ser realizados na UBS, na Secretaria de Saúde ou em local credenciado pelo SUS. Normalmente o médico orienta, durante a consulta, onde o exame pode ser feito. Se você já tem o pedido e não sabe onde ir, pergunte na UBS.',
-      },
-      {
-        type: 'paragraph',
-        text: 'Há exames agendados pela Secretaria de Saúde e outros marcados diretamente no local de realização.',
-      },
-      {
         type: 'callout',
         variant: 'tip',
         title: 'Importante',
-        text: 'Antes de qualquer coisa, você precisa do pedido médico autorizado. Sem o pedido, não é possível agendar o exame.',
+        text: 'Você precisa do pedido médico antes de tudo. Sem ele, não é possível agendar o exame.',
       },
-
       {
         type: 'heading',
         level: 2,
-        text: 'O que levar',
-        icon: 'clipboard',
+        text: 'Como solicitar',
+        icon: 'target',
       },
       {
-        type: 'list',
-        items: [
-          'Pedido de exame assinado por médico ou profissional de saúde autorizado',
-          'Cartão do SUS — se não tiver, solicite na UBS com documento com foto',
-          'Documento com foto (RG e CPF ou CNH)',
-        ],
+        type: 'action-step',
+        action: 'Vá à UBS e consulte um médico',
+        imageKey: 'ubs',
+        detail: 'O médico avalia e emite o pedido de exame.',
       },
       {
-        type: 'image',
-        imageKey: 'cartao-sus',
-        alt: 'Cartão do SUS e documento com foto',
+        type: 'action-step',
+        action: 'Vá ao local indicado com o pedido',
+        imageKey: 'doctor-patient',
+        detail: 'Pode ser a Secretaria de Saúde, a UBS ou local credenciado.',
       },
       {
-        type: 'info-panel',
-        title: 'Não tem o pedido de exame?',
-        text: 'Vá à UBS mais próxima com seu Cartão do SUS e documento com foto e solicite uma consulta. O profissional de saúde avalia e, se necessário, emite o pedido de exame na hora.',
+        type: 'action-step',
+        action: 'Agende informando que é pelo SUS',
+        imageKey: 'phone',
+        detail: 'Pergunte sobre preparo necessário, endereço exato e horário.',
       },
       {
-        type: 'callout',
-        variant: 'tip',
-        title: 'Pedido de médico particular',
-        text: 'Alguns municípios aceitam pedidos de médico particular; outros não. Informe-se sempre na UBS sobre como proceder no seu município.',
-      },
-
-      {
-        type: 'heading',
-        level: 2,
-        text: 'Agendar o exame',
-        icon: 'phone',
-      },
-      {
-        type: 'paragraph',
-        text: 'Contate a Secretaria de Saúde ou o local indicado para realização do exame. Tenha em mãos o pedido autorizado, o documento de identificação e o Cartão do SUS. Ao marcar, informe que o atendimento será pelo SUS.',
+        type: 'action-step',
+        action: 'Compareça no dia marcado',
+        imageKey: 'checklist',
+        detail:
+          'Leve todos os documentos e siga as orientações de preparo. Atrasos podem impedir o atendimento.',
       },
       {
         type: 'callout',
         variant: 'checklist',
-        title: 'Perguntas para fazer no agendamento',
+        title: 'O que levar',
         items: [
-          'Preciso levar resultados de exames anteriores?',
-          'Precisa de jejum ou algum preparo especial?',
-          'Qual é o endereço exato e quando será realizado?',
-          'Com quanto tempo de antecedência devo chegar?',
-          'Se o exame for em outra cidade, como consigo o transporte?',
-          'Se o transporte não for fornecido, em qual departamento devo resolver antes de denunciar?',
-        ],
-      },
-
-      {
-        type: 'heading',
-        level: 2,
-        text: 'Comparecer ao exame',
-        icon: 'person',
-      },
-      {
-        type: 'paragraph',
-        text: 'Vá ao local no dia e horário marcados, sem atraso. Leve o pedido, o Cartão do SUS e o documento com foto. Se houver preparo especial — como jejum —, siga as orientações à risca. Quem não faz o preparo pode ser impedido de realizar o exame.',
-      },
-
-      {
-        type: 'heading',
-        level: 2,
-        text: 'Checklist antes de sair',
-        icon: 'check',
-      },
-      {
-        type: 'list',
-        items: [
-          'Separe todos os resultados de exames anteriores que o médico pediu para levar',
-          'Confirme o endereço com antecedência e planeje o trajeto',
-          'Verifique se está com o Cartão do SUS, o RG ou CNH e o pedido de exame',
-          'Leve máscara — alguns locais ainda exigem ao entrar',
-          'Chegue com antecedência — atrasos podem impedir o atendimento',
+          'Pedido de exame assinado pelo médico',
+          'Cartão do SUS',
+          'Documento com foto (RG ou CNH)',
         ],
       },
     ],
@@ -135,73 +74,43 @@ export const examArticles: GuideArticle[] = [
     content: [
       {
         type: 'paragraph',
-        text: 'Às vezes sentimos um incômodo, mas não sabemos qual exame fazer — ou sequer qual profissional de saúde procurar. Isso é normal. Você não precisa saber: é o profissional de saúde quem determina se há necessidade de exame e qual tipo.',
+        text: 'Às vezes sentimos um incômodo, mas não sabemos qual exame fazer. Isso é normal — você não precisa saber. É o profissional de saúde quem determina se há necessidade de exame e qual tipo.',
       },
-
-      { type: 'heading', level: 2, text: 'O que fazer', icon: 'target' },
       {
-        type: 'list',
-        ordered: true,
-        items: [
-          'Agende e realize uma consulta na UBS (postinho de saúde)',
-          'O médico ou profissional de saúde avalia seu caso',
-          'Se necessário, ele emite o pedido do exame adequado',
-        ],
+        type: 'heading',
+        level: 2,
+        text: 'O que fazer',
+        icon: 'target',
+      },
+      {
+        type: 'action-step',
+        action: 'Agende uma consulta na UBS',
+        imageKey: 'ubs',
+        detail:
+          'O postinho é a porta de entrada — você não precisa saber o nome do exame.',
+      },
+      {
+        type: 'action-step',
+        action: 'O médico avalia seu caso',
+        imageKey: 'doctor-patient',
+        detail:
+          'Descreva o que sente. O profissional determina se há necessidade de exame.',
+      },
+      {
+        type: 'action-step',
+        action: 'O médico emite o pedido do exame',
+        detail: 'Com o pedido em mãos, você já pode agendar o exame.',
       },
       {
         type: 'callout',
         variant: 'tip',
-        text: 'Você não precisa saber o nome do exame antes de ir à UBS. Descreva o incômodo para o profissional e ele determina o que é necessário.',
-      },
-
-      {
-        type: 'heading',
-        level: 2,
-        text: 'Quais exames o SUS realiza',
-        icon: 'shield',
-      },
-      {
-        type: 'paragraph',
-        text: 'O SUS cobre praticamente todos os exames diagnósticos, sem custo para você. Não é preciso se preocupar se o exame será pago ou não — basta ter o pedido médico.',
-      },
-      {
-        type: 'info-panel',
-        title: 'O SUS realiza todos os exames necessários',
-        text: 'Exames laboratoriais, de imagem e procedimentos diagnósticos são oferecidos gratuitamente. A única exceção são exames de fins estéticos ou experimentais — salvo se houver necessidade médica comprovada.',
-      },
-
-      {
-        type: 'heading',
-        level: 2,
-        text: 'Quando o exame é urgente',
-        icon: 'activity',
-      },
-      {
-        type: 'paragraph',
-        text: 'Em casos urgentes — suspeita de doença grave ou piora do estado de saúde — o profissional de saúde precisa indicar expressamente a urgência no pedido de exame. Isso garante prioridade no agendamento.',
+        text: 'Você não precisa saber o nome do exame antes de ir à UBS. Descreva o incômodo e o profissional determina o que é necessário.',
       },
       {
         type: 'callout',
         variant: 'emergency',
         title: 'Caso urgente',
         text: 'Peça ao médico que escreva "URGENTE" no pedido de exame. Esse registro é fundamental para garantir prioridade no agendamento.',
-      },
-
-      {
-        type: 'heading',
-        level: 2,
-        text: 'Exame em outra cidade',
-        icon: 'location',
-      },
-      {
-        type: 'paragraph',
-        text: 'Alguns exames não estão disponíveis em todos os municípios. Se o seu exame precisar ser feito em outra cidade, procure a Secretaria Municipal de Saúde para agendar o exame e o transporte de ida e volta.',
-      },
-      {
-        type: 'callout',
-        variant: 'tip',
-        title: 'Transporte sanitário',
-        text: 'O município é obrigado a fornecer transporte quando o exame é realizado em outra cidade. Pergunte sobre isso no momento do agendamento.',
       },
     ],
   },
@@ -216,88 +125,50 @@ export const examArticles: GuideArticle[] = [
     iconName: 'chart',
     content: [
       {
-        type: 'paragraph',
-        text: 'Esperar meses por um exame é comum no SUS — mas não significa que você precisa aceitar sem fazer nada. Você tem direitos e há formas de agir.',
+        type: 'callout',
+        variant: 'emergency',
+        title: 'Caso grave ou urgente',
+        text: 'Se o exame não foi agendado e o seu caso é grave, não espere. Vá diretamente à Defensoria Pública. O atendimento é gratuito.',
       },
-
       {
         type: 'heading',
         level: 2,
-        text: 'Quanto tempo é razoável esperar',
-        icon: 'chart',
-      },
-      {
-        type: 'paragraph',
-        text: 'Não existe prazo único definido em lei para todos os exames. O tempo varia por município, tipo de exame e demanda local. Qualquer demora que prejudique sua saúde não pode acontecer — especialmente em casos urgentes, que devem ser marcados imediatamente.',
-      },
-
-      {
-        type: 'heading',
-        level: 2,
-        text: 'O que fazer quando a espera está longa',
+        text: 'O que fazer, passo a passo',
         icon: 'target',
       },
       {
-        type: 'list',
-        ordered: true,
+        type: 'action-step',
+        action: 'Volte à UBS e registre a reclamação',
+        imageKey: 'ubs',
+        detail: 'Pergunte a previsão e peça que a reclamação seja registrada.',
+      },
+      {
+        type: 'action-step',
+        action: 'Vá à Secretaria de Saúde com o pedido',
+        detail: 'Explique a urgência e peça prioridade no agendamento.',
+      },
+      {
+        type: 'action-step',
+        action: 'Ligue para o Disque Saúde: 136',
+        imageKey: 'phone',
+        detail: 'Gratuito, 24 horas. Registre a demora e anote o protocolo.',
+      },
+      {
+        type: 'action-step',
+        action: 'Procure a Defensoria Pública',
+        imageKey: 'patient-rights',
+        detail:
+          'Se o exame for urgente, o atendimento é gratuito e pode resolver em dias.',
+      },
+      {
+        type: 'callout',
+        variant: 'checklist',
+        title: 'O que levar em cada etapa',
         items: [
-          'Volte à UBS e pergunte a previsão — peça para registrar sua reclamação por escrito',
-          'Vá à Secretaria de Saúde do município com o pedido e explique a urgência',
-          'Acione o Disque Saúde: 136 (gratuito, 24h) para registrar a demora',
-          'Procure a Defensoria Pública se o exame for urgente — o atendimento é gratuito',
+          'Pedido de exame',
+          'Cartão do SUS e RG',
+          'Número de protocolo de cada tentativa anterior',
         ],
-      },
-
-      {
-        type: 'heading',
-        level: 2,
-        text: 'Se o exame for urgente',
-        icon: 'activity',
-      },
-      {
-        type: 'paragraph',
-        text: 'Em casos urgentes — suspeita de doença grave ou piora do estado de saúde — o médico pode indicar urgência no pedido. Com isso, o agendamento deve ser imediato. Se mesmo assim não for marcado em tempo hábil, acione a Defensoria Pública.',
-      },
-      {
-        type: 'callout',
-        variant: 'emergency',
-        title: 'Caso grave',
-        text: 'Se o exame não foi agendado em menos de 30 dias e seu caso é grave, não espere — acesse os canais de solução: Secretaria de Saúde, ouvidoria municipal e Disque Saúde (136).',
-      },
-
-      {
-        type: 'heading',
-        level: 2,
-        text: 'O que você pode e não pode fazer',
-        icon: 'shield',
-      },
-      {
-        type: 'paragraph',
-        text: 'Ser assertivo e educado é o que garante que seu pedido seja levado a sério. Há formas certas e erradas de agir — entender a diferença protege o seu caso.',
-      },
-      {
-        type: 'callout',
-        variant: 'tip',
-        title: 'Você pode',
-        text: 'Pedir que o exame seja marcado o quanto antes, explicando que a demora está prejudicando sua saúde. Seja comunicativo e direto: "Meu caso é urgente, preciso que este exame seja marcado o quanto antes."',
-      },
-      {
-        type: 'callout',
-        variant: 'warning',
-        title: 'Você não pode',
-        text: 'Ameaçar médicos, atendentes ou qualquer funcionário público, mesmo que ele esteja errado. Mantenha a compostura para não prejudicar o seu caso.',
-      },
-
-      { type: 'heading', level: 2, text: 'A judicialização', icon: 'fist' },
-      {
-        type: 'paragraph',
-        text: 'A judicialização deve ser a última tentativa — exceto em casos de urgência ou emergência, onde é fundamental buscar ajuda do Ministério Público ou da Justiça o quanto antes. Se você tentou todas as alternativas (Secretaria de Saúde, ouvidoria municipal, ouvidoria do SUS) sem sucesso, contate um advogado ou a Defensoria Pública.',
-      },
-      {
-        type: 'callout',
-        variant: 'tip',
-        title: 'Guarde todos os documentos',
-        text: 'Guarde o pedido de exame, comprovantes de agendamento e qualquer papel que mostre que você tentou marcar. Esses documentos são fundamentais se precisar acionar a Justiça.',
       },
     ],
   },

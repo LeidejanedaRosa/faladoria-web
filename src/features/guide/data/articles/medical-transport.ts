@@ -14,24 +14,10 @@ export const medicalTransportArticles: GuideArticle[] = [
     iconName: 'location',
     content: [
       {
-        type: 'heading',
-        level: 2,
-        text: 'Quem tem direito',
-        icon: 'users',
-      },
-      {
-        type: 'list',
-        items: [
-          'Pacientes que precisam de atendimento médico em outro município',
-          'Pessoas sem condição financeira de arcar com o deslocamento',
-          'Pacientes que precisam de acompanhante — o transporte cobre os dois',
-          'Usuários em tratamento contínuo (quimioterapia, hemodiálise, fisioterapia)',
-        ],
-      },
-      {
-        type: 'info-panel',
-        title: 'O que é o TFD?',
-        text: 'TFD significa Tratamento Fora do Domicílio. É o programa do SUS que garante transporte e diária para pacientes que precisam ir a outro município para receber atendimento de saúde não disponível na cidade onde moram.',
+        type: 'callout',
+        variant: 'tip',
+        title: 'Quem tem direito',
+        text: 'Pacientes que precisam de atendimento em outro município, sem condição de arcar com o deslocamento, em tratamento contínuo (quimioterapia, hemodiálise, fisioterapia) ou que precisam de acompanhante.',
       },
       {
         type: 'heading',
@@ -40,14 +26,29 @@ export const medicalTransportArticles: GuideArticle[] = [
         icon: 'clipboard',
       },
       {
-        type: 'list',
-        ordered: true,
-        items: [
-          'Vá à sua UBS (posto de saúde) com o encaminhamento médico para o serviço em outro município',
-          'Peça para falar sobre o TFD — Tratamento Fora do Domicílio',
-          'A Secretaria de Saúde do seu município avalia e organiza o transporte',
-          'Aguarde o agendamento e confirmação do dia e horário do transporte',
-        ],
+        type: 'action-step',
+        action: 'Vá à UBS com o encaminhamento médico',
+        imageKey: 'ubs',
+        detail: 'O encaminhamento deve indicar o serviço em outro município.',
+      },
+      {
+        type: 'action-step',
+        action: 'Peça para falar sobre o TFD',
+        imageKey: 'doctor-patient',
+        detail:
+          'Tratamento Fora do Domicílio — o profissional vai te orientar.',
+      },
+      {
+        type: 'action-step',
+        action: 'A Secretaria organiza o transporte',
+        imageKey: 'ambulance',
+        detail: 'A Secretaria de Saúde do seu município avalia o pedido.',
+      },
+      {
+        type: 'action-step',
+        action: 'Aguarde a confirmação',
+        imageKey: 'calendar',
+        detail: 'Anote o dia, horário e ponto de embarque confirmados.',
       },
       {
         type: 'callout',
@@ -62,29 +63,10 @@ export const medicalTransportArticles: GuideArticle[] = [
         ],
       },
       {
-        type: 'heading',
-        level: 2,
-        text: 'Se o transporte for negado',
-        icon: 'megaphone',
-      },
-      {
-        type: 'paragraph',
-        text: 'A negativa do transporte sanitário é ilegal quando o paciente preenche os requisitos do TFD. Não aceite a recusa sem contestar.',
-      },
-      {
-        type: 'list',
-        items: [
-          'Peça a negativa por escrito com justificativa assinada',
-          'Registre reclamação no Disque Saúde: 136',
-          'Procure a Ouvidoria da Secretaria de Saúde do seu município',
-          'Acione a Defensoria Pública — o atendimento é gratuito',
-        ],
-      },
-      {
         type: 'callout',
         variant: 'warning',
-        title: 'Falta de verba não é justificativa',
-        text: 'Nenhum município pode alegar falta de recursos para negar transporte sanitário. O TFD é uma obrigação legal do Estado — não uma concessão.',
+        title: 'Transporte negado?',
+        text: 'Peça a negativa por escrito, registre no Disque Saúde (136) e procure a Ouvidoria da Secretaria. Falta de verba não é justificativa — o TFD é uma obrigação legal.',
       },
     ],
   },
@@ -98,30 +80,10 @@ export const medicalTransportArticles: GuideArticle[] = [
     iconName: 'clipboard',
     content: [
       {
-        type: 'info-panel',
-        title: 'Transporte próprio também tem cobertura',
-        text: 'Se o município não disponibilizar veículo para o seu deslocamento, ele é obrigado a reembolsar as despesas com passagem ou combustível. Esse direito está previsto na Portaria GM/MS nº 55/1999, que regulamenta o TFD.',
-      },
-      {
-        type: 'heading',
-        level: 2,
-        text: 'Quando você tem direito ao reembolso',
-        icon: 'check',
-      },
-      {
-        type: 'list',
-        items: [
-          'O município não disponibilizou transporte próprio na data do atendimento',
-          'Você precisou viajar para outro município para consulta, exame, cirurgia ou tratamento encaminhado pelo SUS',
-          'O deslocamento foi autorizado previamente pela Secretaria de Saúde',
-          'Você conservou os comprovantes de passagem ou combustível',
-        ],
-      },
-      {
         type: 'callout',
         variant: 'tip',
-        title: 'Guarde todos os comprovantes',
-        text: 'Bilhetes de ônibus, recibos de combustível e qualquer comprovante de despesa de transporte são essenciais para o reembolso. Sem comprovação, o município pode negar o pagamento.',
+        title: 'Transporte próprio também tem cobertura',
+        text: 'Se o município não disponibilizar veículo, ele é obrigado a reembolsar as despesas com passagem ou combustível — desde que o deslocamento tenha sido autorizado previamente pela Secretaria de Saúde.',
       },
       {
         type: 'heading',
@@ -130,15 +92,28 @@ export const medicalTransportArticles: GuideArticle[] = [
         icon: 'clipboard',
       },
       {
-        type: 'list',
-        ordered: true,
-        items: [
-          'Após o atendimento, vá à Secretaria de Saúde do seu município',
-          'Apresente a documentação do atendimento realizado (relatório, receita ou comprovante)',
-          'Entregue os comprovantes de despesa com transporte',
-          'Preencha o formulário de solicitação de reembolso do TFD',
-          'Anote o número do protocolo e acompanhe o prazo de pagamento',
-        ],
+        type: 'action-step',
+        action: 'Vá à Secretaria de Saúde após o atendimento',
+        detail:
+          'Leve a documentação do atendimento realizado — relatório, receita ou comprovante.',
+      },
+      {
+        type: 'action-step',
+        action: 'Entregue os comprovantes de transporte',
+        imageKey: 'checklist',
+        detail:
+          'Bilhetes de ônibus, recibos de combustível ou qualquer comprovante de despesa.',
+      },
+      {
+        type: 'action-step',
+        action: 'Preencha o formulário de reembolso do TFD',
+        detail: 'O atendente vai te ajudar a preencher.',
+      },
+      {
+        type: 'action-step',
+        action: 'Anote o número do protocolo',
+        imageKey: 'phone',
+        detail: 'Acompanhe o prazo de pagamento com o protocolo em mãos.',
       },
       {
         type: 'callout',
@@ -154,29 +129,10 @@ export const medicalTransportArticles: GuideArticle[] = [
         ],
       },
       {
-        type: 'heading',
-        level: 2,
-        text: 'Se negar ou atrasar o reembolso',
-        icon: 'megaphone',
-      },
-      {
-        type: 'paragraph',
-        text: 'Cada município define seu próprio prazo de pagamento, mas a demora injustificada ou a negativa sem razão válida podem ser contestadas.',
-      },
-      {
-        type: 'list',
-        items: [
-          'Registre reclamação na Ouvidoria da Secretaria de Saúde',
-          'Acione o Disque Saúde: 136',
-          'Procure o Ministério Público se o valor não for pago',
-          'A Defensoria Pública pode ingressar com ação judicial — o serviço é gratuito',
-        ],
-      },
-      {
         type: 'callout',
         variant: 'warning',
         title: 'Faça tudo com autorização prévia',
-        text: 'O reembolso exige que o deslocamento tenha sido autorizado antes de acontecer. Se você viajou sem autorização da Secretaria de Saúde, o reembolso pode ser negado legalmente. Sempre solicite a autorização TFD antes da viagem.',
+        text: 'O reembolso exige que o deslocamento tenha sido autorizado antes de acontecer. Se você viajou sem autorização da Secretaria, o reembolso pode ser negado legalmente.',
       },
     ],
   },
