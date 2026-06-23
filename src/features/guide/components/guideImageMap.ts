@@ -34,6 +34,10 @@ import deniedSurgeryImg from '@assets/guide/surgery/denied-surgery.webp'
 import surgeryQueueImg from '@assets/guide/surgery/surgery-queue.webp'
 import treatmentCategoryImg from '@assets/guide/treatment/category.webp'
 import treatmentSessionImg from '@assets/guide/treatment/treatment-session.webp'
+import womensCategoryImg from '@assets/guide/womens-health/category.webp'
+import familyPlanningImg from '@assets/guide/womens-health/family-planning.webp'
+import prenatalImg from '@assets/guide/womens-health/prenatal.webp'
+import preventiveScreeningImg from '@assets/guide/womens-health/preventive-screening-and-mammogram.webp'
 
 import type { SharedStepImageKey } from '../data/guideArticles'
 
@@ -46,6 +50,7 @@ export const GUIDE_CATEGORY_IMAGES: Partial<Record<string, string>> = {
   'atendimento-domiciliar': homeCareCategoryImg,
   'transporte-sanitario': medicalTransportCategoryImg,
   equipamentos: equipmentCategoryImg,
+  'saude-da-mulher': womensCategoryImg,
 }
 
 export const GUIDE_ARTICLE_IMAGES: Partial<Record<string, string>> = {
@@ -65,6 +70,9 @@ export const GUIDE_ARTICLE_IMAGES: Partial<Record<string, string>> = {
   'como-solicitar-equipamentos': howToObtainEquipmentImg,
   'cpap-bipap-sus': cpapBipapImg,
   'aparelho-auditivo-sus': hearingAidImg,
+  'pre-natal': prenatalImg,
+  'preventivo-e-mamografia': preventiveScreeningImg,
+  'planejamento-familiar': familyPlanningImg,
 }
 
 export const SHARED_STEP_IMAGES: Record<SharedStepImageKey, string> = {
