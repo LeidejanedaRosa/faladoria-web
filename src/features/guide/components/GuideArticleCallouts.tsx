@@ -39,7 +39,7 @@ const SimpleCallout = ({
       <Icon className='h-4.5 w-4.5' />
     </span>
     <div>
-      {block.title && <p className='text-sm font-semibold'>{block.title}</p>}
+      {block.title && <h3 className='text-sm font-semibold'>{block.title}</h3>}
       {block.text && (
         <p className={cn('text-sm leading-relaxed', block.title && 'mt-0.5')}>
           {block.text}
@@ -80,7 +80,7 @@ const EmergencyCallout = ({ block }: { block: CalloutData }) => (
     </span>
     <div>
       {block.title && (
-        <p className='text-sm font-bold text-red-700'>{block.title}</p>
+        <h3 className='text-sm font-bold text-red-700'>{block.title}</h3>
       )}
       {block.highlight && (
         <p
@@ -110,7 +110,7 @@ const ChecklistCallout = ({ block }: { block: CalloutData }) => (
     </span>
     <div className='flex-1'>
       {block.title && (
-        <p className='text-sm font-semibold text-green-800'>{block.title}</p>
+        <h3 className='text-sm font-semibold text-green-800'>{block.title}</h3>
       )}
       {block.items && block.items.length > 0 && (
         <ul className='mt-2 space-y-1.5'>
