@@ -409,3 +409,131 @@ export type {
 **Conexão com TROUBLESHOOTING existente**: este é outro caso do problema documentado em ["`tsc --noEmit` passa mas o erro real existe"](#tsc---noemit-passa-mas-o-erro-real-existe--cache-do-build-composto). Usar `tsc -p tsconfig.app.json --noEmit` é obrigatório para validação confiável.
 
 **Regra (reforço)**: toda exportação nova em qualquer arquivo de `features/guide/data/` deve ser adicionada ao barrel `data/index.ts` imediatamente. A ausência não gera erro no arquivo fonte — só no consumidor.
+
+---
+
+## Cor `blue` duplicada em 17 categorias — union type com 16 cores
+
+**Data**: 2026-06-23
+
+**Sintoma**: Sem erro de compilação. Identificado em auditoria de código: `transporte-sanitario` e `como-funciona-o-sus` compartilhavam `color: 'blue'`, tornando-as visualmente idênticas na grade de categorias.
+
+**Causa raiz**: a union `GuideCategory['color']` foi criada com 16 valores para 16 categorias, mas o projeto cresceu para 17 categorias sem a union ser atualizada. O TypeScript não detectou o problema porque `'blue'` é um valor válido — apenas duas categorias o usavam.
+
+**Solução**:
+
+1. Adicionado `'slate'` à union de cores em `guideCategories.ts`
+2. Adicionado tema `slate` ao `CATEGORY_THEME` em `guideCategoryTheme.ts` (7 campos obrigatórios)
+3. Atribuído `color: 'slate'` à categoria `como-funciona-o-sus`
+4. Adicionado teste `'all category colors are unique'` em `guideUtils.test.ts` para prevenção futura
+
+**Regra**: ao adicionar uma nova categoria, verificar se a cor não está em uso por outra categoria. O teste de unicidade de cores detecta a duplicação automaticamente no pre-push.
+
+---
+
+## Testes E2E em `guide-page.spec.ts` com 5 assertivas erradas desde a criação
+
+**Data**: 2026-06-23
+
+**Sintoma**: Os seguintes testes falhavam em runtime mas não haviam sido executados desde a criação do arquivo:
+
+1. `h1.toContainText('Como conseguir pelo SUS')` — o `<h1>` contém `'Você tem direito à'`
+2. `getByText('Escolha um tema para começar')` — o texto real é `'Encontre o serviço que você precisa'`
+3. `toHaveTitle(/Guia do SUS.*Faladoria/)` — o título real é `'Como conseguir pelo SUS | Faladoria'`
+4. `collectionPage.name === 'Guia do SUS'` — o valor real é `'Como conseguir pelo SUS'`
+5. `ariaLabel.toContain('Guia do SUS')` — o label real usa `GUIDE_CONTENT.seo.title = 'Como conseguir pelo SUS'`
+
+**Causa raiz**: os testes foram escritos com valores assumidos em vez de valores lidos do código. `GUIDE_CONTENT.hero.headline.base + highlight` gera o texto do `<h1>` — diferente do `seo.title`. O título do documento e os structured data usam `seo.title`, não `hero.headline`.
+
+**Solução**: ler `GUIDE_CONTENT` nos dados reais e corrigir todos os 5 valores. Adicionada constante `const GUIDE_URL = '/como-conseguir-pelo-sus'` para eliminar literais duplicados nos testes.
+
+**Regra**: antes de escrever assertivas de texto em testes E2E, localizar a fonte do dado no código — não assumir que o texto visível é igual ao título SEO ou à constante de rota.
+
+---
+
+## `guide-article-page.spec.ts` CRÍTICO: redirect apontando para CATEGORY_URL em vez de GUIDE_URL
+
+**Data**: 2026-06-23
+
+**Sintoma**: O teste `'should redirect to guide root for unknown article slug'` usava `page.waitForURL(CATEGORY_URL)` e falharia por timeout em execução real.
+
+**Causa raiz**: `GuideArticlePage.tsx` (linha 40-41) redireciona **sempre** para `GUIDE_ROUTES.root` quando o artigo não é encontrado — nunca para a categoria. O teste assumia que o redirect ia para a categoria, mas o código vai para a raiz do Guide.
+
+```tsx
+// GuideArticlePage.tsx — comportamento real
+if (!article || !category || article.categorySlug !== category.slug) {
+  return <Navigate to={GUIDE_ROUTES.root} replace />
+}
+```
+
+**Solução**: corrigir o teste para `page.waitForURL(GUIDE_URL)` e o `<h1>` esperado para `'Você tem direito à'` (texto da página raiz do Guide). Renomear o teste para `'should redirect to guide root for unknown article slug'`.
+
+---
+
+## `playwright/prefer-web-first-assertions` quebrando assertiva de meta description
+
+**Data**: 2026-06-23
+
+**Sintoma**: `npx eslint --fix` converteu `getAttribute('content')` para `toHaveAttribute('content')`, mas quebrou o código:
+
+```ts
+// depois do --fix (quebrado):
+const description = page.locator('meta[name="description"]')
+await expect(description).toHaveAttribute('content') // sem valor para comparar
+expect(description!.length).toBeGreaterThan(10) // description agora é Locator, não string
+```
+
+**Causa raiz**: o código original usava `getAttribute` para obter o valor da string e depois verificar seu comprimento. O auto-fix do ESLint substituiu por `toHaveAttribute`, mas não adaptou a lógica que usava o valor retornado.
+
+**Solução**: reescrever a assertiva usando apenas a API web-first do Playwright:
+
+```ts
+await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+  'content',
+  /pré-natal|SUS|gravidez/
+)
+```
+
+**Regra**: ao aceitar um auto-fix do ESLint que converte `getAttribute` para `toHaveAttribute`, verificar se o código subsequente usava o valor de retorno do `getAttribute`. Se sim, reescrever a assertiva inteira usando `toHaveAttribute` com matcher, em vez de adaptar o código parcialmente.
+
+---
+
+## Teste `renders correctly when detail is omitted` falhando por `<p>` do `GuideArticleFooter`
+
+**Data**: 2026-06-23
+
+**Sintoma**:
+
+```
+AssertionError: expected 11 to equal 0
+```
+
+O teste verificava `container.querySelectorAll('p').length === 0` após renderizar um `GuideArticleLayout` com apenas um `action-step` sem `detail`.
+
+**Causa raiz**: `GuideArticleLayout` renderiza `GuideArticleFooter` no mesmo tree. O `GuideArticleFooter` contém múltiplos elementos `<p>` (links de rodapé, texto informativo). O count de `<p>` verificava o componente inteiro, não apenas a área do step.
+
+**Solução**: remover a assertiva `querySelectorAll('p').length === 0` — ela não verificava o comportamento pretendido (ausência do bloco de detalhe). Manter apenas a assertiva semântica relevante: verificar que o `<h3>` do action step é renderizado corretamente, o que prova que o componente funciona sem `detail`.
+
+```ts
+// assertiva removida (falsa):
+expect(container.querySelectorAll('p').length).toBe(0)
+
+// assertiva mantida (real):
+expect(
+  screen.getByRole('heading', { level: 3, name: 'Vá à UBS' })
+).toBeInTheDocument()
+```
+
+**Regra**: nunca usar `querySelectorAll` para verificar ausência de um elemento quando o componente renderizado inclui outros componentes que também podem ter esse elemento. Usar seletores mais específicos ou assertivas baseadas em papel (`getByRole`) que refletem o comportamento pretendido.
+
+---
+
+## `sonarjs/no-duplicate-string` bloqueando commit em arquivo com múltiplos artigos
+
+**Sintoma**: pre-commit falha com `error  Define a constant instead of duplicating this literal 3 times  sonarjs/no-duplicate-string` ao commitar um arquivo de artigos com 3 ou mais artigos que compartilham strings de checklist.
+
+**Causa raiz**: a regra está configurada com `threshold: 3`. Strings comuns entre artigos da mesma categoria — itens de checklist como `'Cartão do SUS'`, `'CPF'`, `'Comprovante de residência'` e títulos de seção como `'Como solicitar'` — repetem-se exatamente 3 vezes (uma por artigo), disparando a regra.
+
+**Solução**: extrair as strings repetidas como constantes no topo do arquivo, seguindo o padrão de `CATEGORY_SLUG` e `DATE_PUBLISHED`. Ver decisão em DECISIONS.md "Constantes compartilhadas para strings repetidas em equipment.ts".
+
+**Prevenção**: ao criar um segundo artigo em qualquer arquivo de categoria, verificar se strings de checklist ou headings se repetem e extraí-las imediatamente — antes do commit.

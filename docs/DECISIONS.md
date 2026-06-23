@@ -534,3 +534,95 @@ export const GUIDE_ARTICLE_HEADING_ID = 'article-heading'
 **Como foi verificado**: `grep -r "type: 'image'" src/features/guide/data/` e equivalentes para `info-panel` e `heading.*level.*3` retornaram zero resultados em todos os arquivos de artigos.
 
 **Alternativa rejeitada**: manter os tipos como "reserva para uso futuro". Código não utilizado tem custo de manutenção real: qualquer desenvolvedor que ler o código vai tentar entender para que serve. Se necessário no futuro, o tipo pode ser reintroduzido — o git preserva o histórico.
+
+---
+
+## 2026-06-22 — Separação de CPAP/BiPAP e aparelho auditivo da categoria Equipamentos
+
+**Contexto**: O artigo inicial `como-solicitar-equipamentos` listava CPAP, BiPAP e aparelhos auditivos junto com cadeiras de rodas, muletas, órteses e próteses em um único callout "O que o SUS fornece". Durante a construção do conteúdo, identificou-se que esses equipamentos têm fluxos de solicitação completamente diferentes.
+
+**Decisão**: Criar artigos próprios para `cpap-bipap-sus` e `aparelho-auditivo-sus`, e removê-los do artigo geral. O artigo `como-solicitar-equipamentos` passou a cobrir exclusivamente OPM (Órteses, Próteses e Meios Auxiliares de Locomoção) via RCPD/CER.
+
+**Por quê**: CPAP/BiPAP exige polissonografia e segue o PCDT de SAOS (Portaria SAS nº 1.274/2013), com dispensação via Central de Regulação. Aparelhos auditivos seguem a Política Nacional de Atenção à Saúde Auditiva (Portaria GM/MS nº 2.073/2004), com atendimento obrigatório via SASA ou CEA. Misturar os três fluxos em um único artigo induziria o usuário ao erro — é o tipo de conteúdo que, se errado, gera dano real para a pessoa.
+
+**Alternativa rejeitada**: manter todos os equipamentos em um único artigo com seções diferenciadas. Rejeitada porque dificulta a leitura e o usuário que precisa de CPAP não precisa ler sobre cadeira de rodas — e vice-versa.
+
+---
+
+## 2026-06-22 — Correção do fluxo de OPM: Secretaria de Saúde → CER
+
+**Contexto**: O artigo original orientava o usuário a "ir à Secretaria de Saúde com o laudo". Esse é o fluxo informal, mas não o fluxo oficial estabelecido pela Portaria GM/MS nº 793/2012 (RCPD).
+
+**Decisão**: Corrigir para o fluxo oficial: UBS/especialista → laudo + encaminhamento → CER (Centro Especializado em Reabilitação) ou serviço de reabilitação física vinculado à RCPD. Também adicionado "encaminhamento" à lista de documentos necessários — era obrigatório mas estava ausente.
+
+**Fonte**: Portaria GM/MS nº 793/2012, Art. 5º — as Oficinas Ortopédicas que realizam dispensação, confecção e adaptação de OPM são "necessariamente vinculadas a serviços de reabilitação física".
+
+---
+
+## 2026-06-23 — `slate` como 17ª cor no sistema de cores do Guide
+
+**Contexto**: Com 17 categorias e apenas 16 cores na union `GuideCategory['color']`, a cor `blue` estava atribuída a duas categorias: `transporte-sanitario` e `como-funciona-o-sus`. Isso não causava erro de compilação, mas significava que as duas categorias seriam indistinguíveis visualmente na grade.
+
+**Decisão**: Adicionar `'slate'` à union de cores em `guideCategories.ts` e ao mapa `CATEGORY_THEME` em `guideCategoryTheme.ts`. Atribuir `color: 'slate'` à categoria `como-funciona-o-sus`.
+
+**Por quê `slate` e não outra cor**: slate é visualmente neutro e adequado para uma categoria informativa/institucional ("como funciona o SUS") — não carrega a carga semântica de urgência (vermelho), cautela (amarelo) ou saúde (verde). A escolha foi deliberada pela natureza do conteúdo.
+
+**Regra de prevenção**: um teste de unicidade de cores (`all category colors are unique`) foi adicionado em `guideUtils.test.ts`. Qualquer adição de categoria que reutilize uma cor existente falhará no pre-push.
+
+---
+
+## 2026-06-23 — `getArticleBySlug` aceita `categorySlug` opcional para validação de rota
+
+**Contexto**: `getArticleBySlug(slug)` buscava apenas pelo `slug`, sem considerar `categorySlug`. Em rotas como `/como-conseguir-pelo-sus/:categorySlug/:articleSlug`, a função poderia retornar um artigo de outra categoria se dois artigos tivessem o mesmo slug (possível futuramente). A `GuideArticlePage` já validava `article.categorySlug !== category.slug` separadamente, mas a validação na própria função é mais segura.
+
+**Decisão**: Adicionar parâmetro opcional `categorySlug?: string` a `getArticleBySlug`. Quando fornecido, a busca exige que `a.categorySlug === categorySlug`. Sem o parâmetro, comportamento idêntico ao anterior (compatibilidade retroativa).
+
+**Por que opcional e não obrigatório**: `getArticleBySlug` também é usado em testes de dados sem contexto de categoria. Tornar obrigatório quebraria esses usos sem ganho real.
+
+**Uso em `GuideArticlePage`**: `getArticleBySlug(articleSlug ?? '', categorySlug)` — o `categorySlug` da URL é passado, eliminando a necessidade de validar `article.categorySlug !== category.slug` após o lookup.
+
+---
+
+## 2026-06-23 — Sentry para tipos de bloco desconhecidos no `GuideArticleLayout`
+
+**Contexto**: O mapa `CONTENT_BLOCK_RENDERERS` em `GuideArticleLayout.tsx` retorna `undefined` para tipos de bloco não registrados. O comportamento silencioso (retornar `null` e não renderizar) é correto para produção, mas mascarava erros de dados — um bloco com `type` inválido passaria despercebido.
+
+**Decisão**: Em desenvolvimento (`import.meta.env.DEV`): `console.warn` com o tipo desconhecido. Em produção: `Sentry.captureMessage(...)` com nível `'warning'`.
+
+**Por que `import.meta.env.DEV` e não `process.env.NODE_ENV`**: este é um projeto Vite. As variáveis de ambiente do Vite são acessadas via `import.meta.env`. `process.env.NODE_ENV` não existe no contexto do browser sem configuração adicional de polyfill.
+
+**Alternativa rejeitada**: lançar exceção. Bloco desconhecido não deve crashar a página — o resto do artigo deve continuar renderizando normalmente.
+
+---
+
+## 2026-06-23 — `aria-label` em `<li>` de action steps para WCAG 1.3.1
+
+**Contexto**: `GuideActionStepCard` renderizava `<li>` para cada passo sem nome acessível. O número do passo era visível apenas visualmente (indicador circular com número). Leitores de tela anunciavam o conteúdo do item sem contexto de sequência.
+
+**Decisão**: Adicionar `aria-label={`Passo ${stepIndex}`}` ao elemento `<li>` em `GuideActionStepCard`.
+
+**Por que no `<li>` e não no indicador visual**: o indicador circular (`<span aria-hidden>`) é decorativo — seu conteúdo já está sendo suprimido de leitores de tela com `aria-hidden`. O `aria-label` no `<li>` fornece o contexto de sequência para todo o item, não apenas para o número.
+
+**Referência WCAG**: 1.3.1 Info and Relationships — informação transmitida visualmente deve ser disponível programaticamente.
+
+---
+
+## 2026-06-23 — Remoção de exports mortos: `GuideActionStepCard`, `GuideActionStepList` e re-export de `ArticleStepIconName`
+
+**Contexto**: O barrel `src/features/guide/components/index.ts` exportava `GuideActionStepCard` e `GuideActionStepList` — componentes internos de implementação do `GuideArticleLayout`, sem uso externo à feature. O arquivo `guideIconMap.ts` re-exportava `ArticleStepIconName`, que já é exportado pelo barrel canônico `data/index.ts`.
+
+**Decisão**: Remover os dois exports do barrel de componentes. Remover o `export type { ArticleStepIconName }` de `guideIconMap.ts`.
+
+**Por que não exportar componentes internos**: a API pública de uma feature é definida pelo barrel `index.ts`. Exportar componentes de implementação cria acoplamento implícito — código externo pode começar a importá-los e qualquer refatoração interna se torna um breaking change. `GuideActionStepCard` e `GuideActionStepList` são detalhes de implementação de `GuideArticleLayout`.
+
+**Por que remover a re-exportação de tipo**: `ArticleStepIconName` tem uma fonte canônica (`data/index.ts`). Uma re-exportação em `guideIconMap.ts` cria dois caminhos de import para o mesmo tipo — confunde sobre qual é o caminho correto e pode gerar inconsistência se a re-exportação ficar desatualizada.
+
+---
+
+## 2026-06-22 — Constantes compartilhadas para strings repetidas em equipment.ts
+
+**Contexto**: Com três artigos no mesmo arquivo (`equipment.ts`), seis strings de conteúdo passaram a aparecer três vezes cada: `'Como solicitar'`, `'Documentos necessários'`, `'Cartão do SUS'`, `'Documento com foto (RG ou CNH)'`, `'CPF'`, `'Comprovante de residência'` e `'doctor-patient'`. A regra `sonarjs/no-duplicate-string` (threshold: 3) bloqueou o pre-commit.
+
+**Decisão**: Extrair as sete strings como constantes no topo do arquivo (`HOW_TO_SECTION`, `REQUIRED_DOCS_TITLE`, `DOC_SUS_CARD`, `DOC_PHOTO_ID`, `DOC_CPF`, `DOC_PROOF_OF_ADDRESS`, `IMG_DOCTOR_PATIENT`), seguindo o mesmo padrão já usado para `CATEGORY_SLUG` e `DATE_PUBLISHED`.
+
+**Regra**: arquivos com múltiplos artigos na mesma categoria devem extrair strings compartilhadas entre artigos como constantes no topo do arquivo. Isso evita retrabalho no pre-commit e mantém o conteúdo de checklist sincronizado entre artigos da mesma família.
