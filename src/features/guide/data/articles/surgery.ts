@@ -1,4 +1,5 @@
 import type { GuideArticle } from '../guideArticles'
+import { DOC_PHOTO_ID, DOC_SUS_CARD } from './articleConstants'
 
 const CATEGORY_SLUG = 'cirurgia'
 const DATE_PUBLISHED = '2026-05-01'
@@ -48,8 +49,8 @@ export const surgeryArticles: GuideArticle[] = [
         title: 'O que levar',
         items: [
           'Pedido de cirurgia assinado pelo médico',
-          'Cartão do SUS',
-          'Documento com foto (RG ou CNH)',
+          DOC_SUS_CARD,
+          DOC_PHOTO_ID,
           'Exames solicitados pelo cirurgião',
         ],
       },

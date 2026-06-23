@@ -1,4 +1,5 @@
 import type { GuideArticle } from '../guideArticles'
+import { DOC_PHOTO_ID, DOC_SUS_CARD } from './articleConstants'
 
 const CATEGORY_SLUG = 'vacinacao'
 const DATE_PUBLISHED = '2026-05-01'
@@ -94,8 +95,8 @@ export const vaccinationArticles: GuideArticle[] = [
         title: 'O que levar',
         items: [
           'Caderneta de vacinação (se tiver)',
-          'Cartão do SUS',
-          'Documento com foto',
+          DOC_SUS_CARD,
+          DOC_PHOTO_ID,
         ],
       },
     ],

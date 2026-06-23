@@ -1,4 +1,5 @@
 import type { GuideArticle } from '../guideArticles'
+import { DOC_PHOTO_ID, DOC_SUS_CARD } from './articleConstants'
 
 const CATEGORY_SLUG = 'atendimento-domiciliar'
 const DATE_PUBLISHED = '2026-05-01'
@@ -57,8 +58,8 @@ export const homeCareArticles: GuideArticle[] = [
         variant: 'checklist',
         title: 'O que levar à UBS',
         items: [
-          'Cartão do SUS',
-          'Documento com foto (RG ou CPF)',
+          DOC_SUS_CARD,
+          DOC_PHOTO_ID,
           'Laudo ou receita médica com justificativa',
           'Exames recentes (se tiver)',
         ],
