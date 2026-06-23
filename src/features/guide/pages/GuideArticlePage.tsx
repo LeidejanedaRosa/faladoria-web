@@ -23,7 +23,7 @@ export function GuideArticlePage() {
     articleSlug: string
   }>()
 
-  const article = getArticleBySlug(articleSlug ?? '')
+  const article = getArticleBySlug(articleSlug ?? '', categorySlug)
   const category = getCategoryBySlug(categorySlug ?? '')
 
   useDocumentMeta({
@@ -59,14 +59,19 @@ export function GuideArticlePage() {
               article.title,
               article.summary,
               GUIDE_ROUTES.article(category.slug, article.slug),
-              article.datePublished
+              article.datePublished,
+              article.dateModified
             )}
           />
           <BreadcrumbSchema items={breadcrumbItems} />
         </>
       }
     >
-      <GuideArticleLayout article={article} breadcrumbItems={breadcrumbItems} />
+      <GuideArticleLayout
+        article={article}
+        category={category}
+        breadcrumbItems={breadcrumbItems}
+      />
     </PageShell>
   )
 }

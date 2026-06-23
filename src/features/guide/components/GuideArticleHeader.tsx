@@ -1,9 +1,9 @@
 import { cn } from '@shared/utils/cn'
 
 import {
-  getCategoryBySlug,
   GUIDE_ARTICLE_HEADING_ID,
   type GuideArticle,
+  type GuideCategory,
 } from '../data'
 import { CATEGORY_THEME } from './guideCategoryTheme'
 import { GUIDE_ICON_MAP } from './guideIconMap'
@@ -11,10 +11,13 @@ import { GUIDE_ARTICLE_IMAGES, GUIDE_CATEGORY_IMAGES } from './guideImageMap'
 
 interface GuideArticleHeaderProps {
   article: GuideArticle
+  category: GuideCategory | undefined
 }
 
-export const GuideArticleHeader = ({ article }: GuideArticleHeaderProps) => {
-  const category = getCategoryBySlug(article.categorySlug)
+export const GuideArticleHeader = ({
+  article,
+  category,
+}: GuideArticleHeaderProps) => {
   const theme = CATEGORY_THEME[category?.color ?? 'purple']
   const Icon = category ? GUIDE_ICON_MAP[category.iconName] : null
   const articleImage = GUIDE_ARTICLE_IMAGES[article.slug]

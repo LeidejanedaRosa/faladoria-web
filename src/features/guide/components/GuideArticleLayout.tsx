@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+import * as Sentry from '@sentry/react'
 import { Container } from '@shared/components/layout'
 import type { BreadcrumbItem } from '@shared/data'
 import { cn } from '@shared/utils/cn'
@@ -8,10 +9,10 @@ import {
   type ActionStepBlock,
   type ArticleBlock,
   type ArticleStepIconName,
-  getCategoryBySlug,
   GUIDE_ARTICLE_HEADING_ID,
   GUIDE_CONTENT,
   type GuideArticle,
+  type GuideCategory,
 } from '../data'
 import { GuideActionStepList } from './GuideActionStepList'
 import { Callout } from './GuideArticleCallouts'
@@ -23,6 +24,7 @@ import { ARTICLE_STEP_ICON_MAP } from './guideIconMap'
 
 interface GuideArticleLayoutProps {
   article: GuideArticle
+  category: GuideCategory | undefined
   breadcrumbItems: BreadcrumbItem[]
 }
 
@@ -117,7 +119,20 @@ const StepBlockRenderer = ({
   theme?: CategoryTheme
 }) => {
   const render = CONTENT_BLOCK_RENDERERS[block.type]
-  if (!render) return null
+  if (!render) {
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `GuideArticleLayout: no renderer for block type "${block.type}". Check groupIntoSteps or add a renderer to CONTENT_BLOCK_RENDERERS.`
+      )
+    } else {
+      Sentry.captureMessage(
+        `GuideArticleLayout: unknown block type "${block.type}"`,
+        'warning'
+      )
+    }
+    return null
+  }
   return <>{render(block, theme)}</>
 }
 
@@ -265,9 +280,9 @@ const StepCard = ({
 
 export const GuideArticleLayout = ({
   article,
+  category,
   breadcrumbItems,
 }: GuideArticleLayoutProps) => {
-  const category = getCategoryBySlug(article.categorySlug)
   const theme = CATEGORY_THEME[category?.color ?? 'purple']
   const { preamble, steps } = groupIntoSteps(article.content)
 
@@ -276,7 +291,7 @@ export const GuideArticleLayout = ({
       <GuideBreadcrumb items={breadcrumbItems} />
 
       <article aria-labelledby={GUIDE_ARTICLE_HEADING_ID}>
-        <GuideArticleHeader article={article} />
+        <GuideArticleHeader article={article} category={category} />
 
         {preamble.length > 0 && (
           <div className='mb-6 space-y-4'>
