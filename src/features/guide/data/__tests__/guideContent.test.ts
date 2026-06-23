@@ -48,6 +48,12 @@ describe('GUIDE_COLLECTION_PAGE_STRUCTURED_DATA', () => {
     )
   })
 
+  it('sets name to the guide SEO title', () => {
+    expect(GUIDE_COLLECTION_PAGE_STRUCTURED_DATA.name).toBe(
+      'Como conseguir pelo SUS'
+    )
+  })
+
   it('sets inLanguage to pt-BR', () => {
     expect(GUIDE_COLLECTION_PAGE_STRUCTURED_DATA.inLanguage).toBe('pt-BR')
   })
@@ -89,8 +95,11 @@ describe('createArticleStructuredData', () => {
     expect(result.inLanguage).toBe('pt-BR')
   })
 
-  it('sets datePublished as an ISO date string (YYYY-MM-DD)', () => {
-    expect(result.datePublished).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+  it('sets datePublished as a valid ISO date (YYYY-MM-DD)', () => {
+    expect(result.datePublished).toMatch(
+      /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/
+    )
+    expect(new Date(result.datePublished).toString()).not.toBe('Invalid Date')
   })
 
   it('links author to the organization node', () => {
@@ -103,5 +112,26 @@ describe('createArticleStructuredData', () => {
 
   it('links publisher to the organization node', () => {
     expect(result.publisher['@id']).toBe(`${COMPANY_INFO.url}/#organization`)
+  })
+
+  it('uses the provided dateModified when given', () => {
+    const withModified = createArticleStructuredData(
+      'Título',
+      'Descrição.',
+      '/url',
+      '2026-05-01',
+      '2026-06-01'
+    )
+    expect(withModified.dateModified).toBe('2026-06-01')
+  })
+
+  it('falls back to datePublished when dateModified is not provided', () => {
+    const withoutModified = createArticleStructuredData(
+      'Título',
+      'Descrição.',
+      '/url',
+      '2026-05-01'
+    )
+    expect(withoutModified.dateModified).toBe('2026-05-01')
   })
 })

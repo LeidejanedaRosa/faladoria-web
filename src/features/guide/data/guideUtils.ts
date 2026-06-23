@@ -10,8 +10,15 @@ export function getArticlesByCategory(categorySlug: string): GuideArticle[] {
   return GUIDE_ARTICLES.filter(a => a.categorySlug === categorySlug)
 }
 
-export function getArticleBySlug(slug: string): GuideArticle | undefined {
-  return GUIDE_ARTICLES.find(a => a.slug === slug)
+export function getArticleBySlug(
+  slug: string,
+  categorySlug?: string
+): GuideArticle | undefined {
+  return GUIDE_ARTICLES.find(
+    a =>
+      a.slug === slug &&
+      (categorySlug === undefined || a.categorySlug === categorySlug)
+  )
 }
 
 export function getCategoriesByGroup(groupSlug: string): GuideCategory[] {

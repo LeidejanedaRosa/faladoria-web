@@ -196,7 +196,8 @@ export function createArticleStructuredData(
   title: string,
   description: string,
   articleUrl: string,
-  datePublished: string
+  datePublished: string,
+  dateModified?: string
 ) {
   return {
     '@context': SCHEMA_ORG,
@@ -206,6 +207,7 @@ export function createArticleStructuredData(
     url: `${COMPANY_INFO.url}${articleUrl}`,
     inLanguage: 'pt-BR',
     datePublished,
+    dateModified: dateModified ?? datePublished,
     author: {
       '@id': `${COMPANY_INFO.url}/#organization`,
     },
@@ -215,11 +217,11 @@ export function createArticleStructuredData(
     publisher: {
       '@id': `${COMPANY_INFO.url}/#organization`,
     },
-  } as const
+  }
 }
 
 export const GUIDE_COLLECTION_PAGE_STRUCTURED_DATA = {
-  '@context': 'https://schema.org',
+  '@context': SCHEMA_ORG,
   '@type': 'CollectionPage',
   name: GUIDE_CONTENT.seo.title,
   description: GUIDE_CONTENT.seo.description,

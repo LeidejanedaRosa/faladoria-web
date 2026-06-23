@@ -4,12 +4,13 @@ import { parseJsonLdScripts } from '../helpers/jsonLd'
 
 type JsonLd = Record<string, unknown>
 
+const GUIDE_URL = '/como-conseguir-pelo-sus'
+const CATEGORY_URL = `${GUIDE_URL}/seus-direitos`
+
 test.describe('GuideCategoryPage', () => {
   test.describe('Valid category (seus-direitos)', () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto('/guia-do-sus/seus-direitos', {
-        waitUntil: 'domcontentloaded',
-      })
+      await page.goto(CATEGORY_URL, { waitUntil: 'domcontentloaded' })
       await page.locator('h1').waitFor({ timeout: 15000 })
     })
 
@@ -17,17 +18,21 @@ test.describe('GuideCategoryPage', () => {
       test('should render the category heading', async ({ page }) => {
         const h1 = page.locator('h1')
         await expect(h1).toBeVisible()
-        await expect(h1).toContainText('Seus Direitos')
+        await expect(h1).toContainText('Seus direitos')
       })
 
       test('should render the category description', async ({ page }) => {
         await expect(
-          page.getByText('Conheça seus direitos como usuário do SUS')
+          page.getByText('Seus direitos e como exigi-los.')
         ).toBeVisible()
       })
 
-      test('should render the "coming soon" placeholder', async ({ page }) => {
-        await expect(page.getByText('Conteúdo em breve')).toBeVisible()
+      test('should render article cards and not the coming soon placeholder', async ({
+        page,
+      }) => {
+        await expect(page.getByText('Conteúdo em breve')).toBeHidden()
+        const articleLinks = page.locator(`a[href^="${CATEGORY_URL}/"]`)
+        await expect(articleLinks.first()).toBeVisible()
       })
 
       test('should render the breadcrumb navigation', async ({ page }) => {
@@ -36,7 +41,7 @@ test.describe('GuideCategoryPage', () => {
 
         await expect(breadcrumb.getByText('Início')).toBeVisible()
         await expect(breadcrumb.getByText('Guia do SUS')).toBeVisible()
-        await expect(breadcrumb.getByText('Seus Direitos')).toBeVisible()
+        await expect(breadcrumb.getByText('Seus direitos')).toBeVisible()
       })
 
       test('should have correct breadcrumb links', async ({ page }) => {
@@ -46,7 +51,7 @@ test.describe('GuideCategoryPage', () => {
         await expect(homeLink).toHaveAttribute('href', '/')
 
         const guideLink = breadcrumb.getByText('Guia do SUS')
-        await expect(guideLink).toHaveAttribute('href', '/guia-do-sus')
+        await expect(guideLink).toHaveAttribute('href', GUIDE_URL)
       })
 
       test('should mark the current page in breadcrumb', async ({ page }) => {
@@ -54,13 +59,13 @@ test.describe('GuideCategoryPage', () => {
         const currentItem = breadcrumb.locator('[aria-current="page"]')
 
         await expect(currentItem).toBeVisible()
-        await expect(currentItem).toContainText('Seus Direitos')
+        await expect(currentItem).toContainText('Seus direitos')
       })
     })
 
     test.describe('SEO', () => {
       test('should set the document title', async ({ page }) => {
-        await expect(page).toHaveTitle(/Seus Direitos.*Guia do SUS.*Faladoria/)
+        await expect(page).toHaveTitle(/Seus direitos.*Guia do SUS.*Faladoria/)
       })
 
       test('should set the meta description', async ({ page }) => {
@@ -81,6 +86,18 @@ test.describe('GuideCategoryPage', () => {
 
         expect(breadcrumb).toBeTruthy()
         expect(breadcrumb!.itemListElement).toHaveLength(3)
+      })
+
+      test('should render CollectionPage structured data', async ({ page }) => {
+        const scripts = await parseJsonLdScripts(page)
+
+        const collectionPage = (scripts as JsonLd[]).find(
+          d => d['@type'] === 'CollectionPage'
+        )
+
+        expect(collectionPage).toBeTruthy()
+        expect(collectionPage!.name).toBe('Seus direitos')
+        expect(collectionPage!.inLanguage).toBe('pt-BR')
       })
 
       test('should render organization structured data', async ({ page }) => {
@@ -108,7 +125,7 @@ test.describe('GuideCategoryPage', () => {
         await expect(main).toBeAttached()
 
         const ariaLabel = await main.getAttribute('aria-label')
-        expect(ariaLabel).toContain('Seus Direitos')
+        expect(ariaLabel).toContain('Seus direitos')
       })
 
       test('should use semantic article element', async ({ page }) => {
@@ -132,14 +149,10 @@ test.describe('GuideCategoryPage', () => {
         await expect(ol).toBeAttached()
       })
 
-      test('should have aria-hidden on breadcrumb separators', async ({
-        page,
-      }) => {
-        const separators = page.locator(
-          'nav[aria-label="Breadcrumb"] li[aria-hidden="true"]'
-        )
-        const count = separators
-        await expect(count).toHaveCount(2)
+      test('should have 3 breadcrumb items', async ({ page }) => {
+        const breadcrumb = page.locator('nav[aria-label="Breadcrumb"]')
+        const items = breadcrumb.locator('ol > li')
+        await expect(items).toHaveCount(3)
       })
     })
   })
@@ -148,9 +161,7 @@ test.describe('GuideCategoryPage', () => {
     test.describe('Desktop', () => {
       test.beforeEach(async ({ page }) => {
         await page.setViewportSize({ width: 1280, height: 800 })
-        await page.goto('/guia-do-sus/seus-direitos', {
-          waitUntil: 'domcontentloaded',
-        })
+        await page.goto(CATEGORY_URL, { waitUntil: 'domcontentloaded' })
         await page.locator('h1').waitFor({ timeout: 15000 })
       })
 
@@ -174,9 +185,7 @@ test.describe('GuideCategoryPage', () => {
     test.describe('Mobile', () => {
       test.beforeEach(async ({ page }) => {
         await page.setViewportSize({ width: 375, height: 667 })
-        await page.goto('/guia-do-sus/seus-direitos', {
-          waitUntil: 'domcontentloaded',
-        })
+        await page.goto(CATEGORY_URL, { waitUntil: 'domcontentloaded' })
         await page.locator('h1').waitFor({ timeout: 15000 })
       })
 
@@ -207,11 +216,11 @@ test.describe('GuideCategoryPage', () => {
     test('should redirect to guide page for unknown slugs', async ({
       page,
     }) => {
-      await page.goto('/guia-do-sus/slug-invalido', {
+      await page.goto(`${GUIDE_URL}/slug-invalido`, {
         waitUntil: 'domcontentloaded',
       })
 
-      await page.waitForURL('/guia-do-sus', { timeout: 10000 })
+      await page.waitForURL(GUIDE_URL, { timeout: 10000 })
 
       const h1 = page.locator('h1')
       await expect(h1).toContainText('Como conseguir pelo SUS')

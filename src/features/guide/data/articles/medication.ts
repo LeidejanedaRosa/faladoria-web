@@ -1,4 +1,5 @@
 import type { GuideArticle } from '../guideArticles'
+import { DOC_CPF, DOC_SUS_CARD } from './articleConstants'
 
 const CATEGORY_SLUG = 'medicamento'
 const DATE_PUBLISHED = '2026-05-01'
@@ -51,7 +52,7 @@ export const medicationArticles: GuideArticle[] = [
         title: 'O que levar',
         items: [
           'Receita médica atualizada',
-          'Cartão do SUS',
+          DOC_SUS_CARD,
           'Documento com foto (RG, CNH ou Carteira de Trabalho)',
         ],
       },
@@ -154,7 +155,7 @@ export const medicationArticles: GuideArticle[] = [
           'Laudo ou relatório médico detalhado',
           'Exames que comprovam o diagnóstico',
           'Cartão do SUS e documento com foto',
-          'CPF',
+          DOC_CPF,
         ],
       },
       {

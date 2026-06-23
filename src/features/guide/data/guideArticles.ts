@@ -58,6 +58,7 @@ export interface GuideArticle {
   title: string
   summary: string
   datePublished: string
+  dateModified?: string
   content: ArticleBlock[]
   categorySlug: string
   iconName?: ArticleStepIconName

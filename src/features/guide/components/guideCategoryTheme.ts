@@ -155,4 +155,13 @@ export const CATEGORY_THEME: Record<GuideCategory['color'], CategoryTheme> = {
     text: 'text-yellow-700',
     textAccent: 'text-yellow-600',
   },
+  slate: {
+    iconBg: 'bg-slate-500',
+    iconBgLight: 'bg-slate-100',
+    softBg: 'bg-slate-50',
+    border: 'border-slate-200',
+    borderHover: 'hover:border-slate-300',
+    text: 'text-slate-700',
+    textAccent: 'text-slate-600',
+  },
 }

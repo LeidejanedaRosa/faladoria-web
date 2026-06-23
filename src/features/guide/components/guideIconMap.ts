@@ -24,7 +24,6 @@ import type { IconProps } from '@shared/types/icon'
 
 import type { ArticleStepIconName, GuideCategory } from '../data'
 
-export type { ArticleStepIconName }
 export type IconComponent = (props: IconProps) => ReactElement
 
 export const GUIDE_ICON_MAP: Record<GuideCategory['iconName'], IconComponent> =

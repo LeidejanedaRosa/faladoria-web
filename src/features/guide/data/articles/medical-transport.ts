@@ -1,4 +1,9 @@
 import type { GuideArticle } from '../guideArticles'
+import {
+  DOC_PHOTO_ID,
+  DOC_PROOF_OF_ADDRESS,
+  DOC_SUS_CARD,
+} from './articleConstants'
 
 const CATEGORY_SLUG = 'transporte-sanitario'
 const DATE_PUBLISHED = '2026-05-01'
@@ -56,9 +61,9 @@ export const medicalTransportArticles: GuideArticle[] = [
         title: 'Documentos para levar à UBS',
         items: [
           'Encaminhamento médico com a indicação do serviço em outro município',
-          'Cartão do SUS',
-          'Documento com foto (RG ou CNH)',
-          'Comprovante de residência',
+          DOC_SUS_CARD,
+          DOC_PHOTO_ID,
+          DOC_PROOF_OF_ADDRESS,
           'Exames recentes relacionados ao tratamento (se tiver)',
         ],
       },
@@ -123,8 +128,8 @@ export const medicalTransportArticles: GuideArticle[] = [
           'Autorização prévia do TFD emitida pela Secretaria de Saúde',
           'Comprovante do atendimento realizado (relatório médico, receita ou guia)',
           'Bilhetes de passagem ou recibo de combustível',
-          'Cartão do SUS',
-          'Documento com foto',
+          DOC_SUS_CARD,
+          DOC_PHOTO_ID,
           'Dados bancários para depósito',
         ],
       },

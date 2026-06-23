@@ -76,10 +76,22 @@ describe('getCategoriesByGroup', () => {
 
 describe('getArticleBySlug', () => {
   it('returns the correct article for a valid slug', () => {
-    const article = GUIDE_ARTICLES[0]
-    const result = getArticleBySlug(article.slug)
+    const result = getArticleBySlug('direito-a-saude')
     expect(result).toBeDefined()
-    expect(result?.slug).toBe(article.slug)
+    expect(result?.slug).toBe('direito-a-saude')
+    expect(result?.categorySlug).toBe('seus-direitos')
+  })
+
+  it('returns the correct article when categorySlug is provided', () => {
+    const result = getArticleBySlug('direito-a-saude', 'seus-direitos')
+    expect(result).toBeDefined()
+    expect(result?.slug).toBe('direito-a-saude')
+  })
+
+  it('returns undefined when slug matches but categorySlug does not', () => {
+    expect(
+      getArticleBySlug('direito-a-saude', 'categoria-errada')
+    ).toBeUndefined()
   })
 
   it('returns undefined for an invalid slug', () => {
@@ -88,5 +100,25 @@ describe('getArticleBySlug', () => {
 
   it('returns undefined for an empty string', () => {
     expect(getArticleBySlug('')).toBeUndefined()
+  })
+})
+
+describe('slug uniqueness', () => {
+  it('all article slugs are unique across all categories', () => {
+    const slugs = GUIDE_ARTICLES.map(a => a.slug)
+    const unique = new Set(slugs)
+    expect(unique.size).toBe(slugs.length)
+  })
+
+  it('all category slugs are unique', () => {
+    const slugs = GUIDE_CATEGORIES.map(c => c.slug)
+    const unique = new Set(slugs)
+    expect(unique.size).toBe(slugs.length)
+  })
+
+  it('all category colors are unique', () => {
+    const colors = GUIDE_CATEGORIES.map(c => c.color)
+    const unique = new Set(colors)
+    expect(unique.size).toBe(colors.length)
   })
 })

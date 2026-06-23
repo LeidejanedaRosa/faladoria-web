@@ -1,14 +1,16 @@
 import type { GuideArticle } from '../guideArticles'
+import {
+  DOC_CPF,
+  DOC_PHOTO_ID,
+  DOC_PROOF_OF_ADDRESS,
+  DOC_SUS_CARD,
+} from './articleConstants'
 
 const CATEGORY_SLUG = 'equipamentos'
 const DATE_PUBLISHED = '2026-05-01'
 const HOW_TO_SECTION = 'Como solicitar'
 const IMG_DOCTOR_PATIENT = 'doctor-patient' as const
 const REQUIRED_DOCS_TITLE = 'Documentos necessários'
-const DOC_SUS_CARD = 'Cartão do SUS'
-const DOC_PHOTO_ID = 'Documento com foto (RG ou CNH)'
-const DOC_CPF = 'CPF'
-const DOC_PROOF_OF_ADDRESS = 'Comprovante de residência'
 
 export const equipmentArticles: GuideArticle[] = [
   {

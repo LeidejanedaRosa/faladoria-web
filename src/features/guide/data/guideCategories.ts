@@ -35,6 +35,7 @@ export interface GuideCategory {
     | 'fuchsia'
     | 'red'
     | 'yellow'
+    | 'slate'
 }
 
 export const GUIDE_CATEGORIES: GuideCategory[] = [
@@ -135,7 +136,7 @@ export const GUIDE_CATEGORIES: GuideCategory[] = [
     color: 'purple',
   },
 
-  // Direitos e ação — fuchsia, blue, rose, amber (distintos dentro do grupo)
+  // Direitos e ação — fuchsia, slate, yellow, red (distintos dentro do grupo)
   {
     slug: 'seus-direitos',
     label: 'Seus direitos',
@@ -148,7 +149,7 @@ export const GUIDE_CATEGORIES: GuideCategory[] = [
     label: 'Como funciona o SUS',
     description: 'Estrutura, princípios e organização.',
     iconName: 'building',
-    color: 'blue',
+    color: 'slate',
   },
   {
     slug: 'denuncias',

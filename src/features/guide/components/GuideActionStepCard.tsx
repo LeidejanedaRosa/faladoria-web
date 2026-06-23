@@ -18,7 +18,10 @@ export const GuideActionStepCard = ({
   const src = block.imageKey ? SHARED_STEP_IMAGES[block.imageKey] : undefined
 
   return (
-    <li className='overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm'>
+    <li
+      aria-label={`Passo ${stepIndex}`}
+      className='overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm'
+    >
       <div className='flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:gap-6 sm:p-6'>
         <span
           className={cn(
@@ -31,7 +34,7 @@ export const GuideActionStepCard = ({
         </span>
 
         <div className='flex-1'>
-          <p className='text-lg font-bold text-gray-900'>{block.action}</p>
+          <h3 className='text-lg font-bold text-gray-900'>{block.action}</h3>
           {block.detail && (
             <p className='mt-1 text-base leading-relaxed text-gray-600'>
               {block.detail}
