@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { GUIDE_ARTICLE_HEADING_ID } from '../../data'
-import type { GuideArticle } from '../../data'
+import type { GuideArticle, GuideCategory } from '../../data'
 import { GuideArticleHeader } from '../GuideArticleHeader'
 
 vi.mock('../guideImageMap', () => ({
@@ -23,8 +23,21 @@ function makeArticle(overrides: Partial<GuideArticle> = {}): GuideArticle {
   }
 }
 
-function renderHeader(article: GuideArticle) {
-  return render(<GuideArticleHeader article={article} />)
+function makeMockCategory(
+  overrides: Partial<GuideCategory> = {}
+): GuideCategory {
+  return {
+    slug: 'consulta',
+    label: 'Consulta',
+    description: 'Como agendar uma consulta pelo SUS.',
+    iconName: 'clipboard',
+    color: 'rose',
+    ...overrides,
+  }
+}
+
+function renderHeader(article: GuideArticle, category?: GuideCategory) {
+  return render(<GuideArticleHeader article={article} category={category} />)
 }
 
 describe('GuideArticleHeader', () => {
@@ -56,7 +69,8 @@ describe('GuideArticleHeader', () => {
   describe('Conditional image', () => {
     it('renders the article image when available', () => {
       const { container } = renderHeader(
-        makeArticle({ slug: 'artigo-com-imagem' })
+        makeArticle({ slug: 'artigo-com-imagem' }),
+        makeMockCategory()
       )
       expect(container.querySelector('img')).toHaveAttribute(
         'src',
@@ -66,7 +80,8 @@ describe('GuideArticleHeader', () => {
 
     it('uses the category image as fallback when the article has no specific image', () => {
       const { container } = renderHeader(
-        makeArticle({ slug: 'sem-imagem', categorySlug: 'consulta' })
+        makeArticle({ slug: 'sem-imagem', categorySlug: 'consulta' }),
+        makeMockCategory({ slug: 'consulta' })
       )
       expect(container.querySelector('img')).toHaveAttribute(
         'src',
@@ -75,38 +90,31 @@ describe('GuideArticleHeader', () => {
     })
 
     it('renders no image when neither article nor category has one', () => {
-      const { container } = renderHeader(
-        makeArticle({
-          slug: 'sem-imagem',
-          categorySlug: 'categoria-sem-imagem',
-        })
-      )
+      const { container } = renderHeader(makeArticle({ slug: 'sem-imagem' }))
       expect(container.querySelector('img')).not.toBeInTheDocument()
     })
 
     it('loads the image eagerly to avoid late LCP', () => {
       const { container } = renderHeader(
-        makeArticle({ slug: 'artigo-com-imagem' })
+        makeArticle({ slug: 'artigo-com-imagem' }),
+        makeMockCategory()
       )
       expect(container.querySelector('img')).toHaveAttribute('loading', 'eager')
     })
 
     it('the image has fetchPriority high for LCP loading priority', () => {
       const { container } = renderHeader(
-        makeArticle({ slug: 'artigo-com-imagem' })
+        makeArticle({ slug: 'artigo-com-imagem' }),
+        makeMockCategory()
       )
       expect(container.querySelector('img')).toHaveAttribute(
         'fetchpriority',
         'high'
       )
     })
-  })
 
-  describe('Category icon', () => {
-    it('renders no image when the category does not exist', () => {
-      const { container } = renderHeader(
-        makeArticle({ categorySlug: 'categoria-inexistente' })
-      )
+    it('renders no image when category is undefined', () => {
+      const { container } = renderHeader(makeArticle(), undefined)
       expect(container.querySelector('img')).not.toBeInTheDocument()
     })
   })
@@ -114,7 +122,8 @@ describe('GuideArticleHeader', () => {
   describe('Accessibility', () => {
     it('the image is decorative and hidden from screen readers', () => {
       const { container } = renderHeader(
-        makeArticle({ slug: 'artigo-com-imagem' })
+        makeArticle({ slug: 'artigo-com-imagem' }),
+        makeMockCategory()
       )
       const img = container.querySelector('img')
       expect(img).toHaveAttribute('alt', '')
@@ -123,7 +132,8 @@ describe('GuideArticleHeader', () => {
 
     it('the image has dimension attributes to prevent CLS', () => {
       const { container } = renderHeader(
-        makeArticle({ slug: 'artigo-com-imagem' })
+        makeArticle({ slug: 'artigo-com-imagem' }),
+        makeMockCategory()
       )
       const img = container.querySelector('img')
       expect(Number(img?.getAttribute('width'))).toBeGreaterThan(0)

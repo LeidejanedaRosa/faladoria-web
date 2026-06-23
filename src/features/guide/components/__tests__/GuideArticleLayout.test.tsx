@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 
-import type { ArticleBlock, GuideArticle } from '../../data'
+import type { ArticleBlock, GuideArticle, GuideCategory } from '../../data'
 import { GuideArticleLayout } from '../GuideArticleLayout'
 
 vi.mock('../guideImageMap', () => ({
@@ -30,10 +30,14 @@ function makeArticle(overrides: Partial<GuideArticle> = {}): GuideArticle {
   }
 }
 
-function renderLayout(article: GuideArticle) {
+function renderLayout(article: GuideArticle, category?: GuideCategory) {
   return render(
     <MemoryRouter>
-      <GuideArticleLayout article={article} breadcrumbItems={breadcrumbItems} />
+      <GuideArticleLayout
+        article={article}
+        category={category}
+        breadcrumbItems={breadcrumbItems}
+      />
     </MemoryRouter>
   )
 }
@@ -175,6 +179,22 @@ describe('GuideArticleLayout', () => {
       renderLayout(makeArticle({ content }))
       expect(screen.getByText('Dica importante')).toBeInTheDocument()
       expect(screen.getByText('Texto da dica.')).toBeInTheDocument()
+    })
+
+    it('renders the callout title as h3 for correct heading hierarchy', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Passo' },
+        {
+          type: 'callout',
+          variant: 'tip',
+          title: 'Dica importante',
+          text: 'Texto.',
+        },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(
+        screen.getByRole('heading', { level: 3, name: 'Dica importante' })
+      ).toBeInTheDocument()
     })
 
     it('renders the emergency number in an emergency callout', () => {
@@ -433,6 +453,29 @@ describe('GuideArticleLayout', () => {
       ]
       const { container } = renderLayout(makeArticle({ content }))
       expect(container.querySelector('img')).not.toBeInTheDocument()
+    })
+
+    it('renders correctly when detail is omitted', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Como solicitar' },
+        { type: 'action-step', action: 'Vá à UBS' },
+      ]
+      renderLayout(makeArticle({ content }))
+      // detail is optional — the action title should still render
+      expect(
+        screen.getByRole('heading', { level: 3, name: 'Vá à UBS' })
+      ).toBeInTheDocument()
+    })
+
+    it('renders the action title as h3 for correct heading hierarchy', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Como solicitar' },
+        { type: 'action-step', action: 'Vá à UBS' },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(
+        screen.getByRole('heading', { level: 3, name: 'Vá à UBS' })
+      ).toBeInTheDocument()
     })
   })
 
