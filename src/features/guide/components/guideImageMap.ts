@@ -1,6 +1,10 @@
 import appointmentCategoryImg from '@assets/guide/appointment/category.webp'
 import howToScheduleImg from '@assets/guide/appointment/how-to-schedule.webp'
 import specialistAppointmentImg from '@assets/guide/appointment/specialist-appointment.webp'
+import childHealthCategoryImg from '@assets/guide/child-health/category.webp'
+import childCareImg from '@assets/guide/child-health/child-care.webp'
+import newbornImg from '@assets/guide/child-health/newborn.webp'
+import oralHealthImg from '@assets/guide/child-health/oral-health.webp'
 import equipmentCategoryImg from '@assets/guide/equipment/category.webp'
 import cpapBipapImg from '@assets/guide/equipment/cpap-bipap.webp'
 import hearingAidImg from '@assets/guide/equipment/hearing-aid.webp'
@@ -57,6 +61,7 @@ export const GUIDE_CATEGORY_IMAGES: Partial<Record<string, string>> = {
   equipamentos: equipmentCategoryImg,
   'saude-da-mulher': womensCategoryImg,
   'saude-do-homem': mensCategoryImg,
+  'saude-da-crianca': childHealthCategoryImg,
 }
 
 export const GUIDE_ARTICLE_IMAGES: Partial<Record<string, string>> = {
@@ -83,6 +88,9 @@ export const GUIDE_ARTICLE_IMAGES: Partial<Record<string, string>> = {
   'pre-natal': prenatalImg,
   'preventivo-e-mamografia': preventiveScreeningImg,
   'planejamento-familiar': familyPlanningImg,
+  'triagem-neonatal': newbornImg,
+  puericultura: childCareImg,
+  'saude-bucal-da-crianca': oralHealthImg,
 }
 
 export const SHARED_STEP_IMAGES: Record<SharedStepImageKey, string> = {
