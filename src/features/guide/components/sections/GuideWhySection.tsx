@@ -61,9 +61,9 @@ export const GuideWhySection = () => (
                   <Icon className='h-6 w-6 text-white' />
                 </div>
                 <div className='flex flex-col gap-0.5'>
-                  <span className='text-sm font-bold text-gray-900'>
+                  <strong className='text-sm font-bold text-gray-900'>
                     {item.title}
-                  </span>
+                  </strong>
                   <p className='text-xs leading-snug text-gray-500'>
                     {item.description}
                   </p>
