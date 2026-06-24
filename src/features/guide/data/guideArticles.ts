@@ -32,18 +32,24 @@ export type SharedStepImageKey =
   | 'phone'
   | 'ubs'
 
+export type CalloutBlock =
+  | { type: 'callout'; variant: 'tip'; title?: string; text?: string }
+  | { type: 'callout'; variant: 'warning'; title?: string; text?: string }
+  | {
+      type: 'callout'
+      variant: 'emergency'
+      title?: string
+      highlight?: string
+      text?: string
+    }
+  | { type: 'callout'; variant: 'checklist'; title?: string; items?: string[] }
+  | { type: 'callout'; variant?: never; title?: string; text?: string }
+
 export type ArticleBlock =
   | { type: 'paragraph'; text: string }
   | { type: 'heading'; level: 2; text: string; icon?: ArticleStepIconName }
   | { type: 'list'; items: string[]; ordered?: boolean }
-  | {
-      type: 'callout'
-      variant?: 'tip' | 'warning' | 'emergency' | 'checklist'
-      title?: string
-      text?: string
-      highlight?: string
-      items?: string[]
-    }
+  | CalloutBlock
   | {
       type: 'action-step'
       action: string

@@ -13,6 +13,12 @@ import { cn } from '@shared/utils/cn'
 import type { ArticleBlock } from '../data'
 
 type CalloutData = Extract<ArticleBlock, { type: 'callout' }>
+type TipCalloutData = Extract<CalloutData, { variant: 'tip' }>
+type WarningCalloutData = Extract<CalloutData, { variant: 'warning' }>
+type EmergencyCalloutData = Extract<CalloutData, { variant: 'emergency' }>
+type ChecklistCalloutData = Extract<CalloutData, { variant: 'checklist' }>
+type DefaultCalloutData = Exclude<CalloutData, { variant: string }>
+type TextCalloutData = TipCalloutData | WarningCalloutData | DefaultCalloutData
 
 const SimpleCallout = ({
   block,
@@ -21,7 +27,7 @@ const SimpleCallout = ({
   icon: Icon,
   defaultLabel,
 }: {
-  block: CalloutData
+  block: TextCalloutData
   containerClassName: string
   iconClassName: string
   icon: ComponentType<{ className?: string }>
@@ -39,7 +45,7 @@ const SimpleCallout = ({
       <Icon className='h-4.5 w-4.5' />
     </span>
     <div>
-      {block.title && <h3 className='text-sm font-semibold'>{block.title}</h3>}
+      {block.title && <p className='text-sm font-semibold'>{block.title}</p>}
       {block.text && (
         <p className={cn('text-sm leading-relaxed', block.title && 'mt-0.5')}>
           {block.text}
@@ -49,7 +55,7 @@ const SimpleCallout = ({
   </div>
 )
 
-const TipCallout = ({ block }: { block: CalloutData }) => (
+const TipCallout = ({ block }: { block: TipCalloutData }) => (
   <SimpleCallout
     block={block}
     containerClassName='border-purple-200 bg-purple-50 text-purple-900'
@@ -59,7 +65,7 @@ const TipCallout = ({ block }: { block: CalloutData }) => (
   />
 )
 
-const WarningCallout = ({ block }: { block: CalloutData }) => (
+const WarningCallout = ({ block }: { block: WarningCalloutData }) => (
   <SimpleCallout
     block={block}
     containerClassName='border-amber-200 bg-amber-50 text-amber-900'
@@ -69,7 +75,7 @@ const WarningCallout = ({ block }: { block: CalloutData }) => (
   />
 )
 
-const EmergencyCallout = ({ block }: { block: CalloutData }) => (
+const EmergencyCallout = ({ block }: { block: EmergencyCalloutData }) => (
   <div
     role='note'
     aria-label={block.title ?? 'Atenção'}
@@ -80,7 +86,7 @@ const EmergencyCallout = ({ block }: { block: CalloutData }) => (
     </span>
     <div>
       {block.title && (
-        <h3 className='text-sm font-bold text-red-700'>{block.title}</h3>
+        <p className='text-sm font-bold text-red-700'>{block.title}</p>
       )}
       {block.highlight && (
         <p
@@ -99,7 +105,7 @@ const EmergencyCallout = ({ block }: { block: CalloutData }) => (
   </div>
 )
 
-const ChecklistCallout = ({ block }: { block: CalloutData }) => (
+const ChecklistCallout = ({ block }: { block: ChecklistCalloutData }) => (
   <div
     role='note'
     aria-label={block.title ?? 'Lista de verificação'}
@@ -110,7 +116,7 @@ const ChecklistCallout = ({ block }: { block: CalloutData }) => (
     </span>
     <div className='flex-1'>
       {block.title && (
-        <h3 className='text-sm font-semibold text-green-800'>{block.title}</h3>
+        <p className='text-sm font-semibold text-green-800'>{block.title}</p>
       )}
       {block.items && block.items.length > 0 && (
         <ul className='mt-2 space-y-1.5'>
@@ -131,7 +137,7 @@ const ChecklistCallout = ({ block }: { block: CalloutData }) => (
   </div>
 )
 
-const DefaultCallout = ({ block }: { block: CalloutData }) => (
+const DefaultCallout = ({ block }: { block: DefaultCalloutData }) => (
   <SimpleCallout
     block={block}
     containerClassName='border-purple-200 bg-purple-50 text-purple-900'
@@ -141,16 +147,17 @@ const DefaultCallout = ({ block }: { block: CalloutData }) => (
   />
 )
 
-const CALLOUT_VARIANTS = {
-  tip: TipCallout,
-  warning: WarningCallout,
-  emergency: EmergencyCallout,
-  checklist: ChecklistCallout,
-  default: DefaultCallout,
-} as const
-
 export const Callout = ({ block }: { block: CalloutData }) => {
-  const variant = block.variant ?? 'default'
-  const Component = CALLOUT_VARIANTS[variant]
-  return <Component block={block} />
+  switch (block.variant) {
+    case 'tip':
+      return <TipCallout block={block} />
+    case 'warning':
+      return <WarningCallout block={block} />
+    case 'emergency':
+      return <EmergencyCallout block={block} />
+    case 'checklist':
+      return <ChecklistCallout block={block} />
+    default:
+      return <DefaultCallout block={block} />
+  }
 }
