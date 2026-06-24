@@ -202,7 +202,7 @@ describe('GuideArticleLayout', () => {
       expect(screen.getByText('Texto da dica.')).toBeInTheDocument()
     })
 
-    it('renders the callout title as h3 for correct heading hierarchy', () => {
+    it('renders the callout title as a paragraph, not a heading', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Passo' },
         {
@@ -213,9 +213,11 @@ describe('GuideArticleLayout', () => {
         },
       ]
       renderLayout(makeArticle({ content }))
+      const el = screen.getByText('Dica importante')
+      expect(el.tagName.toLowerCase()).toBe('p')
       expect(
-        screen.getByRole('heading', { level: 3, name: 'Dica importante' })
-      ).toBeInTheDocument()
+        screen.queryByRole('heading', { name: 'Dica importante' })
+      ).not.toBeInTheDocument()
     })
 
     it('renders the emergency number in an emergency callout', () => {
