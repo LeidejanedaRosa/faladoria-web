@@ -124,7 +124,7 @@ describe('GuideCategoryLayout', () => {
     it('renders the WhatsApp link in the help panel', async () => {
       await setup(mockArticles)
       const helpLink = screen.getByRole('link', {
-        name: new RegExp(GUIDE_CONTENT.categoryPage.help.title),
+        name: /Fale com a equipe pelo WhatsApp/,
       })
       expect(helpLink).toHaveAttribute('href', expect.stringContaining('wa.me'))
       expect(helpLink).toHaveAttribute('target', '_blank')

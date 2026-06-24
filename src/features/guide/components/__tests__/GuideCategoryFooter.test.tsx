@@ -36,4 +36,13 @@ describe('GuideCategoryFooter', () => {
     expect(link).toHaveAttribute('target', '_blank')
     expect(link).toHaveAttribute('rel', 'noopener noreferrer')
   })
+
+  it('the help link has an accessible label for external navigation', () => {
+    renderFooter()
+    const link = screen.getByRole('link')
+    expect(link).toHaveAttribute(
+      'aria-label',
+      expect.stringContaining('abre em nova aba')
+    )
+  })
 })

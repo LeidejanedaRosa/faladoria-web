@@ -528,6 +528,63 @@ expect(
 
 ---
 
+## Imagens com `alt=""` têm role ARIA `"presentation"`, não `"img"`, em testes
+
+**Data**: 2026-06-24
+
+**Sintoma**: `screen.getByRole('img', { hidden: true })` lança `TestingLibraryElementError: Unable to find an accessible element with the role "img"` mesmo quando a imagem está visível no DOM.
+
+**Causa raiz**:
+
+Imagens com `alt=""` recebem role ARIA implícito `"presentation"` (ou `"none"`), não `"img"`. Esse comportamento é especificado pelo WAI-ARIA: `alt` vazio sinaliza que a imagem é decorativa, e o browser a expõe como elemento de apresentação. O `aria-hidden="true"` adicional não é a causa — a causa é o role implícito ser diferente de `"img"`.
+
+**Solução**:
+
+Para imagens decorativas (`alt=""`), usar `container.querySelector('img')` em vez de `getByRole`:
+
+```ts
+// NÃO funciona para imagens com alt="":
+const img = screen.getByRole('img', { hidden: true }) // TestingLibraryElementError
+
+// CORRETO para imagens decorativas:
+const { container } = render(<Component />)
+const img = container.querySelector('img')
+expect(img).toBeInTheDocument()
+expect(img).toHaveAttribute('src', '/expected.webp')
+```
+
+**Regra**: `getByRole('img')` consulta elementos expostos com role `img` na árvore de acessibilidade. Imagens decorativas (`alt=""`) são expostas como `presentation`, não como `img` — portanto não são encontradas por `getByRole`. Para esses casos, usar `container.querySelector('img')`.
+
+---
+
+## ffmpeg in-place falha silenciosamente em assets com permissão somente-leitura
+
+**Data**: 2026-06-24
+
+**Sintoma**: Após `ffmpeg -i input.webp [opções] input.webp.tmp && mv input.webp.tmp input.webp`, o arquivo de destino manteve o tamanho original — sem mensagem de erro visível.
+
+**Causa raiz**:
+
+`mv` entre filesystems diferentes (e.g., `/tmp` numa partição separada e `src/assets/` no disco do projeto) não é um simples `rename(2)` — vira copy + unlink. Nesse caso, o shell cria um novo inode no destino; se o diretório de destino tiver restrições ou o arquivo original tiver sido rastreado pelo git com permissões `644` que o processo não consegue substituir atomicamente, o `mv` falha. A falha era silenciosa porque o `&&` foi satisfeito pelo `ffmpeg`, e o código de saída do `mv` não foi verificado.
+
+**Importante**: `mv` e `cp` têm requisitos de permissão distintos: `mv` numa mesma partição precisa de escrita no _diretório_; `cp` sobrescrevendo um arquivo existente precisa de escrita no _arquivo_. Este workaround funciona porque os assets em `src/assets/guide/` têm `644` com o usuário como dono (escrita no arquivo disponível) e o diretório tem `755`.
+
+**Solução**:
+
+Para este projeto, comprimir para um diretório temporário e usar `cp` para sobrescrever o arquivo de destino:
+
+```bash
+# Comprimir para diretório temporário:
+ffmpeg -i input.webp -c:v libwebp -quality 80 -compression_level 6 /tmp/out.webp
+
+# Sobrescrever o asset — funciona porque o usuário tem escrita no arquivo 644:
+cp /tmp/out.webp src/assets/guide/category/input.webp
+```
+
+**Nota sobre a escolha de `cp`**: neste fluxo específico, `cp` é mais seguro porque: (1) o arquivo temporário em `/tmp` pode estar numa partição diferente (tornando `mv` uma operação cross-filesystem sujeita a falhas silenciosas); (2) `cp` preserva o inode original, o que evita que ferramentas que rastreiam inodes (como algumas implementações de `inotify`) percam o arquivo. Em outros contextos, `mv` dentro da mesma partição é perfeitamente válido.
+
+---
+
 ## `sonarjs/no-duplicate-string` bloqueando commit em arquivo com múltiplos artigos
 
 **Sintoma**: pre-commit falha com `error  Define a constant instead of duplicating this literal 3 times  sonarjs/no-duplicate-string` ao commitar um arquivo de artigos com 3 ou mais artigos que compartilham strings de checklist.

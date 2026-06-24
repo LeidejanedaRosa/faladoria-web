@@ -15,7 +15,10 @@ export const mentalHealthArticles: GuideArticle[] = [
     content: [
       {
         type: 'callout',
-        text: 'Se você ou alguém próximo estiver em crise ou com pensamentos suicidas, ligue agora para o CVV: 188. O atendimento é gratuito e funciona 24 horas por dia.',
+        variant: 'emergency',
+        title: 'Em crise ou com pensamentos suicidas',
+        highlight: '188',
+        text: 'CVV — Centro de Valorização da Vida. Atendimento gratuito, 24 horas por dia.',
       },
       {
         type: 'heading',
