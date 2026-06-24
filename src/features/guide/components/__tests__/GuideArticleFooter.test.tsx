@@ -34,6 +34,15 @@ describe('GuideArticleFooter', () => {
     ).toBeInTheDocument()
   })
 
+  it('the help link has an accessible label for external navigation', () => {
+    renderFooter()
+    const link = screen.getByRole('link')
+    expect(link).toHaveAttribute(
+      'aria-label',
+      expect.stringContaining('abre em nova aba')
+    )
+  })
+
   it('renders all four trust signals', () => {
     renderFooter()
     for (const signal of GUIDE_CONTENT.articlePage.trustSignals) {

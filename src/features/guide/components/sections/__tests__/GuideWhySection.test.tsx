@@ -55,6 +55,17 @@ describe('GuideWhySection', () => {
       })
     })
 
+    it('should render item titles as <strong> elements', () => {
+      const { container } = renderSection()
+
+      GUIDE_CONTENT.why.items.forEach(item => {
+        const el = Array.from(container.querySelectorAll('strong')).find(
+          strong => strong.textContent === item.title
+        )
+        expect(el).toBeInTheDocument()
+      })
+    })
+
     it('should render icons with aria-hidden', () => {
       const { container } = renderSection()
 
