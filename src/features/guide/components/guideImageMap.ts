@@ -43,6 +43,10 @@ import deniedSurgeryImg from '@assets/guide/surgery/denied-surgery.webp'
 import surgeryQueueImg from '@assets/guide/surgery/surgery-queue.webp'
 import treatmentCategoryImg from '@assets/guide/treatment/category.webp'
 import treatmentSessionImg from '@assets/guide/treatment/treatment-session.webp'
+import adultCalendarImg from '@assets/guide/vaccination/adult-calendar.webp'
+import vaccinationCategoryImg from '@assets/guide/vaccination/category.webp'
+import childrensCalendarImg from '@assets/guide/vaccination/childrens-calendar.webp'
+import pregnancyCalendarImg from '@assets/guide/vaccination/pregnancy-calendar.webp'
 import womensCategoryImg from '@assets/guide/womens-health/category.webp'
 import familyPlanningImg from '@assets/guide/womens-health/family-planning.webp'
 import prenatalImg from '@assets/guide/womens-health/prenatal.webp'
@@ -62,6 +66,7 @@ export const GUIDE_CATEGORY_IMAGES: Partial<Record<string, string>> = {
   'saude-da-mulher': womensCategoryImg,
   'saude-do-homem': mensCategoryImg,
   'saude-da-crianca': childHealthCategoryImg,
+  vacinacao: vaccinationCategoryImg,
 }
 
 export const GUIDE_ARTICLE_IMAGES: Partial<Record<string, string>> = {
@@ -91,6 +96,9 @@ export const GUIDE_ARTICLE_IMAGES: Partial<Record<string, string>> = {
   'triagem-neonatal': newbornImg,
   puericultura: childCareImg,
   'saude-bucal-da-crianca': oralHealthImg,
+  'calendario-infantil': childrensCalendarImg,
+  'calendario-adulto': adultCalendarImg,
+  'vacinacao-na-gestacao': pregnancyCalendarImg,
 }
 
 export const SHARED_STEP_IMAGES: Record<SharedStepImageKey, string> = {

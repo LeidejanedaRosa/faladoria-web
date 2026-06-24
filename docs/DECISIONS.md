@@ -15,11 +15,14 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 A primeira seção de qualquer artigo é sempre `ProceduralStepSection` (passo a passo). As seguintes, sendo `InformationalStepCard`, apareciam numeradas a partir de **2**, criando uma sequência visualmente quebrada: passos 1, 2, 3 → "2. Cronograma" → "3. O que é avaliado".
 
-**Decisão**: Remover o prefixo `{stepNumber}.` do `<h2>` em `InformationalStepCard`. O `stepNumber` continua sendo usado no `id` do heading (para `aria-labelledby`) e no badge da esquerda quando o ícone não está disponível.
+**Decisão**: Remover o prefixo `{stepNumber}.` do `<h2>` em `InformationalStepCard`. Remover também o badge numérico de fallback na caixa de ícone — a caixa só é renderizada quando um ícone for explicitamente definido no heading (`icon: 'syringe'` etc.). O `stepNumber` continua sendo usado exclusivamente no `id` do heading (para `aria-labelledby`).
 
 **Por quê**: A numeração de seções só faz sentido quando todas as seções a exibem. Como `ProceduralStepSection` não exibe — e é sempre a primeira — as seções seguintes aparecem numeradas a partir de 2, o que confunde o leitor. Headings de artigo não são passos de um fluxo sequencial a ser seguido: são âncoras de navegação dentro do conteúdo.
 
-**Alternativa rejeitada**: Adicionar o número também em `ProceduralStepSection` — criaria conflito com a numeração dos `action-steps` internos (que já são numerados 1, 2, 3 dentro da seção), resultando em "1. Como garantir" → passo 1, passo 2, passo 3 → "2. O que detecta".
+**Alternativas rejeitadas**:
+
+- Adicionar o número também em `ProceduralStepSection` — criaria conflito com a numeração dos `action-steps` internos (que já são numerados 1, 2, 3 dentro da seção).
+- Manter o badge mas com um ícone genérico de fallback — um ícone genérico sem significado semântico é ruído visual. Sem ícone explícito, a seção fica mais limpa sem a caixa.
 
 ---
 

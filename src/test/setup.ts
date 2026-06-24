@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
 import { afterEach } from 'vitest'
 
@@ -39,5 +39,5 @@ const MockIntersectionObserver = class {
   }
   unobserve() {}
 }
-global.IntersectionObserver =
+globalThis.IntersectionObserver =
   MockIntersectionObserver as typeof IntersectionObserver
