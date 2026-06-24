@@ -619,6 +619,36 @@ export const GUIDE_ARTICLE_HEADING_ID = 'article-heading'
 
 ---
 
+## 2026-06-24 — `AccessibleLink` com filhos React complexos exige `aria-label` explícito
+
+**Contexto**: `GuideCategoryFooter` e `GuideArticleFooter` usavam `<a>` nativo para o link do WhatsApp com múltiplos filhos (ícone SVG + texto + chevron). Ao migrar para `AccessibleLink`, o accessible name calculado automaticamente produzia `[object Object] Falar com a equipe (abre em nova aba)` em vez do texto esperado.
+
+**Decisão**: Passar `aria-label` explícito em qualquer `AccessibleLink` cujos filhos incluam nós React não-texto (ícones, elementos aninhados, fragmentos).
+
+**Por quê**: A função `computeAriaLabel` em `AccessibleLink` constrói o nome acessível via interpolação de string sobre `children`. Quando `children` é um React element (ex.: `<PhoneIcon />` + texto), a serialização produz `"[object Object]"`. O `aria-label` explícito contorna isso e é semanticamente mais preciso. Para links externos, incluir `"(abre em nova aba)"` no `aria-label` garante que leitores de tela anunciem o comportamento da nova aba mesmo quando `showExternalIcon={false}`.
+
+**Quando aplicar**:
+
+- Filhos contêm ícones SVG → `aria-label` explícito obrigatório
+- Filhos são texto puro → `computeAriaLabel` funciona corretamente; `aria-label` desnecessário
+- Links externos com `showExternalIcon={false}` → incluir `"(abre em nova aba)"` no `aria-label`
+
+**Alternativa rejeitada**: Reescrever `computeAriaLabel` para extrair text nodes dos filhos React via `React.Children`. A complexidade adicionada ao componente compartilhado não justifica o ganho — o `aria-label` explícito é mais legível e previsível para quem mantém o código.
+
+---
+
+## 2026-06-24 — Remoção de `GuideCategoryCard`, `GuideArticleCard` e `GuideBreadcrumb` do barrel de componentes
+
+**Contexto**: O barrel `src/features/guide/components/index.ts` exportava `GuideCategoryCard`, `GuideArticleCard` e `GuideBreadcrumb`. Auditoria identificou que os três são componentes internos de implementação — usados exclusivamente dentro de `GuideCategoryLayout` e `GuideArticleLayout`, sem nenhum consumidor externo à feature.
+
+**Decisão**: Remover os três do barrel. A API pública da feature permanece: `GuideCategoryLayout`, `GuideArticleLayout` e as três sections (`GuideCategoriesSection`, `GuideHeroSection`, `GuideWhySection`).
+
+**Por quê**: Exportar componentes de implementação pelo barrel cria acoplamento implícito — qualquer código externo pode começar a importá-los diretamente, tornando refatorações internas breaking changes. Se um componente não tem consumidor externo, não deve estar no barrel.
+
+**Conexão**: segue a mesma decisão de 2026-06-23 que removeu `GuideActionStepCard` e `GuideActionStepList` do barrel pelos mesmos motivos.
+
+---
+
 ## 2026-06-22 — Constantes compartilhadas para strings repetidas em equipment.ts
 
 **Contexto**: Com três artigos no mesmo arquivo (`equipment.ts`), seis strings de conteúdo passaram a aparecer três vezes cada: `'Como solicitar'`, `'Documentos necessários'`, `'Cartão do SUS'`, `'Documento com foto (RG ou CNH)'`, `'CPF'`, `'Comprovante de residência'` e `'doctor-patient'`. A regra `sonarjs/no-duplicate-string` (threshold: 3) bloqueou o pre-commit.

@@ -528,6 +528,61 @@ expect(
 
 ---
 
+## Imagens com `alt=""` têm role ARIA `"presentation"`, não `"img"`, em testes
+
+**Data**: 2026-06-24
+
+**Sintoma**: `screen.getByRole('img', { hidden: true })` lança `TestingLibraryElementError: Unable to find an accessible element with the role "img"` mesmo quando a imagem está visível no DOM.
+
+**Causa raiz**:
+
+Imagens com `alt=""` recebem role ARIA implícito `"presentation"` (ou `"none"`), não `"img"`. Esse comportamento é especificado pelo WAI-ARIA: `alt` vazio sinaliza que a imagem é decorativa, e o browser a expõe como elemento de apresentação. O `aria-hidden="true"` adicional não é a causa — a causa é o role implícito ser diferente de `"img"`.
+
+**Solução**:
+
+Para imagens decorativas (`alt=""`), usar `container.querySelector('img')` em vez de `getByRole`:
+
+```ts
+// NÃO funciona para imagens com alt="":
+const img = screen.getByRole('img', { hidden: true }) // TestingLibraryElementError
+
+// CORRETO para imagens decorativas:
+const { container } = render(<Component />)
+const img = container.querySelector('img')
+expect(img).toBeInTheDocument()
+expect(img).toHaveAttribute('src', '/expected.webp')
+```
+
+**Regra**: `getByRole('img')` funciona apenas para imagens com `alt` não vazio. Para imagens decorativas (`alt=""`), usar `container.querySelector('img')`.
+
+---
+
+## ffmpeg in-place falha silenciosamente em assets com permissão somente-leitura
+
+**Data**: 2026-06-24
+
+**Sintoma**: Após `ffmpeg -i input.webp [opções] input.webp.tmp && mv input.webp.tmp input.webp`, o arquivo de destino manteve o tamanho original — sem mensagem de erro visível.
+
+**Causa raiz**:
+
+Arquivos `.webp` nos assets têm permissão `644` (`-rw-r--r--`). O `mv` tenta substituir o inode e falha silenciosamente quando o arquivo de destino não tem permissão de escrita para o usuário (e.g., arquivo criado por outro processo ou `git checkout`). O `&&` no shell já havia sido satisfeito pelo `ffmpeg`, então a falha do `mv` não interrompeu a execução.
+
+**Solução**:
+
+Comprimir para scratchpad e depois usar `cp` (que sobrescreve o conteúdo, não o inode):
+
+```bash
+# Comprimir para diretório temporário:
+ffmpeg -i input.webp -c:v libwebp -quality 80 -compression_level 6 /tmp/out.webp
+
+# Copiar para o destino — cp funciona mesmo com arquivo 644:
+cp /tmp/out.webp src/assets/guide/category/input.webp
+```
+
+**Regra**: ao comprimir imagens in-place com ffmpeg, usar `cp` de um diretório temporário para o destino — nunca `mv`. O `cp` sobrescreve o conteúdo do arquivo existente sem precisar de permissão de substituição de inode.
+
+---
+
 ## `sonarjs/no-duplicate-string` bloqueando commit em arquivo com múltiplos artigos
 
 **Sintoma**: pre-commit falha com `error  Define a constant instead of duplicating this literal 3 times  sonarjs/no-duplicate-string` ao commitar um arquivo de artigos com 3 ou mais artigos que compartilham strings de checklist.
