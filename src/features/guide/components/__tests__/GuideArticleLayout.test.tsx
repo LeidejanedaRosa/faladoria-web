@@ -97,13 +97,13 @@ describe('GuideArticleLayout', () => {
   })
 
   describe('Block: heading', () => {
-    it('renders level 2 as a numbered h2 step', () => {
+    it('renders level 2 as an h2 step section', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Seção principal' },
       ]
       renderLayout(makeArticle({ content }))
       expect(
-        screen.getByRole('heading', { level: 2, name: '1. Seção principal' })
+        screen.getByRole('heading', { level: 2, name: 'Seção principal' })
       ).toBeInTheDocument()
     })
 
@@ -114,7 +114,7 @@ describe('GuideArticleLayout', () => {
       ]
       renderLayout(makeArticle({ content }))
       expect(
-        screen.getByRole('region', { name: '1. Seção principal' })
+        screen.getByRole('region', { name: 'Seção principal' })
       ).toBeInTheDocument()
     })
   })
@@ -494,10 +494,39 @@ describe('GuideArticleLayout', () => {
       expect(screen.getByText('Dica inicial')).toBeInTheDocument()
       expect(screen.getByText('Leia antes de começar.')).toBeInTheDocument()
     })
+
+    it('renders multiple preamble blocks before the first step section', () => {
+      const content: ArticleBlock[] = [
+        {
+          type: 'callout',
+          variant: 'tip',
+          title: 'Dica inicial',
+          text: 'Info geral.',
+        },
+        {
+          type: 'callout',
+          variant: 'warning',
+          title: 'Prazo crítico',
+          text: 'Atenção ao prazo.',
+        },
+        { type: 'heading', level: 2, text: 'Como garantir' },
+        { type: 'action-step', action: 'Vá à UBS' },
+      ]
+      renderLayout(makeArticle({ content }))
+      const tip = screen.getByRole('note', { name: 'Dica inicial' })
+      const warning = screen.getByRole('note', { name: 'Prazo crítico' })
+      const section = screen.getByRole('region', { name: 'Como garantir' })
+      expect(tip).toBeInTheDocument()
+      expect(warning).toBeInTheDocument()
+      expect(
+        warning.compareDocumentPosition(section) &
+          Node.DOCUMENT_POSITION_FOLLOWING
+      ).toBeTruthy()
+    })
   })
 
-  describe('Step numbering', () => {
-    it('numbers multiple informational steps sequentially', () => {
+  describe('Multiple informational steps', () => {
+    it('renders each step heading without a numeric prefix', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Primeiro' },
         { type: 'heading', level: 2, text: 'Segundo' },
@@ -505,13 +534,13 @@ describe('GuideArticleLayout', () => {
       ]
       renderLayout(makeArticle({ content }))
       expect(
-        screen.getByRole('heading', { level: 2, name: '1. Primeiro' })
+        screen.getByRole('heading', { level: 2, name: 'Primeiro' })
       ).toBeInTheDocument()
       expect(
-        screen.getByRole('heading', { level: 2, name: '2. Segundo' })
+        screen.getByRole('heading', { level: 2, name: 'Segundo' })
       ).toBeInTheDocument()
       expect(
-        screen.getByRole('heading', { level: 2, name: '3. Terceiro' })
+        screen.getByRole('heading', { level: 2, name: 'Terceiro' })
       ).toBeInTheDocument()
     })
   })

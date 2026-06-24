@@ -115,7 +115,7 @@ export const GUIDE_CATEGORIES: GuideCategory[] = [
   {
     slug: 'saude-da-crianca',
     label: 'Saúde da criança',
-    description: 'Crescimento, vacinas e desenvolvimento.',
+    description: 'Triagem neonatal, puericultura e saúde bucal.',
     iconName: 'users',
     color: 'emerald',
   },
