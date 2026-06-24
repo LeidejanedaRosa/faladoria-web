@@ -167,23 +167,19 @@ const InformationalStepCard = ({
       className='overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm'
     >
       <div className='flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:gap-6 sm:p-6'>
-        <div className='shrink-0'>
-          <div
-            className={cn(
-              'flex h-16 w-16 items-center justify-center rounded-2xl',
-              theme.iconBgLight
-            )}
-            aria-hidden='true'
-          >
-            {Icon ? (
+        {Icon && (
+          <div className='shrink-0'>
+            <div
+              className={cn(
+                'flex h-16 w-16 items-center justify-center rounded-2xl',
+                theme.iconBgLight
+              )}
+              aria-hidden='true'
+            >
               <Icon className={cn('h-8 w-8', theme.textAccent)} />
-            ) : (
-              <span className={cn('text-xl font-bold', theme.text)}>
-                {step.stepNumber}
-              </span>
-            )}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className='flex-1'>
           <h2
