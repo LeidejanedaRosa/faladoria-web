@@ -6,6 +6,23 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-06-24 — Headings de seção sem prefixo numérico em `InformationalStepCard`
+
+**Contexto**: `GuideArticleLayout` divide os blocos de conteúdo em dois tipos de seção:
+
+- `ProceduralStepSection` — renderiza quando há `action-step` no grupo. Exibe o título do H2 sem prefixo numérico.
+- `InformationalStepCard` — renderiza quando não há `action-step`. Exibia `{stepNumber}. {heading}` no H2.
+
+A primeira seção de qualquer artigo é sempre `ProceduralStepSection` (passo a passo). As seguintes, sendo `InformationalStepCard`, apareciam numeradas a partir de **2**, criando uma sequência visualmente quebrada: passos 1, 2, 3 → "2. Cronograma" → "3. O que é avaliado".
+
+**Decisão**: Remover o prefixo `{stepNumber}.` do `<h2>` em `InformationalStepCard`. O `stepNumber` continua sendo usado no `id` do heading (para `aria-labelledby`) e no badge da esquerda quando o ícone não está disponível.
+
+**Por quê**: A numeração de seções só faz sentido quando todas as seções a exibem. Como `ProceduralStepSection` não exibe — e é sempre a primeira — as seções seguintes aparecem numeradas a partir de 2, o que confunde o leitor. Headings de artigo não são passos de um fluxo sequencial a ser seguido: são âncoras de navegação dentro do conteúdo.
+
+**Alternativa rejeitada**: Adicionar o número também em `ProceduralStepSection` — criaria conflito com a numeração dos `action-steps` internos (que já são numerados 1, 2, 3 dentro da seção), resultando em "1. Como garantir" → passo 1, passo 2, passo 3 → "2. O que detecta".
+
+---
+
 ## 2026-06-15 — `role='note'` + `aria-label` para callout de emergência estático
 
 **Contexto**: O `EmergencyCallout` usava `role='alert'`, que é uma live region do ARIA projetada para conteúdo que aparece dinamicamente no DOM. Esse callout é conteúdo estático presente na página ao carregar.

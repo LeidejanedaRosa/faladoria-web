@@ -190,7 +190,7 @@ const InformationalStepCard = ({
             id={headingId}
             className={cn('text-base leading-snug font-bold', theme.text)}
           >
-            {step.stepNumber}. {step.heading}
+            {step.heading}
           </h2>
           {contentBlocks.length > 0 && (
             <div className='mt-3 space-y-3'>
