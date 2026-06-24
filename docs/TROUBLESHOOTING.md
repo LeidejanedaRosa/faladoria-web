@@ -553,7 +553,7 @@ expect(img).toBeInTheDocument()
 expect(img).toHaveAttribute('src', '/expected.webp')
 ```
 
-**Regra**: `getByRole('img')` funciona apenas para imagens com `alt` não vazio. Para imagens decorativas (`alt=""`), usar `container.querySelector('img')`.
+**Regra**: `getByRole('img')` consulta elementos expostos com role `img` na árvore de acessibilidade. Imagens decorativas (`alt=""`) são expostas como `presentation`, não como `img` — portanto não são encontradas por `getByRole`. Para esses casos, usar `container.querySelector('img')`.
 
 ---
 
@@ -565,21 +565,23 @@ expect(img).toHaveAttribute('src', '/expected.webp')
 
 **Causa raiz**:
 
-Arquivos `.webp` nos assets têm permissão `644` (`-rw-r--r--`). O `mv` tenta substituir o inode e falha silenciosamente quando o arquivo de destino não tem permissão de escrita para o usuário (e.g., arquivo criado por outro processo ou `git checkout`). O `&&` no shell já havia sido satisfeito pelo `ffmpeg`, então a falha do `mv` não interrompeu a execução.
+`mv` entre filesystems diferentes (e.g., `/tmp` numa partição separada e `src/assets/` no disco do projeto) não é um simples `rename(2)` — vira copy + unlink. Nesse caso, o shell cria um novo inode no destino; se o diretório de destino tiver restrições ou o arquivo original tiver sido rastreado pelo git com permissões `644` que o processo não consegue substituir atomicamente, o `mv` falha. A falha era silenciosa porque o `&&` foi satisfeito pelo `ffmpeg`, e o código de saída do `mv` não foi verificado.
+
+**Importante**: `mv` e `cp` têm requisitos de permissão distintos: `mv` numa mesma partição precisa de escrita no _diretório_; `cp` sobrescrevendo um arquivo existente precisa de escrita no _arquivo_. Este workaround funciona porque os assets em `src/assets/guide/` têm `644` com o usuário como dono (escrita no arquivo disponível) e o diretório tem `755`.
 
 **Solução**:
 
-Comprimir para scratchpad e depois usar `cp` (que sobrescreve o conteúdo, não o inode):
+Para este projeto, comprimir para um diretório temporário e usar `cp` para sobrescrever o arquivo de destino:
 
 ```bash
 # Comprimir para diretório temporário:
 ffmpeg -i input.webp -c:v libwebp -quality 80 -compression_level 6 /tmp/out.webp
 
-# Copiar para o destino — cp funciona mesmo com arquivo 644:
+# Sobrescrever o asset — funciona porque o usuário tem escrita no arquivo 644:
 cp /tmp/out.webp src/assets/guide/category/input.webp
 ```
 
-**Regra**: ao comprimir imagens in-place com ffmpeg, usar `cp` de um diretório temporário para o destino — nunca `mv`. O `cp` sobrescreve o conteúdo do arquivo existente sem precisar de permissão de substituição de inode.
+**Nota sobre a escolha de `cp`**: neste fluxo específico, `cp` é mais seguro porque: (1) o arquivo temporário em `/tmp` pode estar numa partição diferente (tornando `mv` uma operação cross-filesystem sujeita a falhas silenciosas); (2) `cp` preserva o inode original, o que evita que ferramentas que rastreiam inodes (como algumas implementações de `inotify`) percam o arquivo. Em outros contextos, `mv` dentro da mesma partição é perfeitamente válido.
 
 ---
 
