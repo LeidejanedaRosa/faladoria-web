@@ -17,6 +17,11 @@ import repaymentImg from '@assets/guide/medical-transport/repayment.webp'
 import medicationCategoryImg from '@assets/guide/medication/category.webp'
 import freeMedicationImg from '@assets/guide/medication/free-medication.webp'
 import highCostMedicationImg from '@assets/guide/medication/high-cost-medication.webp'
+import mensCategoryImg from '@assets/guide/mens-health/category.webp'
+import mensMentalHealthImg from '@assets/guide/mens-health/mens-mental-health.webp'
+import mensSexualHealthImg from '@assets/guide/mens-health/mens-sexual-health.webp'
+import prostateImg from '@assets/guide/mens-health/prostate.webp'
+import vasectomyImg from '@assets/guide/mens-health/vasectomy.webp'
 import ambulanceImg from '@assets/guide/shared/ambulance.webp'
 import calendarImg from '@assets/guide/shared/calendar.webp'
 import susCardImg from '@assets/guide/shared/cartao-sus.webp'
@@ -51,6 +56,7 @@ export const GUIDE_CATEGORY_IMAGES: Partial<Record<string, string>> = {
   'transporte-sanitario': medicalTransportCategoryImg,
   equipamentos: equipmentCategoryImg,
   'saude-da-mulher': womensCategoryImg,
+  'saude-do-homem': mensCategoryImg,
 }
 
 export const GUIDE_ARTICLE_IMAGES: Partial<Record<string, string>> = {
@@ -70,6 +76,10 @@ export const GUIDE_ARTICLE_IMAGES: Partial<Record<string, string>> = {
   'como-solicitar-equipamentos': howToObtainEquipmentImg,
   'cpap-bipap-sus': cpapBipapImg,
   'aparelho-auditivo-sus': hearingAidImg,
+  'cancer-de-prostata-sus': prostateImg,
+  'vasectomia-sus': vasectomyImg,
+  'saude-sexual-masculina-sus': mensSexualHealthImg,
+  'saude-mental-homem-sus': mensMentalHealthImg,
   'pre-natal': prenatalImg,
   'preventivo-e-mamografia': preventiveScreeningImg,
   'planejamento-familiar': familyPlanningImg,
