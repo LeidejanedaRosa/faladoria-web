@@ -65,6 +65,26 @@ describe('GuideArticleLayout', () => {
       ).toBeInTheDocument()
     })
 
+    it('renders a procedural section followed by an informational section', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Como fazer' },
+        { type: 'action-step', action: 'Primeiro passo' },
+        { type: 'heading', level: 2, text: 'O que saber' },
+        { type: 'list', items: ['Item A'] },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(
+        screen.getByRole('heading', { level: 2, name: 'Como fazer' })
+      ).toBeInTheDocument()
+      expect(
+        screen.getByRole('heading', { level: 3, name: 'Primeiro passo' })
+      ).toBeInTheDocument()
+      expect(
+        screen.getByRole('heading', { level: 2, name: 'O que saber' })
+      ).toBeInTheDocument()
+      expect(screen.getByText('Item A')).toBeInTheDocument()
+    })
+
     it('renders breadcrumb navigation', () => {
       renderLayout(makeArticle())
       expect(
@@ -87,12 +107,13 @@ describe('GuideArticleLayout', () => {
   })
 
   describe('Block: paragraph', () => {
-    it('renders text as a paragraph', () => {
+    it('renders text as a <p> element', () => {
       const content: ArticleBlock[] = [
         { type: 'paragraph', text: 'Parágrafo de teste.' },
       ]
       renderLayout(makeArticle({ content }))
-      expect(screen.getByText('Parágrafo de teste.')).toBeInTheDocument()
+      const el = screen.getByText('Parágrafo de teste.')
+      expect(el.tagName.toLowerCase()).toBe('p')
     })
   })
 
@@ -455,16 +476,14 @@ describe('GuideArticleLayout', () => {
       expect(container.querySelector('img')).not.toBeInTheDocument()
     })
 
-    it('renders correctly when detail is omitted', () => {
+    it('does not render a detail paragraph when detail is omitted', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Como solicitar' },
         { type: 'action-step', action: 'Vá à UBS' },
       ]
       renderLayout(makeArticle({ content }))
-      // detail is optional — the action title should still render
-      expect(
-        screen.getByRole('heading', { level: 3, name: 'Vá à UBS' })
-      ).toBeInTheDocument()
+      const listItem = screen.getByRole('listitem', { name: 'Passo 1' })
+      expect(listItem.querySelector('p')).not.toBeInTheDocument()
     })
 
     it('renders the action title as h3 for correct heading hierarchy', () => {
@@ -475,6 +494,24 @@ describe('GuideArticleLayout', () => {
       renderLayout(makeArticle({ content }))
       expect(
         screen.getByRole('heading', { level: 3, name: 'Vá à UBS' })
+      ).toBeInTheDocument()
+    })
+
+    it('renders non-action-step blocks after the action list in a procedural section', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Como fazer' },
+        { type: 'action-step', action: 'Vá à UBS' },
+        {
+          type: 'callout',
+          variant: 'tip',
+          title: 'Dica extra',
+          text: 'Informação adicional.',
+        },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(screen.getByText('Vá à UBS')).toBeInTheDocument()
+      expect(
+        screen.getByRole('note', { name: 'Dica extra' })
       ).toBeInTheDocument()
     })
   })
@@ -542,6 +579,26 @@ describe('GuideArticleLayout', () => {
       expect(
         screen.getByRole('heading', { level: 2, name: 'Terceiro' })
       ).toBeInTheDocument()
+    })
+
+    it('does not render a numeric badge for informational sections without an icon', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Primeira seção' },
+        { type: 'paragraph', text: 'Conteúdo da seção.' },
+        { type: 'heading', level: 2, text: 'Segunda seção' },
+        { type: 'paragraph', text: 'Mais conteúdo.' },
+      ]
+      renderLayout(makeArticle({ content }))
+      expect(screen.queryByText('2')).not.toBeInTheDocument()
+    })
+
+    it('renders the icon box when the step heading has an explicit icon', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Seção com ícone', icon: 'syringe' },
+      ]
+      renderLayout(makeArticle({ content }))
+      const section = screen.getByRole('region', { name: 'Seção com ícone' })
+      expect(section.querySelector('svg')).toBeInTheDocument()
     })
   })
 })
