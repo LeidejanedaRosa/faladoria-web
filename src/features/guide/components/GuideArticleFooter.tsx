@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react'
 
 import {
+  AccessibleLink,
   CheckIcon,
   HeartIcon,
   PhoneIcon,
@@ -42,15 +43,16 @@ export const GuideArticleFooter = () => {
         <div className='sm:w-2/5 sm:shrink-0'>
           <p className='text-lg font-bold text-purple-900'>{help.title}</p>
           <p className='mt-1 text-sm text-gray-600'>{help.description}</p>
-          <a
+          <AccessibleLink
             href={WHATSAPP_URL}
-            target='_blank'
-            rel='noopener noreferrer'
+            external
+            showExternalIcon={false}
+            aria-label={`${help.cta} pelo WhatsApp (abre em nova aba)`}
             className='mt-4 inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-purple-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600'
           >
             <PhoneIcon className='h-4 w-4' aria-hidden='true' />
             {help.cta}
-          </a>
+          </AccessibleLink>
         </div>
 
         <div

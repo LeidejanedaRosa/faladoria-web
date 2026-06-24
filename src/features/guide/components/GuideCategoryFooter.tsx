@@ -1,4 +1,5 @@
 import {
+  AccessibleLink,
   ChevronRightIcon,
   LightbulbIcon,
   PhoneIcon,
@@ -30,10 +31,11 @@ export const GuideCategoryFooter = () => {
         aria-hidden='true'
       />
 
-      <a
+      <AccessibleLink
         href={WHATSAPP_URL}
-        target='_blank'
-        rel='noopener noreferrer'
+        external
+        showExternalIcon={false}
+        aria-label='Fale com a equipe pelo WhatsApp (abre em nova aba)'
         className='flex flex-1 items-center gap-4 px-6 py-5 transition-colors hover:bg-purple-100/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600'
       >
         <div
@@ -50,7 +52,7 @@ export const GuideCategoryFooter = () => {
           className='text-purple-dark h-5 w-5 shrink-0'
           aria-hidden='true'
         />
-      </a>
+      </AccessibleLink>
     </footer>
   )
 }
