@@ -583,6 +583,24 @@ expect(img).toHaveAttribute('src', '/expected.webp')
 
 ---
 
+## Callout com `<h3>` quebrava hierarquia de headings no preamble
+
+**Data**: 2026-06-24
+
+**Sintoma**: Auditoria de acessibilidade identificou hierarquia H1 → H3 → H2 no artigo de crise de saúde mental. O artigo usava um callout de emergency logo no início (antes do primeiro H2), e o título do callout era renderizado como `<h3>`.
+
+**Causa raiz**: `GuideArticleCallouts.tsx` usava `<h3>` para títulos de callout em todas as variantes. No layout de artigo, blocos que aparecem antes do primeiro H2 são renderizados como **preamble** — fora de qualquer `<section>` com heading H2. Um callout no preamble com `<h3>` criava a sequência H1 (título do artigo) → H3 (título do callout) → H2 (primeira seção), violando WCAG 1.3.1 (Info and Relationships) e prejudicando navegação por leitores de tela.
+
+**Por que não era óbvio**: O `<h3>` era semanticamente correto em callouts dentro de seções (H2 → H3 é válido). O problema era contextual: o mesmo componente renderizava corretamente dentro de uma seção e incorretamente no preamble, sem nenhum erro em build ou lint.
+
+**Solução**: Substituir `<h3>` por `<p className='text-sm font-semibold'>` em todos os componentes de callout (`SimpleCallout`, `EmergencyCallout`, `ChecklistCallout`). Títulos de callout são rótulos visuais de contexto — não estrutura de documento — e não devem ser headings. O `role='note'` com `aria-label` já provê o contexto semântico necessário para leitores de tela.
+
+**Teste atualizado**: `GuideArticleLayout.test.tsx` tinha um teste que assertava `<h3>` como correto — renomeado e invertido para verificar que o título é um `<p>` e que nenhum heading com aquele nome existe no documento.
+
+**Regra geral**: Componentes de callout ou badge que aparecem em posição variável no documento (preamble, dentro de seção, dentro de lista) não devem usar heading elements — o nível correto é imprevisível em compile time.
+
+---
+
 ## ffmpeg in-place falha silenciosamente em assets com permissão somente-leitura
 
 **Data**: 2026-06-24
