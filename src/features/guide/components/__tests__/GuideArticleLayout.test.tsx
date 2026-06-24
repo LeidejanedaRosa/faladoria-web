@@ -589,7 +589,10 @@ describe('GuideArticleLayout', () => {
         { type: 'paragraph', text: 'Mais conteúdo.' },
       ]
       renderLayout(makeArticle({ content }))
-      expect(screen.queryByText('2')).not.toBeInTheDocument()
+      const secondSection = screen.getByRole('region', {
+        name: 'Segunda seção',
+      })
+      expect(within(secondSection).queryByText('2')).not.toBeInTheDocument()
     })
 
     it('renders the icon box when the step heading has an explicit icon', () => {
