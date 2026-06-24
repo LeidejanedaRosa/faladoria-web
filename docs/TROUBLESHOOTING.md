@@ -4,20 +4,27 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
-## Seções de artigo numeradas a partir do "2" em vez de "1"
+## Seções de artigo com numeração incorreta em `InformationalStepCard`
 
-**Data**: 2026-06-24
+**Data**: 2026-06-24 (sintoma 1) / 2026-06-24 (sintoma 2)
 
-**Sintoma**: Em artigos do Guia do SUS com mais de uma seção H2, as seções informacionais (listas, cronogramas) exibiam prefixo numérico começando do 2 — "2. Cronograma de consultas", "3. O que é avaliado" — mesmo sendo as seções seguintes à primeira.
+**Sintoma 1**: Em artigos com mais de uma seção H2, as seções informacionais exibiam prefixo numérico no heading começando do 2 — "2. Cronograma de consultas", "3. O que é avaliado".
 
-**Causa raiz**: `GuideArticleLayout` possui dois subcomponentes para renderizar grupos de seção:
+**Sintoma 2** (descoberto ao testar a categoria Vacinação): a caixa de ícone à esquerda da `InformationalStepCard` exibia o número "2" quando nenhum ícone era definido no heading — visualmente confuso e acessibilidade incorreta (o `<span>` não tinha `aria-hidden`).
 
-- `ProceduralStepSection`: renderizado quando o grupo tem `action-step`. Não exibia o `stepNumber` no `<h2>`.
-- `InformationalStepCard`: renderizado quando o grupo não tem `action-step`. Exibia `{stepNumber}. {heading}` no `<h2>`.
+**Causa raiz**: `GuideArticleLayout` tem dois subcomponentes de renderização de seção:
 
-Como a primeira seção de qualquer artigo é sempre `ProceduralStepSection` (o passo a passo), ela não mostrava número. A segunda seção (`InformationalStepCard`) mostrava "2." — criando a aparência de que a numeração começava em 2.
+- `ProceduralStepSection`: renderizado quando o grupo tem `action-step`. Não exibia número.
+- `InformationalStepCard`: renderizado quando o grupo não tem `action-step`. (1) Exibia `{stepNumber}. {heading}` no `<h2>`. (2) Exibia `{stepNumber}` na caixa de ícone como fallback quando nenhum ícone estava definido.
 
-**Solução**: Remover `{stepNumber}.` do `<h2>` em `InformationalStepCard`. O `stepNumber` permanece para fins de `id` (`step-N-heading`) e para o badge de fallback (quando não há ícone).
+Como a primeira seção é sempre `ProceduralStepSection`, a segunda seção informacional aparecia numerada a partir de 2 — nos dois pontos.
+
+**Soluções**:
+
+1. Remover `{stepNumber}.` do `<h2>` em `InformationalStepCard`.
+2. Substituir `{Icon ? <Icon /> : <span>{stepNumber}</span>}` por `{Icon && <Icon />}` — a caixa de ícone só é renderizada quando um ícone for explicitamente definido no heading.
+
+O `stepNumber` permanece exclusivamente para o `id` do heading (`step-N-heading`), usado pelo `aria-labelledby` da seção.
 
 Ver [DECISIONS.md](DECISIONS.md#2026-06-24--headings-de-seção-sem-prefixo-numérico-em-informationalstepcard) para o raciocínio completo.
 
