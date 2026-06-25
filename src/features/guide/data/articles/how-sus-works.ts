@@ -2,6 +2,7 @@ import type { GuideArticle } from '../guideArticles'
 
 const CATEGORY_SLUG = 'como-funciona-o-sus'
 const DATE_PUBLISHED = '2026-05-01'
+const DATE_MODIFIED = '2026-06-25'
 
 export const howSusWorksArticles: GuideArticle[] = [
   {
@@ -9,13 +10,27 @@ export const howSusWorksArticles: GuideArticle[] = [
     categorySlug: CATEGORY_SLUG,
     title: 'O que é o SUS',
     summary:
-      'Entenda o que é o Sistema Único de Saúde, seus princípios e como ele está organizado no Brasil.',
+      'O SUS é o sistema público de saúde do Brasil, criado pela Constituição de 1988 para garantir atendimento gratuito e universal a toda pessoa em território nacional.',
     datePublished: DATE_PUBLISHED,
+    dateModified: DATE_MODIFIED,
     iconName: 'building',
     content: [
       {
         type: 'callout',
-        text: 'O SUS é gratuito, universal e integral. Gratuito: você não paga nada. Universal: é para todos os brasileiros. Integral: cobre desde uma consulta simples até um transplante de órgão.',
+        text: 'O Sistema Único de Saúde (SUS) é o sistema público de saúde do Brasil. Foi criado pela Constituição Federal de 1988 e é considerado um dos maiores sistemas de saúde pública do mundo — atende mais de 200 milhões de pessoas.',
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: 'Os três princípios do SUS',
+      },
+      {
+        type: 'list',
+        items: [
+          'Gratuito: você não paga nada pelo atendimento — nem consulta, nem exame, nem cirurgia',
+          'Universal: é para toda pessoa em território brasileiro — independentemente de nacionalidade ou situação migratória',
+          'Integral: cobre desde uma consulta básica até transplante de órgão',
+        ],
       },
       {
         type: 'heading',
@@ -58,6 +73,7 @@ export const howSusWorksArticles: GuideArticle[] = [
     summary:
       'Conheça a diferença entre atenção básica, média e alta complexidade e saiba onde buscar cada tipo de cuidado.',
     datePublished: DATE_PUBLISHED,
+    dateModified: DATE_PUBLISHED,
     iconName: 'chart',
     content: [
       {
@@ -67,7 +83,7 @@ export const howSusWorksArticles: GuideArticle[] = [
       {
         type: 'heading',
         level: 2,
-        text: 'Nível 1 — UBS (Postinho)',
+        text: 'Nível 1 — UBS (postinho)',
       },
       {
         type: 'list',
@@ -108,6 +124,57 @@ export const howSusWorksArticles: GuideArticle[] = [
           'Cirurgias complexas, transplantes e internações',
           'Tratamento de câncer e doenças graves, UTI',
         ],
+      },
+    ],
+  },
+  {
+    slug: 'quem-e-responsavel-pelo-sus',
+    categorySlug: CATEGORY_SLUG,
+    title: 'Quem é responsável pelo SUS',
+    summary:
+      'O SUS é financiado por impostos e gerido de forma compartilhada por União, estados e municípios. Entenda o que cabe à prefeitura no atendimento da sua cidade.',
+    datePublished: DATE_PUBLISHED,
+    dateModified: DATE_MODIFIED,
+    iconName: 'users',
+    content: [
+      {
+        type: 'callout',
+        text: 'O SUS é financiado com o dinheiro dos seus impostos. Nenhuma unidade de saúde pode cobrar pelo atendimento — você já pagou por isso.',
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: 'O que é responsabilidade da prefeitura',
+      },
+      {
+        type: 'list',
+        items: [
+          'A gestão municipal organiza e coordena o atendimento nas UBS da sua cidade',
+          'A Secretaria de Saúde contrata médicos, enfermeiros e demais profissionais',
+          'O município é obrigado por lei a garantir o acesso ao atendimento básico',
+          'Quando não há especialista no município, a Secretaria deve encaminhar para outro serviço da rede',
+          'Problemas no atendimento básico — como falta de médico na UBS ou encaminhamentos não cumpridos — são responsabilidade da gestão municipal',
+        ],
+      },
+      {
+        type: 'heading',
+        level: 2,
+        text: 'De onde vêm os recursos',
+      },
+      {
+        type: 'list',
+        items: [
+          'O SUS é financiado por impostos federais, estaduais e municipais',
+          'União, estados e municípios dividem a responsabilidade pelo financiamento',
+          'Nenhuma unidade de saúde do SUS pode cobrar qualquer valor pelo atendimento',
+          'Quem cobra pelo atendimento do SUS comete crime',
+        ],
+      },
+      {
+        type: 'callout',
+        variant: 'tip',
+        title: 'Quando o atendimento for negado na UBS',
+        text: 'O responsável direto é a Secretaria Municipal de Saúde. É o primeiro lugar a procurar quando a UBS não resolver.',
       },
     ],
   },
