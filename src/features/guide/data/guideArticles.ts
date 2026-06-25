@@ -55,6 +55,7 @@ export type ArticleBlock =
       action: string
       imageKey?: SharedStepImageKey
       detail?: string
+      link?: { label: string; href: string }
     }
 
 export type ActionStepBlock = Extract<ArticleBlock, { type: 'action-step' }>

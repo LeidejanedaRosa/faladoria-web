@@ -1,3 +1,4 @@
+import { AccessibleLink } from '@shared/components/ui'
 import { cn } from '@shared/utils/cn'
 
 import type { ActionStepBlock } from '../data'
@@ -39,6 +40,18 @@ export const GuideActionStepCard = ({
             <p className='mt-1 text-base leading-relaxed text-gray-600'>
               {block.detail}
             </p>
+          )}
+          {block.link && (
+            <AccessibleLink
+              href={block.link.href}
+              external
+              className={cn(
+                'mt-2 text-sm font-medium underline',
+                theme.textAccent
+              )}
+            >
+              {block.link.label}
+            </AccessibleLink>
           )}
         </div>
 
