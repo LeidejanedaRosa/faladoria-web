@@ -9,14 +9,14 @@ export const judicialActionArticles: GuideArticle[] = [
     categorySlug: CATEGORY_SLUG,
     title: 'Quando recorrer à Justiça',
     summary:
-      'A Justiça é o último recurso — mas não precisa ser caso grave. Saiba quando ir direto e quando esgotar os canais antes.',
+      'Você pode recorrer à Justiça a qualquer momento, sem precisar esgotar os canais antes. Saiba quando ir direto e quando vale tentar os canais primeiro.',
     datePublished: DATE_PUBLISHED,
     dateModified: DATE_PUBLISHED,
     iconName: 'fist',
     content: [
       {
         type: 'callout',
-        text: 'Qualquer pessoa pode judicializar após esgotar os canais administrativos. Não precisa ser caso grave nem urgente para ter esse direito.',
+        text: 'Qualquer pessoa pode recorrer à Justiça a qualquer momento — sem precisar esgotar os canais administrativos antes. Não precisa ser caso grave nem urgente para ter esse direito.',
       },
       {
         type: 'heading',
@@ -30,7 +30,7 @@ export const judicialActionArticles: GuideArticle[] = [
           'Há risco de morte ou dano irreversível à saúde sem atendimento imediato',
           'Não há tempo para aguardar a resposta da Secretaria ou da Ouvidoria',
           'Nesse caso: procure a Defensoria Pública, o Ministério Público ou o Judiciário diretamente — sem passar pelas etapas anteriores',
-          'O juiz tem até 72 horas para decidir uma liminar em casos de saúde urgentes',
+          'A liminar pode ser concedida com urgência e passa a valer imediatamente após a decisão',
         ],
       },
       {
@@ -55,7 +55,7 @@ export const judicialActionArticles: GuideArticle[] = [
       {
         type: 'callout',
         variant: 'tip',
-        text: 'Casos não urgentes também são aceitos pela Justiça — desde que você comprove a necessidade médica e as tentativas anteriores pelos canais administrativos.',
+        text: 'Casos não urgentes também são aceitos pela Justiça. Comprove a necessidade médica; se houver tentativas anteriores pelos canais administrativos, documente-as — isso fortalece o processo, mas não é um pré-requisito.',
       },
     ],
   },
@@ -98,7 +98,7 @@ export const judicialActionArticles: GuideArticle[] = [
         action: 'Em casos urgentes, peça uma liminar',
         imageKey: 'clock',
         detail:
-          'A liminar (ou tutela de urgência) é uma decisão judicial que obriga o Estado a agir imediatamente. O juiz tem até 72 horas para decidir.',
+          'A liminar (ou tutela de urgência) é uma decisão judicial que obriga o Estado a agir — e passa a valer imediatamente após ser concedida.',
       },
       {
         type: 'callout',
