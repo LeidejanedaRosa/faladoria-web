@@ -55,6 +55,10 @@ import womensCategoryImg from '@assets/guide/womens-health/category.webp'
 import familyPlanningImg from '@assets/guide/womens-health/family-planning.webp'
 import prenatalImg from '@assets/guide/womens-health/prenatal.webp'
 import preventiveScreeningImg from '@assets/guide/womens-health/preventive-screening-and-mammogram.webp'
+import rightsCategoryImg from '@assets/guide/your-rights/category.webp'
+import demandRightsImg from '@assets/guide/your-rights/demand-ones-rights.webp'
+import rightToBeTreatedImg from '@assets/guide/your-rights/right-to-be-treated.webp'
+import rightToHealthImg from '@assets/guide/your-rights/right-to-health.webp'
 
 import type { SharedStepImageKey } from '../data/guideArticles'
 
@@ -72,6 +76,7 @@ export const GUIDE_CATEGORY_IMAGES: Partial<Record<string, string>> = {
   'saude-da-crianca': childHealthCategoryImg,
   vacinacao: vaccinationCategoryImg,
   'saude-mental': mentalHealthCategoryImg,
+  'seus-direitos': rightsCategoryImg,
 }
 
 export const GUIDE_ARTICLE_IMAGES: Partial<Record<string, string>> = {
@@ -107,6 +112,9 @@ export const GUIDE_ARTICLE_IMAGES: Partial<Record<string, string>> = {
   'consulta-psicologo-sus': psychologistImg,
   'caps-o-que-e-e-como-funciona': capsImg,
   'crise-de-saude-mental-o-que-fazer': mentalHealthCrisisImg,
+  'direito-a-saude': rightToHealthImg,
+  'carta-dos-direitos-dos-usuarios': rightToBeTreatedImg,
+  'como-exigir-seus-direitos': demandRightsImg,
 }
 
 export const SHARED_STEP_IMAGES: Record<SharedStepImageKey, string> = {
