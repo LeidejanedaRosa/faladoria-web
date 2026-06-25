@@ -2,6 +2,7 @@ import type { GuideArticle } from '../guideArticles'
 
 const CATEGORY_SLUG = 'como-funciona-o-sus'
 const DATE_PUBLISHED = '2026-05-01'
+const DATE_MODIFIED = '2026-06-25'
 
 export const howSusWorksArticles: GuideArticle[] = [
   {
@@ -9,9 +10,9 @@ export const howSusWorksArticles: GuideArticle[] = [
     categorySlug: CATEGORY_SLUG,
     title: 'O que é o SUS',
     summary:
-      'O SUS é o sistema público de saúde do Brasil, criado pela Constituição de 1988 para garantir atendimento gratuito e universal a todos os brasileiros.',
+      'O SUS é o sistema público de saúde do Brasil, criado pela Constituição de 1988 para garantir atendimento gratuito e universal a toda pessoa em território nacional.',
     datePublished: DATE_PUBLISHED,
-    dateModified: DATE_PUBLISHED,
+    dateModified: DATE_MODIFIED,
     iconName: 'building',
     content: [
       {
@@ -27,7 +28,7 @@ export const howSusWorksArticles: GuideArticle[] = [
         type: 'list',
         items: [
           'Gratuito: você não paga nada pelo atendimento — nem consulta, nem exame, nem cirurgia',
-          'Universal: é para todos os brasileiros e estrangeiros residentes no país, sem exceção',
+          'Universal: é para toda pessoa em território brasileiro — independentemente de nacionalidade ou situação migratória',
           'Integral: cobre desde uma consulta básica até transplante de órgão',
         ],
       },
@@ -131,9 +132,9 @@ export const howSusWorksArticles: GuideArticle[] = [
     categorySlug: CATEGORY_SLUG,
     title: 'Quem é responsável pelo SUS',
     summary:
-      'O SUS é financiado pelos seus impostos e gerido pela prefeitura. Entenda quem é responsável pelo atendimento na sua cidade.',
+      'O SUS é financiado por impostos e gerido de forma compartilhada por União, estados e municípios. Entenda o que cabe à prefeitura no atendimento da sua cidade.',
     datePublished: DATE_PUBLISHED,
-    dateModified: DATE_PUBLISHED,
+    dateModified: DATE_MODIFIED,
     iconName: 'users',
     content: [
       {
@@ -143,7 +144,7 @@ export const howSusWorksArticles: GuideArticle[] = [
       {
         type: 'heading',
         level: 2,
-        text: 'A prefeitura é responsável',
+        text: 'O que é responsabilidade da prefeitura',
       },
       {
         type: 'list',
@@ -152,7 +153,7 @@ export const howSusWorksArticles: GuideArticle[] = [
           'A Secretaria de Saúde contrata médicos, enfermeiros e demais profissionais',
           'O município é obrigado por lei a garantir o acesso ao atendimento básico',
           'Quando não há especialista no município, a Secretaria deve encaminhar para outro serviço da rede',
-          'Filas de espera, falta de médico e medicamento em falta são responsabilidade da gestão municipal',
+          'Problemas no atendimento básico — como falta de médico na UBS ou encaminhamentos não cumpridos — são responsabilidade da gestão municipal',
         ],
       },
       {
