@@ -153,7 +153,11 @@ export const complaintsArticles: GuideArticle[] = [
         type: 'action-step',
         action: 'Ou registre pela internet',
         detail:
-          'Acesse gov.br/saude e procure "Ouvidoria do SUS". Você pode registrar a qualquer hora, inclusive de forma anônima — mas denúncias anônimas não podem ser rastreadas, acompanhadas nem recebem resposta.',
+          'Você pode registrar a qualquer hora, inclusive de forma anônima — mas denúncias anônimas não podem ser rastreadas, acompanhadas nem recebem resposta.',
+        link: {
+          label: 'Acessar Ouvidoria do SUS',
+          href: 'https://www.gov.br/saude/pt-br/canais-de-atendimento/ouvidoria-do-sus',
+        },
       },
       {
         type: 'heading',
