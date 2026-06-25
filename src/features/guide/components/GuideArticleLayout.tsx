@@ -9,6 +9,7 @@ import {
   type ActionStepBlock,
   type ArticleBlock,
   type ArticleStepIconName,
+  type CalloutBlock,
   GUIDE_ARTICLE_HEADING_ID,
   GUIDE_CONTENT,
   type GuideArticle,
@@ -135,8 +136,6 @@ const StepBlockRenderer = ({
   }
   return <>{render(block, theme)}</>
 }
-
-type CalloutBlock = Extract<ArticleBlock, { type: 'callout' }>
 
 const StepRightColumn = ({ blocks }: { blocks: CalloutBlock[] }) => (
   <div className='space-y-3 sm:flex-1'>
