@@ -65,7 +65,7 @@ describe('GuideArticleLayout', () => {
       ).toBeInTheDocument()
     })
 
-    it('renders a procedural section followed by an informational section', () => {
+    it('renders a procedural section heading as h2 when the step has action-steps', () => {
       const content: ArticleBlock[] = [
         { type: 'heading', level: 2, text: 'Como fazer' },
         { type: 'action-step', action: 'Primeiro passo' },
@@ -76,12 +76,42 @@ describe('GuideArticleLayout', () => {
       expect(
         screen.getByRole('heading', { level: 2, name: 'Como fazer' })
       ).toBeInTheDocument()
+    })
+
+    it('renders each action-step title as h3 inside a procedural section', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Como fazer' },
+        { type: 'action-step', action: 'Primeiro passo' },
+        { type: 'heading', level: 2, text: 'O que saber' },
+        { type: 'list', items: ['Item A'] },
+      ]
+      renderLayout(makeArticle({ content }))
       expect(
         screen.getByRole('heading', { level: 3, name: 'Primeiro passo' })
       ).toBeInTheDocument()
+    })
+
+    it('renders the heading of an informational section that follows a procedural one as h2', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Como fazer' },
+        { type: 'action-step', action: 'Primeiro passo' },
+        { type: 'heading', level: 2, text: 'O que saber' },
+        { type: 'list', items: ['Item A'] },
+      ]
+      renderLayout(makeArticle({ content }))
       expect(
         screen.getByRole('heading', { level: 2, name: 'O que saber' })
       ).toBeInTheDocument()
+    })
+
+    it('renders list content inside an informational section that follows a procedural one', () => {
+      const content: ArticleBlock[] = [
+        { type: 'heading', level: 2, text: 'Como fazer' },
+        { type: 'action-step', action: 'Primeiro passo' },
+        { type: 'heading', level: 2, text: 'O que saber' },
+        { type: 'list', items: ['Item A'] },
+      ]
+      renderLayout(makeArticle({ content }))
       expect(screen.getByText('Item A')).toBeInTheDocument()
     })
 
