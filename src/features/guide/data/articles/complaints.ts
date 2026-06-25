@@ -129,7 +129,7 @@ export const complaintsArticles: GuideArticle[] = [
     summary:
       'A Ouvidoria é o canal oficial para registrar reclamações. O protocolo que ela gera é sua garantia em todas as etapas seguintes.',
     datePublished: DATE_PUBLISHED,
-    dateModified: DATE_PUBLISHED,
+    dateModified: '2026-06-25',
     iconName: 'phone',
     content: [
       {
@@ -153,7 +153,7 @@ export const complaintsArticles: GuideArticle[] = [
         type: 'action-step',
         action: 'Ou registre pela internet',
         detail:
-          'Acesse gov.br/saude e procure "Ouvidoria do SUS". Você pode registrar a qualquer hora, inclusive de forma anônima.',
+          'Acesse gov.br/saude e procure "Ouvidoria do SUS". Você pode registrar a qualquer hora, inclusive de forma anônima — mas denúncias anônimas não podem ser rastreadas, acompanhadas nem recebem resposta.',
       },
       {
         type: 'heading',
@@ -174,7 +174,7 @@ export const complaintsArticles: GuideArticle[] = [
         type: 'callout',
         variant: 'tip',
         title: 'Prazo de resposta',
-        text: 'O prazo para a Ouvidoria responder é de até 30 dias úteis. Se não houver retorno no prazo, leve o protocolo diretamente ao Ministério Público.',
+        text: 'O prazo para a Ouvidoria concluir a resposta é de até 30 dias corridos a partir do recebimento. Esse prazo pode ser prorrogado uma vez, pelo mesmo período, desde que justificado. Se não houver retorno após a prorrogação, passe para a etapa seguinte da escalada.',
       },
       {
         type: 'callout',
