@@ -58,14 +58,14 @@ export const complaintsArticles: GuideArticle[] = [
     summary:
       'Siga a escalada certa: Secretaria Municipal, Ouvidoria, 136, Ministério Público e Defensoria — nessa ordem, guardando os protocolos.',
     datePublished: DATE_PUBLISHED,
-    dateModified: DATE_PUBLISHED,
+    dateModified: '2026-06-25',
     iconName: 'target',
     content: [
       {
         type: 'callout',
         variant: 'warning',
         title: 'Caso urgente?',
-        text: 'Se houver risco de vida, vá direto ao Ministério Público, à Defensoria Pública ou ao Judiciário. O Judiciário pode agir em até 72 horas com uma liminar de urgência.',
+        text: 'Se houver risco de vida, vá direto ao Ministério Público, à Defensoria Pública ou ao Judiciário. Uma liminar de urgência pode ser concedida e passa a valer imediatamente após a decisão.',
       },
       {
         type: 'paragraph',
@@ -108,7 +108,7 @@ export const complaintsArticles: GuideArticle[] = [
         type: 'action-step',
         action: 'Acione a Defensoria Pública ou o Judiciário',
         detail:
-          'A Defensoria atende gratuitamente. Em casos urgentes, um juiz pode emitir uma liminar em até 72 horas obrigando o Estado a agir.',
+          'A Defensoria atende gratuitamente. Em casos urgentes, um juiz pode emitir uma liminar que obriga o Estado a agir — e a decisão passa a valer imediatamente.',
       },
       {
         type: 'callout',
