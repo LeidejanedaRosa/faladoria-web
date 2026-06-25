@@ -81,6 +81,39 @@ describe('GuideActionStepCard', () => {
     })
   })
 
+  describe('Conditional link', () => {
+    it('renders an accessible link when link is provided', () => {
+      renderCard(
+        makeBlock({ link: { label: 'Acessar gov.br', href: 'https://gov.br' } })
+      )
+      expect(
+        screen.getByRole('link', { name: /Acessar gov\.br/i })
+      ).toBeInTheDocument()
+    })
+
+    it('does not render a link when link is omitted', () => {
+      renderCard(makeBlock({ link: undefined }))
+      expect(screen.queryByRole('link')).not.toBeInTheDocument()
+    })
+
+    it('opens the link in a new tab', () => {
+      renderCard(
+        makeBlock({ link: { label: 'Acessar gov.br', href: 'https://gov.br' } })
+      )
+      expect(screen.getByRole('link')).toHaveAttribute('target', '_blank')
+    })
+
+    it('has rel noopener noreferrer for security', () => {
+      renderCard(
+        makeBlock({ link: { label: 'Acessar gov.br', href: 'https://gov.br' } })
+      )
+      expect(screen.getByRole('link')).toHaveAttribute(
+        'rel',
+        'noopener noreferrer'
+      )
+    })
+  })
+
   describe('Conditional image', () => {
     it('renders an image when imageKey is provided', () => {
       const { container } = renderCard(makeBlock({ imageKey: 'ubs' }))
