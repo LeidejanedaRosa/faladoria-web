@@ -1,67 +1,93 @@
 import { Container } from '@shared/components/layout'
-import { GUIDE_ROUTES } from '@shared/data'
-import { Link } from 'react-router-dom'
+import { InfoCircleIcon } from '@shared/components/ui'
+import type { BreadcrumbItem } from '@shared/data'
+import { cn } from '@shared/utils/cn'
 
-import { GUIDE_CONTENT, type GuideCategory } from '../data'
+import {
+  getArticlesByCategory,
+  GUIDE_CATEGORY_HEADING_ID,
+  GUIDE_CONTENT,
+  type GuideCategory,
+} from '../data'
+import { GuideArticleCard } from './GuideArticleCard'
+import { GuideBreadcrumb } from './GuideBreadcrumb'
+import { GuideCategoryFooter } from './GuideCategoryFooter'
+import { GuideCategoryHeader } from './GuideCategoryHeader'
+import { CATEGORY_THEME } from './guideCategoryTheme'
 
 interface GuideCategoryLayoutProps {
   category: GuideCategory
+  breadcrumbItems: BreadcrumbItem[]
 }
 
-export const GuideCategoryLayout = ({ category }: GuideCategoryLayoutProps) => {
+export const GuideCategoryLayout = ({
+  category,
+  breadcrumbItems,
+}: GuideCategoryLayoutProps) => {
+  const articles = getArticlesByCategory(category.slug)
+  const { comingSoon, categoryPage } = GUIDE_CONTENT
+  const theme = CATEGORY_THEME[category.color]
+
   return (
     <Container className='py-12 sm:py-16 lg:py-20'>
-      <nav aria-label='Breadcrumb' className='mb-8'>
-        <ol className='flex items-center gap-2 text-sm'>
-          <li>
-            <Link
-              to='/'
-              className='text-purple-dark hover:text-purple-medium transition-colors'
-            >
-              Início
-            </Link>
-          </li>
-          <li aria-hidden='true' className='text-gray-400'>
-            /
-          </li>
-          <li>
-            <Link
-              to={GUIDE_ROUTES.root}
-              className='text-purple-dark hover:text-purple-medium transition-colors'
-            >
-              Guia do SUS
-            </Link>
-          </li>
-          <li aria-hidden='true' className='text-gray-400'>
-            /
-          </li>
-          <li>
-            <span className='text-gray-600' aria-current='page'>
-              {category.label}
-            </span>
-          </li>
-        </ol>
-      </nav>
+      <GuideBreadcrumb items={breadcrumbItems} />
 
-      <article className='mx-auto max-w-3xl'>
-        <header className='mb-10'>
-          <h1 className='text-purple-deepest text-3xl font-bold sm:text-4xl'>
-            {category.label}
-          </h1>
-          <p className='mt-3 text-lg leading-relaxed text-gray-600'>
-            {category.description}
-          </p>
-        </header>
+      <section aria-labelledby={GUIDE_CATEGORY_HEADING_ID} className='mt-2'>
+        <GuideCategoryHeader category={category} />
 
-        <div className='rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-6 py-16 text-center'>
-          <p className='text-lg font-medium text-gray-500'>
-            {GUIDE_CONTENT.comingSoon.heading}
-          </p>
-          <p className='mt-2 text-sm text-gray-400'>
-            {GUIDE_CONTENT.comingSoon.description}
-          </p>
-        </div>
-      </article>
+        {category.infoPoints && category.infoPoints.length > 0 && (
+          <section
+            aria-label={categoryPage.articles.infoPoints.heading}
+            className={cn(
+              'mt-6 rounded-2xl border px-6 py-5',
+              theme.softBg,
+              theme.border
+            )}
+          >
+            <h2 className={cn('text-sm font-semibold', theme.text)}>
+              {categoryPage.articles.infoPoints.heading}
+            </h2>
+            <ul className='mt-3 space-y-2'>
+              {category.infoPoints.map(point => (
+                <li
+                  key={point}
+                  className={cn('flex items-start gap-2 text-sm', theme.text)}
+                >
+                  <InfoCircleIcon
+                    className='mt-0.5 h-4 w-4 shrink-0'
+                    aria-hidden='true'
+                  />
+                  {point}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {articles.length > 0 ? (
+          <ul
+            className='mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2'
+            aria-label={`Artigos de ${category.label}`}
+          >
+            {articles.map(article => (
+              <li key={article.slug}>
+                <GuideArticleCard article={article} category={category} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className='mt-8 rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-6 py-16 text-center'>
+            <p className='text-lg font-medium text-gray-500'>
+              {comingSoon.heading}
+            </p>
+            <p className='mt-2 text-sm text-gray-400'>
+              {comingSoon.description}
+            </p>
+          </div>
+        )}
+
+        <GuideCategoryFooter />
+      </section>
     </Container>
   )
 }

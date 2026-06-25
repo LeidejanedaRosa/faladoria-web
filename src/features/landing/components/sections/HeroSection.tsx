@@ -1,10 +1,11 @@
-import logoFaladoria from '@assets/faladoria_secundaria.svg'
+import logoFaladoria from '@assets/faladoria-secondary.svg'
 import { Container } from '@shared/components/layout/Container'
-import { ActivityIcon, WhatsAppIcon } from '@shared/components/ui'
 import {
   AccessibleLink,
+  ActivityIcon,
   ScreenReaderOnly,
-} from '@shared/components/ui/Accessibility'
+  WhatsAppIcon,
+} from '@shared/components/ui'
 import { COMPANY_INFO, WHATSAPP_URL } from '@shared/data/companyInfo'
 import { SECTION_IDS } from '@shared/data/navigation'
 

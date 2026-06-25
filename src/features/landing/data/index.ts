@@ -1,6 +1,6 @@
 export { HERO_HEADING_ID, HERO_CONTENT } from './heroContent'
 export { PROBLEM_HEADING_ID, PROBLEM_CONTENT } from './problemContent'
-export type { NewsArticle, NewsArticleImage } from './problemContent'
+export type { NewsArticle } from './problemContent'
 export { SOLUTION_HEADING_ID, SOLUTION_CONTENT } from './solutionContent'
 export {
   HOW_IT_WORKS_HEADING_ID,
@@ -18,7 +18,7 @@ export type {
   TransparencyStat,
 } from './transparencyContent'
 export { ABOUT_HEADING_ID, ABOUT_CONTENT } from './aboutContent'
-export type { FounderInfo, FounderTrait, TextSegment } from './aboutContent'
+export type { FounderTrait } from './aboutContent'
 export { FAQ_HEADING_ID, FAQ_CONTENT } from './faqContent'
 export type { FaqItem } from './faqContent'
 export {

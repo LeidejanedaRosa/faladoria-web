@@ -1,9 +1,9 @@
 import { Container } from '@shared/components/layout/Container'
-import { PersonIcon } from '@shared/components/ui'
 import {
   AccessibleLink,
+  PersonIcon,
   ScreenReaderOnly,
-} from '@shared/components/ui/Accessibility'
+} from '@shared/components/ui'
 import { WhatsAppCTA } from '@shared/components/ui/WhatsAppCTA'
 
 import {

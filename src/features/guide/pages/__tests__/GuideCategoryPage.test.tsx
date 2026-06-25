@@ -35,15 +35,18 @@ vi.mock('../../components', () => ({
   ),
 }))
 vi.mock('../../data', () => ({
-  GUIDE_CATEGORIES: [
-    {
-      slug: 'seus-direitos',
-      label: 'Seus Direitos',
-      description: 'Descrição de direitos',
-      iconName: 'shield',
-      color: 'purple',
-    },
-  ],
+  getCategoryBySlug: vi.fn((slug: string) =>
+    slug === 'seus-direitos'
+      ? {
+          slug: 'seus-direitos',
+          label: 'Seus Direitos',
+          description: 'Descrição de direitos',
+          iconName: 'shield',
+          color: 'purple',
+        }
+      : undefined
+  ),
+  createCategoryStructuredData: vi.fn(() => ({})),
 }))
 
 function renderWithSlug(slug: string) {
@@ -64,13 +67,13 @@ function renderWithSlug(slug: string) {
 }
 
 describe('GuideCategoryPage', () => {
-  it('renders the category content when slug is valid', () => {
+  it('renders category content when the slug is valid', () => {
     renderWithSlug('seus-direitos')
     expect(screen.getByTestId('guide-category-layout')).toBeInTheDocument()
     expect(screen.getByText('Seus Direitos')).toBeInTheDocument()
   })
 
-  it('redirects to /como-conseguir-pelo-sus when slug is unknown', () => {
+  it('redirects to /como-conseguir-pelo-sus when the slug is invalid', () => {
     renderWithSlug('categoria-inexistente')
     expect(screen.getByTestId('guide-page')).toBeInTheDocument()
     expect(
@@ -78,7 +81,7 @@ describe('GuideCategoryPage', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('calls useDocumentMeta with category label when slug is valid', async () => {
+  it('calls useDocumentMeta with the category label when the slug is valid', async () => {
     const { useDocumentMeta } = await import('@shared/hooks/useDocumentMeta')
     renderWithSlug('seus-direitos')
     expect(useDocumentMeta).toHaveBeenCalledWith(
@@ -86,7 +89,7 @@ describe('GuideCategoryPage', () => {
     )
   })
 
-  it('calls useDocumentMeta with fallback title when slug is unknown', async () => {
+  it('calls useDocumentMeta with a generic title when the slug does not exist', async () => {
     const { useDocumentMeta } = await import('@shared/hooks/useDocumentMeta')
     renderWithSlug('nao-existe')
     expect(useDocumentMeta).toHaveBeenCalledWith(

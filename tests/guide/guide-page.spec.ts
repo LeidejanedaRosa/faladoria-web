@@ -4,9 +4,11 @@ import { parseJsonLdScripts } from '../helpers/jsonLd'
 
 type JsonLd = Record<string, unknown>
 
+const GUIDE_URL = '/como-conseguir-pelo-sus'
+
 test.describe('GuidePage', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/guia-do-sus', { waitUntil: 'domcontentloaded' })
+    await page.goto(GUIDE_URL, { waitUntil: 'domcontentloaded' })
     await page.locator('h1').waitFor({ timeout: 15000 })
   })
 
@@ -14,7 +16,7 @@ test.describe('GuidePage', () => {
     test('should render the hero section with h1', async ({ page }) => {
       const h1 = page.locator('h1#guide-heading')
       await expect(h1).toBeVisible()
-      await expect(h1).toContainText('Como conseguir pelo SUS')
+      await expect(h1).toContainText('Você tem direito à')
     })
 
     test('should render the hero badge', async ({ page }) => {
@@ -28,23 +30,23 @@ test.describe('GuidePage', () => {
     })
 
     test('should render the categories heading', async ({ page }) => {
-      const h2 = page.getByText('Escolha um tema para começar')
+      const h2 = page.getByText('Encontre o serviço que você precisa')
       await expect(h2).toBeVisible()
     })
 
-    test('should render all 6 category cards', async ({ page }) => {
-      const cards = page.locator('a[href^="/guia-do-sus/"]')
-      await expect(cards).toHaveCount(6)
+    test('should render all 17 category cards', async ({ page }) => {
+      const cards = page.locator(`a[href^="${GUIDE_URL}/"]`)
+      await expect(cards).toHaveCount(17)
     })
 
-    test('should render all category labels', async ({ page }) => {
+    test('should render representative category labels from each group', async ({
+      page,
+    }) => {
       const expectedLabels = [
-        'Seus Direitos',
-        'Como funciona o SUS',
-        'Como Conseguir',
+        'Consulta',
+        'Saúde da mulher',
         'Vacinação',
-        'Prevenção',
-        'Denuncie',
+        'Seus direitos',
       ]
 
       for (const label of expectedLabels) {
@@ -52,18 +54,18 @@ test.describe('GuidePage', () => {
       }
     })
 
-    test('should have correct card links', async ({ page }) => {
+    test('should have correct card links for representative categories', async ({
+      page,
+    }) => {
       const expectedSlugs = [
-        'seus-direitos',
-        'como-funciona-o-sus',
-        'como-conseguir',
+        'consulta',
+        'saude-da-mulher',
         'vacinacao',
-        'prevencao',
-        'denuncie',
+        'seus-direitos',
       ]
 
       for (const slug of expectedSlugs) {
-        const card = page.locator(`a[href="/guia-do-sus/${slug}"]`)
+        const card = page.locator(`a[href="${GUIDE_URL}/${slug}"]`)
         await expect(card).toBeAttached()
       }
     })
@@ -71,7 +73,7 @@ test.describe('GuidePage', () => {
 
   test.describe('SEO', () => {
     test('should set the document title', async ({ page }) => {
-      await expect(page).toHaveTitle(/Guia do SUS.*Faladoria/)
+      await expect(page).toHaveTitle(/Como conseguir pelo SUS.*Faladoria/)
     })
 
     test('should set the meta description', async ({ page }) => {
@@ -115,8 +117,8 @@ test.describe('GuidePage', () => {
       )
 
       expect(collectionPage).toBeTruthy()
-      expect(collectionPage!.name).toBe('Guia do SUS')
-      expect(collectionPage!.url).toContain('/guia-do-sus')
+      expect(collectionPage!.name).toBe('Como conseguir pelo SUS')
+      expect(collectionPage!.url).toContain('/como-conseguir-pelo-sus')
     })
   })
 
@@ -131,7 +133,7 @@ test.describe('GuidePage', () => {
       await expect(main).toBeAttached()
 
       const ariaLabel = await main.getAttribute('aria-label')
-      expect(ariaLabel).toContain('Guia do SUS')
+      expect(ariaLabel).toContain('Como conseguir pelo SUS')
     })
 
     test('should have aria-labelledby on hero section', async ({ page }) => {
@@ -148,26 +150,25 @@ test.describe('GuidePage', () => {
       await expect(categories).toBeAttached()
     })
 
-    test('should have aria-hidden on all card icons', async ({ page }) => {
-      const icons = page.locator('a[href^="/guia-do-sus/"] svg')
-      await expect(icons).toHaveCount(6)
-      const iconCount = await icons.count()
-
-      for (let i = 0; i < iconCount; i++) {
-        await expect(icons.nth(i)).toHaveAttribute('aria-hidden', 'true')
-      }
+    test('should have aria-hidden icon wrappers for all category cards', async ({
+      page,
+    }) => {
+      const iconWrappers = page.locator(
+        `a[href^="${GUIDE_URL}/"] div[aria-hidden="true"]`
+      )
+      await expect(iconWrappers).toHaveCount(17)
     })
 
-    test('should have correct heading hierarchy (h1 > h2 > h3)', async ({
+    test('should have correct heading hierarchy (h1 > h3 groups > h4 cards)', async ({
       page,
     }) => {
       const h1 = page.locator('h1')
-      const h2 = page.locator('section h2')
-      const h3s = page.locator('a[href^="/guia-do-sus/"] h3')
+      const groupHeadings = page.locator('section h3')
+      const cardHeadings = page.locator(`a[href^="${GUIDE_URL}/"] h4`)
 
       await expect(h1).toHaveCount(1)
-      await expect(h2).toHaveCount(1)
-      await expect(h3s).toHaveCount(6)
+      await expect(groupHeadings).toHaveCount(4)
+      await expect(cardHeadings).toHaveCount(17)
     })
   })
 
@@ -175,27 +176,27 @@ test.describe('GuidePage', () => {
     test('should navigate to category page when clicking a card', async ({
       page,
     }) => {
-      const card = page.locator('a[href="/guia-do-sus/seus-direitos"]')
+      const card = page.locator(`a[href="${GUIDE_URL}/consulta"]`)
       await card.click()
 
-      await page.waitForURL('/guia-do-sus/seus-direitos', { timeout: 10000 })
+      await page.waitForURL(`${GUIDE_URL}/consulta`, { timeout: 10000 })
 
       const h1 = page.locator('h1')
-      await expect(h1).toContainText('Seus Direitos')
+      await expect(h1).toContainText('Consulta')
     })
 
     test('should navigate back to guide page via breadcrumb', async ({
       page,
     }) => {
-      await page.locator('a[href="/guia-do-sus/seus-direitos"]').click()
-      await page.waitForURL('/guia-do-sus/seus-direitos', { timeout: 10000 })
+      await page.locator(`a[href="${GUIDE_URL}/consulta"]`).click()
+      await page.waitForURL(`${GUIDE_URL}/consulta`, { timeout: 10000 })
 
       const breadcrumbGuideLink = page
         .locator('nav[aria-label="Breadcrumb"]')
         .getByText('Guia do SUS')
       await breadcrumbGuideLink.click()
 
-      await page.waitForURL('/guia-do-sus', { timeout: 10000 })
+      await page.waitForURL(GUIDE_URL, { timeout: 10000 })
 
       const h1 = page.locator('h1')
       await expect(h1).toContainText('Como conseguir pelo SUS')
@@ -206,14 +207,14 @@ test.describe('GuidePage', () => {
     test.describe('Desktop', () => {
       test.beforeEach(async ({ page }) => {
         await page.setViewportSize({ width: 1280, height: 800 })
-        await page.goto('/guia-do-sus', { waitUntil: 'domcontentloaded' })
+        await page.goto(GUIDE_URL, { waitUntil: 'domcontentloaded' })
         await page.locator('h1').waitFor({ timeout: 15000 })
       })
 
       test('should render category cards in 3-column grid', async ({
         page,
       }) => {
-        const cards = page.locator('a[href^="/guia-do-sus/"]')
+        const cards = page.locator(`a[href^="${GUIDE_URL}/"]`)
         const firstBox = await cards.nth(0).boundingBox()
         const secondBox = await cards.nth(1).boundingBox()
         const thirdBox = await cards.nth(2).boundingBox()
@@ -231,14 +232,14 @@ test.describe('GuidePage', () => {
     test.describe('Mobile', () => {
       test.beforeEach(async ({ page }) => {
         await page.setViewportSize({ width: 375, height: 667 })
-        await page.goto('/guia-do-sus', { waitUntil: 'domcontentloaded' })
+        await page.goto(GUIDE_URL, { waitUntil: 'domcontentloaded' })
         await page.locator('h1').waitFor({ timeout: 15000 })
       })
 
       test('should render category cards in 2-column grid', async ({
         page,
       }) => {
-        const cards = page.locator('a[href^="/guia-do-sus/"]')
+        const cards = page.locator(`a[href^="${GUIDE_URL}/"]`)
         const firstBox = await cards.nth(0).boundingBox()
         const secondBox = await cards.nth(1).boundingBox()
 

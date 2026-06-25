@@ -1,0 +1,133 @@
+import appointmentCategoryImg from '@assets/guide/appointment/category.webp'
+import howToScheduleImg from '@assets/guide/appointment/how-to-schedule.webp'
+import specialistAppointmentImg from '@assets/guide/appointment/specialist-appointment.webp'
+import childHealthCategoryImg from '@assets/guide/child-health/category.webp'
+import childCareImg from '@assets/guide/child-health/child-care.webp'
+import newbornImg from '@assets/guide/child-health/newborn.webp'
+import oralHealthImg from '@assets/guide/child-health/oral-health.webp'
+import equipmentCategoryImg from '@assets/guide/equipment/category.webp'
+import cpapBipapImg from '@assets/guide/equipment/cpap-bipap.webp'
+import hearingAidImg from '@assets/guide/equipment/hearing-aid.webp'
+import howToObtainEquipmentImg from '@assets/guide/equipment/how-to-obtain-equipment-through-the-sus.webp'
+import examCategoryImg from '@assets/guide/exam/category.webp'
+import delayedExamImg from '@assets/guide/exam/delayed-exam.webp'
+import howToRequestExamImg from '@assets/guide/exam/how-to-request-exam.webp'
+import whatExamDoINeedImg from '@assets/guide/exam/what-exam-do-i-need.webp'
+import homeCareCategoryImg from '@assets/guide/home-care/category.webp'
+import homeCareHeroImg from '@assets/guide/home-care/home-care.webp'
+import medicalTransportCategoryImg from '@assets/guide/medical-transport/category.webp'
+import medicalTransportHeroImg from '@assets/guide/medical-transport/medical-transport.webp'
+import repaymentImg from '@assets/guide/medical-transport/repayment.webp'
+import medicationCategoryImg from '@assets/guide/medication/category.webp'
+import freeMedicationImg from '@assets/guide/medication/free-medication.webp'
+import highCostMedicationImg from '@assets/guide/medication/high-cost-medication.webp'
+import mensCategoryImg from '@assets/guide/mens-health/category.webp'
+import mensMentalHealthImg from '@assets/guide/mens-health/mens-mental-health.webp'
+import mensSexualHealthImg from '@assets/guide/mens-health/mens-sexual-health.webp'
+import prostateImg from '@assets/guide/mens-health/prostate.webp'
+import vasectomyImg from '@assets/guide/mens-health/vasectomy.webp'
+import capsImg from '@assets/guide/mental-health/caps.webp'
+import mentalHealthCategoryImg from '@assets/guide/mental-health/category.webp'
+import mentalHealthCrisisImg from '@assets/guide/mental-health/mental-health.webp'
+import psychologistImg from '@assets/guide/mental-health/psychologist.webp'
+import ambulanceImg from '@assets/guide/shared/ambulance.webp'
+import calendarImg from '@assets/guide/shared/calendar.webp'
+import susCardImg from '@assets/guide/shared/cartao-sus.webp'
+import checklistImg from '@assets/guide/shared/checklist.webp'
+import clockImg from '@assets/guide/shared/clock.webp'
+import doctorPatientImg from '@assets/guide/shared/doctor-patient.webp'
+import equipmentImg from '@assets/guide/shared/equipment.webp'
+import sharedHomeCareImg from '@assets/guide/shared/home-care.webp'
+import medicationsImg from '@assets/guide/shared/medications.webp'
+import patientRightsImg from '@assets/guide/shared/patient-rights.webp'
+import phoneImg from '@assets/guide/shared/phone.webp'
+import ubsImg from '@assets/guide/shared/ubs.webp'
+import surgeryCategoryImg from '@assets/guide/surgery/category.webp'
+import deniedSurgeryImg from '@assets/guide/surgery/denied-surgery.webp'
+import surgeryQueueImg from '@assets/guide/surgery/surgery-queue.webp'
+import treatmentCategoryImg from '@assets/guide/treatment/category.webp'
+import treatmentSessionImg from '@assets/guide/treatment/treatment-session.webp'
+import adultCalendarImg from '@assets/guide/vaccination/adult-calendar.webp'
+import vaccinationCategoryImg from '@assets/guide/vaccination/category.webp'
+import childrensCalendarImg from '@assets/guide/vaccination/childrens-calendar.webp'
+import pregnancyCalendarImg from '@assets/guide/vaccination/pregnancy-calendar.webp'
+import womensCategoryImg from '@assets/guide/womens-health/category.webp'
+import familyPlanningImg from '@assets/guide/womens-health/family-planning.webp'
+import prenatalImg from '@assets/guide/womens-health/prenatal.webp'
+import preventiveScreeningImg from '@assets/guide/womens-health/preventive-screening-and-mammogram.webp'
+import rightsCategoryImg from '@assets/guide/your-rights/category.webp'
+import demandRightsImg from '@assets/guide/your-rights/demand-ones-rights.webp'
+import rightToBeTreatedImg from '@assets/guide/your-rights/right-to-be-treated.webp'
+import rightToHealthImg from '@assets/guide/your-rights/right-to-health.webp'
+
+import type { SharedStepImageKey } from '../data/guideArticles'
+
+export const GUIDE_CATEGORY_IMAGES: Partial<Record<string, string>> = {
+  consulta: appointmentCategoryImg,
+  exame: examCategoryImg,
+  cirurgia: surgeryCategoryImg,
+  tratamento: treatmentCategoryImg,
+  medicamento: medicationCategoryImg,
+  'atendimento-domiciliar': homeCareCategoryImg,
+  'transporte-sanitario': medicalTransportCategoryImg,
+  equipamentos: equipmentCategoryImg,
+  'saude-da-mulher': womensCategoryImg,
+  'saude-do-homem': mensCategoryImg,
+  'saude-da-crianca': childHealthCategoryImg,
+  vacinacao: vaccinationCategoryImg,
+  'saude-mental': mentalHealthCategoryImg,
+  'seus-direitos': rightsCategoryImg,
+}
+
+export const GUIDE_ARTICLE_IMAGES: Partial<Record<string, string>> = {
+  'como-agendar-consulta': howToScheduleImg,
+  'consulta-especialista': specialistAppointmentImg,
+  'como-solicitar-exame': howToRequestExamImg,
+  'nao-sei-que-exame-preciso': whatExamDoINeedImg,
+  'exame-demorou-muito': delayedExamImg,
+  'fila-de-cirurgia': surgeryQueueImg,
+  'cirurgia-negada': deniedSurgeryImg,
+  'como-conseguir-tratamento': treatmentSessionImg,
+  'farmacia-basica': freeMedicationImg,
+  'medicamentos-alto-custo': highCostMedicationImg,
+  'como-solicitar-atendimento-domiciliar': homeCareHeroImg,
+  'como-solicitar-transporte-sanitario': medicalTransportHeroImg,
+  'reembolso-tfd': repaymentImg,
+  'como-solicitar-equipamentos': howToObtainEquipmentImg,
+  'cpap-bipap-sus': cpapBipapImg,
+  'aparelho-auditivo-sus': hearingAidImg,
+  'cancer-de-prostata-sus': prostateImg,
+  'vasectomia-sus': vasectomyImg,
+  'saude-sexual-masculina-sus': mensSexualHealthImg,
+  'saude-mental-homem-sus': mensMentalHealthImg,
+  'pre-natal': prenatalImg,
+  'preventivo-e-mamografia': preventiveScreeningImg,
+  'planejamento-familiar': familyPlanningImg,
+  'triagem-neonatal': newbornImg,
+  puericultura: childCareImg,
+  'saude-bucal-da-crianca': oralHealthImg,
+  'calendario-infantil': childrensCalendarImg,
+  'calendario-adulto': adultCalendarImg,
+  'vacinacao-na-gestacao': pregnancyCalendarImg,
+  'consulta-psicologo-sus': psychologistImg,
+  'caps-o-que-e-e-como-funciona': capsImg,
+  'crise-de-saude-mental-o-que-fazer': mentalHealthCrisisImg,
+  'direito-a-saude': rightToHealthImg,
+  'carta-dos-direitos-dos-usuarios': rightToBeTreatedImg,
+  'como-exigir-seus-direitos': demandRightsImg,
+}
+
+export const SHARED_STEP_IMAGES: Record<SharedStepImageKey, string> = {
+  ambulance: ambulanceImg,
+  calendar: calendarImg,
+  'cartao-sus': susCardImg,
+  checklist: checklistImg,
+  clock: clockImg,
+  'doctor-patient': doctorPatientImg,
+  equipment: equipmentImg,
+  'home-care': sharedHomeCareImg,
+  medications: medicationsImg,
+  'patient-rights': patientRightsImg,
+  phone: phoneImg,
+  ubs: ubsImg,
+}

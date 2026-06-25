@@ -1,5 +1,5 @@
 import { Container } from '@shared/components/layout/Container'
-import { ScreenReaderOnly } from '@shared/components/ui/Accessibility'
+import { ScreenReaderOnly } from '@shared/components/ui'
 import { FOOTER_CONTENT, FOOTER_HEADING_ID } from '@shared/data/footerContent'
 import { SECTION_IDS } from '@shared/data/navigation'
 

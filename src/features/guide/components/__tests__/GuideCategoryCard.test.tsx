@@ -25,25 +25,46 @@ function renderCard() {
 
 describe('GuideCategoryCard', () => {
   describe('Content', () => {
-    it('should render the category label as h3', () => {
+    it('renders the category name', () => {
       renderCard()
+      expect(screen.getByText('Seus Direitos')).toBeInTheDocument()
+    })
 
+    it('renders the category description', () => {
+      renderCard()
+      expect(screen.getByText(mockCategory.description)).toBeInTheDocument()
+    })
+
+    it('renders the link with the correct href for the category', () => {
+      renderCard()
+      expect(screen.getByRole('link')).toHaveAttribute(
+        'href',
+        GUIDE_ROUTES.category(mockCategory.slug)
+      )
+    })
+
+    it('the name and description compose the accessible name of the link', () => {
+      renderCard()
       expect(
-        screen.getByRole('heading', { name: 'Seus Direitos', level: 3 })
+        screen.getByRole('link', {
+          name: `${mockCategory.label} ${mockCategory.description}`,
+        })
       ).toBeInTheDocument()
     })
+  })
 
-    it('should render a link with the category label as accessible name', () => {
+  describe('Semantics', () => {
+    it('renders the category name as h4', () => {
       renderCard()
-
       expect(
-        screen.getByRole('link', { name: mockCategory.label })
-      ).toHaveAttribute('href', GUIDE_ROUTES.category(mockCategory.slug))
+        screen.getByRole('heading', { level: 4, name: 'Seus Direitos' })
+      ).toBeInTheDocument()
     })
+  })
 
-    it('should render the icon with aria-hidden', () => {
+  describe('Accessibility', () => {
+    it('the icon is hidden from screen readers', () => {
       const { container } = renderCard()
-
       const icon = container.querySelector('svg')
       expect(icon).toHaveAttribute('aria-hidden', 'true')
     })

@@ -1,12 +1,12 @@
-import filaAvif from '@assets/fila.avif'
-import filaJpg from '@assets/fila.jpg'
-import filaWebp from '@assets/fila.webp'
-import medicamentosAvif from '@assets/medicamentos.avif'
-import medicamentosJpg from '@assets/medicamentos.jpg'
-import medicamentosWebp from '@assets/medicamentos.webp'
-import pacienteAvif from '@assets/paciente.avif'
-import pacienteJpeg from '@assets/paciente.jpeg'
-import pacienteWebp from '@assets/paciente.webp'
+import medicationsAvif from '@assets/medications.avif'
+import medicationsJpg from '@assets/medications.jpg'
+import medicationsWebp from '@assets/medications.webp'
+import patientAvif from '@assets/patient.avif'
+import patientJpeg from '@assets/patient.jpeg'
+import patientWebp from '@assets/patient.webp'
+import queueAvif from '@assets/queue.avif'
+import queueJpg from '@assets/queue.jpg'
+import queueWebp from '@assets/queue.webp'
 
 export interface NewsArticleImage {
   avif: string
@@ -57,9 +57,9 @@ export const PROBLEM_CONTENT = {
       source: 'Terra',
       url: 'https://www.terra.com.br/noticias/fila-de-espera-no-sus-para-cirurgias-segue-crescendo,9ade9643697629d9f48ae5199b354f008dsm26fq.html',
       image: {
-        avif: filaAvif,
-        webp: filaWebp,
-        fallback: filaJpg,
+        avif: queueAvif,
+        webp: queueWebp,
+        fallback: queueJpg,
         alt: 'Pessoas aguardando em fila de espera no SUS',
         width: 1200,
         height: 630,
@@ -71,9 +71,9 @@ export const PROBLEM_CONTENT = {
       source: 'JusBrasil',
       url: 'https://www.jusbrasil.com.br/noticias/paciente-e-chamada-para-consulta-pelo-sus-onze-anos-apos-ter-morrido/703486596',
       image: {
-        avif: pacienteAvif,
-        webp: pacienteWebp,
-        fallback: pacienteJpeg,
+        avif: patientAvif,
+        webp: patientWebp,
+        fallback: patientJpeg,
         alt: 'Paciente em situação de espera no sistema de saúde público',
         width: 932,
         height: 537,
@@ -85,9 +85,9 @@ export const PROBLEM_CONTENT = {
       source: 'G1',
       url: 'https://g1.globo.com/jornal-nacional/noticia/2022/07/22/prefeituras-farmacias-e-hospitais-enfrentam-crescente-falta-de-remedios-basicos.ghtml',
       image: {
-        avif: medicamentosAvif,
-        webp: medicamentosWebp,
-        fallback: medicamentosJpg,
+        avif: medicationsAvif,
+        webp: medicationsWebp,
+        fallback: medicationsJpg,
         alt: 'Prateleiras vazias em farmácia pública por falta de medicamentos',
         width: 984,
         height: 656,

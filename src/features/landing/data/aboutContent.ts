@@ -1,4 +1,4 @@
-import simoneCelina from '@assets/simone_about.png'
+import simoneCelina from '@assets/simone-about.png'
 
 export const ABOUT_HEADING_ID = 'about-heading'
 

@@ -1,24 +1,6 @@
 import React, { forwardRef } from 'react'
 
-import type { AccessibilityProps } from '@shared/types/accessibility'
-
-const getVariantClasses = (
-  variant: 'primary' | 'secondary' | 'ghost',
-  isCurrentPage: boolean
-) => {
-  const variantClasses = {
-    primary: isCurrentPage
-      ? 'text-primary-700 font-semibold'
-      : 'text-primary hover:text-gray-200',
-    secondary: isCurrentPage
-      ? 'text-gray-800 font-semibold'
-      : 'text-gray-600 hover:text-gray-800',
-    ghost: isCurrentPage
-      ? 'text-white font-semibold'
-      : 'text-white hover:text-gray-200 hover:underline',
-  }
-  return variantClasses[variant]
-}
+import { cn } from '@shared/utils/cn'
 
 const computeAriaLabel = (
   external: boolean,
@@ -27,11 +9,6 @@ const computeAriaLabel = (
 ) => {
   return external ? ariaLabel || `${children} (abre em nova aba)` : ariaLabel
 }
-
-const resolveAriaCurrent = (
-  ariaCurrent: AccessibleLinkProps['ariaCurrent'],
-  isCurrent: boolean | undefined
-) => (ariaCurrent !== undefined ? ariaCurrent : isCurrent ? 'page' : undefined)
 
 const ExternalLinkIcon = () => (
   <svg
@@ -50,8 +27,6 @@ interface AccessibleLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorEleme
   children: React.ReactNode
   external?: boolean
   showExternalIcon?: boolean
-  variant?: 'primary' | 'secondary' | 'ghost'
-  isCurrent?: boolean
   ariaCurrent?:
     | boolean
     | 'page'
@@ -71,12 +46,10 @@ export const AccessibleLink = forwardRef<
       children,
       external = false,
       showExternalIcon = true,
-      variant = 'primary',
       'aria-label': ariaLabel,
-      className = '',
+      className,
       href,
       onKeyDown,
-      isCurrent,
       ariaCurrent,
       rel: _rel,
       target: _target,
@@ -84,26 +57,18 @@ export const AccessibleLink = forwardRef<
     },
     ref
   ) => {
-    const currentValue = resolveAriaCurrent(ariaCurrent, isCurrent)
-
-    const isCurrentPage = Boolean(currentValue)
-
-    const baseClasses = [
-      'inline-flex items-center font-medium rounded',
-      'transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary',
-    ]
-
-    const variantClass = getVariantClasses(variant, isCurrentPage)
-
     const computedAriaLabel = computeAriaLabel(external, ariaLabel, children)
 
     return (
       <a
         ref={ref}
         href={href}
-        className={[...baseClasses, variantClass, className].join(' ')}
+        className={cn(
+          'inline-flex items-center rounded transition-colors duration-200',
+          className
+        )}
         onKeyDown={onKeyDown}
-        aria-current={currentValue || undefined}
+        aria-current={ariaCurrent || undefined}
         {...safeProps}
         {...(external && {
           target: '_blank',
@@ -123,5 +88,3 @@ export const AccessibleLink = forwardRef<
 )
 
 AccessibleLink.displayName = 'AccessibleLink'
-
-export type { AccessibilityProps }

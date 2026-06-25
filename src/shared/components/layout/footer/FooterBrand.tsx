@@ -1,11 +1,8 @@
-import logoFaladoria from '@assets/faladoria_secundaria.svg'
-import { COMPANY_INFO } from '@shared/data/companyInfo'
+import logoFaladoria from '@assets/faladoria-secondary.svg'
+import { COMPANY_INFO, LOGO_HEIGHT, LOGO_WIDTH } from '@shared/data/companyInfo'
 import { Link } from 'react-router-dom'
 
 import { FOOTER_FOCUS_RING } from './footerStyles'
-
-const LOGO_WIDTH = 600
-const LOGO_HEIGHT = 485
 
 export const FooterBrand = () => (
   <div>

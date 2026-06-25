@@ -1,25 +1,67 @@
 import type { ReactElement } from 'react'
 
 import {
+  ActivityIcon,
+  BuildingIcon,
+  ChartIcon,
+  ChatIcon,
+  CheckIcon,
   ClipboardIcon,
+  FistIcon,
   HeartIcon,
+  LocationIcon,
   MegaphoneIcon,
+  PersonIcon,
+  PhoneIcon,
+  QuestionIcon,
   SearchIcon,
   ShieldIcon,
   SyringeIcon,
+  TargetIcon,
+  UsersIcon,
 } from '@shared/components/ui'
 import type { IconProps } from '@shared/types/icon'
 
-import type { GuideCategory } from '../data'
+import type { ArticleStepIconName, GuideCategory } from '../data'
 
-type IconComponent = (props: IconProps) => ReactElement
+export type IconComponent = (props: IconProps) => ReactElement
 
 export const GUIDE_ICON_MAP: Record<GuideCategory['iconName'], IconComponent> =
   {
-    shield: ShieldIcon,
-    heart: HeartIcon,
+    activity: ActivityIcon,
+    building: BuildingIcon,
+    chat: ChatIcon,
     clipboard: ClipboardIcon,
-    syringe: SyringeIcon,
-    search: SearchIcon,
+    fist: FistIcon,
+    heart: HeartIcon,
+    location: LocationIcon,
     megaphone: MegaphoneIcon,
+    person: PersonIcon,
+    search: SearchIcon,
+    shield: ShieldIcon,
+    syringe: SyringeIcon,
+    target: TargetIcon,
+    users: UsersIcon,
+  } as const
+
+export const ARTICLE_STEP_ICON_MAP: Record<ArticleStepIconName, IconComponent> =
+  {
+    activity: ActivityIcon,
+    building: BuildingIcon,
+    chart: ChartIcon,
+    chat: ChatIcon,
+    check: CheckIcon,
+    clipboard: ClipboardIcon,
+    fist: FistIcon,
+    heart: HeartIcon,
+    location: LocationIcon,
+    megaphone: MegaphoneIcon,
+    person: PersonIcon,
+    phone: PhoneIcon,
+    question: QuestionIcon,
+    search: SearchIcon,
+    shield: ShieldIcon,
+    syringe: SyringeIcon,
+    target: TargetIcon,
+    users: UsersIcon,
   } as const

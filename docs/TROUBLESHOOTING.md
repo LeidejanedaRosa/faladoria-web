@@ -4,6 +4,32 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## Seções de artigo com numeração incorreta em `InformationalStepCard`
+
+**Data**: 2026-06-24 (sintoma 1) / 2026-06-24 (sintoma 2)
+
+**Sintoma 1**: Em artigos com mais de uma seção H2, as seções informacionais exibiam prefixo numérico no heading começando do 2 — "2. Cronograma de consultas", "3. O que é avaliado".
+
+**Sintoma 2** (descoberto ao testar a categoria Vacinação): a caixa de ícone à esquerda da `InformationalStepCard` exibia o número "2" quando nenhum ícone era definido no heading — visualmente confuso e acessibilidade incorreta (o `<span>` não tinha `aria-hidden`).
+
+**Causa raiz**: `GuideArticleLayout` tem dois subcomponentes de renderização de seção:
+
+- `ProceduralStepSection`: renderizado quando o grupo tem `action-step`. Não exibia número.
+- `InformationalStepCard`: renderizado quando o grupo não tem `action-step`. (1) Exibia `{stepNumber}. {heading}` no `<h2>`. (2) Exibia `{stepNumber}` na caixa de ícone como fallback quando nenhum ícone estava definido.
+
+Como a primeira seção é sempre `ProceduralStepSection`, a segunda seção informacional aparecia numerada a partir de 2 — nos dois pontos.
+
+**Soluções**:
+
+1. Remover `{stepNumber}.` do `<h2>` em `InformationalStepCard`.
+2. Substituir `{Icon ? <Icon /> : <span>{stepNumber}</span>}` por `{Icon && <Icon />}` — a caixa de ícone só é renderizada quando um ícone for explicitamente definido no heading.
+
+O `stepNumber` permanece exclusivamente para o `id` do heading (`step-N-heading`), usado pelo `aria-labelledby` da seção.
+
+Ver [DECISIONS.md](DECISIONS.md#2026-06-24--headings-de-seção-sem-prefixo-numérico-em-informationalstepcard) para o raciocínio completo.
+
+---
+
 ## `tsc --noEmit` passa mas o erro real existe — cache do build composto
 
 **Data**: 2026-05-25
@@ -205,6 +231,114 @@ Substituir `<a href="...">` por `<Link to="...">` (React Router DOM) em todos os
 
 ---
 
+## `GuideArticlePage` renderizava artigo com categoria errada
+
+**Data**: 2026-05-28
+
+**Sintoma**: Visitar `/como-conseguir-pelo-sus/consulta/como-solicitar-exames-pelo-sus` (categoria incorreta para o artigo) renderizava a página sem redirecionar. O breadcrumb mostrava "Consulta" e a canonical URL tinha o slug errado, gerando conteúdo duplicado para o Google.
+
+**Causa raiz**:
+
+`getArticleBySlug` busca em todos os artigos independentemente do `categorySlug` da URL. A validação anterior verificava apenas `!article || !category`, não a relação entre os dois:
+
+```ts
+// antes
+if (!article || !category) {
+  return <Navigate to={GUIDE_ROUTES.root} replace />
+}
+```
+
+Um artigo de exame existia, uma categoria "consulta" existia — a condição passava. O artigo era renderizado sob a categoria errada.
+
+**Solução**:
+
+Adicionar a verificação de propriedade do artigo:
+
+```ts
+if (!article || !category || article.categorySlug !== category.slug) {
+  return <Navigate to={GUIDE_ROUTES.root} replace />
+}
+```
+
+**Regra**: em qualquer lookup que envolva dois parâmetros de URL interdependentes (`categorySlug` + `articleSlug`), validar não apenas a existência de cada entidade, mas a relação entre elas.
+
+---
+
+## `GuideCategoryLayout.test.tsx` falhava após adicionar constante ao barrel
+
+**Data**: 2026-05-28
+
+**Sintoma**:
+
+```
+Error: [vitest] No "GUIDE_CATEGORY_HEADING_ID" export is defined on the "../../data" mock.
+Did you forget to return it from "vi.mock"?
+```
+
+Todos os 8 testes do `GuideCategoryLayout.test.tsx` falharam após `GUIDE_CATEGORY_HEADING_ID` ser adicionado a `guideContent.ts`.
+
+**Causa raiz**:
+
+O teste mocava `../../data` com `vi.mock('../../data', async () => { const actual = await vi.importActual(...); return { ...actual, getArticlesByCategory: vi.fn() } })`. O `...actual` deveria incluir a nova constante — mas o barrel `data/index.ts` não re-exportava `GUIDE_CATEGORY_HEADING_ID`. O Vitest tentava acessar a exportação via o módulo mockado e não a encontrava.
+
+A causa real não era o mock em si, mas a constante não estar no barrel.
+
+**Solução**:
+
+Adicionar a constante ao barrel `features/guide/data/index.ts`:
+
+```ts
+export {
+  GUIDE_HEADING_ID,
+  GUIDE_CATEGORIES_HEADING_ID,
+  GUIDE_CATEGORIES_SECTION_ID,
+  GUIDE_CATEGORY_HEADING_ID,  // ← adicionado
+  GUIDE_ARTICLE_HEADING_ID,   // ← adicionado
+  ...
+} from './guideContent'
+```
+
+**Regra**: toda constante, tipo ou função adicionada a um arquivo dentro de `features/guide/data/` deve ser re-exportada pelo barrel `data/index.ts` antes de ser importada por qualquer componente via `'../data'`.
+
+---
+
+## `TS7053: StepGroup.icon` tipado como `string` em vez de `ArticleStepIconName`
+
+**Data**: 2026-06-14
+
+**Sintoma**:
+
+```
+src/features/guide/components/GuideArticleLayout.tsx(311,28): error TS7053:
+Element implicitly has an 'any' type because expression of type 'string'
+can't be used to index type 'Record<ArticleStepIconName, IconComponent>'.
+```
+
+**Causa raiz**:
+
+Quando `ArticleStepIconName` foi movido de `components/guideIconMap.ts` para `data/guideArticles.ts`, a interface interna `StepGroup` em `GuideArticleLayout.tsx` não foi atualizada. O campo `icon?: string` ainda usava o tipo primitivo, o que impedia o uso de `step.icon` como chave de `ARTICLE_STEP_ICON_MAP` (que aceita apenas `ArticleStepIconName`).
+
+**Solução**:
+
+1. Importar `ArticleStepIconName` de `'../data'` em `GuideArticleLayout.tsx`
+2. Atualizar `StepGroup.icon` de `string` para `ArticleStepIconName`
+
+```ts
+// antes
+interface StepGroup {
+  icon?: string
+}
+
+// depois
+interface StepGroup {
+  icon?: ArticleStepIconName
+}
+```
+
+**Regra**: ao mover um tipo de uma camada para outra, buscar por todas as interfaces internas que usavam o tipo primitivo correspondente (`string`, `number`) como substituto informal. Esses são os pontos que o compilador não detecta automaticamente durante a refatoração.
+
+---
+
 ## Função `slugify` duplicada com implementações divergentes
 
 **Data**: 2026-05-25
@@ -224,3 +358,283 @@ As duas abordagens funcionam para Latin, mas a segunda é mais robusta para outr
 Criado `src/shared/utils/slugify.ts` com implementação unificada (baseada na versão mais robusta) e 8 testes cobrindo diacríticos, espaços, caracteres especiais, números e strings vazias. As duas implementações inline foram removidas.
 
 Ver [DECISIONS.md](DECISIONS.md#2026-05-23--slugify-como-utilitário-compartilhado) para o raciocínio da implementação escolhida.
+
+---
+
+## `StepRightColumn` filtrava blocos já filtrados — branch de código morto com erro de tipo
+
+**Data**: 2026-06-22
+
+**Sintoma**: Nenhum erro visível em runtime. Identificado em revisão: `StepRightColumn` recebia `blocks: ArticleBlock[]` e fazia `block.type === 'callout'` internamente, com um `else return null`. O branch `null` nunca era atingido porque o caller passava apenas callouts.
+
+**Causa raiz**:
+
+Após refatorações anteriores, `InformationalStepCard` já filtrava `rightBlocks` antes de passar para `StepRightColumn`:
+
+```tsx
+// caller já filtrava:
+const rightBlocks = step.blocks.filter(b => b.type === 'callout')
+
+// mas StepRightColumn filtrava de novo:
+const StepRightColumn = ({ blocks }: { blocks: ArticleBlock[] }) => (
+  blocks.map(block => block.type === 'callout'
+    ? <Callout key={...} block={block} />
+    : null  // nunca atingido
+  )
+)
+```
+
+Além do código morto, o tipo `ArticleBlock[]` estava errado para o prop — `Callout` espera `Extract<ArticleBlock, { type: 'callout' }>`, não `ArticleBlock`.
+
+**Solução**:
+
+1. Definir `type CalloutBlock = Extract<ArticleBlock, { type: 'callout' }>` no escopo do módulo
+2. Retipar o prop de `StepRightColumn` para `{ blocks: CalloutBlock[] }`
+3. Retirar o check interno — o componente itera e renderiza diretamente
+4. Usar type predicate no caller: `step.blocks.filter((b): b is CalloutBlock => b.type === 'callout')`
+
+**Regra**: quando um componente recebe dados já filtrados por tipo, o prop deve refletir o tipo estreitado — não o tipo base. O type predicate no caller é o mecanismo correto para satisfazer o TypeScript sem assertion.
+
+---
+
+## `ActionStepBlock` exportado do módulo mas não adicionado ao barrel
+
+**Data**: 2026-06-22
+
+**Sintoma**: `tsc -p tsconfig.app.json --noEmit` reportou:
+
+```
+error TS2305: Module '"../data"' has no exported member 'ActionStepBlock'.
+```
+
+Três arquivos afetados: `GuideActionStepCard.tsx`, `GuideActionStepList.tsx`, `GuideArticleLayout.tsx`. O comando `tsc --noEmit` (sem `-p`) não reportou nenhum erro — o cache stale mascarou o problema.
+
+**Causa raiz**:
+
+`ActionStepBlock` foi adicionado como export em `data/guideArticles.ts`:
+
+```ts
+export type ActionStepBlock = Extract<ArticleBlock, { type: 'action-step' }>
+```
+
+Mas não foi adicionado ao barrel `data/index.ts`. Os componentes importam de `'../data'` (o barrel), não diretamente de `'../data/guideArticles'`.
+
+**Solução**:
+
+Adicionar ao `data/index.ts`:
+
+```ts
+export type {
+  GuideArticle,
+  ArticleBlock,
+  ActionStepBlock, // ← adicionado
+  ArticleStepIconName,
+} from './guideArticles'
+```
+
+**Conexão com TROUBLESHOOTING existente**: este é outro caso do problema documentado em ["`tsc --noEmit` passa mas o erro real existe"](#tsc---noemit-passa-mas-o-erro-real-existe--cache-do-build-composto). Usar `tsc -p tsconfig.app.json --noEmit` é obrigatório para validação confiável.
+
+**Regra (reforço)**: toda exportação nova em qualquer arquivo de `features/guide/data/` deve ser adicionada ao barrel `data/index.ts` imediatamente. A ausência não gera erro no arquivo fonte — só no consumidor.
+
+---
+
+## Cor `blue` duplicada em 17 categorias — union type com 16 cores
+
+**Data**: 2026-06-23
+
+**Sintoma**: Sem erro de compilação. Identificado em auditoria de código: `transporte-sanitario` e `como-funciona-o-sus` compartilhavam `color: 'blue'`, tornando-as visualmente idênticas na grade de categorias.
+
+**Causa raiz**: a union `GuideCategory['color']` foi criada com 16 valores para 16 categorias, mas o projeto cresceu para 17 categorias sem a union ser atualizada. O TypeScript não detectou o problema porque `'blue'` é um valor válido — apenas duas categorias o usavam.
+
+**Solução**:
+
+1. Adicionado `'slate'` à union de cores em `guideCategories.ts`
+2. Adicionado tema `slate` ao `CATEGORY_THEME` em `guideCategoryTheme.ts` (7 campos obrigatórios)
+3. Atribuído `color: 'slate'` à categoria `como-funciona-o-sus`
+4. Adicionado teste `'all category colors are unique'` em `guideUtils.test.ts` para prevenção futura
+
+**Regra**: ao adicionar uma nova categoria, verificar se a cor não está em uso por outra categoria. O teste de unicidade de cores detecta a duplicação automaticamente no pre-push.
+
+---
+
+## Testes E2E em `guide-page.spec.ts` com 5 assertivas erradas desde a criação
+
+**Data**: 2026-06-23
+
+**Sintoma**: Os seguintes testes falhavam em runtime mas não haviam sido executados desde a criação do arquivo:
+
+1. `h1.toContainText('Como conseguir pelo SUS')` — o `<h1>` contém `'Você tem direito à'`
+2. `getByText('Escolha um tema para começar')` — o texto real é `'Encontre o serviço que você precisa'`
+3. `toHaveTitle(/Guia do SUS.*Faladoria/)` — o título real é `'Como conseguir pelo SUS | Faladoria'`
+4. `collectionPage.name === 'Guia do SUS'` — o valor real é `'Como conseguir pelo SUS'`
+5. `ariaLabel.toContain('Guia do SUS')` — o label real usa `GUIDE_CONTENT.seo.title = 'Como conseguir pelo SUS'`
+
+**Causa raiz**: os testes foram escritos com valores assumidos em vez de valores lidos do código. `GUIDE_CONTENT.hero.headline.base + highlight` gera o texto do `<h1>` — diferente do `seo.title`. O título do documento e os structured data usam `seo.title`, não `hero.headline`.
+
+**Solução**: ler `GUIDE_CONTENT` nos dados reais e corrigir todos os 5 valores. Adicionada constante `const GUIDE_URL = '/como-conseguir-pelo-sus'` para eliminar literais duplicados nos testes.
+
+**Regra**: antes de escrever assertivas de texto em testes E2E, localizar a fonte do dado no código — não assumir que o texto visível é igual ao título SEO ou à constante de rota.
+
+---
+
+## `guide-article-page.spec.ts` CRÍTICO: redirect apontando para CATEGORY_URL em vez de GUIDE_URL
+
+**Data**: 2026-06-23
+
+**Sintoma**: O teste `'should redirect to guide root for unknown article slug'` usava `page.waitForURL(CATEGORY_URL)` e falharia por timeout em execução real.
+
+**Causa raiz**: `GuideArticlePage.tsx` (linha 40-41) redireciona **sempre** para `GUIDE_ROUTES.root` quando o artigo não é encontrado — nunca para a categoria. O teste assumia que o redirect ia para a categoria, mas o código vai para a raiz do Guide.
+
+```tsx
+// GuideArticlePage.tsx — comportamento real
+if (!article || !category || article.categorySlug !== category.slug) {
+  return <Navigate to={GUIDE_ROUTES.root} replace />
+}
+```
+
+**Solução**: corrigir o teste para `page.waitForURL(GUIDE_URL)` e o `<h1>` esperado para `'Você tem direito à'` (texto da página raiz do Guide). Renomear o teste para `'should redirect to guide root for unknown article slug'`.
+
+---
+
+## `playwright/prefer-web-first-assertions` quebrando assertiva de meta description
+
+**Data**: 2026-06-23
+
+**Sintoma**: `npx eslint --fix` converteu `getAttribute('content')` para `toHaveAttribute('content')`, mas quebrou o código:
+
+```ts
+// depois do --fix (quebrado):
+const description = page.locator('meta[name="description"]')
+await expect(description).toHaveAttribute('content') // sem valor para comparar
+expect(description!.length).toBeGreaterThan(10) // description agora é Locator, não string
+```
+
+**Causa raiz**: o código original usava `getAttribute` para obter o valor da string e depois verificar seu comprimento. O auto-fix do ESLint substituiu por `toHaveAttribute`, mas não adaptou a lógica que usava o valor retornado.
+
+**Solução**: reescrever a assertiva usando apenas a API web-first do Playwright:
+
+```ts
+await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+  'content',
+  /pré-natal|SUS|gravidez/
+)
+```
+
+**Regra**: ao aceitar um auto-fix do ESLint que converte `getAttribute` para `toHaveAttribute`, verificar se o código subsequente usava o valor de retorno do `getAttribute`. Se sim, reescrever a assertiva inteira usando `toHaveAttribute` com matcher, em vez de adaptar o código parcialmente.
+
+---
+
+## Teste `renders correctly when detail is omitted` falhando por `<p>` do `GuideArticleFooter`
+
+**Data**: 2026-06-23
+
+**Sintoma**:
+
+```
+AssertionError: expected 11 to equal 0
+```
+
+O teste verificava `container.querySelectorAll('p').length === 0` após renderizar um `GuideArticleLayout` com apenas um `action-step` sem `detail`.
+
+**Causa raiz**: `GuideArticleLayout` renderiza `GuideArticleFooter` no mesmo tree. O `GuideArticleFooter` contém múltiplos elementos `<p>` (links de rodapé, texto informativo). O count de `<p>` verificava o componente inteiro, não apenas a área do step.
+
+**Solução**: remover a assertiva `querySelectorAll('p').length === 0` — ela não verificava o comportamento pretendido (ausência do bloco de detalhe). Manter apenas a assertiva semântica relevante: verificar que o `<h3>` do action step é renderizado corretamente, o que prova que o componente funciona sem `detail`.
+
+```ts
+// assertiva removida (falsa):
+expect(container.querySelectorAll('p').length).toBe(0)
+
+// assertiva mantida (real):
+expect(
+  screen.getByRole('heading', { level: 3, name: 'Vá à UBS' })
+).toBeInTheDocument()
+```
+
+**Regra**: nunca usar `querySelectorAll` para verificar ausência de um elemento quando o componente renderizado inclui outros componentes que também podem ter esse elemento. Usar seletores mais específicos ou assertivas baseadas em papel (`getByRole`) que refletem o comportamento pretendido.
+
+---
+
+## Imagens com `alt=""` têm role ARIA `"presentation"`, não `"img"`, em testes
+
+**Data**: 2026-06-24
+
+**Sintoma**: `screen.getByRole('img', { hidden: true })` lança `TestingLibraryElementError: Unable to find an accessible element with the role "img"` mesmo quando a imagem está visível no DOM.
+
+**Causa raiz**:
+
+Imagens com `alt=""` recebem role ARIA implícito `"presentation"` (ou `"none"`), não `"img"`. Esse comportamento é especificado pelo WAI-ARIA: `alt` vazio sinaliza que a imagem é decorativa, e o browser a expõe como elemento de apresentação. O `aria-hidden="true"` adicional não é a causa — a causa é o role implícito ser diferente de `"img"`.
+
+**Solução**:
+
+Para imagens decorativas (`alt=""`), usar `container.querySelector('img')` em vez de `getByRole`:
+
+```ts
+// NÃO funciona para imagens com alt="":
+const img = screen.getByRole('img', { hidden: true }) // TestingLibraryElementError
+
+// CORRETO para imagens decorativas:
+const { container } = render(<Component />)
+const img = container.querySelector('img')
+expect(img).toBeInTheDocument()
+expect(img).toHaveAttribute('src', '/expected.webp')
+```
+
+**Regra**: `getByRole('img')` consulta elementos expostos com role `img` na árvore de acessibilidade. Imagens decorativas (`alt=""`) são expostas como `presentation`, não como `img` — portanto não são encontradas por `getByRole`. Para esses casos, usar `container.querySelector('img')`.
+
+---
+
+## Callout com `<h3>` quebrava hierarquia de headings no preamble
+
+**Data**: 2026-06-24
+
+**Sintoma**: Auditoria de acessibilidade identificou hierarquia H1 → H3 → H2 no artigo de crise de saúde mental. O artigo usava um callout de emergency logo no início (antes do primeiro H2), e o título do callout era renderizado como `<h3>`.
+
+**Causa raiz**: `GuideArticleCallouts.tsx` usava `<h3>` para títulos de callout em todas as variantes. No layout de artigo, blocos que aparecem antes do primeiro H2 são renderizados como **preamble** — fora de qualquer `<section>` com heading H2. Um callout no preamble com `<h3>` criava a sequência H1 (título do artigo) → H3 (título do callout) → H2 (primeira seção), violando WCAG 1.3.1 (Info and Relationships) e prejudicando navegação por leitores de tela.
+
+**Por que não era óbvio**: O `<h3>` era semanticamente correto em callouts dentro de seções (H2 → H3 é válido). O problema era contextual: o mesmo componente renderizava corretamente dentro de uma seção e incorretamente no preamble, sem nenhum erro em build ou lint.
+
+**Solução**: Substituir `<h3>` por `<p className='text-sm font-semibold'>` em todos os componentes de callout (`SimpleCallout`, `EmergencyCallout`, `ChecklistCallout`). Títulos de callout são rótulos visuais de contexto — não estrutura de documento — e não devem ser headings. O `role='note'` com `aria-label` já provê o contexto semântico necessário para leitores de tela.
+
+**Teste atualizado**: `GuideArticleLayout.test.tsx` tinha um teste que assertava `<h3>` como correto — renomeado e invertido para verificar que o título é um `<p>` e que nenhum heading com aquele nome existe no documento.
+
+**Regra geral**: Componentes de callout ou badge que aparecem em posição variável no documento (preamble, dentro de seção, dentro de lista) não devem usar heading elements — o nível correto é imprevisível em compile time.
+
+---
+
+## ffmpeg in-place falha silenciosamente em assets com permissão somente-leitura
+
+**Data**: 2026-06-24
+
+**Sintoma**: Após `ffmpeg -i input.webp [opções] input.webp.tmp && mv input.webp.tmp input.webp`, o arquivo de destino manteve o tamanho original — sem mensagem de erro visível.
+
+**Causa raiz**:
+
+`mv` entre filesystems diferentes (e.g., `/tmp` numa partição separada e `src/assets/` no disco do projeto) não é um simples `rename(2)` — vira copy + unlink. Nesse caso, o shell cria um novo inode no destino; se o diretório de destino tiver restrições ou o arquivo original tiver sido rastreado pelo git com permissões `644` que o processo não consegue substituir atomicamente, o `mv` falha. A falha era silenciosa porque o `&&` foi satisfeito pelo `ffmpeg`, e o código de saída do `mv` não foi verificado.
+
+**Importante**: `mv` e `cp` têm requisitos de permissão distintos: `mv` numa mesma partição precisa de escrita no _diretório_; `cp` sobrescrevendo um arquivo existente precisa de escrita no _arquivo_. Este workaround funciona porque os assets em `src/assets/guide/` têm `644` com o usuário como dono (escrita no arquivo disponível) e o diretório tem `755`.
+
+**Solução**:
+
+Para este projeto, comprimir para um diretório temporário e usar `cp` para sobrescrever o arquivo de destino:
+
+```bash
+# Comprimir para diretório temporário:
+ffmpeg -i input.webp -c:v libwebp -quality 80 -compression_level 6 /tmp/out.webp
+
+# Sobrescrever o asset — funciona porque o usuário tem escrita no arquivo 644:
+cp /tmp/out.webp src/assets/guide/category/input.webp
+```
+
+**Nota sobre a escolha de `cp`**: neste fluxo específico, `cp` é mais seguro porque: (1) o arquivo temporário em `/tmp` pode estar numa partição diferente (tornando `mv` uma operação cross-filesystem sujeita a falhas silenciosas); (2) `cp` preserva o inode original, o que evita que ferramentas que rastreiam inodes (como algumas implementações de `inotify`) percam o arquivo. Em outros contextos, `mv` dentro da mesma partição é perfeitamente válido.
+
+---
+
+## `sonarjs/no-duplicate-string` bloqueando commit em arquivo com múltiplos artigos
+
+**Sintoma**: pre-commit falha com `error  Define a constant instead of duplicating this literal 3 times  sonarjs/no-duplicate-string` ao commitar um arquivo de artigos com 3 ou mais artigos que compartilham strings de checklist.
+
+**Causa raiz**: a regra está configurada com `threshold: 3`. Strings comuns entre artigos da mesma categoria — itens de checklist como `'Cartão do SUS'`, `'CPF'`, `'Comprovante de residência'` e títulos de seção como `'Como solicitar'` — repetem-se exatamente 3 vezes (uma por artigo), disparando a regra.
+
+**Solução**: extrair as strings repetidas como constantes no topo do arquivo, seguindo o padrão de `CATEGORY_SLUG` e `DATE_PUBLISHED`. Ver decisão em DECISIONS.md "Constantes compartilhadas para strings repetidas em equipment.ts".
+
+**Prevenção**: ao criar um segundo artigo em qualquer arquivo de categoria, verificar se strings de checklist ou headings se repetem e extraí-las imediatamente — antes do commit.

@@ -1,23 +1,19 @@
 export const COMPANY_INFO = {
-  // Basic Info
   name: 'Faladoria',
   legalName: 'Faladoria Tecnologia LTDA', // TODO: Update with real legal name
   description:
     'Canal de mediação entre usuários do SUS e gestores de saúde para resolver problemas de atendimento via WhatsApp.',
   shortDescription: 'Sua voz no SUS',
 
-  // URLs
   url: 'https://faladoria-web.vercel.app', // TODO: Update with real URL
   logo: '/logo.svg',
-  ogImage: '/og-image.jpg', // 1200x630px recommended
+  ogImage: '/og-image.jpg',
 
-  // Contact
   contact: {
     email: 'canalfaladoria@gmail.com',
     whatsapp: '+55 35 997003315',
   },
 
-  // Address
   address: {
     street: 'Rua Example', // TODO: Update with real address
     number: '123',
@@ -30,7 +26,6 @@ export const COMPANY_INFO = {
     countryCode: 'BR',
   },
 
-  // Social Media
   social: {
     instagram: '',
     linkedin: '',
@@ -39,11 +34,9 @@ export const COMPANY_INFO = {
     youtube: '',
   },
 
-  // Business Info
   foundingDate: '2024',
   industry: 'HealthTech',
 
-  // SEO
   seo: {
     title: 'Faladoria - Sua voz no SUS',
     titleTemplate: '%s | Faladoria',
@@ -63,12 +56,14 @@ export const COMPANY_INFO = {
     themeColor: '#3b82f6', // TODO: Update with brand color
   },
 
-  // Legal (Brazilian specific)
   legal: {
     cnpj: '00.000.000/0000-00', // TODO: Update with real CNPJ
     registrationNumber: '',
   },
 } as const
+
+export const LOGO_WIDTH = 600
+export const LOGO_HEIGHT = 485
 
 export const WHATSAPP_URL = `https://wa.me/${COMPANY_INFO.contact.whatsapp.replace(/\D/g, '')}`
 
