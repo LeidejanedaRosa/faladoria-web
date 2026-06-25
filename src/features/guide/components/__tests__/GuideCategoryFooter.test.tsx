@@ -9,21 +9,29 @@ function renderFooter() {
 }
 
 describe('GuideCategoryFooter', () => {
-  it('renders the tip block', () => {
+  it('renders the tip block title', () => {
     renderFooter()
     expect(
       screen.getByText(GUIDE_CONTENT.categoryPage.tip.title)
     ).toBeInTheDocument()
+  })
+
+  it('renders the tip block description', () => {
+    renderFooter()
     expect(
       screen.getByText(GUIDE_CONTENT.categoryPage.tip.description)
     ).toBeInTheDocument()
   })
 
-  it('renders the help block', () => {
+  it('renders the help block title', () => {
     renderFooter()
     expect(
       screen.getByText(GUIDE_CONTENT.categoryPage.help.title)
     ).toBeInTheDocument()
+  })
+
+  it('renders the help block description', () => {
+    renderFooter()
     expect(
       screen.getByText(GUIDE_CONTENT.categoryPage.help.description)
     ).toBeInTheDocument()

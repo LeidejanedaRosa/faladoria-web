@@ -26,6 +26,10 @@ import mensMentalHealthImg from '@assets/guide/mens-health/mens-mental-health.we
 import mensSexualHealthImg from '@assets/guide/mens-health/mens-sexual-health.webp'
 import prostateImg from '@assets/guide/mens-health/prostate.webp'
 import vasectomyImg from '@assets/guide/mens-health/vasectomy.webp'
+import capsImg from '@assets/guide/mental-health/caps.webp'
+import mentalHealthCategoryImg from '@assets/guide/mental-health/category.webp'
+import mentalHealthCrisisImg from '@assets/guide/mental-health/mental-health.webp'
+import psychologistImg from '@assets/guide/mental-health/psychologist.webp'
 import ambulanceImg from '@assets/guide/shared/ambulance.webp'
 import calendarImg from '@assets/guide/shared/calendar.webp'
 import susCardImg from '@assets/guide/shared/cartao-sus.webp'
@@ -67,6 +71,7 @@ export const GUIDE_CATEGORY_IMAGES: Partial<Record<string, string>> = {
   'saude-do-homem': mensCategoryImg,
   'saude-da-crianca': childHealthCategoryImg,
   vacinacao: vaccinationCategoryImg,
+  'saude-mental': mentalHealthCategoryImg,
 }
 
 export const GUIDE_ARTICLE_IMAGES: Partial<Record<string, string>> = {
@@ -99,6 +104,9 @@ export const GUIDE_ARTICLE_IMAGES: Partial<Record<string, string>> = {
   'calendario-infantil': childrensCalendarImg,
   'calendario-adulto': adultCalendarImg,
   'vacinacao-na-gestacao': pregnancyCalendarImg,
+  'consulta-psicologo-sus': psychologistImg,
+  'caps-o-que-e-e-como-funciona': capsImg,
+  'crise-de-saude-mental-o-que-fazer': mentalHealthCrisisImg,
 }
 
 export const SHARED_STEP_IMAGES: Record<SharedStepImageKey, string> = {

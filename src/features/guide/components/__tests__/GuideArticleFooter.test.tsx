@@ -9,11 +9,15 @@ function renderFooter() {
 }
 
 describe('GuideArticleFooter', () => {
-  it('renders the help block', () => {
+  it('renders the help block title', () => {
     renderFooter()
     expect(
       screen.getByText(GUIDE_CONTENT.articlePage.help.title)
     ).toBeInTheDocument()
+  })
+
+  it('renders the help block description', () => {
+    renderFooter()
     expect(
       screen.getByText(GUIDE_CONTENT.articlePage.help.description)
     ).toBeInTheDocument()

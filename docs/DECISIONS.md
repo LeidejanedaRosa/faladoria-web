@@ -669,6 +669,27 @@ export const GUIDE_ARTICLE_HEADING_ID = 'article-heading'
 
 ---
 
+## 2026-06-24 — `CalloutBlock` como discriminated union com dispatch via `switch`
+
+**Contexto**: O tipo `ArticleBlock` definia callouts com um único membro genérico (`{ type: 'callout'; variant?: string; title?: string; text?: string; highlight?: string; items?: string[] }`). Isso permitia combinações inválidas em tempo de autoria — como `text` em um checklist ou `highlight` em um tip — sem nenhum erro do TypeScript. Ao introduzir o artigo de crise de saúde mental (que usa a variante `emergency` com `highlight`), ficou claro que o tipo precisava ser refinado.
+
+**Decisão**: Extrair `CalloutBlock` como uma discriminated union separada, com cada variante declarando apenas seus campos válidos. No componente `GuideArticleCallouts.tsx`, substituir o lookup table `CALLOUT_VARIANTS` por um `switch` statement.
+
+**Por quê**:
+
+O lookup table `CALLOUT_VARIANTS[variant]` não funcionava com a discriminated union porque TypeScript não conseguia narrar o `block` ao tipo específico da variante dentro de cada entrada da map — cada componente esperava um tipo narrowed (ex.: `TipCalloutData`), mas o lookup passava `CalloutData` completo. O `switch` resolve isso nativamente: TypeScript auto-narro `block` em cada `case` branch via control flow analysis.
+
+Para os type aliases locais (`TipCalloutData`, `DefaultCalloutData`, etc.), foram usados `Extract` e `Exclude` sobre `CalloutData`:
+
+- `Extract<CalloutData, { variant: 'tip' }>` → isola a variante tip
+- `Exclude<CalloutData, { variant: string }>` → isola o default (`variant?: never`), porque `Extract<CalloutData, { variant?: never }>` é não confiável: `{ variant?: never }` é satisfeito por qualquer tipo (structural typing), enquanto `Exclude` com `{ variant: string }` remove corretamente os membros com literal string em `variant`
+
+**Benefício**: erros de autoria de conteúdo (campo inválido para a variante) viram erros de TypeScript em `mental-health.ts` em vez de data loss silencioso em runtime.
+
+**Alternativa rejeitada**: Manter o lookup table e adicionar type assertions (`as TipCalloutData`). Rejeitado porque suprime a garantia de tipo — o TypeScript passa a acreditar sem verificar, e erros no mapeamento de componentes ficam invisíveis.
+
+---
+
 ## 2026-06-22 — Constantes compartilhadas para strings repetidas em equipment.ts
 
 **Contexto**: Com três artigos no mesmo arquivo (`equipment.ts`), seis strings de conteúdo passaram a aparecer três vezes cada: `'Como solicitar'`, `'Documentos necessários'`, `'Cartão do SUS'`, `'Documento com foto (RG ou CNH)'`, `'CPF'`, `'Comprovante de residência'` e `'doctor-patient'`. A regra `sonarjs/no-duplicate-string` (threshold: 3) bloqueou o pre-commit.
