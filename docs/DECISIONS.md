@@ -6,6 +6,48 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-09-14 — Pipeline de CI/CD: `.github/workflows/ci.yml`
+
+**Contexto**: não existia `.github/workflows/` nenhum — nada bloqueava um build quebrado de ir
+pro Vercel, que faz auto-deploy a cada push sem gate nenhum. Maior gap da rodada de padronização
+deste repositório.
+
+**Decisão**: dois jobs paralelos:
+
+- **`quality`**: secret scan (`gitleaks/gitleaks-action@v2`) → `pnpm audit --prod` (bloqueante)
+  → `pnpm audit` total (não-bloqueante — ver decisão de devDependencies, ainda pendente) →
+  type-check → lint → format:check → `test:coverage` → SonarCloud (condicionado a
+  `SONAR_TOKEN`) → build → **Lighthouse CI** (`treosh/lighthouse-ci-action@v12`, sem gate de
+  secret) → upload de source maps pro Sentry (condicionado às 3 env vars **e** só em push pra
+  `main` — diferente do `faladoria-backend`: aqui a Vercel faz deploy automático a cada push,
+  então subir source map em toda PR poluiria o histórico de releases do Sentry com builds que
+  nunca chegam a produção).
+- **`e2e`**: instala browsers do Playwright (`--with-deps`) e roda `pnpm test:e2e` — separado do
+  `quality` porque o setup de browsers é pesado e não deve atrasar o feedback rápido de
+  lint/type-check.
+
+`node-version: 20` (não 24 como o `faladoria-backend`) — bate com o `engines` mínimo já
+declarado no `package.json` deste projeto; alinhar as versões de Node entre os dois repositórios
+é decisão da usuária, fora do escopo desta rodada.
+
+**Observações registradas, não resolvidas nesta branch**:
+
+- **Sem branch protection disponível** no plano atual do GitHub (privado + free, confirmado via
+  API — 403 "Upgrade to GitHub Pro or make this repository public"). O merge manual revisado
+  continua sendo o único gate real até o repositório se tornar público ou a conta virar paga.
+- **`e2e` roda contra `pnpm dev`** (servidor de desenvolvimento), não contra o build de
+  produção — `playwright.config.ts` já define isso, não foi mudado nesta rodada. Um E2E verde
+  não garante 100% que o build minificado renderiza de forma idêntica.
+- **`pnpm audit` total não-bloqueante** — as 83 vulnerabilidades pré-existentes em
+  devDependencies (Vite/Rollup/PostCSS/cadeia do `@lhci/cli`) ficam visíveis no CI, mas não
+  travam o build até serem resolvidas numa rodada própria.
+
+**Validação**: `pnpm audit --prod` limpo, `type-check`/`lint`/`format:check` limpos,
+`test:coverage` em 97%+ (ver decisão anterior), `pnpm build` ok, `pnpm exec lhci autorun` contra
+o build real passou sem nenhuma assertion falhando.
+
+---
+
 ## 2026-09-14 — `thresholds` de cobertura do Vitest estava quebrado desde a migração pra v4
 
 **Contexto**: `vitest.config.ts` declarava `coverage.thresholds.global.{branches,functions,lines,statements}`. Rodando `pnpm test:coverage` com a cobertura real em ~72% (bem abaixo dos 80% configurados), o comando saía com exit code 0 — nenhum erro, nenhum aviso. O bug: o tipo `Threshold` do Vitest 4 (`@vitest/coverage-v8@^4.0.0`, já usado neste projeto) é plano —
