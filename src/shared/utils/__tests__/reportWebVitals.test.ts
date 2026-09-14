@@ -20,6 +20,17 @@ function fakeMetric(overrides: Partial<Metric> = {}): Metric {
   } as Metric
 }
 
+// web-vitals types each onXXX callback param as its own narrowed metric subtype (e.g.
+// `onLCP`'s callback only accepts `LCPMetric`, name: 'LCP'), so `tsc -b` (used by `pnpm build`,
+// stricter than the `type-check` script's tsconfig) rejects passing the generic `Metric` these
+// tests construct. Widening the captured mock callback's own type here is correct: at runtime
+// it's always the same `vi.fn()` regardless of which onXXX registered it.
+function asGenericCallback(
+  callback: unknown
+): ((metric: Metric) => void) | undefined {
+  return callback as ((metric: Metric) => void) | undefined
+}
+
 describe('reportWebVitals', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -42,7 +53,9 @@ describe('reportWebVitals', () => {
     const onPerfEntry = vi.fn()
 
     reportWebVitals(onPerfEntry)
-    const registeredCallback = vi.mocked(onLCP).mock.calls[0]?.[0]
+    const registeredCallback = asGenericCallback(
+      vi.mocked(onLCP).mock.calls[0]?.[0]
+    )
     const metric = fakeMetric()
     registeredCallback?.(metric)
 
@@ -63,7 +76,9 @@ describe('reportWebVitals', () => {
     it('logs to the console in dev mode instead of sending analytics', async () => {
       const { onLCP } = await import('web-vitals')
       reportWebVitals()
-      const registeredCallback = vi.mocked(onLCP).mock.calls[0]?.[0]
+      const registeredCallback = asGenericCallback(
+        vi.mocked(onLCP).mock.calls[0]?.[0]
+      )
       const metric = fakeMetric()
 
       registeredCallback?.(metric)
@@ -78,7 +93,9 @@ describe('reportWebVitals', () => {
 
       const { onCLS } = await import('web-vitals')
       reportWebVitals()
-      const registeredCallback = vi.mocked(onCLS).mock.calls[0]?.[0]
+      const registeredCallback = asGenericCallback(
+        vi.mocked(onCLS).mock.calls[0]?.[0]
+      )
       const metric = fakeMetric({ name: 'CLS', value: 0.05 })
 
       registeredCallback?.(metric)
