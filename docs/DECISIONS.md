@@ -6,6 +6,54 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-09-14 — Lighthouse CI configurado com thresholds derivados empiricamente
+
+**Contexto**: `@lhci/cli` já era devDependency e existia o script `pnpm lighthouse`, mas não
+havia `lighthouserc.cjs` nenhum — rodar o script falhava. O padrão global
+(`~/.claude/CLAUDE.md`) exige Lighthouse CI rodando a cada push em todo projeto com frontend.
+
+**Processo empírico** (não chutado): `pnpm build`, depois `pnpm exec lhci collect` 3x contra 4
+páginas-arquétipo (Home `/`, índice do Guia `/como-conseguir-pelo-sus`, uma categoria
+`/como-conseguir-pelo-sus/consulta`, um artigo real
+`/como-conseguir-pelo-sus/consulta/como-agendar-consulta`) usando `staticDistDir: './dist'` +
+`isSinglePageApplication: true` — **o mesmo modo que vai rodar de verdade no CI**, não um
+`pnpm preview` isolado (que mediu números mais otimistas por não competir por CPU com o próprio
+processo do LHCI rodando Chrome headless). Medianas observadas por página:
+
+| Página        | Performance | A11y | Best Practices | SEO | LCP (mediana) |
+| ------------- | ----------- | ---- | -------------- | --- | ------------- |
+| Home          | 0.87        | 0.97 | 0.96           | 1.0 | 2546ms        |
+| Guia (índice) | 0.88        | 0.96 | 1.0            | 1.0 | 2788ms        |
+| Categoria     | 0.89        | 0.96 | 1.0            | 1.0 | 2955ms        |
+| Artigo        | 0.80        | 0.96 | 1.0            | 1.0 | 3782ms        |
+
+**Decisão**: `lighthouserc.cjs` com thresholds `error` para as 4 categorias e para
+LCP/CLS, `warn` para TBT/Speed Index (métricas secundárias, mais ruidosas — TBT chegou a 1596ms
+numa rodada isolada da Home, Speed Index a 4464ms numa do artigo, ambos outliers de uma única
+execução). Threshold de cada categoria fica com margem abaixo da pior mediana observada entre as
+4 páginas (ex.: performance pior mediana 0.80 → threshold 0.70), usando
+`aggregationMethod: 'median'` em cada assertion — o CI sempre calcula a mediana real das 3
+execuções daquele run, o número no config é só o piso de aprovação, não um valor fixo copiado.
+Validado rodando `pnpm exec lhci autorun` de ponta a ponta contra o config final antes de
+commitar — passou limpo.
+
+**Pendência conhecida, não escondida**: a página de artigo (LCP mediana 3782ms) já está acima da
+meta de 2.5s do próprio `CLAUDE.md` deste projeto ("Core Web Vitals: LCP < 2.5s"). O threshold do
+Lighthouse CI (4400ms) protege contra regressão _adicional_ a partir de hoje, não substitui a
+otimização real da página — suspeita inicial é a imagem de capa/hero do artigo não estar
+recebendo o mesmo tratamento de prioridade/otimização das outras páginas. Investigar quando o
+Lighthouse CI já estiver rodando em CI real por um tempo (mais dados, menos ruído de máquina
+única).
+
+**Alternativa rejeitada**: usar `assertMatrix` para thresholds distintos por página (LCP da Home
+mais apertado que o do artigo, por exemplo) em vez de um único threshold uniforme calibrado pela
+pior página. Seria mais preciso, mas adicionaria complexidade de configuração desproporcional ao
+estágio atual do projeto (4 páginas, ainda sem dashboard) — considerar `assertMatrix` se o
+número de páginas/arquétipos crescer o suficiente pra um único piso ficar frouxo demais pras
+páginas mais leves.
+
+---
+
 ## 2026-09-14 — Remoção de 7 documentos genéricos de template
 
 **Contexto**: Auditoria de padronização (mesma rodada aplicada antes ao `portfolio` e ao
