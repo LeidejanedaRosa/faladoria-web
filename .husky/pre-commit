@@ -1,5 +1,15 @@
 echo "🔍 Rodando verificações pre-commit..."
 
+echo "🔐 Checando segredos..."
+GITLEAKS_BIN="$(command -v gitleaks || echo "$HOME/.local/bin/gitleaks")"
+
+if [ ! -x "$GITLEAKS_BIN" ]; then
+  echo "gitleaks não encontrado. Instale: https://github.com/gitleaks/gitleaks#installing"
+  exit 1
+fi
+
+"$GITLEAKS_BIN" protect --staged --redact --verbose || exit 1
+
 echo "📝 Checando lint e formatação..."
 pnpm exec lint-staged
 
