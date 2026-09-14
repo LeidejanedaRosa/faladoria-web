@@ -6,6 +6,48 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-09-14 — `thresholds` de cobertura do Vitest estava quebrado desde a migração pra v4
+
+**Contexto**: `vitest.config.ts` declarava `coverage.thresholds.global.{branches,functions,lines,statements}`. Rodando `pnpm test:coverage` com a cobertura real em ~72% (bem abaixo dos 80% configurados), o comando saía com exit code 0 — nenhum erro, nenhum aviso. O bug: o tipo `Threshold` do Vitest 4 (`@vitest/coverage-v8@^4.0.0`, já usado neste projeto) é plano —
+`branches | functions | lines | statements` direto em `thresholds`, sem wrapper `global`. Essa
+sintaxe era válida na v2/v3; na v4 a chave `global` é simplesmente desconhecida e ignorada, então
+nenhum threshold real é aplicado, silenciosamente, desde que o projeto migrou pra v4.
+
+**Decisão**: `thresholds: { branches: 80, functions: 80, lines: 80, statements: 80 }`, sem
+wrapper. Confirmado empiricamente: antes da correção, `pnpm test:coverage` saía com exit 0
+mesmo com ~72% de cobertura real; depois, sai com exit 1 e lista cada métrica que não bate o
+threshold — só então foi possível confiar que o gate está funcionando de verdade.
+
+**A cobertura real revelada pela correção** (~63-78% dependendo da métrica) foi tratada em duas
+frentes, não escondida atrás de um número mais baixo:
+
+1. **`coverage.exclude` ampliado** para arquivos que o próprio `CLAUDE.md` deste projeto já diz
+   que não precisam de teste unitário: "Data constants / static config objects → No" (conteúdo
+   estático dos `*Content.ts`, artigos do Guia, categorias) e "Pure presentational components
+   (no logic, no hooks, no interactions) → No — prefer E2E" (seções da landing page, subcomponentes
+   triviais do footer, ícones puros, páginas finas como `NotFoundPage`/`GuidePage`). Todos esses
+   já têm cobertura via `tests/sections/*.spec.ts`/`tests/layout/*.spec.ts` (Playwright) — excluir
+   da métrica de cobertura unitária não remove teste nenhum, só para de contar contra um número
+   que a própria convenção do projeto diz que não se aplica a eles.
+2. **Testes reais novos** para os arquivos que tinham lógica de verdade e zero cobertura:
+   `sentry.ts` (branch de `beforeSend` filtrando extensões de browser/scripts externos),
+   `reportWebVitals.ts` (branches dev/produção do `sendToAnalytics`), `structuredData.ts`
+   (`createBreadcrumb`/`createFaqStructuredData`), `FooterContact.tsx`/`FooterLinks.tsx`
+   (renderização condicional de link interno/externo/sem-href), `BreadcrumbSchema.tsx` (mesma
+   lógica de `isLastItem` já teorizada em `structuredData.ts`, agora testada na camada de
+   componente), `PageShell.tsx` (estado do sidebar mobile e atributo `inert`).
+
+**Resultado**: 97.45% statements / 95.07% branches / 98.68% functions / 97.35% lines — threshold
+de 80% batendo de verdade, não por acaso.
+
+**Alternativa rejeitada**: baixar o threshold pra bater com a realidade atual (~70%) sem separar
+o que é gap real do que é métrica mal-configurada. Rejeitada porque misturaria dívida técnica de
+verdade (`sentry.ts` sem teste) com arquivos que a própria convenção do projeto nunca esperou que
+fossem testados no Vitest — um threshold mais baixo escondendo os dois tipos de lacuna igualmente
+não ajudaria a saber, no futuro, se uma queda de cobertura é motivo de alerta ou não.
+
+---
+
 ## 2026-09-14 — Atualização do react-router-dom: 12 vulnerabilidades reais em produção
 
 **Contexto**: `pnpm audit --prod` reportava 12 advisories, todas em `react-router@7.13.0`
