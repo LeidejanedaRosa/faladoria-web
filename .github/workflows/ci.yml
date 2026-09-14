@@ -1,0 +1,154 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    # gitleaks-action no evento pull_request lista os commits do PR via API do GitHub — o
+    # default de permissão do repo (Settings > Actions > Workflow permissions) não inclui isso,
+    # causando 403 "Resource not accessible by integration" (mesmo achado do faladoria-backend).
+    permissions:
+      contents: read
+      pull-requests: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Security audit (production dependencies)
+        run: pnpm audit --prod --audit-level high
+
+      # Não-bloqueante por enquanto — 83 vulnerabilidades pré-existentes em devDependencies
+      # (Vite/Rollup/PostCSS/cadeia do @lhci/cli/etc.) não vão pra produção. Fica visível aqui
+      # até serem resolvidas numa branch dedicada, quando este step vira bloqueante também.
+      - name: Security audit (all dependencies, non-blocking)
+        run: pnpm audit --audit-level high || true
+        continue-on-error: true
+
+      - name: Type check
+        run: pnpm type-check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format check
+        run: pnpm format:check
+
+      - name: Run unit tests with coverage
+        run: pnpm test:coverage
+
+      - name: Check SonarCloud configuration
+        id: sonar_check
+        run: |
+          if [ -n "${{ secrets.SONAR_TOKEN }}" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::SONAR_TOKEN not set yet — skipping SonarCloud scan."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: SonarCloud Scan
+        if: steps.sonar_check.outputs.configured == 'true'
+        uses: SonarSource/sonarqube-scan-action@v8
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: SonarCloud Quality Gate check
+        if: steps.sonar_check.outputs.configured == 'true'
+        uses: SonarSource/sonarqube-quality-gate-action@v1
+        with:
+          pollingTimeoutSec: 300
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Build
+        run: pnpm build
+
+      - name: Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          configPath: './lighthouserc.cjs'
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+      - name: Check Sentry configuration
+        id: sentry_check
+        # Só faz sentido publicar source maps a partir de um build que realmente vai para
+        # produção. A Vercel faz deploy automático a cada push (diferente do faladoria-backend,
+        # que não tem deploy automático) — subir source maps em toda PR aberta poluiria o
+        # histórico de releases do Sentry com builds que nunca chegam a produção.
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          if [ -n "${{ secrets.SENTRY_AUTH_TOKEN }}" ] && [ -n "${{ secrets.SENTRY_ORG }}" ] && [ -n "${{ secrets.SENTRY_PROJECT }}" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::SENTRY_AUTH_TOKEN/SENTRY_ORG/SENTRY_PROJECT not all set yet — skipping source map upload."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload source maps to Sentry
+        if: steps.sentry_check.outputs.configured == 'true'
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          environment: production
+          sourcemaps: './dist'
+          set_commits: 'skip'
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps
+
+      - name: Run E2E tests
+        run: pnpm test:e2e
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14

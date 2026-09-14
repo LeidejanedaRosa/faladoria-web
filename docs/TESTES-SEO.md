@@ -12,22 +12,16 @@ npm run test:seo
 
 ```bash
 # Metadados SEO (títulos, descrições, Open Graph, etc)
-npm run test:seo:metadata
+pnpm exec playwright test tests/seo/metadata.spec.ts
 
 # HTML Semântico (estrutura, landmarks, hierarquia de headings)
-npm run test:seo:semantic
+pnpm exec playwright test tests/seo/semantic-html.spec.ts
 
-# Acessibilidade WCAG 2.1 AA (contraste, teclado, ARIA, etc)
-npm run test:seo:a11y
+# Acessibilidade (contraste, teclado, ARIA, etc)
+pnpm exec playwright test tests/seo/accessibility.spec.ts
 
 # Performance e Palavras-chave (Core Web Vitals, keywords, structured data)
-npm run test:seo:performance
-```
-
-### Validação completa (executar todos em sequência)
-
-```bash
-bash scripts/validate-seo.sh
+pnpm exec playwright test tests/seo/performance-keywords.spec.ts
 ```
 
 ### Ver relatório de testes
@@ -87,10 +81,14 @@ Todos os testes são baseados em:
 
 ## Quando os Testes São Executados
 
-- ✅ Em cada commit (via Husky)
-- ✅ Em cada pull request (via GitHub Actions)
-- ✅ Antes do deploy (via pre-deploy script)
+- ✅ Em cada push/pull request (job `e2e` do GitHub Actions, `.github/workflows/ci.yml`)
 - ✅ Manualmente quando necessário
+
+Não rodam nos hooks do Husky: `pre-commit` só faz lint + type-check, `pre-push` só roda os
+testes unitários (`pnpm run test` → `vitest run`) — testes E2E/Playwright (este arquivo) nunca
+rodaram localmente em nenhum hook, nem antes desta correção nem depois. Também não rodam no
+script de pre-deploy (`scripts/pre-deploy-validation.sh`), que hoje só chama type-check, lint,
+`test:coverage` e `build` — sem `test:e2e`.
 
 ---
 
