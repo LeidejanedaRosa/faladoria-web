@@ -6,6 +6,43 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-09-14 — Remoção de 7 documentos genéricos de template
+
+**Contexto**: Auditoria de padronização (mesma rodada aplicada antes ao `portfolio` e ao
+`faladoria-backend`) encontrou 7 arquivos de documentação que descreviam uma stack diferente da
+real deste projeto: `docs/ARCHITECTURE.md` (mencionava TanStack Query como "API Client" — o
+projeto não tem nenhum cliente de API ainda), `docs/BETTER-AUTH-GUIDE.md` (guia de integração
+Better Auth com um backend genérico Hono + Drizzle + Postgres — a integração real será com o
+`faladoria-backend`, que é Fastify + MongoDB), `docs/FOLDER-STRUCTURE.md` (estrutura de pastas
+genérica, divergente da real já documentada em `CLAUDE.md`), `docs/SETUP-GUIDE.md` (lido por
+completo: `.eslintrc.cjs` no formato legado quando o projeto usa flat config, `tailwind.config.js`
+quando a v4 real usa `@theme` em `src/index.css`, aliases `@components`/`@utils`/`@hooks` que não
+existem — os reais são `@shared`/`@features`/`@assets`, API antiga do Sentry
+`Sentry.BrowserTracing()`/`Sentry.Replay()`), `docs/CONTRIBUTING.md` (lido por completo: 100%
+genérico, nada que não esteja já e melhor coberto pelo `CLAUDE.md` real), `docs/CHANGELOG.md`
+(lido por completo: abre com "mudanças notáveis **neste template**" e lista TanStack Router/Vite
+5 no "Core Stack") e `QUICKSTART.md` na raiz (achado durante a implementação desta branch, não
+listado na auditoria original — é um checklist de "como iniciar um novo projeto a partir deste
+template", com `gh repo create ... --template seu-usuario/react-vite-template` e links pros 6
+arquivos acima).
+
+**Decisão**: Deletar os 7 arquivos. Mantidos: `docs/DECISIONS.md`, `docs/TROUBLESHOOTING.md`,
+`docs/TESTES.md`, `docs/TESTES-SEO.md` — confirmados como documentação genuína e específica do
+projeto real.
+
+**Por quê**: Documentação errada é pior que nenhuma documentação — um guia de auth descrevendo um
+backend que não existe (Hono/Drizzle/Postgres) enganaria quem for implementar a integração real
+com o `faladoria-backend` quando a feature `auth/` for construída. `README.md` não referenciava
+nenhum dos 7 arquivos (confirmado via grep antes de apagar), então a remoção não quebra nenhum
+link existente.
+
+**Alternativa rejeitada**: Reescrever os 6 documentos (menos `QUICKSTART.md`, achado depois) para
+refletir a stack real, em vez de apagar. Rejeitada porque nenhum descreve nada específico do
+projeto que não esteja já coberto, com mais precisão, no `CLAUDE.md` real — manter os arquivos só
+para reescrevê-los criaria duas fontes de verdade para a mesma informação.
+
+---
+
 ## 2026-06-24 — Headings de seção sem prefixo numérico em `InformationalStepCard`
 
 **Contexto**: `GuideArticleLayout` divide os blocos de conteúdo em dois tipos de seção:
