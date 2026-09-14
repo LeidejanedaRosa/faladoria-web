@@ -6,6 +6,47 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-09-14 — Atualização do react-router-dom: 12 vulnerabilidades reais em produção
+
+**Contexto**: `pnpm audit --prod` reportava 12 advisories, todas em `react-router@7.13.0`
+(dependência transitiva de `react-router-dom@7.13.0`, fixada exata no lockfile) — incluindo
+achados classificados como RCE ("arbitrary constructor invocation... leading to Unauth RCE") e
+DoS. `package.json` já declarava `^7.13.0`, faixa que permite patch/minor.
+
+**Investigação do pin**: `git log` mostra que `react-router-dom` foi adicionado em 2026-02-12
+(`feat(routing): add React Router with BrowserRouter setup`) e o lockfile nunca mais foi tocado
+especificamente por essa dependência depois disso — não é pin intencional documentado em nenhum
+lugar, é lockfile parado há 7 meses.
+
+**Decisão**: `pnpm update react-router-dom` → `7.13.0` para `7.18.3` (dentro do range `^7.13.0`
+já declarado, resolveu tanto `react-router-dom` quanto sua dependência transitiva
+`react-router`). `pnpm audit --prod` confirmado limpo depois ("No known vulnerabilities found").
+
+**Validação**: `type-check`, `lint`, `build` limpos. `test:coverage` com os 415 testes unitários
+passando (a % de cobertura reportada não é confiável neste momento — ver decisão separada sobre o
+bug do `thresholds` do Vitest 4, investigado e corrigido em paralelo a esta branch). Suíte E2E
+completa (5 browsers/projetos) rodada duas vezes — antes e depois do bump — pra isolar o que era
+regressão real do que já existia:
+
+- **1749 passaram, 21 skipped, 33 falharam** — as mesmas 33 falhas ocorrem **de forma idêntica**
+  rodando a suíte contra o código original (antes do bump, via `git stash` temporário +
+  reinstalação do lockfile antigo). Confirma que nenhuma delas foi causada pelo bump.
+- As 33 falhas pré-existentes estão concentradas exclusivamente em `webkit`, `Mobile Chrome` e
+  `Mobile Safari` (zero falhas em `chromium`/`firefox` desktop) e cobrem testes sem nenhuma
+  relação com roteamento (FAQ, Hero, WCAG/axe, canonical URL) — abrir como investigação própria,
+  fora do escopo desta branch (ver pendência abaixo).
+- Achado lateral durante a investigação: os browsers Firefox e WebKit do Playwright não estavam
+  instalados nesta máquina (`pnpm exec playwright install` resolveu) — a primeira tentativa de
+  rodar a suíte completa falhou só por isso, não por causa do código.
+
+**Pendência**: investigar por que 33 testes falham consistentemente em WebKit/viewports mobile,
+independente do react-router-dom — provável causa comum (timing de carregamento de imagem,
+regra de contraste/touch-target específica de viewport pequeno, ou comportamento de render
+específico do motor WebKit). Não é uma regressão desta branch, mas é uma lacuna real de
+cross-browser coverage que valeria investigar numa rodada própria.
+
+---
+
 ## 2026-09-14 — Lighthouse CI configurado com thresholds derivados empiricamente
 
 **Contexto**: `@lhci/cli` já era devDependency e existia o script `pnpm lighthouse`, mas não
