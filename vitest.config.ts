@@ -25,13 +25,15 @@ export default defineConfig({
         'dist/',
         'coverage/',
       ],
+      // Vitest 4's Threshold type é plano (branches/functions/lines/statements direto), sem
+      // wrapper "global" — a versão anterior desta config usava a API antiga (Vitest 2/3), que
+      // silenciosamente nunca aplicava nenhum threshold real (chave desconhecida ignorada, exit
+      // code sempre 0 independente da cobertura real).
       thresholds: {
-        global: {
-          branches: 80,
-          functions: 80,
-          lines: 80,
-          statements: 80,
-        },
+        branches: 80,
+        functions: 80,
+        lines: 80,
+        statements: 80,
       },
     },
   },
