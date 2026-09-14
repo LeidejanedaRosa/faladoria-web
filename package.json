@@ -11,7 +11,7 @@
     "build": "tsc -b && vite build",
     "build:analyze": "ANALYZE=true pnpm run build",
     "preview": "vite preview",
-    "type-check": "tsc -p tsconfig.app.json --noEmit",
+    "type-check": "tsc -p tsconfig.test.json --noEmit",
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,md}\"",
