@@ -6,6 +6,94 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-09-15 — Triagem completa das falhas pré-existentes da suíte E2E
+
+**Contexto**: pendência aberta na decisão "Job `e2e` do CI marcado non-blocking" (abaixo).
+Investigação dedicada, arquivo por arquivo, rodando cada spec completo nos 5 browsers/projetos
+localmente para confirmar cada correção antes de seguir para a próxima.
+
+**Correção de rumo importante**: a "pista adicional" registrada na decisão anterior (hipótese de
+`workers: 1` do CI causar vazamento de estado do SPA entre `page.goto()` sequenciais) **estava
+errada**. Reproduzindo `guide-page.spec.ts` "should navigate back to guide page via breadcrumb"
+isoladamente, sem `CI=true`, com workers paralelos padrão, a falha é 100% determinística em todos
+os 5 browsers — não é isolamento de teste. Causa real: `GUIDE_CONTENT.seo.title` ("Como conseguir
+pelo SUS", usado no `<title>` da página) e `GUIDE_CONTENT.hero.headline` ("Você tem direito à
+saúde pública.", o H1 visível) são dois textos propositalmente diferentes (título de busca vs.
+manchete persuasiva) — o teste comparava o H1 com o texto errado. Fica registrado aqui para não
+repetir a mesma investigação errada numa sessão futura.
+
+**Causas raiz encontradas, por categoria**:
+
+1. **Regex/seletor desatualizado após rename** — `hero-section.spec.ts` esperava
+   `faladoria_secundaria` (underscore, português); o asset real é `faladoria-secondary.svg` desde
+   o commit `db5a688` ("rename assets... from Portuguese to English"), que não atualizou o teste.
+2. **Testes copiados sem adaptar ao componente real** — `guide-category-page.spec.ts` verificava
+   `<article>`/`<header>` (padrão do `GuideArticleLayout`, para UMA página de artigo), mas
+   `GuideCategoryPage` corretamente usa `<section>` + `<header>` (é uma listagem de vários
+   artigos, não um artigo único — `<article>` seria semanticamente errado aqui).
+3. **Expectativa não bate com o texto real vigente** — `href="#transparencia"` esperado vs.
+   `/#transparencia` real (proposital: `AccessibleLink` é `<a>` pura, sem interceptação do React
+   Router, então o `/` garante navegação correta partindo de qualquer rota); CTA do
+   `GuideHighlightSection` esperando a rota antiga `/guia-do-sus` em vez de
+   `/como-conseguir-pelo-sus` (`GUIDE_ROUTES.root`); H1 comparado com `seo.title` em vez do
+   `hero.headline` real (ver acima); FAQ testando um H3 visual duplicado que foi removido de
+   propósito no commit `ef65ce6` ("replace aria-hidden h3 with visible h2") sem atualizar o teste.
+4. **Seletor amplo demais (strict-mode violation)** — `how-it-works-section.spec.ts` filtrava
+   `<p>` contendo "WhatsApp" e batia em 3 elementos (subtítulo + 2 descrições de step), não só o
+   subtítulo pretendido.
+5. **Tolerância de pixel rígida demais entre browsers** — teste de centralização exigia diferença
+   de margem < 5px; WebKit reserva espaço de scrollbar de forma diferente do Chromium/Firefox,
+   gerando ~10px de assimetria sem efeito visual real. Tolerância ampliada para 20px.
+6. **Seletor não bate com a arquitetura real** — `performance-keywords.spec.ts` verificava
+   `touch-friendly` só em `<button>` com texto visível; as CTAs reais do site são `<a>` (correto,
+   são navegação) e os únicos `<button>` reais (menu hambúrguer/fechar) só têm ícone, sem texto
+   visível (nome acessível via `aria-label`). Teste ampliado para considerar `button, a` e
+   `aria-label` como nome acessível válido.
+
+**Bugs reais de produto encontrados e corrigidos (não eram bug de teste)**:
+
+- **`HomePage` removia seu próprio `canonical`/`og:url`**: `useDocumentMeta` só seta
+  `canonical`/`og:url` quando um valor é passado; quando ausente, o hook **remove** ativamente
+  essas tags do DOM. `HomePage.tsx` chamava `useDocumentMeta` sem `canonical` — o `<link
+rel="canonical">` e `<meta property="og:url">` hardcoded no `index.html` para a home eram
+  apagados assim que o React montava. Corrigido passando `canonical: COMPANY_INFO.url`.
+  **Achado adicional, não corrigido nesta rodada** (fora do escopo dos testes falhando):
+  `LegalPageLayout` (política de privacidade, termos de uso) tem a mesma omissão — nenhum teste
+  cobre isso hoje, fica como pendência a avaliar.
+- **Link de WhatsApp do rodapé sem indicação de nova aba**: todos os outros links externos do
+  site incluem "(abre em nova aba)" no `aria-label` (WCAG 2.4.4); só o contato do rodapé
+  ("Fale com a gente") não incluía. Corrigido em `footerContent.ts`.
+- **5 violações reais de contraste de cor (WCAG 2.1 AA, `serious`)**, confirmadas via
+  `@axe-core/playwright`, não hipóteses: `text-purple-dark`/`text-purple-medium` (tons pensados
+  para fundo claro) sendo usados como texto sobre `bg-purple-deep`/`bg-purple-deepest` (quase
+  preto) no rodapé (`FooterBrand`, `FooterMission`) — ratio medido de 2.52–3.29 contra o mínimo de
+  4.5:1. Corrigido trocando para `text-lavender` (`#b3abf2`), que já existe na paleta e mede
+  ~7.9–8.8:1 contra os mesmos fundos. Mais 2 casos de `text-gray-500` sobre fundos claros
+  (`GuideHighlightSection`) medindo 3.89 e 4.39 — por pouco abaixo do mínimo; trocado para
+  `text-gray-600` (~6.1–6.9:1).
+- **Meta description das 17 categorias do Guia sem a palavra "SUS"** — decisão da usuária: em vez
+  de relaxar o teste, reescrever as 17 descriptions (usadas tanto como meta description quanto
+  como texto visível nos cards) incluindo "SUS"/"no SUS"/"pelo SUS" de forma natural, já que o
+  produto inteiro é sobre o SUS e a palavra carrega peso de SEO real. Título da página já reforça
+  "Guia do SUS" separadamente — sem risco de keyword stuffing.
+
+**Validação**: cada um dos 14 arquivos de teste com falhas (ou tocados por alguma correção) foi
+rodado completo nos 5 browsers/projetos localmente, um por um, antes de seguir para o próximo —
+não só a suíte inteira no final. Os 4 arquivos de `tests/sections/` não tocados por nenhuma
+correção (`about-section`, `problem-section`, `solution-section`, `transparency-section`) — que já
+estavam verdes antes desta rodada e continuam sem relação com nenhuma mudança feita — foram
+smoke-testados só em `chromium` em vez dos 5 browsers, para poupar a máquina (RAM/swap sob
+pressão real durante a sessão — ver `.claude` memory sobre isso). `pnpm
+type-check`/`lint`/`format:check`/`test:coverage` limpos (97%+ de cobertura, 448 testes).
+
+**Concluído**: `continue-on-error: true` removido do job `e2e` em `ci.yml` — volta a ser
+bloqueante, mesmo nível de garantia do `quality`. Branch protection da `main` atualizada
+(`gh api PUT .../branches/main/protection`) para exigir os dois checks:
+`required_status_checks.contexts: ["quality", "e2e"]` (antes só `quality`). A pendência registrada
+na decisão abaixo está resolvida.
+
+---
+
 ## 2026-09-15 — Repositório tornado público + branch protection em `main`
 
 **Contexto**: branch protection com "required status checks" é indisponível em repositório
@@ -91,6 +179,11 @@ completo entre `page.goto()` sequenciais no mesmo worker, fazendo uma navegaçã
 da página do teste anterior. Se confirmado, a causa seria estrutural (afeta potencialmente todo
 teste que navega entre páginas), não um bug isolado por teste — o que mudaria a ordem de
 prioridade da triagem sugerida acima (investigar isso primeiro, antes de ir teste por teste).
+
+**Resolvido em 2026-09-15** — ver decisão "Triagem completa das falhas pré-existentes da suíte
+E2E" no topo deste arquivo. A hipótese de `workers: 1`/vazamento de estado acima **não se
+confirmou**: a causa real era um teste comparando o H1 com o texto errado (`seo.title` em vez de
+`hero.headline`), determinística em qualquer configuração de workers.
 
 ---
 
