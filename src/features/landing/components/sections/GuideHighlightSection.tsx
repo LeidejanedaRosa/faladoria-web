@@ -58,7 +58,7 @@ const UrlIndicator = () => (
   <div className='border-lavender bg-lavender/20 flex items-center gap-3 rounded-xl border px-4 py-3'>
     <GlobeIcon className='text-purple-dark h-5 w-5 shrink-0' />
     <div>
-      <span className='block text-xs text-gray-500'>
+      <span className='block text-xs text-gray-600'>
         {GUIDE_HIGHLIGHT_CONTENT.urlIndicator.label}
       </span>
       <span className='text-purple-dark block text-sm font-medium'>
@@ -91,7 +91,7 @@ const BrowserChrome = () => (
     </div>
     <div className='flex flex-1 items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5'>
       <LockIcon className='h-3 w-3 shrink-0 text-gray-400' />
-      <span className='truncate text-xs text-gray-500'>
+      <span className='truncate text-xs text-gray-600'>
         {GUIDE_HIGHLIGHT_CONTENT.urlIndicator.url}
       </span>
     </div>

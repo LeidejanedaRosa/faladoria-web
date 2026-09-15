@@ -21,8 +21,7 @@ export const FooterBrand = () => (
     </Link>
     <p className='text-lavender mt-4 max-w-xs text-sm leading-relaxed'>
       Conectando cidadãos à gestão pública para um{' '}
-      <strong className='text-purple-dark font-bold'>SUS</strong> melhor para
-      todos.
+      <strong className='font-bold'>SUS</strong> melhor para todos.
     </p>
   </div>
 )

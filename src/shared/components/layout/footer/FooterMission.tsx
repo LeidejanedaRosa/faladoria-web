@@ -58,14 +58,12 @@ export const FooterMission = () => {
         </div>
 
         <div className='flex-1'>
-          <p className='text-purple-medium text-xs font-semibold tracking-widest uppercase'>
+          <p className='text-lavender text-xs font-semibold tracking-widest uppercase'>
             {FOOTER_CONTENT.missionLabel}
           </p>
           <p className='mt-2 text-base leading-relaxed text-white'>
             {prefix}
-            <strong className='text-purple-dark font-semibold'>
-              {highlight}
-            </strong>
+            <strong className='text-lavender font-semibold'>{highlight}</strong>
           </p>
         </div>
 
