@@ -13,15 +13,22 @@ hardcoded com um comentário `// TODO: Update with real URL`. É usada em 11 lug
 SEO/JSON-LD (canonical, `og:url`, structured data via `GuideCategoryPage`/`GuideArticlePage`/
 `GuidePage`) — nunca em chamada de API. Contraria a regra do projeto de nunca hardcodear URLs.
 
-**Decisão**: `url: import.meta.env.VITE_SITE_URL || 'https://faladoria-web.vercel.app'` — mantém o
-valor atual como fallback de desenvolvimento (nada quebra se a env var não estiver definida) e
-permite configurar por ambiente (preview vs. produção na Vercel) sem editar código. Adicionado
-`readonly VITE_SITE_URL: string` em `global.d.ts`, `VITE_SITE_URL=http://localhost:5173` em
-`.env.example`, e documentado no README.
+**Decisão**: `url: import.meta.env.VITE_SITE_URL || 'https://faladoria-web.vercel.app'` — o
+hardcoded de antes vira o fallback de **produção** (é a URL real já em uso, não um valor de dev)
+para o caso da env var não estar definida no deploy, e permite configurar por ambiente (preview
+vs. produção na Vercel) sem editar código. Adicionado `readonly VITE_SITE_URL: string` em
+`global.d.ts`, `VITE_SITE_URL=http://localhost:5173` em `.env.example` (esse sim é só valor de
+dev local — bem diferente do fallback do código), e documentado no README.
 
 **Nome escolhido**: `VITE_SITE_URL`, não `VITE_APP_URL` (evita confundir com metadata de app tipo
 PWA) nem `VITE_API_URL` (semanticamente a base do futuro cliente HTTP do dashboard — algo
 completamente diferente da URL pública do próprio site usada em canonical/JSON-LD).
+
+**Correção pós-review (CodeRabbit)**: `url` normaliza barra(s) final(is) antes de armazenar
+(`.replace(/\/+$/, '')`). Motivo: o valor é concatenado direto com paths que já começam com `/` em
+11 lugares (`${COMPANY_INFO.url}${GUIDE_ROUTES.root}`, `${url}/#website` em
+`structuredData.ts`, etc.) — sem a normalização, configurar `VITE_SITE_URL` com barra final (erro
+comum ao copiar URL do navegador) geraria barra dupla em toda URL de canonical/JSON-LD gerada.
 
 **Validação**: os 11 usos continuam corretos — cobertos pelos testes E2E de SEO já existentes
 (`tests/seo/metadata.spec.ts`, `tests/guide/*.spec.ts`), rodados sem `VITE_SITE_URL` definido

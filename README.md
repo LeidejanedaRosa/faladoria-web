@@ -246,14 +246,14 @@ Atualize os placeholders em [src/shared/data/companyInfo.ts](src/shared/data/com
 
 Copie `.env.example` para `.env.local` e preencha conforme necessário.
 
-| Variável                                  | Obrigatória | Descrição                                                                                              |
-| ----------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------ |
-| `VITE_SITE_URL`                           | Produção    | URL pública do site — usada em canonical, og:url e JSON-LD. Padrão: `https://faladoria-web.vercel.app` |
-| `VITE_SENTRY_DSN`                         | Produção    | DSN do projeto no Sentry para monitoramento de erros                                                   |
-| `VITE_SENTRY_ENVIRONMENT`                 | Produção    | Ambiente (`production`, `staging`)                                                                     |
-| `VITE_SENTRY_TRACES_SAMPLE_RATE`          | Produção    | Taxa de amostragem de traces de performance (0 a 1)                                                    |
-| `VITE_SENTRY_REPLAYS_SESSION_SAMPLE_RATE` | Produção    | Taxa de amostragem de sessões para Session Replay                                                      |
-| `PLAYWRIGHT_BASE_URL`                     | Testes E2E  | URL base para os testes. Padrão: `http://localhost:5173`                                               |
+| Variável                                  | Obrigatória | Descrição                                                                                                                                                                                                                                                                    |
+| ----------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VITE_SITE_URL`                           | Produção    | URL pública do site — usada em canonical, og:url e JSON-LD, sem barra final. Em `.env.example` traz um valor de localhost só para dev; se não definida no deploy, o código cai no fallback já hardcoded (`https://faladoria-web.vercel.app`), não no valor do `.env.example` |
+| `VITE_SENTRY_DSN`                         | Produção    | DSN do projeto no Sentry para monitoramento de erros                                                                                                                                                                                                                         |
+| `VITE_SENTRY_ENVIRONMENT`                 | Produção    | Ambiente (`production`, `staging`)                                                                                                                                                                                                                                           |
+| `VITE_SENTRY_TRACES_SAMPLE_RATE`          | Produção    | Taxa de amostragem de traces de performance (0 a 1)                                                                                                                                                                                                                          |
+| `VITE_SENTRY_REPLAYS_SESSION_SAMPLE_RATE` | Produção    | Taxa de amostragem de sessões para Session Replay                                                                                                                                                                                                                            |
+| `PLAYWRIGHT_BASE_URL`                     | Testes E2E  | URL base para os testes. Padrão: `http://localhost:5173`                                                                                                                                                                                                                     |
 
 ---
 
