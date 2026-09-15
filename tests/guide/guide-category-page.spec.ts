@@ -23,7 +23,7 @@ test.describe('GuideCategoryPage', () => {
 
       test('should render the category description', async ({ page }) => {
         await expect(
-          page.getByText('Seus direitos e como exigi-los.')
+          page.getByText('Seus direitos no SUS e como exigi-los.')
         ).toBeVisible()
       })
 
@@ -128,13 +128,21 @@ test.describe('GuideCategoryPage', () => {
         expect(ariaLabel).toContain('Seus direitos')
       })
 
-      test('should use semantic article element', async ({ page }) => {
-        const article = page.locator('article')
-        await expect(article).toBeAttached()
+      test('should use semantic section element for the category listing', async ({
+        page,
+      }) => {
+        const section = page.locator(
+          'section[aria-labelledby="category-heading"]'
+        )
+        await expect(section).toBeAttached()
       })
 
-      test('should use semantic header inside article', async ({ page }) => {
-        const header = page.locator('article header')
+      test('should use semantic header inside the category section', async ({
+        page,
+      }) => {
+        const header = page.locator(
+          'section[aria-labelledby="category-heading"] header'
+        )
         await expect(header).toBeAttached()
       })
 
@@ -165,20 +173,25 @@ test.describe('GuideCategoryPage', () => {
         await page.locator('h1').waitFor({ timeout: 15000 })
       })
 
-      test('should render the article centered with constrained width', async ({
+      test('should render the category content centered with constrained width', async ({
         page,
       }) => {
-        const article = page.locator('article')
-        const articleBox = await article.boundingBox()
+        const section = page.locator(
+          'section[aria-labelledby="category-heading"]'
+        )
+        const sectionBox = await section.boundingBox()
         const viewportWidth = 1280
 
-        expect(articleBox).toBeTruthy()
-        // Article should be narrower than the viewport (max-w-3xl constraint)
-        expect(articleBox!.width).toBeLessThan(viewportWidth)
-        // Article should be horizontally centered
-        const leftMargin = articleBox!.x
-        const rightMargin = viewportWidth - (articleBox!.x + articleBox!.width)
-        expect(Math.abs(leftMargin - rightMargin)).toBeLessThan(5)
+        expect(sectionBox).toBeTruthy()
+        // Content should be narrower than the viewport (Container's max-w-7xl constraint)
+        expect(sectionBox!.width).toBeLessThan(viewportWidth)
+        // Content should be horizontally centered. Tolerance is wider than a
+        // typical CSS rounding error because WebKit reserves scrollbar space
+        // differently from Chromium/Firefox, shifting the measured margins by
+        // a few extra pixels without any real visual effect.
+        const leftMargin = sectionBox!.x
+        const rightMargin = viewportWidth - (sectionBox!.x + sectionBox!.width)
+        expect(Math.abs(leftMargin - rightMargin)).toBeLessThan(20)
       })
     })
 
@@ -189,15 +202,17 @@ test.describe('GuideCategoryPage', () => {
         await page.locator('h1').waitFor({ timeout: 15000 })
       })
 
-      test('should render the article filling most of the viewport width', async ({
+      test('should render the category content filling most of the viewport width', async ({
         page,
       }) => {
-        const article = page.locator('article')
-        const articleBox = await article.boundingBox()
+        const section = page.locator(
+          'section[aria-labelledby="category-heading"]'
+        )
+        const sectionBox = await section.boundingBox()
 
-        expect(articleBox).toBeTruthy()
-        // On mobile, article should use most of the available width
-        expect(articleBox!.width).toBeGreaterThan(300)
+        expect(sectionBox).toBeTruthy()
+        // On mobile, content should use most of the available width
+        expect(sectionBox!.width).toBeGreaterThan(300)
       })
 
       test('should render the breadcrumb without horizontal overflow', async ({
@@ -223,7 +238,7 @@ test.describe('GuideCategoryPage', () => {
       await page.waitForURL(GUIDE_URL, { timeout: 10000 })
 
       const h1 = page.locator('h1')
-      await expect(h1).toContainText('Como conseguir pelo SUS')
+      await expect(h1).toContainText('Você tem direito à saúde pública.')
     })
   })
 })
