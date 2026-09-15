@@ -5,7 +5,7 @@ export const COMPANY_INFO = {
     'Canal de mediação entre usuários do SUS e gestores de saúde para resolver problemas de atendimento via WhatsApp.',
   shortDescription: 'Sua voz no SUS',
 
-  url: 'https://faladoria-web.vercel.app', // TODO: Update with real URL
+  url: import.meta.env.VITE_SITE_URL || 'https://faladoria-web.vercel.app',
   logo: '/logo.svg',
   ogImage: '/og-image.jpg',
 
