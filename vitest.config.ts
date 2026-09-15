@@ -12,7 +12,9 @@ export default defineConfig({
     exclude: ['**/node_modules/**', '**/dist/**', '**/tests/**'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html'],
+      // 'lcov' adicionado ao default do provider v8 — SonarCloud lê a cobertura JS/TS via
+      // coverage/lcov.info (sonar.javascript.lcov.reportPaths, ver sonar-project.properties).
+      reporter: ['text', 'json', 'html', 'lcov'],
       include: ['src/**/*.{ts,tsx}'],
       exclude: [
         'node_modules/',
