@@ -37,7 +37,7 @@ test.describe('GuideHighlightSection', () => {
       const cta = section.getByText('Explorar o Guia')
 
       await expect(cta).toBeVisible()
-      await expect(cta).toHaveAttribute('href', '/guia-do-sus')
+      await expect(cta).toHaveAttribute('href', '/como-conseguir-pelo-sus')
     })
 
     test('should render the banner image', async ({ page }) => {
