@@ -5,7 +5,12 @@ export const COMPANY_INFO = {
     'Canal de mediação entre usuários do SUS e gestores de saúde para resolver problemas de atendimento via WhatsApp.',
   shortDescription: 'Sua voz no SUS',
 
-  url: import.meta.env.VITE_SITE_URL || 'https://faladoria-web.vercel.app',
+  // Trailing slash stripped: url is concatenated directly with paths that
+  // already start with "/" (canonical links, JSON-LD @id/url fields) — a
+  // trailing slash here would produce double slashes in every generated URL.
+  url: (
+    import.meta.env.VITE_SITE_URL || 'https://faladoria-web.vercel.app'
+  ).replace(/\/+$/, ''),
   logo: '/logo.svg',
   ogImage: '/og-image.jpg',
 
