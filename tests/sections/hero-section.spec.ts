@@ -41,7 +41,7 @@ test.describe('HeroSection', () => {
       const logo = hero.locator('img')
 
       await expect(logo).toBeVisible()
-      await expect(logo).toHaveAttribute('src', /faladoria_secundaria/)
+      await expect(logo).toHaveAttribute('src', /faladoria-secondary/)
     })
 
     test('should render the badge with status indicator', async ({ page }) => {
@@ -114,7 +114,7 @@ test.describe('HeroSection', () => {
       )
 
       await expect(transparencyLink).toBeVisible()
-      await expect(transparencyLink).toHaveAttribute('href', '#transparencia')
+      await expect(transparencyLink).toHaveAttribute('href', '/#transparencia')
       await expect(transparencyLink).not.toHaveAttribute('target')
       await expect(transparencyLink).not.toHaveAttribute('rel')
     })
