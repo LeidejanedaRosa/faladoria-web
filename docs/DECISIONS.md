@@ -6,6 +6,39 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-09-15 — Repositório tornado público + branch protection em `main`
+
+**Contexto**: branch protection com "required status checks" é indisponível em repositório
+privado no plano free do GitHub (confirmado via API — 403 "Upgrade to GitHub Pro or make this
+repository public"). Sem isso, o merge manual revisado era o único gate real, mesmo já com CI
+rodando (ver decisão de 2026-09-14 sobre `.github/workflows/ci.yml`).
+
+**Decisão**: repositório tornado público (`gh repo edit --visibility public`), e `main` protegida
+com `required_status_checks` exigindo o job `quality` (não `e2e`, que é `continue-on-error: true`
+de propósito — ver decisão anterior) e `enforce_admins: true`. Feito só depois do `ci.yml` já ter
+rodado de verdade (branch anterior), pra saber o nome real do job a exigir.
+
+**Por quê publicar em vez de manter privado**: este repositório é só o frontend público (landing
+page + conteúdo do Guia do SUS) — sem segredo, sem lógica de negócio sensível ainda (as features
+`auth/`/`dashboard/` nem existem no código). Não há risco de segurança real em expor o
+código-fonte de uma página pública que qualquer visitante já vê renderizada no navegador.
+
+**`enforce_admins: true`**: a proteção vale até pra quem tem acesso admin (a própria autora) —
+sem bypass acidental de "sou admin, posso pular". Decisão deliberada, não um padrão default do
+GitHub (que vem `false`).
+
+**Validação**: `gh api repos/.../branches/main/protection` confirma
+`required_checks: ["quality"]`, `strict: true`, `enforce_admins: true`. Esta própria branch
+(`docs/branch-protection`) serve de teste empírico: se a proteção estiver funcionando, o merge
+só deveria ser possível depois do check `quality` passar nela.
+
+**Alternativa rejeitada**: manter privado e aceitar não ter branch protection. Rejeitada porque
+o CI sem enforcement automático depende inteiramente de alguém lembrar de olhar a aba Checks
+antes de mergear — o mesmo tipo de "confiar na memória" que a auditoria de qualidade já
+identificou como frágil em outros pontos deste projeto.
+
+---
+
 ## 2026-09-14 — Job `e2e` do CI marcado non-blocking: suíte E2E já tem falhas pré-existentes
 
 **Contexto**: primeira execução real do `ci.yml` (PR #48). O job `quality` passou limpo. O job
@@ -46,6 +79,18 @@ da fila de padronização. Processo sugerido: baixar o relatório HTML do Playwr
 (regex/seletor errado vs. timeout/timing vs. diferença real de comportamento por engine),
 corrigir uma causa raiz por vez (não teste por teste), revalidando a suíte completa entre cada
 correção. Só depois de zerar as falhas, remover o `continue-on-error: true` do job `e2e`.
+
+**Pista adicional (execução de 2026-09-15)**: várias falhas mostram conteúdo de uma página/
+categoria aparecendo onde outra era esperada — ex.: `guide-page.spec.ts` "should navigate back to
+guide page via breadcrumb" encontrou o `h1` de "Você tem direito à saúde pública." (categoria
+`seus-direitos`) em vez de "Como conseguir pelo SUS" (índice do Guia); `guide-category-page.spec.ts`
+"should redirect to guide page for unknown slugs" teve o mesmo sintoma. O CI roda com
+`workers: 1` (`playwright.config.ts`, `workers: process.env.CI ? 1 : undefined`) — hipótese a
+verificar primeiro na triagem: estado do SPA (React Router client-side) não resetando por
+completo entre `page.goto()` sequenciais no mesmo worker, fazendo uma navegação "vazar" conteúdo
+da página do teste anterior. Se confirmado, a causa seria estrutural (afeta potencialmente todo
+teste que navega entre páginas), não um bug isolado por teste — o que mudaria a ordem de
+prioridade da triagem sugerida acima (investigar isso primeiro, antes de ir teste por teste).
 
 ---
 
