@@ -6,6 +6,29 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-09-15 — URL do site vira variável de ambiente (`VITE_SITE_URL`)
+
+**Contexto**: `src/shared/data/companyInfo.ts` tinha `url: 'https://faladoria-web.vercel.app'`
+hardcoded com um comentário `// TODO: Update with real URL`. É usada em 11 lugares, todos
+SEO/JSON-LD (canonical, `og:url`, structured data via `GuideCategoryPage`/`GuideArticlePage`/
+`GuidePage`) — nunca em chamada de API. Contraria a regra do projeto de nunca hardcodear URLs.
+
+**Decisão**: `url: import.meta.env.VITE_SITE_URL || 'https://faladoria-web.vercel.app'` — mantém o
+valor atual como fallback de desenvolvimento (nada quebra se a env var não estiver definida) e
+permite configurar por ambiente (preview vs. produção na Vercel) sem editar código. Adicionado
+`readonly VITE_SITE_URL: string` em `global.d.ts`, `VITE_SITE_URL=http://localhost:5173` em
+`.env.example`, e documentado no README.
+
+**Nome escolhido**: `VITE_SITE_URL`, não `VITE_APP_URL` (evita confundir com metadata de app tipo
+PWA) nem `VITE_API_URL` (semanticamente a base do futuro cliente HTTP do dashboard — algo
+completamente diferente da URL pública do próprio site usada em canonical/JSON-LD).
+
+**Validação**: os 11 usos continuam corretos — cobertos pelos testes E2E de SEO já existentes
+(`tests/seo/metadata.spec.ts`, `tests/guide/*.spec.ts`), rodados sem `VITE_SITE_URL` definido
+(usa o fallback) e confirmados passando. `pnpm build` limpo.
+
+---
+
 ## 2026-09-15 — Triagem completa das falhas pré-existentes da suíte E2E
 
 **Contexto**: pendência aberta na decisão "Job `e2e` do CI marcado non-blocking" (abaixo).
