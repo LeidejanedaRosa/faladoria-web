@@ -26,6 +26,7 @@ export function HomePage() {
   useDocumentMeta({
     title: COMPANY_INFO.shortDescription,
     description: COMPANY_INFO.description,
+    canonical: COMPANY_INFO.url,
   })
 
   useEffect(() => {

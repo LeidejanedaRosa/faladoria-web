@@ -123,11 +123,6 @@ jobs:
 
   e2e:
     runs-on: ubuntu-latest
-    # Não-bloqueante por enquanto — a suíte E2E já tem falhas reais e pré-existentes,
-    # espalhadas por vários browsers/specs, sem relação com o pipeline em si (confirmado rodando
-    # localmente contra o código antes desta branch). Fica visível aqui (o job continua rodando
-    # e reportando) até ser triado numa rodada dedicada — ver docs/DECISIONS.md.
-    continue-on-error: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

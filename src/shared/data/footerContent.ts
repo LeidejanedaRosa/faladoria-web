@@ -79,7 +79,7 @@ export const FOOTER_CONTENT = {
         iconName: 'whatsapp',
         label: 'Fale com a gente',
         href: `https://wa.me/${COMPANY_INFO.contact.whatsapp.replace(/\D/g, '')}`,
-        ariaLabel: `Enviar mensagem pelo WhatsApp para ${COMPANY_INFO.contact.whatsapp}`,
+        ariaLabel: `Enviar mensagem pelo WhatsApp para ${COMPANY_INFO.contact.whatsapp} (abre em nova aba)`,
       },
       {
         id: 'contact-address',

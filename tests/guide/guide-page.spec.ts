@@ -199,7 +199,7 @@ test.describe('GuidePage', () => {
       await page.waitForURL(GUIDE_URL, { timeout: 10000 })
 
       const h1 = page.locator('h1')
-      await expect(h1).toContainText('Como conseguir pelo SUS')
+      await expect(h1).toContainText('Você tem direito à saúde pública.')
     })
   })
 

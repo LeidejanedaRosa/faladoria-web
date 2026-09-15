@@ -38,7 +38,7 @@ test.describe('HowItWorksSection', () => {
         'section[aria-labelledby="how-it-works-heading"]'
       )
       const subtitle = section.locator('p').filter({
-        hasText: 'WhatsApp',
+        hasText: 'Todo o processo acontece pelo WhatsApp',
       })
 
       await expect(subtitle).toBeVisible()

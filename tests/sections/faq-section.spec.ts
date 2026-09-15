@@ -30,16 +30,13 @@ test.describe('FaqSection', () => {
       const text = await h2.textContent()
 
       expect(text).toContain('Perguntas frequentes')
-      expect(text).toContain('Faladoria')
     })
 
-    test('should render the visual heading and description', async ({
-      page,
-    }) => {
+    test('should render the heading and description', async ({ page }) => {
       const faq = page.locator(FAQ_SECTION)
 
       await expect(
-        faq.locator('h3', { hasText: 'Perguntas frequentes' })
+        faq.locator('h2', { hasText: 'Perguntas frequentes' })
       ).toBeVisible()
       await expect(
         faq.locator('p', { hasText: 'Tire suas dúvidas' })
@@ -93,12 +90,16 @@ test.describe('FaqSection', () => {
       await expect(labelledbyId).toHaveAttribute('aria-labelledby', h2Id!)
     })
 
-    test('should have screen-reader-only heading', async ({ page }) => {
+    test('heading should be visible and not hidden from screen readers', async ({
+      page,
+    }) => {
       const faq = page.locator(FAQ_SECTION)
-      const srHeading = faq.locator('h2.sr-only#faq-heading')
+      const heading = faq.locator('h2#faq-heading')
 
-      await expect(srHeading).toBeAttached()
-      await expect(srHeading).toContainText('Perguntas frequentes')
+      await expect(heading).toBeVisible()
+      await expect(heading).not.toHaveClass(/sr-only/)
+      await expect(heading).not.toHaveAttribute('aria-hidden')
+      await expect(heading).toContainText('Perguntas frequentes')
     })
 
     test('should use semantic section element', async ({ page }) => {
@@ -128,13 +129,6 @@ test.describe('FaqSection', () => {
       for (let i = 0; i < iconCount; i++) {
         await expect(icons.nth(i)).toHaveAttribute('aria-hidden', 'true')
       }
-    })
-
-    test('visual heading should have aria-hidden', async ({ page }) => {
-      const faq = page.locator(FAQ_SECTION)
-      const visualHeading = faq.locator('h3')
-
-      await expect(visualHeading).toHaveAttribute('aria-hidden', 'true')
     })
   })
 
