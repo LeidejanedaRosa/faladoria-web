@@ -80,6 +80,18 @@ da fila de padronização. Processo sugerido: baixar o relatório HTML do Playwr
 corrigir uma causa raiz por vez (não teste por teste), revalidando a suíte completa entre cada
 correção. Só depois de zerar as falhas, remover o `continue-on-error: true` do job `e2e`.
 
+**Pista adicional (execução de 2026-09-15)**: várias falhas mostram conteúdo de uma página/
+categoria aparecendo onde outra era esperada — ex.: `guide-page.spec.ts` "should navigate back to
+guide page via breadcrumb" encontrou o `h1` de "Você tem direito à saúde pública." (categoria
+`seus-direitos`) em vez de "Como conseguir pelo SUS" (índice do Guia); `guide-category-page.spec.ts`
+"should redirect to guide page for unknown slugs" teve o mesmo sintoma. O CI roda com
+`workers: 1` (`playwright.config.ts`, `workers: process.env.CI ? 1 : undefined`) — hipótese a
+verificar primeiro na triagem: estado do SPA (React Router client-side) não resetando por
+completo entre `page.goto()` sequenciais no mesmo worker, fazendo uma navegação "vazar" conteúdo
+da página do teste anterior. Se confirmado, a causa seria estrutural (afeta potencialmente todo
+teste que navega entre páginas), não um bug isolado por teste — o que mudaria a ordem de
+prioridade da triagem sugerida acima (investigar isso primeiro, antes de ir teste por teste).
+
 ---
 
 ## 2026-09-14 — Pipeline de CI/CD: `.github/workflows/ci.yml`
