@@ -324,20 +324,27 @@ test.describe('Performance & Core Web Vitals Tests', () => {
     }) => {
       await page.setViewportSize({ width: 375, height: 667 })
 
-      const allButtons = await page.locator('button').all()
-      const limitedButtons = allButtons.slice(0, 10)
-      const ctaButtons = []
+      // Real CTAs here are semantic <a> links (navigation/external), not
+      // <button> elements — <button> is reserved for the icon-only menu
+      // toggles, which have no visible text and rely on aria-label instead.
+      const allInteractive = await page.locator('button, a').all()
+      const limitedInteractive = allInteractive.slice(0, 10)
+      const ctaElements = []
 
-      for (const button of limitedButtons) {
-        const text = await button.textContent()
-        if (text && text.trim().length > 0) {
-          ctaButtons.push(button)
+      for (const el of limitedInteractive) {
+        const text = await el.textContent()
+        const ariaLabel = await el.getAttribute('aria-label')
+        const hasAccessibleName =
+          (text && text.trim().length > 0) ||
+          (ariaLabel && ariaLabel.trim().length > 0)
+        if (hasAccessibleName) {
+          ctaElements.push(el)
         }
       }
 
       let touchFriendlyCount = 0
-      for (const button of ctaButtons.slice(0, 5)) {
-        const box = await button.boundingBox()
+      for (const el of ctaElements.slice(0, 5)) {
+        const box = await el.boundingBox()
         if (box && box.height >= 40) {
           touchFriendlyCount++
         }
