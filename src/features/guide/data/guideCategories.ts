@@ -135,7 +135,7 @@ export const GUIDE_CATEGORIES: GuideCategory[] = [
   {
     slug: 'saude-mental',
     label: 'Saúde mental',
-    description: 'Saúde mental no SUS: CAPS, CRAS e prevenção ao suicídio.',
+    description: 'Saúde mental no SUS: CAPS, UBS e prevenção ao suicídio.',
     iconName: 'chat',
     color: 'purple',
   },
