@@ -405,15 +405,21 @@ Formatação automática com `@trivago/prettier-plugin-sort-imports` + `prettier
 
 ### Git Hooks (Husky + lint-staged)
 
-**`git commit`** — lint-staged:
+**`pre-commit`**:
 
-- `.ts`/`.tsx`: ESLint --fix + Prettier
-- `.json`/`.md`/`.css`: Prettier
+- Secret scan (`gitleaks`)
+- lint-staged: `.ts`/`.tsx` → ESLint --fix + Prettier; `.json`/`.md`/`.css` → Prettier
+- Verificação de tipos TypeScript (`pnpm type-check`)
 
-**`git push`** — validações adicionais:
+**`commit-msg`**:
+
+- [Commitlint](https://commitlint.js.org/) valida a mensagem contra
+  [Conventional Commits](https://www.conventionalcommits.org/) (`commitlint.config.cjs`) —
+  bloqueia o commit se o tipo (`feat:`, `fix:`, `chore:`...) estiver ausente ou incorreto
+
+**`pre-push`**:
 
 - Testes unitários (`pnpm test`)
-- Verificação de tipos TypeScript (`pnpm type-check`)
 
 ---
 
