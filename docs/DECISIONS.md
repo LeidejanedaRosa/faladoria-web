@@ -6,6 +6,38 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-09-16 — Commitlint valida Conventional Commits no hook `commit-msg`
+
+**Contexto**: Conventional Commits era só convenção manual — nada impedia um commit fora do
+padrão (`tipo(escopo): mensagem`) de entrar no histórico. Mesmo gap identificado e corrigido no
+`faladoria-backend`.
+
+**Decisão**: `@commitlint/cli` + `@commitlint/config-conventional` como devDependency,
+`commitlint.config.cjs` estendendo a config padrão, e um novo hook `.husky/commit-msg` rodando
+`pnpm exec commitlint --edit "$1"`. README atualizado pra descrever os 3 hooks separadamente
+(`pre-commit`/`commit-msg`/`pre-push`) — aproveitando pra corrigir uma imprecisão pré-existente
+que dizia que o `pre-push` roda `type-check` (na verdade é o `pre-commit` que roda isso; o
+`pre-push` só roda a suíte de testes).
+
+**Validação**: testado empiricamente antes de confiar — `git commit -m "fixed stuff"` foi
+rejeitado (`subject may not be empty`, `type may not be empty`), sem criar commit; a mesma
+tentativa com uma mensagem no formato correto passou normalmente.
+
+**Correção pós-review (CodeRabbit)**: `@commitlint/cli@21.x` inteiro (a versão instalada
+inicialmente, `21.2.2`) declara `engines.node: ">=22.12.0"` — incompatível com o Node 20 que
+este projeto usa de propósito (`package.json` e `ci.yml` fixam Node 20, decisão registrada na
+entrada do pipeline de CI). O CI passou mesmo assim porque `pnpm` não bloqueia por `engines`
+incompatível por padrão (sem `engine-strict` no `.npmrc`) — funcionaria por sorte até uma versão
+futura do commitlint realmente depender de uma API exclusiva do Node 22+. Confirmado via `npm
+view @commitlint/cli@20.5.3 engines` que a última versão da série `20.x` ainda declara
+`>=v18`, compatível. Rebaixado `@commitlint/cli`/`@commitlint/config-conventional` de `21.2.2`
+para `20.5.3` (par exato, mesma versão de release) em vez de subir o Node mínimo do projeto
+inteiro por causa de uma devDependency — decisão de baseline de Node é maior que o escopo desta
+branch. Reteste do hook (commit malformado rejeitado) confirmou que o downgrade não perdeu
+funcionalidade.
+
+---
+
 ## 2026-09-16 — DevDependencies atualizadas: 83 → 2 vulnerabilidades (residual sem correção)
 
 **Contexto**: `pnpm audit` (total) reportava 83 vulnerabilidades — todas em devDependencies,
