@@ -6,6 +6,38 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-09-16 — E2E roda contra o build de produção real, não o dev server
+
+**Contexto**: `playwright.config.ts` usava `webServer.command: 'pnpm dev'` — a suíte E2E sempre
+testou o servidor de desenvolvimento (código não minificado, HMR, sem o code splitting real do
+Rollup). Um E2E verde contra o dev server não garantia que o build minificado renderiza de forma
+idêntica — risco concreto e já demonstrado nesta mesma rodada de padronização: o bug do
+`vendor-react` vazio (ver decisão "DevDependencies atualizadas") só aparece no build de produção,
+nunca no dev server.
+
+**Decisão**: `webServer.command: 'pnpm build && pnpm preview'`; `baseURL`/`url` default mudado de
+`http://localhost:5173` (porta do `pnpm dev`) para `http://localhost:4173` (porta do `pnpm
+preview`, já configurada em `vite.config.ts`); `reuseExistingServer` fixado em `false` (antes era
+`!process.env.CI`) — decisão deliberada: reaproveitar um preview já rodando localmente arrisca
+servir um build desatualizado sem ninguém perceber, o que anula o propósito de testar contra o
+build real. `.env.example`/README atualizados para o novo default de porta.
+
+**Alternativa rejeitada**: manter `reuseExistingServer: !process.env.CI` (permitir reuso local).
+Rejeitada — o ganho de velocidade não compensa o risco de dar falso positivo/negativo num E2E
+rodando contra código que não é mais o que está em disco.
+
+**Trade-off aceito**: cada rodada de E2E agora builda primeiro — mais lenta que apontar direto
+pro `pnpm dev`. Na prática, medido nesta sessão, a suíte rodou **mais rápido** no total mesmo
+com o build extra (build de produção + servidor `preview` respondem mais rápido que o dev server
+com HMR ativo): ~2.9 min + 2.4 min (chromium, 374 testes) vs. ~6.8 min + 6.1 min medidos
+anteriormente contra `pnpm dev` para o mesmo conjunto.
+
+**Validação**: suíte completa (374 testes, chromium) rodada contra o novo fluxo build+preview,
+100% verde — nenhum teste dependia de comportamento específico do dev server (HMR, source não
+minificado). `pnpm type-check`/`lint`/`format:check` limpos.
+
+---
+
 ## 2026-09-16 — Commitlint valida Conventional Commits no hook `commit-msg`
 
 **Contexto**: Conventional Commits era só convenção manual — nada impedia um commit fora do

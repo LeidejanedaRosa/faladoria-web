@@ -10,7 +10,7 @@ export default defineConfig({
   reporter: 'html',
 
   use: {
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:4173',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -42,8 +42,13 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'pnpm dev',
-    url: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173',
-    reuseExistingServer: !process.env.CI,
+    // Runs E2E against the real production build, not the dev server — closer
+    // to what actually ships (minification, real chunk splitting, no HMR-only
+    // behavior). Trade-off: every run rebuilds first, so it's slower than
+    // pointing at `pnpm dev`. reuseExistingServer is always false so a stale
+    // build never gets served silently.
+    command: 'pnpm build && pnpm preview',
+    url: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:4173',
+    reuseExistingServer: false,
   },
 })

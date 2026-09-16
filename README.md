@@ -103,7 +103,10 @@ Executados com `pnpm test`. Rodam em ambiente jsdom sem browser real.
 
 ### Camada 2 — Testes End-to-End (Playwright)
 
-Executados com `pnpm test:e2e`. Rodam em browsers reais (Chromium, WebKit, Firefox).
+Executados com `pnpm test:e2e`. Rodam em browsers reais (Chromium, WebKit, Firefox) contra o
+**build de produção real** (`pnpm build && pnpm preview`), não o servidor de desenvolvimento —
+mais fiel ao que de fato vai pro ar (minificação, code splitting real), ao custo de cada rodada
+de E2E precisar buildar primeiro.
 
 | Biblioteca                                                                                             | O que faz                                                                                                                                            |
 | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -253,7 +256,7 @@ Copie `.env.example` para `.env.local` e preencha conforme necessário.
 | `VITE_SENTRY_ENVIRONMENT`                 | Produção    | Ambiente (`production`, `staging`)                                                                                                                                                                                                                                           |
 | `VITE_SENTRY_TRACES_SAMPLE_RATE`          | Produção    | Taxa de amostragem de traces de performance (0 a 1)                                                                                                                                                                                                                          |
 | `VITE_SENTRY_REPLAYS_SESSION_SAMPLE_RATE` | Produção    | Taxa de amostragem de sessões para Session Replay                                                                                                                                                                                                                            |
-| `PLAYWRIGHT_BASE_URL`                     | Testes E2E  | URL base para os testes. Padrão: `http://localhost:5173`                                                                                                                                                                                                                     |
+| `PLAYWRIGHT_BASE_URL`                     | Testes E2E  | URL base para os testes — servida pelo `pnpm preview` (build de produção), não o `pnpm dev`. Padrão: `http://localhost:4173`                                                                                                                                                 |
 
 ---
 
