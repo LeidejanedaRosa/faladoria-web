@@ -3,11 +3,7 @@ import { formatPercentage } from '@shared/utils/formatPercentage'
 export const TRANSPARENCY_HEADING_ID = 'transparency-heading'
 
 export type InteractionStatus =
-  | 'open'
-  | 'under_review'
-  | 'in_progress'
-  | 'resolved'
-  | 'unresolved'
+  'open' | 'under_review' | 'in_progress' | 'resolved' | 'unresolved'
 
 export interface TransparencyStat {
   id: string
