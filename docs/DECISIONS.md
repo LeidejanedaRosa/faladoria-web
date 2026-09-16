@@ -6,6 +6,30 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-09-16 — Limpeza de variáveis de ambiente mortas + `PLAYWRIGHT_BASE_URL` sincronizada
+
+**Contexto**: `.env.example` tinha `VITE_APP_NAME`, `VITE_APP_ENV`, `VITE_API_URL`,
+`VITE_GA_MEASUREMENT_ID`, `VITE_FEATURE_NEW_UI` e `VITE_FEATURE_BETA` — nenhuma delas era lida em
+nenhum lugar do código (`grep` confirmou zero ocorrências fora do próprio `.env.example` e, no
+caso de `VITE_GA_MEASUREMENT_ID`, da declaração de tipo em `global.d.ts`). São resíduo do template
+inicial do Vite: o Google Analytics nunca foi de fato integrado (`index.html` tem até o
+`dns-prefetch` do GTM comentado; `reportWebVitals.ts` só checa `window.gtag` defensivamente, nunca
+lê a env var pra inicializá-lo). Na direção oposta, `PLAYWRIGHT_BASE_URL` é usada de verdade em
+`playwright.config.ts` e já documentada no README, mas nunca esteve no `.env.example`.
+
+**Decisão**: remover as 6 variáveis mortas do `.env.example` (e `VITE_GA_MEASUREMENT_ID` de
+`global.d.ts`); adicionar `PLAYWRIGHT_BASE_URL=http://localhost:5173` ao `.env.example`.
+
+**Alternativa rejeitada**: manter `VITE_API_URL` e as feature flags como "placeholder para uso
+futuro" do dashboard/auth. Rejeitada — documentar uma variável que não faz nada ainda é mais
+confuso do que ajuda; quando o dashboard existir de verdade, a env var certa entra junto com o
+código que a consome, no PR que implementa aquela feature.
+
+**Validação**: `grep` confirmou zero ocorrências restantes das 6 variáveis fora deste arquivo.
+`pnpm type-check`/`lint`/`build` limpos.
+
+---
+
 ## 2026-09-15 — URL do site vira variável de ambiente (`VITE_SITE_URL`)
 
 **Contexto**: `src/shared/data/companyInfo.ts` tinha `url: 'https://faladoria-web.vercel.app'`
