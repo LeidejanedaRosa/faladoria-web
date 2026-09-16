@@ -6,6 +6,25 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-09-16 — Commitlint valida Conventional Commits no hook `commit-msg`
+
+**Contexto**: Conventional Commits era só convenção manual — nada impedia um commit fora do
+padrão (`tipo(escopo): mensagem`) de entrar no histórico. Mesmo gap identificado e corrigido no
+`faladoria-backend`.
+
+**Decisão**: `@commitlint/cli` + `@commitlint/config-conventional` como devDependency,
+`commitlint.config.cjs` estendendo a config padrão, e um novo hook `.husky/commit-msg` rodando
+`pnpm exec commitlint --edit "$1"`. README atualizado pra descrever os 3 hooks separadamente
+(`pre-commit`/`commit-msg`/`pre-push`) — aproveitando pra corrigir uma imprecisão pré-existente
+que dizia que o `pre-push` roda `type-check` (na verdade é o `pre-commit` que roda isso; o
+`pre-push` só roda a suíte de testes).
+
+**Validação**: testado empiricamente antes de confiar — `git commit -m "fixed stuff"` foi
+rejeitado (`subject may not be empty`, `type may not be empty`), sem criar commit; a mesma
+tentativa com uma mensagem no formato correto passou normalmente.
+
+---
+
 ## 2026-09-16 — DevDependencies atualizadas: 83 → 2 vulnerabilidades (residual sem correção)
 
 **Contexto**: `pnpm audit` (total) reportava 83 vulnerabilidades — todas em devDependencies,
