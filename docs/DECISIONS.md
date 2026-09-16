@@ -6,6 +6,69 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-09-16 — DevDependencies atualizadas: 83 → 2 vulnerabilidades (residual sem correção)
+
+**Contexto**: `pnpm audit` (total) reportava 83 vulnerabilidades — todas em devDependencies,
+nenhuma em produção (`pnpm audit --prod` já estava limpo desde a correção do react-router-dom).
+Pendência registrada no `ci.yml` desde o pipeline de CI inicial.
+
+**Processo** (nunca um bump cego de tudo pra latest — o `pnpm outdated` mostrava major bumps
+grandes demais para essa rodada, ex.: Vite 6→8, TypeScript 5→7, ESLint 9→10, `@sentry/react` 8→10.
+Isso é trabalho de migração dedicado, fora do escopo de "fechar vulnerabilidades"):
+
+1. `pnpm update` (sem `--latest`) — bump só dentro dos ranges semver já aceitos no
+   `package.json`. Sozinho, resolveu 83 → 21.
+2. As 21 restantes rastreadas via `pnpm why` até a origem: 100% vinham de só 2 pacotes,
+   `@lhci/cli@0.14.0` e `markdownlint-cli@0.47.0`, ambos com versão mais nova disponível.
+   Atualizados para `0.15.1`/`0.49.1` → 21 → 10.
+3. As 10 restantes eram dependências transitivas profundas dentro do próprio `@lhci/cli`
+   (`tmp`, `minimatch`, `uuid` — puxadas por `inquirer`/`chrome-launcher`/`lighthouse`), com
+   correção publicada mas não adotada ainda pelo `@lhci/cli`. Forçadas via `pnpm.overrides`
+   (sintaxe seletiva `"minimatch@>=10.0.0"` para não afetar outras major versions de `minimatch`
+   na árvore) → 10 → 2.
+4. As 2 finais são `extract-zip@2.0.1` (via `@lhci/cli` → `lighthouse` → `puppeteer-core` →
+   `@puppeteer/browsers`) — **sem correção publicada** (`npm view extract-zip versions`
+   confirma que 2.0.1 é a versão mais recente que existe). Não há nada a fazer até o
+   `@puppeteer/browsers` trocar de dependência ou o `extract-zip` publicar um patch.
+
+**Decisão**: as 2 vulnerabilidades residuais viram allowlist explícita via
+`pnpm.auditConfig.ignoreGhsas` (`GHSA-jmr9-qjv8-65gv`, `GHSA-7pqw-9j4j-h8q3`) — permite que
+`pnpm audit --audit-level high` volte a ter exit code 0, e o step "Security audit (all
+dependencies)" no `ci.yml` volta a ser **bloqueante** (removido o `continue-on-error: true`).
+
+**Por quê allowlist em vez de manter non-blocking pra sempre**: um audit non-blocking não é
+monitorado de verdade (ninguém olha um step que nunca bloqueia nada) — vira ruído ignorado. Uma
+allowlist explícita, com os IDs nomeados e o motivo documentado aqui, é revisitável: se um dia o
+`extract-zip` publicar correção, o próximo `pnpm audit` vai voltar a acusar essas 2 (porque a
+versão instalada não muda sozinha) e alguém vai precisar decidir ativamente se atualiza ou
+mantém a allowlist — não fica esquecido silenciosamente.
+
+**Efeito colateral encontrado e corrigido**: o bump do Vite/Rollup (`rollup` 4.55→4.63 via
+`@sentry/vite-plugin`) quebrou o `manualChunks` de `vite.config.ts` — o chunk `vendor-react`
+saiu do build com **0 bytes**, e o código do React inteiro (incluindo `react-dom`) foi parar
+dentro do bundle principal (`index.js` cresceu de 282 KB para 311 KB). Investigando o build
+anterior à mudança, percebi que esse `manualChunks` no formato de objeto
+(`{ 'vendor-react': ['react', 'react-dom'] }`, decisão de 2026-05-22) já era **um bug
+pré-existente, não detectado até agora**: o `vendor-react` "funcionando" antes tinha só 11.79 KB
+minificado — pequeno demais pra conter `react` + `react-dom` de verdade (a dupla pesa
+~140 KB minificados). Ou seja, o `react-dom` provavelmente já vinha vazando pro bundle principal
+havia tempo, só que ninguém tinha inspecionado o tamanho dos chunks de perto.
+
+**Correção**: `manualChunks` migrado do formato de objeto pro formato de função (recomendação
+atual do Vite/Rollup 4.x — mais robusto pra diferenciar módulos por caminho real dentro de
+`node_modules`, em vez de por nome de pacote isolado). Resultado real medido: `vendor-react`
+passou a conter 223 KB (69 KB gzip) — `react` + `react-dom` de verdade, pela primeira vez — e
+`index.js` caiu pra 100 KB. Total do bundle ficou praticamente igual (~372 KB antes e depois,
+só redistribuído entre chunks), então não é regressão de peso — é a otimização de cache que a
+decisão original de 2026-05-22 já pretendia, finalmente funcionando de verdade.
+
+**Validação**: `pnpm type-check`/`lint`/`format:check`/`build` limpos. Suíte de 448 testes
+unitários (97%+ cobertura) passando. Suíte E2E completa (374 testes) rodada em chromium contra o
+build real, sem regressão. Smoke test manual contra `pnpm preview` (home → índice do Guia →
+categoria) sem erros de console/página.
+
+---
+
 ## 2026-09-16 — Limpeza de variáveis de ambiente mortas + `PLAYWRIGHT_BASE_URL` sincronizada
 
 **Contexto**: `.env.example` tinha `VITE_APP_NAME`, `VITE_APP_ENV`, `VITE_API_URL`,

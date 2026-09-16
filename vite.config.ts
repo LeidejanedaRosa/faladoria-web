@@ -58,10 +58,14 @@ export default defineConfig({
     cssCodeSplit: true,
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom'],
-          'vendor-router': ['react-router-dom'],
-          'vendor-sentry': ['@sentry/react'],
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return undefined
+          if (id.includes('@sentry')) return 'vendor-sentry'
+          if (id.includes('react-router-dom')) return 'vendor-router'
+          if (id.includes('/react/') || id.includes('/react-dom/')) {
+            return 'vendor-react'
+          }
+          return undefined
         },
       },
     },

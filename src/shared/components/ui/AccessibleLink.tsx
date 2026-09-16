@@ -28,13 +28,7 @@ interface AccessibleLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorEleme
   external?: boolean
   showExternalIcon?: boolean
   ariaCurrent?:
-    | boolean
-    | 'page'
-    | 'step'
-    | 'location'
-    | 'date'
-    | 'time'
-    | 'true'
+    boolean | 'page' | 'step' | 'location' | 'date' | 'time' | 'true'
 }
 
 export const AccessibleLink = forwardRef<

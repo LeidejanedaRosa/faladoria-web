@@ -41,12 +41,8 @@ jobs:
       - name: Security audit (production dependencies)
         run: pnpm audit --prod --audit-level high
 
-      # Não-bloqueante por enquanto — 83 vulnerabilidades pré-existentes em devDependencies
-      # (Vite/Rollup/PostCSS/cadeia do @lhci/cli/etc.) não vão pra produção. Fica visível aqui
-      # até serem resolvidas numa branch dedicada, quando este step vira bloqueante também.
-      - name: Security audit (all dependencies, non-blocking)
-        run: pnpm audit --audit-level high || true
-        continue-on-error: true
+      - name: Security audit (all dependencies)
+        run: pnpm audit --audit-level high
 
       - name: Type check
         run: pnpm type-check
