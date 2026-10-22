@@ -58,7 +58,7 @@ src/
     │   └── seo/           # JsonLdScript, BreadcrumbSchema
     ├── data/              # Global constants (COMPANY_INFO, structuredData, etc.)
     ├── hooks/             # Shared hooks (useDocumentMeta, useFocusTrap, etc.)
-    ├── lib/               # Sentry
+    ├── lib/               # Sentry, api/ (HTTP client for faladoria-backend)
     ├── types/
     └── utils/             # cn, slugify, formatPercentage, reportWebVitals
 ```

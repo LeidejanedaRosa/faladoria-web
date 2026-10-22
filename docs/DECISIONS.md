@@ -6,6 +6,51 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-10-22 — Cliente HTTP: chamada direta à API, com cookie, sem proxy do Vite
+
+**Contexto**: primeira integração com o `faladoria-backend` (quadro de Transparência, depois o
+painel). A sessão é um cookie `HttpOnly` gravado pela API, e o navegador só o envia quando o site
+e a API são o **mesmo site** (mesmo domínio registrável). Em 2026-10-19 a cliente entregou o
+domínio, e o backend decidiu (`faladoria-backend/docs/DECISIONS.md`, "Com domínio próprio", achado
+F267): site em `faladoria.com.br`, API em `api.faladoria.com.br`, chamada direto pelo navegador.
+
+```
+faladoria.com.br  ──fetch(credentials: 'include')──►  api.faladoria.com.br   mesmo site: cookie vai
+localhost:5173    ──fetch(credentials: 'include')──►  localhost:3000         mesmo site: cookie vai
+```
+
+**Decisão**: `src/shared/lib/api/apiRequest.ts`, um `fetch` fino, usado por todas as features:
+
+- Endereço em `VITE_API_URL`. Sem ela, a chamada falha com erro de configuração, **antes** do
+  `try` da rede, para não aparecer ao usuário como "verifique sua conexão".
+- `credentials: 'include'` em toda chamada.
+- `Content-Type: application/json` **só quando há corpo**: o Fastify recusa com `400` um corpo
+  vazio declarado como JSON, e rotas como `reset-password` e `read-all` não têm corpo.
+- Toda resposta de erro vira `ApiError` (`status`, `code`, `message`, `details`,
+  `retryAfterSeconds`), espelhando o formato único da API (`docs/API.md`, seção 2). Resposta que
+  não está nesse formato (HTML de proxy, `502` da plataforma) vira `UNEXPECTED_RESPONSE`; falha de
+  conexão vira `NETWORK_ERROR` com `status: 0`. As telas decidem pelo `code`, nunca pelo texto.
+- Cancelamento (`AbortError`) passa adiante sem virar `ApiError`, para quem cancelou poder ignorar.
+- `204` devolve `undefined`; `202` (mensagem enviada, histórico pendente) devolve o corpo: é
+  sucesso, não erro.
+
+**Alternativas rejeitadas**:
+
+- **Proxy do Vite em desenvolvimento** (`/api` → `localhost:3000`, sugestão da seção 2 do
+  `docs/API.md` do backend, escrita para o plano antigo do rewrite do Vercel): faria o
+  desenvolvimento ser mesma origem e a produção não, e CORS (`CORS_ORIGIN`, `credentials`) só
+  seria exercitado no deploy. Chamando a API pelo endereço nos dois ambientes, um erro de CORS
+  aparece já na máquina.
+- **axios ou ky**: o que eles acrescentam (interceptors, retry) não é necessário aqui, e o retry
+  ficará com a biblioteca de dados do servidor. `fetch` nativo não adiciona peso ao bundle.
+
+**Testes**: `src/shared/lib/api/__tests__/apiRequest.test.ts` (17 casos, `fetch` substituído por
+um mock): URL e parâmetros repetidos, cookie, corpo e cabeçalho, `204`/`202`, formato de erro,
+`details`, `Retry-After`, resposta fora do formato, falha de rede, cancelamento e variável
+ausente. O comportamento real do cookie entre subdomínios só se confere no deploy.
+
+---
+
 ## 2026-09-16 — E2E roda contra o build de produção real, não o dev server
 
 **Contexto**: `playwright.config.ts` usava `webServer.command: 'pnpm dev'` — a suíte E2E sempre
