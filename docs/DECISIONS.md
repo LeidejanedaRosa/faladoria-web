@@ -44,10 +44,11 @@ localhost:5173    ──fetch(credentials: 'include')──►  localhost:3000  
 - **axios ou ky**: o que eles acrescentam (interceptors, retry) não é necessário aqui, e o retry
   ficará com a biblioteca de dados do servidor. `fetch` nativo não adiciona peso ao bundle.
 
-**Testes**: `src/shared/lib/api/__tests__/apiRequest.test.ts` (17 casos, `fetch` substituído por
-um mock): URL e parâmetros repetidos, cookie, corpo e cabeçalho, `204`/`202`, formato de erro,
-`details`, `Retry-After`, resposta fora do formato, falha de rede, cancelamento e variável
-ausente. O comportamento real do cookie entre subdomínios só se confere no deploy.
+**Testes**: `src/shared/lib/api/__tests__/apiRequest.test.ts` (18 casos, `fetch` substituído por
+um mock): URL e parâmetros repetidos, caminho que já traz `?`, cookie, corpo e cabeçalho,
+`204`/`202`, formato de erro, `details`, `Retry-After`, resposta fora do formato, falha de rede,
+cancelamento e variável ausente. O comportamento real do cookie entre subdomínios só se confere
+no deploy.
 
 ---
 
