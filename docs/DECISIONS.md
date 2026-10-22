@@ -6,6 +6,44 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-10-22 — Auditoria: 5 avisos `high` novos fechados (`lint-staged` 16, override do `basic-ftp`)
+
+**Contexto**: o passo "Security audit (all dependencies)" do CI (bloqueante desde 2026-09-16)
+quebrou no PR #56 com 7 avisos `high`, todos em devDependencies e publicados depois da última
+rodada. `pnpm audit --prod` continuava limpo.
+
+**Processo** (o mesmo de 2026-09-16, na mesma ordem):
+
+| Pacote                | Origem                          | Correção                                                                               | Passo                                            |
+| --------------------- | ------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| `vite` 6.4.3          | direto                          | 6.4.5, dentro de `^6.4.3`                                                              | `pnpm update`                                    |
+| `source-map-js` 1.2.1 | `postcss`, `@tailwindcss/node`  | 1.2.2, dentro da faixa                                                                 | `pnpm update`                                    |
+| `markdown-it` 14.3.2  | `markdownlint-cli`              | 14.3.3, dentro de `~14.3.0`                                                            | `pnpm update`                                    |
+| `braces` 3.0.3        | `lint-staged` 15 → `micromatch` | **sem correção publicada**; o `lint-staged` 16.4.0 trocou `micromatch` por `picomatch` | `lint-staged` `^15` → `^16.4.0`                  |
+| `basic-ftp` 5.3.1     | `@lhci/cli` → `get-uri`         | só na 6.2.1; nem o `get-uri` mais novo aceita a 6                                      | `pnpm.overrides` `"basic-ftp@<6.2.1": ">=6.2.1"` |
+
+**Por que o override do `basic-ftp` é seguro**: a única quebra da 6.0.0 é recusar, por padrão,
+host de transferência separado (proteção contra FTP bounce); a API que o `get-uri` usa não mudou.
+E o caminho só roda para endereços `ftp://` num proxy PAC, que o Lighthouse CI não usa.
+
+**Por que `lint-staged` 16.4.0 e não o 17**: o 17 exige Node 22.22.1; o CI roda Node 20. O 16.4.0
+pede Node 20.17. O hook foi exercitado de verdade (`pnpm exec lint-staged` com arquivos em stage).
+
+**Alternativa rejeitada**: incluir `GHSA-vfj7-8cjw-p6xm` (`braces`) e `GHSA-c475-qrg2-pj4r`
+(`basic-ftp`) no `ignoreGhsas`. A allowlist fica só para o que não tem saída (`extract-zip`); os
+dois tinham.
+
+**Efeito colateral**: o `pnpm update` levou o `@axe-core/playwright` a 4.14, que aplica a regra
+`label-content-name-mismatch` (WCAG 2.5.3, "Rótulo no nome"). Ela achou dois links de WhatsApp com
+`aria-label` que não contém o texto visível. Corrigidos nesta mesma branch; ver
+`TROUBLESHOOTING.md`.
+
+**Resultado**: `pnpm audit --audit-level high` com saída 0 (sobram os dois `extract-zip` já
+ignorados, 3 moderados e 1 baixo, abaixo do limite do CI). Tipos, lint, 448 testes unitários,
+build e E2E chromium (369 passaram, 4 pulados de propósito) verdes.
+
+---
+
 ## 2026-09-16 — E2E roda contra o build de produção real, não o dev server
 
 **Contexto**: `playwright.config.ts` usava `webServer.command: 'pnpm dev'` — a suíte E2E sempre

@@ -4,6 +4,72 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## E2E inteiro falha com "Executable doesn't exist" depois de `pnpm update`
+
+**Data**: 2026-10-22
+
+**Sintoma**: todos os 374 testes do Playwright falham localmente, no mesmo ponto:
+`browserType.launch: Executable doesn't exist at ~/.cache/ms-playwright/chromium_headless_shell-1248/...`.
+
+**Causa raiz**: o `pnpm update` subiu o `@playwright/test` (1.63 → 1.64) dentro da faixa do
+`package.json`. Cada versão do Playwright exige o próprio binário do navegador, e o da versão nova
+não estava baixado. Não é falha de código, e não acontece no CI, que roda
+`playwright install --with-deps` a cada execução.
+
+**Solução**: `pnpm exec playwright install chromium` (ou sem argumento, para os três navegadores).
+
+---
+
+## VS Code acusa "Arquivo `@types/node/index.d.ts` não encontrado" depois de `pnpm update`
+
+**Data**: 2026-10-22
+
+**Sintoma**: o editor marca erro no `tsconfig.test.json`: arquivo
+`node_modules/.pnpm/@types+node@22.20.3/node_modules/@types/node/index.d.ts` não encontrado,
+"ponto de entrada da biblioteca de tipos 'node' especificado em compilerOptions". No terminal,
+`pnpm run type-check` passa sem erros.
+
+**Causa raiz**: o pnpm guarda cada pacote numa pasta com a versão no nome. O `pnpm update` levou o
+`@types/node` de 22.20.3 a 22.20.5, e a pasta antiga deixou de existir. O servidor de TypeScript do
+VS Code continuou com o caminho antigo em memória. O projeto está correto; só o editor está
+desatualizado.
+
+```
+antes   node_modules/.pnpm/@types+node@22.20.3/...   ← caminho guardado pelo editor
+depois  node_modules/.pnpm/@types+node@22.20.5/...   ← único que existe
+```
+
+**Solução**: `Ctrl+Shift+P` → **TypeScript: Restart TS Server**. Se persistir, **Developer: Reload
+Window**. Vale para qualquer atualização que mude a versão de um pacote de tipos. Antes de mexer no
+`tsconfig`, confirmar com `pnpm run type-check`: se o terminal passa, o problema é do editor.
+
+---
+
+## Axe passa a acusar `label-content-name-mismatch` sem mudança no código
+
+**Data**: 2026-10-22
+
+**Sintoma**: `tests/seo/accessibility.spec.ts`, "should pass WCAG 2.1 Level AA compliance", falha
+com `label-content-name-mismatch` em dois links de WhatsApp ("Text inside the element is not
+included in the accessible name"), depois de uma atualização de dependências.
+
+**Causa raiz**: o `@axe-core/playwright` 4.14 passou a aplicar a regra do critério WCAG 2.5.3
+(Rótulo no nome). Os links tinham um `aria-label` que **substituía** o texto visível:
+
+```
+na tela: "Fale com a gente"           aria-label: "Enviar mensagem pelo WhatsApp para …"
+na tela: "Compartilhar Experiência"   aria-label: "Compartilhar sua experiência no WhatsApp …"
+```
+
+Quem usa controle por voz fala o que vê ("clicar Fale com a gente"), e o comando não acha o link.
+
+**Solução**: o `aria-label` começa pelo texto visível e só depois acrescenta o contexto:
+"Fale com a gente pelo WhatsApp: … (abre em nova aba)" (`footerContent.ts`) e "Compartilhar
+Experiência pelo WhatsApp (abre em nova aba)" (`problemContent.ts`). Regra para os próximos
+`aria-label`: **conter o texto visível, de preferência no começo**.
+
+---
+
 ## Seções de artigo com numeração incorreta em `InformationalStepCard`
 
 **Data**: 2026-06-24 (sintoma 1) / 2026-06-24 (sintoma 2)

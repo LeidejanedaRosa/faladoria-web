@@ -96,7 +96,7 @@ test.describe('ProblemSection', () => {
       await expect(ctaDescription).toBeVisible()
 
       const ctaButton = section.locator(
-        'a[aria-label="Compartilhar sua experiência no WhatsApp (abre em nova aba)"]'
+        'a[aria-label="Compartilhar Experiência pelo WhatsApp (abre em nova aba)"]'
       )
       await expect(ctaButton).toBeVisible()
     })
@@ -108,7 +108,7 @@ test.describe('ProblemSection', () => {
     }) => {
       const section = page.locator('section[aria-labelledby="problem-heading"]')
       const cta = section.locator(
-        'a[aria-label="Compartilhar sua experiência no WhatsApp (abre em nova aba)"]'
+        'a[aria-label="Compartilhar Experiência pelo WhatsApp (abre em nova aba)"]'
       )
 
       await expect(cta).toHaveAttribute('href', /^https:\/\/wa\.me\/\d+$/)
