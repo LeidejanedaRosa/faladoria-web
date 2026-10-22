@@ -79,7 +79,8 @@ export const FOOTER_CONTENT = {
         iconName: 'whatsapp',
         label: 'Fale com a gente',
         href: `https://wa.me/${COMPANY_INFO.contact.whatsapp.replace(/\D/g, '')}`,
-        ariaLabel: `Enviar mensagem pelo WhatsApp para ${COMPANY_INFO.contact.whatsapp} (abre em nova aba)`,
+        // Starts with label: voice-control users say the visible text (WCAG 2.5.3).
+        ariaLabel: `Fale com a gente pelo WhatsApp: ${COMPANY_INFO.contact.whatsapp} (abre em nova aba)`,
       },
       {
         id: 'contact-address',

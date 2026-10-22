@@ -99,7 +99,8 @@ export const PROBLEM_CONTENT = {
     description:
       'Sua história importa. Compartilhe sua experiência e ajude a transformar a saúde pública.',
     buttonText: 'Compartilhar Experiência',
+    // Starts with buttonText: voice-control users say the visible label (WCAG 2.5.3).
     buttonAriaLabel:
-      'Compartilhar sua experiência no WhatsApp (abre em nova aba)',
+      'Compartilhar Experiência pelo WhatsApp (abre em nova aba)',
   },
 } as const
