@@ -4,6 +4,52 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## "Tentar de novo" perde o foco no navegador, mas o teste de componente passa
+
+**Data**: 2026-10-23
+
+**Sintoma**: no navegador, depois de "Tentar de novo" pelo teclado, o foco ia para o `<body>` e lá
+ficava quando a tentativa falhava. O teste de componente "keeps focus on the retry button when the
+retry fails again" passava.
+
+**Causa raiz**: no TanStack Query 5, uma consulta **sem dados** volta para `status: "pending"` ao
+recomeçar (função `fetchState` do `@tanstack/query-core`). O componente testava `isPending` antes
+de `isError` e mostrava o esqueleto no lugar do botão. No jsdom, o `fetch` simulado responde na
+hora, e o React junta as atualizações sem nunca pintar o esqueleto: o teste nunca via o meio da
+tentativa.
+
+```
+navegador:  clique → pending (esqueleto, botão some, foco no body) → erro (botão novo)
+jsdom:      clique → erro                                            (botão nunca saiu)
+```
+
+**Solução**: `useRecoveryFocus` passou a conduzir a tentativa (`isRetrying`), e os componentes
+testam `isRetrying || isError` antes de `isPending`. Os testes seguram a resposta com
+`deferredResponse()` (`src/test/mockFetch.ts`) para olhar a tela durante a tentativa, e o E2E
+atrasa a resposta em 800 ms. Conferido com a prova inversa: com a ordem antiga, os três testes
+novos falham. Regra: quando o defeito depende de **quanto tempo** algo leva, o teste precisa
+controlar esse tempo; um mock instantâneo esconde o meio do caminho. Ver `DECISIONS.md`, "Quadro
+de Transparência ligado à API".
+
+---
+
+## O navegador mostra o código antigo depois de `pnpm build && pnpm preview`
+
+**Data**: 2026-10-23
+
+**Sintoma**: depois de mudar o código, a conferência no navegador deu o mesmo resultado de antes
+da mudança.
+
+**Causa raiz**: o `pnpm build` falhou (`ELIFECYCLE ... exit code 2`) porque o `tsc -b` também
+compila os testes, e um teste ainda usava a assinatura antiga de um hook. O `vite preview`
+continuou servindo o `dist/` da execução anterior, sem aviso nenhum na página.
+
+**Solução**: confirmar a linha `✓ built in` antes de confiar no que o navegador mostra. Num
+comando encadeado, usar `&&` entre o build e o preview, para o preview não subir depois de um
+build que falhou.
+
+---
+
 ## Teste de foco passa mesmo com a correção desligada
 
 **Data**: 2026-10-23

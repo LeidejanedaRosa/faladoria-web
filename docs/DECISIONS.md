@@ -87,17 +87,21 @@ backend entregou `GET /api/public/complaints/stats` e `GET /api/public/complaint
   que tornaria verdadeiro um texto de prazo ao custo de duas chamadas por minuto por pessoa
   olhando a página.
 
-- **Foco depois de "Tentar de novo"** (`useRecoveryFocus`). O botão some junto com o bloco de
-  erro; sem cuidado, o foco caía no `<body>` e quem usa teclado ou leitor de tela voltava ao topo
-  da página (WCAG 2.4.3 e 4.1.3). Quando a nova tentativa dá certo, o foco vai para o bloco que
-  voltou (`tabIndex={-1}`, com o contorno do `focus-visible`); quando falha, o botão continua na
-  tela e com o foco. Só uma tentativa pedida pela pessoa move o foco, e só para **resgatar** um
-  foco perdido (no botão ou no `<body>`): se ela foi para outro controle enquanto a tentativa
-  carregava, o foco fica onde ela escolheu (apontado na revisão do CodeRabbit). Uma recarga ao
-  voltar para a aba nunca o move. **Rejeitado** (revisão do CodeRabbit): anunciar o selo de
-  horário numa região `role="status"`. A leitura em segundo plano não é resposta a uma ação da
-  pessoa, e o anúncio interromperia quem está lendo outra parte da página a cada carregamento; o
-  erro já é anunciado pelo `role="alert"`.
+- **Foco depois de "Tentar de novo"** (`useRecoveryFocus`). O hook conduz a tentativa inteira
+  (`retry()`, `isRetrying`). Enquanto ela roda, o bloco de erro continua na tela com o mesmo
+  botão, que diz "Tentando de novo…" e usa `aria-disabled` (um botão `disabled` perde o foco no
+  Chrome). Sem isso, o TanStack Query 5 devolve para `pending` uma consulta sem dados ao
+  recomeçar, o esqueleto toma o lugar do botão e o foco cai no `<body>`, também quando a tentativa
+  falha (WCAG 2.4.3 e 4.1.3; apontado na revisão do CodeRabbit). O esqueleto fica só para a
+  primeira carga. Quando a tentativa dá certo, o foco vai para o bloco que voltou
+  (`tabIndex={-1}`, com o contorno do `focus-visible`), mas só para **resgatar** um foco perdido
+  (no botão ou no `<body>`): se a pessoa foi para outro controle enquanto esperava, o foco fica
+  onde ela escolheu. Uma recarga ao voltar para a aba nunca o move. O estado da tentativa mora no
+  hook, e não em cada componente: separados, o aviso de sucesso do TanStack chegaria antes de o
+  conteúdo aparecer, e o foco não teria alvo. **Rejeitado** (revisão do CodeRabbit): anunciar o
+  selo de horário numa região `role="status"`. A leitura em segundo plano não é resposta a uma
+  ação da pessoa, e o anúncio interromperia quem está lendo outra parte da página a cada
+  carregamento; o erro já é anunciado pelo `role="alert"`.
 
 **E2E**: o build do Playwright recebe `VITE_API_URL=https://api.e2e.test`, fixo no `webServer.env`
 do `playwright.config.ts`, e não lido do `.env`: o `.env.local` de quem roda não pode mudar o que o
