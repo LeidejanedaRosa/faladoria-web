@@ -1,5 +1,10 @@
 import { PUBLIC_STATS } from '@/test/fixtures/publicComplaints'
-import { apiErrorResponse, jsonResponse, stubApi } from '@/test/mockFetch'
+import {
+  apiErrorResponse,
+  deferredResponse,
+  jsonResponse,
+  stubApi,
+} from '@/test/mockFetch'
 import { renderWithQueryClient } from '@/test/queryClient'
 
 import { screen, waitFor, within } from '@testing-library/react'
@@ -98,18 +103,48 @@ describe('TransparencyStats', () => {
     expect(document.activeElement).toContainElement(totalLabel)
   })
 
-  it('keeps focus on the retry button when the retry fails again', async () => {
-    fetchMock.mockResolvedValue(apiErrorResponse(503))
+  it('keeps the focused button on screen, saying it is retrying, while the retry runs', async () => {
+    const slowRetry = deferredResponse()
+    fetchMock
+      .mockResolvedValueOnce(apiErrorResponse(503))
+      .mockReturnValueOnce(slowRetry.promise)
 
     renderWithQueryClient(<TransparencyStats />)
-    const retry = await screen.findByRole('button', { name: 'Tentar de novo' })
-    await userEvent.click(retry)
-
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2))
-    await waitFor(() =>
-      expect(
-        screen.getByRole('button', { name: 'Tentar de novo' })
-      ).toHaveFocus()
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Tentar de novo' })
     )
+
+    const retrying = await screen.findByRole('button', {
+      name: 'Tentando de novo…',
+    })
+    expect(retrying).toHaveFocus()
+    expect(retrying).toHaveAttribute('aria-disabled', 'true')
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+
+    slowRetry.release(apiErrorResponse(503))
+
+    const retryAgain = await screen.findByRole('button', {
+      name: 'Tentar de novo',
+    })
+    expect(retryAgain).toHaveFocus()
+  })
+
+  it('ignores a second press while the retry runs', async () => {
+    const slowRetry = deferredResponse()
+    fetchMock
+      .mockResolvedValueOnce(apiErrorResponse(503))
+      .mockReturnValueOnce(slowRetry.promise)
+
+    renderWithQueryClient(<TransparencyStats />)
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Tentar de novo' })
+    )
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Tentando de novo…' })
+    )
+    slowRetry.release(jsonResponse(PUBLIC_STATS))
+
+    expect(await screen.findByText('Total de Demandas')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledTimes(2)
   })
 })

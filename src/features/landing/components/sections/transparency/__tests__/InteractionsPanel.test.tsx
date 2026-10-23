@@ -1,5 +1,10 @@
 import { buildPublicComplaint } from '@/test/fixtures/publicComplaints'
-import { apiErrorResponse, jsonResponse, stubApi } from '@/test/mockFetch'
+import {
+  apiErrorResponse,
+  deferredResponse,
+  jsonResponse,
+  stubApi,
+} from '@/test/mockFetch'
 import { renderWithQueryClient } from '@/test/queryClient'
 
 import { screen, waitFor, within } from '@testing-library/react'
@@ -126,5 +131,28 @@ describe('InteractionsPanel', () => {
     // <body> also contains the content: rule it out, or a lost focus would pass too.
     await waitFor(() => expect(document.activeElement).not.toBe(document.body))
     expect(document.activeElement).toContainElement(list)
+  })
+
+  it('keeps the focused button on screen while the list retry runs', async () => {
+    const slowRetry = deferredResponse()
+    fetchMock
+      .mockResolvedValueOnce(apiErrorResponse(500))
+      .mockReturnValueOnce(slowRetry.promise)
+
+    renderWithQueryClient(<InteractionsPanel />)
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Tentar de novo' })
+    )
+
+    expect(
+      await screen.findByRole('button', { name: 'Tentando de novo…' })
+    ).toHaveFocus()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+
+    slowRetry.release(apiErrorResponse(500))
+
+    expect(
+      await screen.findByRole('button', { name: 'Tentar de novo' })
+    ).toHaveFocus()
   })
 })

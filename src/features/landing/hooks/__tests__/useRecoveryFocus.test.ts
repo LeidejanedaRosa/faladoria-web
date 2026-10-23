@@ -1,26 +1,51 @@
 import { act, renderHook } from '@testing-library/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { useRecoveryFocus } from '../useRecoveryFocus'
 
-const focusTarget = () => {
-  const element = document.createElement('div')
-  element.tabIndex = -1
+const appendFocusable = <K extends keyof HTMLElementTagNameMap>(tag: K) => {
+  const element = document.createElement(tag)
+  element.tabIndex = tag === 'div' ? -1 : 0
   document.body.append(element)
   return element
 }
 
-const renderRecoveryFocus = () => {
-  const target = focusTarget()
-  const hook = renderHook(
-    props => {
-      const result = useRecoveryFocus<HTMLDivElement>(props)
-      result.targetRef.current = target
-      return result
-    },
-    { initialProps: { isSuccess: false, isFetching: false } }
+/** A refetch the test settles by hand, to look at the state in the middle of the retry. */
+const controllableRefetch = () => {
+  let settle: (isSuccess: boolean) => void = () => {}
+  const refetch = vi.fn(
+    () =>
+      new Promise<{ isSuccess: boolean }>(resolve => {
+        settle = isSuccess => resolve({ isSuccess })
+      })
   )
-  return { ...hook, target }
+  return { refetch, settle: (isSuccess: boolean) => settle(isSuccess) }
+}
+
+const renderRecoveryFocus = () => {
+  const target = appendFocusable('div')
+  const retryButton = appendFocusable('button')
+  const { refetch, settle } = controllableRefetch()
+  const hook = renderHook(() => {
+    const result = useRecoveryFocus<HTMLDivElement>(refetch)
+    result.targetRef.current = target
+    return result
+  })
+  const startRetry = () => {
+    retryButton.focus()
+    let pending: Promise<void> = Promise.resolve()
+    act(() => {
+      pending = hook.result.current.retry()
+    })
+    return pending
+  }
+  const finishRetry = async (pending: Promise<void>, isSuccess: boolean) => {
+    await act(async () => {
+      settle(isSuccess)
+      await pending
+    })
+  }
+  return { ...hook, target, retryButton, refetch, startRetry, finishRetry }
 }
 
 afterEach(() => {
@@ -28,83 +53,64 @@ afterEach(() => {
 })
 
 describe('useRecoveryFocus', () => {
-  it('moves focus to the content when a retry succeeds', () => {
-    const { result, rerender, target } = renderRecoveryFocus()
+  it('reports the retry while it runs, so the error block stays mounted', async () => {
+    const { result, startRetry, finishRetry } = renderRecoveryFocus()
 
-    act(() => result.current.markRecovering())
-    rerender({ isSuccess: false, isFetching: true })
-    rerender({ isSuccess: true, isFetching: false })
+    const pending = startRetry()
+    expect(result.current.isRetrying).toBe(true)
+
+    await finishRetry(pending, false)
+    expect(result.current.isRetrying).toBe(false)
+  })
+
+  it('moves focus to the content when the retry works', async () => {
+    const { target, startRetry, finishRetry } = renderRecoveryFocus()
+
+    await finishRetry(startRetry(), true)
 
     expect(document.activeElement).toBe(target)
   })
 
-  it('waits for the request to end before moving focus', () => {
-    const { result, rerender, target } = renderRecoveryFocus()
+  it('rescues focus that fell to <body> when the button left the page', async () => {
+    const { target, retryButton, startRetry, finishRetry } =
+      renderRecoveryFocus()
 
-    act(() => result.current.markRecovering())
-    rerender({ isSuccess: false, isFetching: true })
+    const pending = startRetry()
+    retryButton.remove()
+    await finishRetry(pending, true)
 
-    expect(document.activeElement).not.toBe(target)
+    expect(document.activeElement).toBe(target)
   })
 
-  it('leaves focus alone when the retry fails, so the button keeps it', () => {
-    const { result, rerender, target } = renderRecoveryFocus()
+  it('leaves focus on the retry button when the retry fails again', async () => {
+    const { retryButton, startRetry, finishRetry } = renderRecoveryFocus()
 
-    act(() => result.current.markRecovering())
-    rerender({ isSuccess: false, isFetching: true })
-    rerender({ isSuccess: false, isFetching: false })
+    await finishRetry(startRetry(), false)
 
-    expect(document.activeElement).not.toBe(target)
+    expect(document.activeElement).toBe(retryButton)
   })
 
-  it('forgets a failed retry, so a later refresh does not steal focus', () => {
-    const { result, rerender, target } = renderRecoveryFocus()
+  it('does not steal focus from a control the person moved to while waiting', async () => {
+    const { target, startRetry, finishRetry } = renderRecoveryFocus()
+    const otherLink = appendFocusable('a')
 
-    act(() => result.current.markRecovering())
-    rerender({ isSuccess: false, isFetching: true })
-    rerender({ isSuccess: false, isFetching: false })
-    rerender({ isSuccess: false, isFetching: true })
-    rerender({ isSuccess: true, isFetching: false })
-
-    expect(document.activeElement).not.toBe(target)
-  })
-
-  it('does not steal focus from a control the person moved to while the retry was pending', () => {
-    const { result, rerender, target } = renderRecoveryFocus()
-    const retryButton = document.createElement('button')
-    const otherLink = document.createElement('a')
-    otherLink.href = '#cta'
-    document.body.append(retryButton, otherLink)
-
-    retryButton.focus()
-    act(() => result.current.markRecovering())
-    rerender({ isSuccess: false, isFetching: true })
+    const pending = startRetry()
     otherLink.focus()
-    rerender({ isSuccess: true, isFetching: false })
+    await finishRetry(pending, true)
 
     expect(document.activeElement).toBe(otherLink)
     expect(document.activeElement).not.toBe(target)
   })
 
-  it('still rescues focus left on the retry button itself', () => {
-    const { result, rerender, target } = renderRecoveryFocus()
-    const retryButton = document.createElement('button')
-    document.body.append(retryButton)
+  it('ignores a second press while the retry is running', async () => {
+    const { result, refetch, startRetry, finishRetry } = renderRecoveryFocus()
 
-    retryButton.focus()
-    act(() => result.current.markRecovering())
-    rerender({ isSuccess: false, isFetching: true })
-    rerender({ isSuccess: true, isFetching: false })
+    const pending = startRetry()
+    await act(async () => {
+      await result.current.retry()
+    })
+    await finishRetry(pending, true)
 
-    expect(document.activeElement).toBe(target)
-  })
-
-  it('never moves focus on a load the person did not ask for', () => {
-    const { rerender, target } = renderRecoveryFocus()
-
-    rerender({ isSuccess: false, isFetching: true })
-    rerender({ isSuccess: true, isFetching: false })
-
-    expect(document.activeElement).not.toBe(target)
+    expect(refetch).toHaveBeenCalledTimes(1)
   })
 })

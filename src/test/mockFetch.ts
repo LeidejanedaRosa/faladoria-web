@@ -21,3 +21,12 @@ export const stubApi = () => {
 
 export const requestedUrl = (fetchMock: ReturnType<typeof vi.fn>, call = 0) =>
   String(fetchMock.mock.calls[call]?.[0])
+
+/** A response the test releases by hand, to look at the UI while the request is in flight. */
+export const deferredResponse = () => {
+  let release: (response: Response) => void = () => {}
+  const promise = new Promise<Response>(resolve => {
+    release = resolve
+  })
+  return { promise, release: (response: Response) => release(response) }
+}
