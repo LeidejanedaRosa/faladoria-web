@@ -398,6 +398,36 @@ test.describe('TransparencySection', () => {
       )
     })
 
+    test('should keep keyboard focus on the retry button while retrying and after another failure', async ({
+      page,
+    }) => {
+      await mockPublicBoardDown(page)
+      await gotoSection(page)
+      const section = page.locator(SECTION_SELECTOR)
+      await expect(section.getByRole('alert')).toHaveCount(2, {
+        timeout: 15000,
+      })
+
+      // A slow failure: long enough to see the button while the retry runs.
+      await page.unrouteAll()
+      await page.route('**/api/public/complaints/stats', async route => {
+        await new Promise(resolve => setTimeout(resolve, 800))
+        await route.fulfill({
+          status: 503,
+          json: { statusCode: 503, code: 'INTERNAL_ERROR', message: 'Erro.' },
+        })
+      })
+      await section
+        .getByRole('button', { name: 'Tentar de novo' })
+        .first()
+        .focus()
+      await page.keyboard.press('Enter')
+
+      const focused = page.locator(':focus')
+      await expect(focused).toHaveText('Tentando de novo…')
+      await expect(focused).toHaveText('Tentar de novo', { timeout: 15000 })
+    })
+
     test('should invite the first complaint when nothing is published yet', async ({
       page,
     }) => {
