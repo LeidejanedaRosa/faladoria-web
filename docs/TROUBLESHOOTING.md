@@ -4,6 +4,51 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## `tsc -b` falha com TS6307 depois de o `playwright.config.ts` importar um helper
+
+**Data**: 2026-10-23
+
+**Sintoma**: o `webServer` do Playwright não sobe ("Process from config.webServer was not able to
+start. Exit code: 2"). Rodando `pnpm build` sozinho: `TS6307: File
+'tests/helpers/publicBoardApi.ts' is not listed within the file list of project
+'tsconfig.node.json'`.
+
+**Causa raiz**: o `tsconfig.node.json` é um projeto _composite_ (referenciado pelo `tsc -b`), e
+projeto composite só aceita arquivos que estejam no próprio `include`. O `playwright.config.ts`
+passou a importar o endereço fixo da API do E2E de um helper fora dessa lista. O sintoma aparece no
+Playwright, mas o erro é do build.
+
+**Solução**: o helper entrou no `include` do `tsconfig.node.json`. O build passa a gerar
+`tests/helpers/publicBoardApi.d.ts` ao lado do arquivo, como já fazia com os `*.config.d.ts`; a
+regra `tests/helpers/*.d.ts` foi para o `.gitignore`. Ver `DECISIONS.md`, "Quadro de Transparência
+ligado à API".
+
+---
+
+## E2E do quadro falha só às vezes, só no Mobile Safari, e passa sozinho
+
+**Data**: 2026-10-23
+
+**Sintoma**: "should have screen-reader separators in interaction items" falha numa rodada com os
+cinco projetos, só no Mobile Safari, e passa 3 de 3 rodado sozinho.
+
+**Causa raiz**: o `beforeEach` esperava pelo primeiro `ul > li` da seção, mas **o esqueleto de
+carregamento também é um `ul > li`**. Num navegador lento, o teste seguia com o esqueleto na tela.
+Os outros testes usam `expect(...)` com nova tentativa automática e se recuperavam; este usava
+`locator.count()`, que lê uma vez só e encontrava zero.
+
+```
+beforeEach espera "ul > li"
+   ├─ rápido: dados já chegaram  → li real      → count() = 12 ✅
+   └─ lento:  ainda carregando   → li esqueleto → count() = 0  ❌
+```
+
+**Solução**: esperar por um elemento que só as linhas reais têm (`ul > li time`) e trocar o
+`count()` por `toHaveCount`, que tenta de novo. Regra: com esqueleto na tela, **esperar por algo que
+só o estado final tem**, e evitar `count()` solto em E2E.
+
+---
+
 ## Uma decisão some do `DECISIONS.md` depois de um merge, sem nenhum teste falhar
 
 **Data**: 2026-10-23

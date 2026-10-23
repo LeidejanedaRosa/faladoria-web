@@ -6,6 +6,99 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-10-23 — TanStack Query para o estado do servidor
+
+**Contexto**: o quadro de Transparência e, em seguida, o painel passam a ler dados da API. O
+painel vai precisar de lista paginada por cursor, de recarregar o detalhe e os números das abas
+depois de cada ação (`204`), e de consultar o sino de tempos em tempos (não há tempo real, achado
+F80 do backend). A dúvida era entre o TanStack Query e os loaders do React Router, que já está no
+projeto.
+
+**Decisão**: cada camada com a sua ferramenta.
+
+```
+React Router     "que tela mostro nesta URL?"     rotas e guarda do /dashboard (modo declarativo, sem mudança)
+TanStack Query   "que dado tenho, e ainda vale?"  cache, nova tentativa, recarga, paginação, polling
+```
+
+- `src/shared/lib/queryClient.ts`: um `QueryClient` com uma regra de nova tentativa própria
+  (`shouldRetry`): no máximo 2, e **só** para falha de conexão (`status: 0`) ou erro do servidor
+  (`5xx`). O padrão da biblioteca repete 3 vezes qualquer erro, inclusive `400`/`403`/`429`, que
+  falham igual em toda tentativa; no `429`, repetir ainda aumenta a punição do limite.
+- Provedor em `main.tsx`, por fora do `BrowserRouter`.
+- Chaves de cache por feature (`publicComplaintKeys`), com prefixo comum, para invalidar um grupo
+  inteiro de uma vez.
+
+**Alternativas rejeitadas**:
+
+- **Loaders do React Router (modo dados)**: buscam o dado antes de abrir a rota, mas não guardam
+  entre navegações, não fazem polling nem paginação incremental, e exigiriam migrar o `App.tsx`
+  para `createBrowserRouter`.
+- **Hooks próprios com `fetch`**: sem dependência nova, mas cache, invalidação, cancelamento e
+  paginação escritos e testados à mão, em cerca de 25 telas e ações.
+- **TanStack Router**: substituiria o React Router do site inteiro sem ganho para este problema.
+
+**Testes**: `src/shared/lib/__tests__/queryClient.test.ts` (o que repete e o que não repete). Os
+testes de hooks e componentes usam um `QueryClient` novo por teste, sem nova tentativa
+(`src/test/queryClient.tsx`), e simulam só o `fetch` (`src/test/mockFetch.ts`): o caminho hook →
+serviço → `apiRequest` roda de verdade.
+
+---
+
+## 2026-10-23 — Quadro de Transparência ligado à API
+
+**Contexto**: os totais e as "Últimas Interações" da landing eram números e casos inventados. O
+backend entregou `GET /api/public/complaints/stats` e `GET /api/public/complaints` (sem login,
+`Cache-Control: max-age=60`).
+
+**Decisão**:
+
+- **Camada de dados na própria feature** (`features/landing/services`, `hooks`, `utils`), pelo
+  critério do projeto: só a landing usa essas rotas.
+- **Status com o nome da API** (`inReview`, `inProgress`, `unresolved`, `resolved`). O status
+  `open` saiu da legenda: ele nunca é publicado. `STATUS_CONFIG` é conferido contra o tipo da API
+  com `satisfies`, então um status novo no contrato quebra a compilação até ganhar rótulo.
+- **"Em Mediação" = `inReview + inProgress`** (`buildTransparencyStats`), como o contrato indica.
+- **Dia como texto**: `receivedOn` (`AAAA-MM-DD`, já no dia do Brasil) é rearranjado como texto
+  (`formatPublicDay`). `new Date('2026-09-30')` é meia-noite em UTC, que no Brasil ainda é dia 29.
+- **`staleTime` de 60s**, igual ao `Cache-Control` da API: pedir antes só traria a cópia do cache
+  do navegador.
+- **Três estados novos**, aprovados por print: esqueleto com a altura exata dos cartões (medida:
+  156px desktop, 148px celular, sem deslocamento de layout), erro com "Tentar de novo" em cada
+  bloco, e vazio ("A sua pode ser a primeira"). O aviso de carregamento vai num `<output>` só com
+  o texto para leitor de tela; o desenho do esqueleto fica `aria-hidden`.
+- **Textos corrigidos** (aprovados): "Atualizado em tempo real" → "Dados de até 1 minuto atrás";
+  as legendas falavam de "administrador", mas quem move o status é o serviço de saúde. O selo
+  chegou a dizer "Atualizado a cada minuto", que a revisão apontou como falso: o `staleTime` só
+  marca o dado como velho, e nada busca de novo enquanto a página fica aberta. A alternativa de
+  tornar a promessa verdadeira (`refetchInterval` de 60s) foi rejeitada: duas chamadas por minuto
+  por aba aberta, numa página que não precisa disso.
+
+**E2E**: o build do Playwright recebe `VITE_API_URL=https://api.e2e.test`, fixo no `webServer.env`
+do `playwright.config.ts`, e não lido do `.env`: o `.env.local` de quem roda não pode mudar o que o
+teste chama. Nada responde nesse endereço; a spec do quadro intercepta com `page.route`
+(`tests/helpers/publicBoardApi.ts`), e nas demais specs a chamada falha como uma API fora do ar,
+sem afetar os testes. Por o `playwright.config.ts` importar o helper, ele entrou no `include` do
+`tsconfig.node.json`, e o `.d.ts` que o build gera ao lado foi para o `.gitignore`.
+
+**Alternativas rejeitadas**:
+
+- **Uma só mensagem de erro para o quadro inteiro**, recomendada na revisão de layout; a aprovação
+  manteve um aviso por bloco. Pode voltar se a duplicação incomodar.
+- **Esconder o percentual quando o total é zero** e **trocar "Total de Demandas" por "Reclamações
+  publicadas"** (o total só conta as publicadas): propostos, não adotados nesta entrega.
+
+**Cobertura**: os componentes novos com lógica (`TransparencyStats`, `InteractionsPanel`) têm
+teste próprio, mas continuam fora do número de cobertura, porque `components/sections/**` está no
+`exclude` do Vitest desde quando as seções eram só apresentação.
+
+**Validação**: 503 testes unitários; E2E da spec do quadro nos 5 projetos (135); suíte E2E inteira
+no chromium (371). Conferido também contra o backend real, rodando local, com o build de produção:
+CORS liberando a origem e as credenciais, nenhum erro no console, reclamação em moderação fora do
+quadro, e uma recebida às 01:30 UTC mostrada no dia anterior, o do Brasil.
+
+---
+
 ## 2026-10-22 — Cliente HTTP: chamada direta à API, com cookie, sem proxy do Vite
 
 **Contexto**: primeira integração com o `faladoria-backend` (quadro de Transparência, depois o
@@ -1133,6 +1226,9 @@ export const GUIDE_ARTICLE_HEADING_ID = 'article-heading'
 ---
 
 ## 2026-06-17 — Type assertion em `Object.entries(STATUS_CONFIG)` é limitação conhecida do TypeScript
+
+> **Superada em 2026-10-23**: a legenda passou a percorrer `PUBLIC_COMPLAINT_STATUSES`, uma lista
+> tipada, e a assertion deixou de existir. Ver "Quadro de Transparência ligado à API".
 
 **Contexto**: Auditoria identificou `as [InteractionStatus, ...][]` em `StatusLegend.tsx` para narrowing de `Object.entries`.
 
