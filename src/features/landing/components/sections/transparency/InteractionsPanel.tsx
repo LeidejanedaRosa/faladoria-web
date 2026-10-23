@@ -3,6 +3,7 @@ import {
   TRANSPARENCY_CONTENT,
 } from '../../../data/transparencyContent'
 import { useLatestPublicComplaints } from '../../../hooks/useLatestPublicComplaints'
+import { useRecoveryFocus } from '../../../hooks/useRecoveryFocus'
 import { InteractionItem } from './InteractionItem'
 import { InteractionsListSkeleton } from './InteractionsListSkeleton'
 import { TransparencyLoadError } from './TransparencyLoadError'
@@ -12,25 +13,41 @@ const InteractionsList = () => {
     data: complaints,
     isPending,
     isError,
+    isSuccess,
+    isFetching,
     refetch,
   } = useLatestPublicComplaints(LATEST_COMPLAINTS_LIMIT)
+  const { targetRef, markRecovering } = useRecoveryFocus<HTMLDivElement>({
+    isSuccess,
+    isFetching,
+  })
 
   if (isPending) return <InteractionsListSkeleton />
-  if (isError) return <TransparencyLoadError onRetry={() => void refetch()} />
-  if (complaints.length === 0) {
+  if (isError) {
     return (
-      <p className='py-6 text-center text-sm text-white/70'>
-        {TRANSPARENCY_CONTENT.emptyInteractions}
-      </p>
+      <TransparencyLoadError
+        onRetry={() => {
+          markRecovering()
+          void refetch()
+        }}
+      />
     )
   }
 
   return (
-    <ul className='flex flex-col divide-y divide-white/10'>
-      {complaints.map(complaint => (
-        <InteractionItem key={complaint.id} complaint={complaint} />
-      ))}
-    </ul>
+    <div ref={targetRef} tabIndex={-1}>
+      {complaints.length === 0 ? (
+        <p className='py-6 text-center text-sm text-white/70'>
+          {TRANSPARENCY_CONTENT.emptyInteractions}
+        </p>
+      ) : (
+        <ul className='flex flex-col divide-y divide-white/10'>
+          {complaints.map(complaint => (
+            <InteractionItem key={complaint.id} complaint={complaint} />
+          ))}
+        </ul>
+      )}
+    </div>
   )
 }
 
