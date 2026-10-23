@@ -70,9 +70,13 @@ export const TRANSPARENCY_CONTENT = {
     'Não escondemos os problemas. Mostramos a realidade para cobrar soluções.',
     'Acompanhe o andamento das reclamações publicadas.',
   ],
-  // The data is cached for up to a minute and is not re-fetched while the page stays open:
-  // the copy states its age instead of promising automatic updates.
-  liveIndicator: 'Dados de até 1 minuto atrás',
+  // Shows when the screen got the data instead of promising a freshness limit: nothing
+  // re-fetches while the page stays open, so any "up to N minutes" copy would go stale.
+  freshness: {
+    updatedAtPrefix: 'Atualizado às',
+    loading: 'Atualizando…',
+    failed: 'Não foi possível atualizar',
+  },
 
   stats: [
     {
