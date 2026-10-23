@@ -6,6 +6,128 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-10-23 — TanStack Query para o estado do servidor
+
+**Contexto**: o quadro de Transparência e, em seguida, o painel passam a ler dados da API. O
+painel vai precisar de lista paginada por cursor, de recarregar o detalhe e os números das abas
+depois de cada ação (`204`), e de consultar o sino de tempos em tempos (não há tempo real, achado
+F80 do backend). A dúvida era entre o TanStack Query e os loaders do React Router, que já está no
+projeto.
+
+**Decisão**: cada camada com a sua ferramenta.
+
+```
+React Router     "que tela mostro nesta URL?"     rotas e guarda do /dashboard (modo declarativo, sem mudança)
+TanStack Query   "que dado tenho, e ainda vale?"  cache, nova tentativa, recarga, paginação, polling
+```
+
+- `src/shared/lib/queryClient.ts`: um `QueryClient` com uma regra de nova tentativa própria
+  (`shouldRetry`): no máximo 2, e **só** para falha de conexão (`status: 0`) ou erro do servidor
+  (`5xx`). O padrão da biblioteca repete 3 vezes qualquer erro, inclusive `400`/`403`/`429`, que
+  falham igual em toda tentativa; no `429`, repetir ainda aumenta a punição do limite.
+- Provedor em `main.tsx`, por fora do `BrowserRouter`.
+- Chaves de cache por feature (`publicComplaintKeys`), com prefixo comum, para invalidar um grupo
+  inteiro de uma vez.
+
+**Alternativas rejeitadas**:
+
+- **Loaders do React Router (modo dados)**: buscam o dado antes de abrir a rota, mas não guardam
+  entre navegações, não fazem polling nem paginação incremental, e exigiriam migrar o `App.tsx`
+  para `createBrowserRouter`.
+- **Hooks próprios com `fetch`**: sem dependência nova, mas cache, invalidação, cancelamento e
+  paginação escritos e testados à mão, em cerca de 25 telas e ações.
+- **TanStack Router**: substituiria o React Router do site inteiro sem ganho para este problema.
+
+**Testes**: `src/shared/lib/__tests__/queryClient.test.ts` (o que repete e o que não repete). Os
+testes de hooks e componentes usam um `QueryClient` novo por teste, sem nova tentativa
+(`src/test/queryClient.tsx`), e simulam só o `fetch` (`src/test/mockFetch.ts`): o caminho hook →
+serviço → `apiRequest` roda de verdade.
+
+---
+
+## 2026-10-23 — Quadro de Transparência ligado à API
+
+**Contexto**: os totais e as "Últimas Interações" da landing eram números e casos inventados. O
+backend entregou `GET /api/public/complaints/stats` e `GET /api/public/complaints` (sem login,
+`Cache-Control: max-age=60`).
+
+**Decisão**:
+
+- **Camada de dados na própria feature** (`features/landing/services`, `hooks`, `utils`), pelo
+  critério do projeto: só a landing usa essas rotas.
+- **Status com o nome da API** (`inReview`, `inProgress`, `unresolved`, `resolved`). O status
+  `open` saiu da legenda: ele nunca é publicado. `STATUS_CONFIG` é conferido contra o tipo da API
+  com `satisfies`, então um status novo no contrato quebra a compilação até ganhar rótulo.
+- **"Em Mediação" = `inReview + inProgress`** (`buildTransparencyStats`), como o contrato indica.
+- **Dia como texto**: `receivedOn` (`AAAA-MM-DD`, já no dia do Brasil) é rearranjado como texto
+  (`formatPublicDay`). `new Date('2026-09-30')` é meia-noite em UTC, que no Brasil ainda é dia 29.
+- **`staleTime` de 60s**, igual ao `Cache-Control` da API: pedir antes só traria a cópia do cache
+  do navegador.
+- **Três estados novos**, aprovados por print: esqueleto com a altura exata dos cartões (medida:
+  156px desktop, 148px celular, sem deslocamento de layout), erro com "Tentar de novo" em cada
+  bloco, e vazio ("A sua pode ser a primeira"). O aviso de carregamento vai num `<output>` só com
+  o texto para leitor de tela; o desenho do esqueleto fica `aria-hidden`.
+- **Textos corrigidos** (aprovados): as legendas falavam de "administrador", mas quem move o
+  status é o serviço de saúde.
+- **Selo do cabeçalho: o horário da leitura, não uma promessa de atualização.** Era "Atualizado
+  em tempo real". Duas trocas foram derrubadas na revisão, pelo mesmo motivo: o `staleTime` só
+  marca o dado como velho, e nada busca de novo enquanto a página fica em foco.
+
+  ```
+  "Atualizado a cada minuto"      ❌ nada recarrega sozinho
+  "Dados de até 1 minuto atrás"   ❌ vale ao abrir; 10 min depois, o dado tem 11 min
+  "Atualizado às 14:32"           ✅ continua verdadeiro com a aba aberta por horas
+  ```
+
+  `DataFreshnessBadge` usa o `dataUpdatedAt` da mesma consulta dos cartões (mesma chave, nenhuma
+  chamada a mais), no fuso de quem visita. Existe nos três estados ("Atualizando…", o horário,
+  "Não foi possível atualizar") para o cabeçalho manter a altura no celular (medido: 166px nos
+  três). Saiu o `aria-live`: com o texto mudando sozinho, o leitor de tela interromperia quem
+  está lendo outra parte da página. **Rejeitado**: recarregar a cada 60s (`refetchInterval`),
+  que tornaria verdadeiro um texto de prazo ao custo de duas chamadas por minuto por pessoa
+  olhando a página.
+
+- **Foco depois de "Tentar de novo"** (`useRecoveryFocus`). O hook conduz a tentativa inteira
+  (`retry()`, `isRetrying`). Enquanto ela roda, o bloco de erro continua na tela com o mesmo
+  botão, que diz "Tentando de novo…" e usa `aria-disabled` (um botão `disabled` perde o foco no
+  Chrome). Sem isso, o TanStack Query 5 devolve para `pending` uma consulta sem dados ao
+  recomeçar, o esqueleto toma o lugar do botão e o foco cai no `<body>`, também quando a tentativa
+  falha (WCAG 2.4.3 e 4.1.3; apontado na revisão do CodeRabbit). O esqueleto fica só para a
+  primeira carga. Quando a tentativa dá certo, o foco vai para o bloco que voltou
+  (`tabIndex={-1}`, com o contorno do `focus-visible`), mas só para **resgatar** um foco perdido
+  (no botão ou no `<body>`): se a pessoa foi para outro controle enquanto esperava, o foco fica
+  onde ela escolheu. Uma recarga ao voltar para a aba nunca o move. O estado da tentativa mora no
+  hook, e não em cada componente: separados, o aviso de sucesso do TanStack chegaria antes de o
+  conteúdo aparecer, e o foco não teria alvo. **Rejeitado** (revisão do CodeRabbit): anunciar o
+  selo de horário numa região `role="status"`. A leitura em segundo plano não é resposta a uma
+  ação da pessoa, e o anúncio interromperia quem está lendo outra parte da página a cada
+  carregamento; o erro já é anunciado pelo `role="alert"`.
+
+**E2E**: o build do Playwright recebe `VITE_API_URL=https://api.e2e.test`, fixo no `webServer.env`
+do `playwright.config.ts`, e não lido do `.env`: o `.env.local` de quem roda não pode mudar o que o
+teste chama. Nada responde nesse endereço; a spec do quadro intercepta com `page.route`
+(`tests/helpers/publicBoardApi.ts`), e nas demais specs a chamada falha como uma API fora do ar,
+sem afetar os testes. Por o `playwright.config.ts` importar o helper, ele entrou no `include` do
+`tsconfig.node.json`, e o `.d.ts` que o build gera ao lado foi para o `.gitignore`.
+
+**Alternativas rejeitadas**:
+
+- **Uma só mensagem de erro para o quadro inteiro**, recomendada na revisão de layout; a aprovação
+  manteve um aviso por bloco. Pode voltar se a duplicação incomodar.
+- **Esconder o percentual quando o total é zero** e **trocar "Total de Demandas" por "Reclamações
+  publicadas"** (o total só conta as publicadas): propostos, não adotados nesta entrega.
+
+**Cobertura**: os componentes novos com lógica (`TransparencyStats`, `InteractionsPanel`) têm
+teste próprio, mas continuam fora do número de cobertura, porque `components/sections/**` está no
+`exclude` do Vitest desde quando as seções eram só apresentação.
+
+**Validação**: 503 testes unitários; E2E da spec do quadro nos 5 projetos (135); suíte E2E inteira
+no chromium (371). Conferido também contra o backend real, rodando local, com o build de produção:
+CORS liberando a origem e as credenciais, nenhum erro no console, reclamação em moderação fora do
+quadro, e uma recebida às 01:30 UTC mostrada no dia anterior, o do Brasil.
+
+---
+
 ## 2026-10-22 — Cliente HTTP: chamada direta à API, com cookie, sem proxy do Vite
 
 **Contexto**: primeira integração com o `faladoria-backend` (quadro de Transparência, depois o
@@ -49,6 +171,44 @@ um mock): URL e parâmetros repetidos, caminho que já traz `?`, cookie, corpo e
 `204`/`202`, formato de erro, `details`, `Retry-After`, resposta fora do formato, falha de rede,
 cancelamento e variável ausente. O comportamento real do cookie entre subdomínios só se confere
 no deploy.
+
+---
+
+## 2026-10-22 — Auditoria: 5 avisos `high` novos fechados (`lint-staged` 16, override do `basic-ftp`)
+
+**Contexto**: o passo "Security audit (all dependencies)" do CI (bloqueante desde 2026-09-16)
+quebrou no PR #56 com 7 avisos `high`, todos em devDependencies e publicados depois da última
+rodada. `pnpm audit --prod` continuava limpo.
+
+**Processo** (o mesmo de 2026-09-16, na mesma ordem):
+
+| Pacote                | Origem                          | Correção                                                                               | Passo                                            |
+| --------------------- | ------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| `vite` 6.4.3          | direto                          | 6.4.5, dentro de `^6.4.3`                                                              | `pnpm update`                                    |
+| `source-map-js` 1.2.1 | `postcss`, `@tailwindcss/node`  | 1.2.2, dentro da faixa                                                                 | `pnpm update`                                    |
+| `markdown-it` 14.3.2  | `markdownlint-cli`              | 14.3.3, dentro de `~14.3.0`                                                            | `pnpm update`                                    |
+| `braces` 3.0.3        | `lint-staged` 15 → `micromatch` | **sem correção publicada**; o `lint-staged` 16.4.0 trocou `micromatch` por `picomatch` | `lint-staged` `^15` → `^16.4.0`                  |
+| `basic-ftp` 5.3.1     | `@lhci/cli` → `get-uri`         | só na 6.2.1; nem o `get-uri` mais novo aceita a 6                                      | `pnpm.overrides` `"basic-ftp@<6.2.1": ">=6.2.1"` |
+
+**Por que o override do `basic-ftp` é seguro**: a única quebra da 6.0.0 é recusar, por padrão,
+host de transferência separado (proteção contra FTP bounce); a API que o `get-uri` usa não mudou.
+E o caminho só roda para endereços `ftp://` num proxy PAC, que o Lighthouse CI não usa.
+
+**Por que `lint-staged` 16.4.0 e não o 17**: o 17 exige Node 22.22.1; o CI roda Node 20. O 16.4.0
+pede Node 20.17. O hook foi exercitado de verdade (`pnpm exec lint-staged` com arquivos em stage).
+
+**Alternativa rejeitada**: incluir `GHSA-vfj7-8cjw-p6xm` (`braces`) e `GHSA-c475-qrg2-pj4r`
+(`basic-ftp`) no `ignoreGhsas`. A allowlist fica só para o que não tem saída (`extract-zip`); os
+dois tinham.
+
+**Efeito colateral**: o `pnpm update` levou o `@axe-core/playwright` a 4.14, que aplica a regra
+`label-content-name-mismatch` (WCAG 2.5.3, "Rótulo no nome"). Ela achou dois links de WhatsApp com
+`aria-label` que não contém o texto visível. Corrigidos nesta mesma branch; ver
+`TROUBLESHOOTING.md`.
+
+**Resultado**: `pnpm audit --audit-level high` com saída 0 (sobram os dois `extract-zip` já
+ignorados, 3 moderados e 1 baixo, abaixo do limite do CI). Tipos, lint, 448 testes unitários,
+build e E2E chromium (369 passaram, 4 pulados de propósito) verdes.
 
 ---
 
@@ -1095,6 +1255,9 @@ export const GUIDE_ARTICLE_HEADING_ID = 'article-heading'
 ---
 
 ## 2026-06-17 — Type assertion em `Object.entries(STATUS_CONFIG)` é limitação conhecida do TypeScript
+
+> **Superada em 2026-10-23**: a legenda passou a percorrer `PUBLIC_COMPLAINT_STATUSES`, uma lista
+> tipada, e a assertion deixou de existir. Ver "Quadro de Transparência ligado à API".
 
 **Contexto**: Auditoria identificou `as [InteractionStatus, ...][]` em `StatusLegend.tsx` para narrowing de `Object.entries`.
 

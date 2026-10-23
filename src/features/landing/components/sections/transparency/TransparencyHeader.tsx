@@ -1,6 +1,7 @@
 import { ChartIcon } from '@shared/components/ui'
 
 import { TRANSPARENCY_CONTENT } from '../../../data/transparencyContent'
+import { DataFreshnessBadge } from './DataFreshnessBadge'
 
 export const TransparencyHeader = () => (
   <div className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
@@ -19,13 +20,6 @@ export const TransparencyHeader = () => (
         ))}
       </p>
     </div>
-    <span
-      role='status'
-      aria-live='polite'
-      className='inline-flex items-center gap-2 self-start rounded-full border border-white/20 px-3 py-1.5 text-xs text-white/80'
-    >
-      <span className='h-2 w-2 rounded-full bg-green-400' aria-hidden='true' />
-      {TRANSPARENCY_CONTENT.liveIndicator}
-    </span>
+    <DataFreshnessBadge />
   </div>
 )

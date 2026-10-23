@@ -4,6 +4,139 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## "Tentar de novo" perde o foco no navegador, mas o teste de componente passa
+
+**Data**: 2026-10-23
+
+**Sintoma**: no navegador, depois de "Tentar de novo" pelo teclado, o foco ia para o `<body>` e lá
+ficava quando a tentativa falhava. O teste de componente "keeps focus on the retry button when the
+retry fails again" passava.
+
+**Causa raiz**: no TanStack Query 5, uma consulta **sem dados** volta para `status: "pending"` ao
+recomeçar (função `fetchState` do `@tanstack/query-core`). O componente testava `isPending` antes
+de `isError` e mostrava o esqueleto no lugar do botão. No jsdom, o `fetch` simulado responde na
+hora, e o React junta as atualizações sem nunca pintar o esqueleto: o teste nunca via o meio da
+tentativa.
+
+```
+navegador:  clique → pending (esqueleto, botão some, foco no body) → erro (botão novo)
+jsdom:      clique → erro                                            (botão nunca saiu)
+```
+
+**Solução**: `useRecoveryFocus` passou a conduzir a tentativa (`isRetrying`), e os componentes
+testam `isRetrying || isError` antes de `isPending`. Os testes seguram a resposta com
+`deferredResponse()` (`src/test/mockFetch.ts`) para olhar a tela durante a tentativa, e o E2E
+atrasa a resposta em 800 ms. Conferido com a prova inversa: com a ordem antiga, os três testes
+novos falham. Regra: quando o defeito depende de **quanto tempo** algo leva, o teste precisa
+controlar esse tempo; um mock instantâneo esconde o meio do caminho. Ver `DECISIONS.md`, "Quadro
+de Transparência ligado à API".
+
+---
+
+## O navegador mostra o código antigo depois de `pnpm build && pnpm preview`
+
+**Data**: 2026-10-23
+
+**Sintoma**: depois de mudar o código, a conferência no navegador deu o mesmo resultado de antes
+da mudança.
+
+**Causa raiz**: o `pnpm build` falhou (`ELIFECYCLE ... exit code 2`) porque o `tsc -b` também
+compila os testes, e um teste ainda usava a assinatura antiga de um hook. O `vite preview`
+continuou servindo o `dist/` da execução anterior, sem aviso nenhum na página.
+
+**Solução**: confirmar a linha `✓ built in` antes de confiar no que o navegador mostra. Num
+comando encadeado, usar `&&` entre o build e o preview, para o preview não subir depois de um
+build que falhou.
+
+---
+
+## Teste de foco passa mesmo com a correção desligada
+
+**Data**: 2026-10-23
+
+**Sintoma**: com a linha que move o foco comentada em `useRecoveryFocus`, o teste do hook falhava,
+mas os testes de componente ("moves focus to the totals after a retry that works") continuavam
+passando.
+
+**Causa raiz**: a asserção era `expect(document.activeElement).toContainElement(totalLabel)`. Sem
+a correção, o botão sai do DOM e o foco cai no `<body>`, e o `<body>` contém a página inteira,
+inclusive os cartões. O teste passava com e sem a correção.
+
+```
+foco perdido → document.activeElement = <body> → <body> contém os cartões → ✅ (falso positivo)
+```
+
+**Solução**: exigir antes que o elemento focado **não** seja o `<body>`, e só depois que ele
+contenha o conteúdo. No E2E, o mesmo cuidado vem de `page.locator(':focus')`, que nunca casa com o
+`<body>`. Regra: todo teste de uma correção é conferido desligando a correção. Se ele continua
+passando, não está testando nada.
+
+---
+
+## `tsc -b` falha com TS6307 depois de o `playwright.config.ts` importar um helper
+
+**Data**: 2026-10-23
+
+**Sintoma**: o `webServer` do Playwright não sobe ("Process from config.webServer was not able to
+start. Exit code: 2"). Rodando `pnpm build` sozinho: `TS6307: File
+'tests/helpers/publicBoardApi.ts' is not listed within the file list of project
+'tsconfig.node.json'`.
+
+**Causa raiz**: o `tsconfig.node.json` é um projeto _composite_ (referenciado pelo `tsc -b`), e
+projeto composite só aceita arquivos que estejam no próprio `include`. O `playwright.config.ts`
+passou a importar o endereço fixo da API do E2E de um helper fora dessa lista. O sintoma aparece no
+Playwright, mas o erro é do build.
+
+**Solução**: o helper entrou no `include` do `tsconfig.node.json`. O build passa a gerar
+`tests/helpers/publicBoardApi.d.ts` ao lado do arquivo, como já fazia com os `*.config.d.ts`; a
+regra `tests/helpers/*.d.ts` foi para o `.gitignore`. Ver `DECISIONS.md`, "Quadro de Transparência
+ligado à API".
+
+---
+
+## E2E do quadro falha só às vezes, só no Mobile Safari, e passa sozinho
+
+**Data**: 2026-10-23
+
+**Sintoma**: "should have screen-reader separators in interaction items" falha numa rodada com os
+cinco projetos, só no Mobile Safari, e passa 3 de 3 rodado sozinho.
+
+**Causa raiz**: o `beforeEach` esperava pelo primeiro `ul > li` da seção, mas **o esqueleto de
+carregamento também é um `ul > li`**. Num navegador lento, o teste seguia com o esqueleto na tela.
+Os outros testes usam `expect(...)` com nova tentativa automática e se recuperavam; este usava
+`locator.count()`, que lê uma vez só e encontrava zero.
+
+```
+beforeEach espera "ul > li"
+   ├─ rápido: dados já chegaram  → li real      → count() = 12 ✅
+   └─ lento:  ainda carregando   → li esqueleto → count() = 0  ❌
+```
+
+**Solução**: esperar por um elemento que só as linhas reais têm (`ul > li time`) e trocar o
+`count()` por `toHaveCount`, que tenta de novo. Regra: com esqueleto na tela, **esperar por algo que
+só o estado final tem**, e evitar `count()` solto em E2E.
+
+---
+
+## Uma decisão some do `DECISIONS.md` depois de um merge, sem nenhum teste falhar
+
+**Data**: 2026-10-23
+
+**Sintoma**: a entrada "Auditoria: 5 avisos `high` novos fechados", do PR #57, não estava no
+`DECISIONS.md` da `main`, embora o `TROUBLESHOOTING.md` do mesmo PR estivesse.
+
+**Causa raiz**: o PR #56 e o PR #57 escreveram, cada um, uma entrada nova **no topo** do arquivo.
+No merge `60d3e90` (`main` → `chore/api-client`), o git marcou conflito nesse trecho, e a
+resolução manteve só um dos lados. Documentação não tem teste, então nada acusou.
+
+**Solução**: a entrada foi restaurada com o texto exato do commit do #57 (`git show
+dafb656:docs/DECISIONS.md`). Para os próximos conflitos neste arquivo: quando os dois lados
+**acrescentam** uma entrada no mesmo lugar, a resolução certa é quase sempre manter as duas, uma
+abaixo da outra. Antes de concluir o merge, conferir com `git diff <base>..HEAD -- docs/` que
+nenhuma seção sumiu.
+
+---
+
 ## E2E inteiro falha com "Executable doesn't exist" depois de `pnpm update`
 
 **Data**: 2026-10-22

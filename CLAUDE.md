@@ -14,6 +14,7 @@
 
 - React
 - Vite
+- TanStack Query (server state)
 - TypeScript
 - Tailwind CSS
 - Path Aliases
@@ -37,6 +38,9 @@ src/
 │   │   ├── components/
 │   │   │   └── sections/  # Page sections (Hero, Problem, Solution, etc.)
 │   │   ├── data/          # Section content (heroContent, faqContent, etc.)
+│   │   ├── hooks/         # Transparency board queries (TanStack Query)
+│   │   ├── services/      # Calls to the API's public routes
+│   │   ├── utils/         # Pure board rules (stat cards, public day format)
 │   │   └── pages/         # HomePage, LegalPageLayout, NotFoundPage
 │   ├── guide/             # Guia do SUS feature
 │   │   ├── components/

@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 
+import { E2E_API_URL } from './tests/helpers/publicBoardApi'
+
 export default defineConfig({
   testDir: './tests',
   timeout: 60 * 1000,
@@ -48,6 +50,9 @@ export default defineConfig({
     // pointing at `pnpm dev`. reuseExistingServer is always false so a stale
     // build never gets served silently.
     command: 'pnpm build && pnpm preview',
+    // Fixed here, not read from .env: a developer's .env.local must not change what the
+    // tests hit. Tests intercept this address with page.route.
+    env: { VITE_API_URL: E2E_API_URL },
     url: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:4173',
     reuseExistingServer: false,
   },

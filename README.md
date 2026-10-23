@@ -63,6 +63,7 @@ Landing page institucional e backoffice administrativo da **Faladoria**, platafo
 | **[TypeScript](https://www.typescriptlang.org/)** | 5.x    | Tipagem estática para prevenir bugs em desenvolvimento, melhorar o DX e servir como documentação viva do código                                |
 | **[Tailwind CSS](https://tailwindcss.com/)**      | 4.x    | Framework utility-first que elimina CSS morto na build e garante consistência visual sem folhas de estilo separadas                            |
 | **[React Router DOM](https://reactrouter.com/)**  | 7.x    | Roteamento client-side com suporte a loaders, actions e tipagem nativa                                                                         |
+| **[TanStack Query](https://tanstack.com/query)**  | 5.x    | Estado do servidor: cache, nova tentativa, recarga e paginação dos dados da API (`docs/DECISIONS.md`, 2026-10-23)                              |
 
 ### Dependências de Produção
 
@@ -171,6 +172,9 @@ faladoria-web/
     │   │   │   └── sections/      # Seções da landing (Hero, Problem, Solution, etc.)
     │   │   │       └── transparency/  # Subcomponentes da seção Transparência
     │   │   ├── data/              # Conteúdo das seções (heroContent, faqContent, etc.)
+    │   │   ├── hooks/             # Dados do quadro de Transparência (TanStack Query)
+    │   │   ├── services/          # Chamadas às rotas públicas da API
+    │   │   ├── utils/             # Regras puras do quadro (totais, formato do dia)
     │   │   └── pages/             # HomePage, LegalPageLayout, NotFoundPage
     │   └── guide/                 # Feature Guia do SUS
     │       ├── components/        # GuideCategoryCard, GuideCategoryLayout

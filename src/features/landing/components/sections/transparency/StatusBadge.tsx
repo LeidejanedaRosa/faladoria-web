@@ -1,7 +1,5 @@
-import {
-  type InteractionStatus,
-  STATUS_CONFIG,
-} from '../../../data/transparencyContent'
+import { STATUS_CONFIG } from '../../../data/transparencyContent'
+import type { PublicComplaintStatus } from '../../../services/publicComplaints'
 import { StatusIcon } from './StatusIcon'
 
 const SIZE_STYLES = {
@@ -10,7 +8,7 @@ const SIZE_STYLES = {
 } as const
 
 interface StatusBadgeProps {
-  status: InteractionStatus
+  status: PublicComplaintStatus
   size?: keyof typeof SIZE_STYLES
 }
 

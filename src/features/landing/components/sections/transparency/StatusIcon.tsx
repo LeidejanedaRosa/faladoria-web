@@ -1,6 +1,6 @@
 import type { IconProps } from '@shared/types/icon'
 
-import type { InteractionStatus } from '../../../data/transparencyContent'
+import type { PublicComplaintStatus } from '../../../services/publicComplaints'
 
 interface StatusIconConfig {
   viewBox: string
@@ -19,7 +19,7 @@ interface StatusIconConfig {
   }[]
 }
 
-const STATUS_ICON_MAP: Record<InteractionStatus, StatusIconConfig> = {
+const STATUS_ICON_MAP: Record<PublicComplaintStatus, StatusIconConfig> = {
   resolved: {
     viewBox: '0 0 24 24',
     stroke: 'currentColor',
@@ -28,7 +28,7 @@ const STATUS_ICON_MAP: Record<InteractionStatus, StatusIconConfig> = {
       { d: 'M5 13l4 4L19 7', strokeLinecap: 'round', strokeLinejoin: 'round' },
     ],
   },
-  in_progress: {
+  inProgress: {
     viewBox: '0 0 24 24',
     stroke: 'currentColor',
     strokeWidth: 2,
@@ -41,7 +41,7 @@ const STATUS_ICON_MAP: Record<InteractionStatus, StatusIconConfig> = {
       },
     ],
   },
-  under_review: {
+  inReview: {
     viewBox: '0 0 24 24',
     stroke: 'currentColor',
     strokeWidth: 2,
@@ -53,12 +53,6 @@ const STATUS_ICON_MAP: Record<InteractionStatus, StatusIconConfig> = {
         strokeLinejoin: 'round',
       },
     ],
-  },
-  open: {
-    viewBox: '0 0 24 24',
-    fill: 'currentColor',
-    circles: [{ cx: 12, cy: 12, r: 6 }],
-    paths: [],
   },
   unresolved: {
     viewBox: '0 0 24 24',
@@ -75,7 +69,7 @@ const STATUS_ICON_MAP: Record<InteractionStatus, StatusIconConfig> = {
 }
 
 interface StatusIconProps extends IconProps {
-  status: InteractionStatus
+  status: PublicComplaintStatus
 }
 
 export const StatusIcon = ({

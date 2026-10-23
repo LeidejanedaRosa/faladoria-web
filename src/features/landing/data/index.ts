@@ -9,14 +9,10 @@ export {
 export {
   TRANSPARENCY_HEADING_ID,
   TRANSPARENCY_CONTENT,
-  TOTAL_DEMANDS,
   STATUS_CONFIG,
+  LATEST_COMPLAINTS_LIMIT,
 } from './transparencyContent'
-export type {
-  InteractionStatus,
-  Interaction,
-  TransparencyStat,
-} from './transparencyContent'
+export type { TransparencyStat } from './transparencyContent'
 export { ABOUT_HEADING_ID, ABOUT_CONTENT } from './aboutContent'
 export type { FounderTrait } from './aboutContent'
 export { FAQ_HEADING_ID, FAQ_CONTENT } from './faqContent'
