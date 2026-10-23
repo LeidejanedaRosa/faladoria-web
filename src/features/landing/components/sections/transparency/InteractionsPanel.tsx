@@ -13,26 +13,21 @@ const InteractionsList = () => {
     data: complaints,
     isPending,
     isError,
-    isSuccess,
-    isFetching,
     refetch,
   } = useLatestPublicComplaints(LATEST_COMPLAINTS_LIMIT)
-  const { targetRef, markRecovering } = useRecoveryFocus<HTMLDivElement>({
-    isSuccess,
-    isFetching,
-  })
+  const { targetRef, isRetrying, retry } =
+    useRecoveryFocus<HTMLDivElement>(refetch)
 
-  if (isPending) return <InteractionsListSkeleton />
-  if (isError) {
+  // Retrying first: see TransparencyStats.
+  if (isRetrying || isError) {
     return (
       <TransparencyLoadError
-        onRetry={() => {
-          markRecovering()
-          void refetch()
-        }}
+        onRetry={() => void retry()}
+        isRetrying={isRetrying}
       />
     )
   }
+  if (isPending) return <InteractionsListSkeleton />
 
   return (
     <div ref={targetRef} tabIndex={-1}>

@@ -124,6 +124,7 @@ export const TRANSPARENCY_CONTENT = {
   loadingInteractions: 'Carregando as últimas reclamações…',
   loadError: 'Não foi possível carregar os dados agora.',
   retryButton: 'Tentar de novo',
+  retryingButton: 'Tentando de novo…',
   emptyInteractions:
     'Ainda não há reclamações publicadas. A sua pode ser a primeira.',
 } as const

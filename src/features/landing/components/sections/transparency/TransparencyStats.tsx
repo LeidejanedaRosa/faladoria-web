@@ -6,24 +6,21 @@ import { StatsGridSkeleton } from './StatsGridSkeleton'
 import { TransparencyLoadError } from './TransparencyLoadError'
 
 export const TransparencyStats = () => {
-  const { data, isPending, isError, isSuccess, isFetching, refetch } =
-    usePublicComplaintStats()
-  const { targetRef, markRecovering } = useRecoveryFocus<HTMLDivElement>({
-    isSuccess,
-    isFetching,
-  })
+  const { data, isPending, isError, refetch } = usePublicComplaintStats()
+  const { targetRef, isRetrying, retry } =
+    useRecoveryFocus<HTMLDivElement>(refetch)
 
-  if (isPending) return <StatsGridSkeleton />
-  if (isError) {
+  // Retrying first: a query with no data goes back to pending on refetch, and the skeleton
+  // would replace the focused retry button.
+  if (isRetrying || isError) {
     return (
       <TransparencyLoadError
-        onRetry={() => {
-          markRecovering()
-          void refetch()
-        }}
+        onRetry={() => void retry()}
+        isRetrying={isRetrying}
       />
     )
   }
+  if (isPending) return <StatsGridSkeleton />
 
   return (
     <div ref={targetRef} tabIndex={-1}>

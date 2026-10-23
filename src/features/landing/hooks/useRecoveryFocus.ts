@@ -1,42 +1,44 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-interface QueryState {
-  isSuccess: boolean
-  isFetching: boolean
-}
+type Refetch = () => Promise<{ isSuccess: boolean }>
 
 /**
- * After a retry that succeeds, moves focus to the content that replaced the error. The retry
- * button leaves the DOM with the error block, which would otherwise drop focus on <body> and
- * send keyboard and screen-reader users back to the top of the page (WCAG 2.4.3, 4.1.3).
- * It only rescues a lost focus: if the person moved on while the retry was pending, it stays.
+ * Runs a retry and keeps keyboard and screen-reader users where they were (WCAG 2.4.3, 4.1.3).
+ *
+ * - While the retry runs, `isRetrying` keeps the error block (and its focused button) mounted.
+ *   Without it, TanStack Query puts a query that has no data back to `pending`, the skeleton
+ *   replaces the button, and focus falls to <body>, even when the retry then fails.
+ * - On success, focus moves to the content that replaced the error, but only to rescue a lost
+ *   focus: if the person moved to another control while waiting, it stays there.
  */
-export const useRecoveryFocus = <T extends HTMLElement>({
-  isSuccess,
-  isFetching,
-}: QueryState) => {
+export const useRecoveryFocus = <T extends HTMLElement>(refetch: Refetch) => {
   const targetRef = useRef<T>(null)
-  // Refs, not state: marking the retry changes nothing on screen.
-  const isRecoveringRef = useRef(false)
+  const [isRetrying, setIsRetrying] = useState(false)
+  // Refs, not state: they only carry facts from the retry to the effect below.
   const retryTriggerRef = useRef<Element | null>(null)
+  const shouldRestoreFocusRef = useRef(false)
 
+  // Runs after the render that ends the retry, when the content (the target) is mounted.
   useEffect(() => {
-    if (!isRecoveringRef.current || isFetching) return
-    isRecoveringRef.current = false
+    if (isRetrying || !shouldRestoreFocusRef.current) return
+    shouldRestoreFocusRef.current = false
     const active = document.activeElement
     const focusWasLost =
       active === null ||
       active === document.body ||
       active === retryTriggerRef.current
     retryTriggerRef.current = null
-    // A failed retry keeps the error block, and the button keeps its focus.
-    if (isSuccess && focusWasLost) targetRef.current?.focus()
-  }, [isSuccess, isFetching])
+    if (focusWasLost) targetRef.current?.focus()
+  }, [isRetrying])
 
-  const markRecovering = () => {
-    isRecoveringRef.current = true
+  const retry = async () => {
+    if (isRetrying) return
     retryTriggerRef.current = document.activeElement
+    setIsRetrying(true)
+    const { isSuccess } = await refetch()
+    shouldRestoreFocusRef.current = isSuccess
+    setIsRetrying(false)
   }
 
-  return { targetRef, markRecovering }
+  return { targetRef, isRetrying, retry }
 }
