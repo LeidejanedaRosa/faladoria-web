@@ -4,6 +4,29 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## Teste de foco passa mesmo com a correção desligada
+
+**Data**: 2026-10-23
+
+**Sintoma**: com a linha que move o foco comentada em `useRecoveryFocus`, o teste do hook falhava,
+mas os testes de componente ("moves focus to the totals after a retry that works") continuavam
+passando.
+
+**Causa raiz**: a asserção era `expect(document.activeElement).toContainElement(totalLabel)`. Sem
+a correção, o botão sai do DOM e o foco cai no `<body>`, e o `<body>` contém a página inteira,
+inclusive os cartões. O teste passava com e sem a correção.
+
+```
+foco perdido → document.activeElement = <body> → <body> contém os cartões → ✅ (falso positivo)
+```
+
+**Solução**: exigir antes que o elemento focado **não** seja o `<body>`, e só depois que ele
+contenha o conteúdo. No E2E, o mesmo cuidado vem de `page.locator(':focus')`, que nunca casa com o
+`<body>`. Regra: todo teste de uma correção é conferido desligando a correção. Se ele continua
+passando, não está testando nada.
+
+---
+
 ## `tsc -b` falha com TS6307 depois de o `playwright.config.ts` importar um helper
 
 **Data**: 2026-10-23
