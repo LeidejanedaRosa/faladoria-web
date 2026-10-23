@@ -49,14 +49,18 @@ test.describe('TransparencySection', () => {
         ).toBeVisible()
       })
 
-      test('should state how fresh the data is, not claim real time', async ({
+      test('should show when the screen got the data, not promise a refresh', async ({
         page,
       }) => {
-        const liveIndicator = page
-          .locator(SECTION_SELECTOR)
-          .locator('[role="status"]')
+        const section = page.locator(SECTION_SELECTOR)
+        // An instant ("…T14:32…"): the list rows carry only a day ("2026-10-22").
+        const readAt = section.locator('time[datetime*="T"]')
 
-        await expect(liveIndicator).toContainText('Dados de até 1 minuto atrás')
+        await expect(
+          section.getByText(/^Atualizado às \d{2}:\d{2}$/)
+        ).toBeVisible()
+        await expect(readAt).toHaveText(/^\d{2}:\d{2}$/)
+        await expect(readAt).toHaveAttribute('datetime', /^\d{4}-\d{2}-\d{2}T/)
       })
 
       test('should render the four stat labels', async ({ page }) => {
@@ -154,14 +158,10 @@ test.describe('TransparencySection', () => {
         await expect(srHeading).toContainText('Transparência')
       })
 
-      test('should have aria-live="polite" on the live indicator', async ({
-        page,
-      }) => {
-        const liveIndicator = page
-          .locator(SECTION_SELECTOR)
-          .locator('[role="status"]')
+      test('should not announce the read time on its own', async ({ page }) => {
+        const section = page.locator(SECTION_SELECTOR)
 
-        await expect(liveIndicator).toHaveAttribute('aria-live', 'polite')
+        await expect(section.locator('[aria-live]')).toHaveCount(0)
       })
 
       test('should render progressbars with proper ARIA attributes', async ({
@@ -358,6 +358,9 @@ test.describe('TransparencySection', () => {
       await expect(section.getByRole('alert').first()).toContainText(
         'Não foi possível carregar os dados agora.'
       )
+      await expect(
+        section.getByText('Não foi possível atualizar')
+      ).toBeVisible()
 
       await page.unrouteAll()
       await mockPublicBoard(page)
