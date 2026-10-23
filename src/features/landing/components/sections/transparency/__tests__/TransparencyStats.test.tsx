@@ -2,7 +2,7 @@ import { PUBLIC_STATS } from '@/test/fixtures/publicComplaints'
 import { apiErrorResponse, jsonResponse, stubApi } from '@/test/mockFetch'
 import { renderWithQueryClient } from '@/test/queryClient'
 
-import { screen, within } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {
   afterEach,
@@ -80,5 +80,36 @@ describe('TransparencyStats', () => {
     expect(await screen.findByText('Total de Demandas')).toBeInTheDocument()
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+
+  it('moves focus to the totals after a retry that works, instead of dropping it on the page', async () => {
+    fetchMock
+      .mockResolvedValueOnce(apiErrorResponse(503))
+      .mockResolvedValueOnce(jsonResponse(PUBLIC_STATS))
+
+    renderWithQueryClient(<TransparencyStats />)
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Tentar de novo' })
+    )
+
+    const totalLabel = await screen.findByText('Total de Demandas')
+    // <body> also contains the content: rule it out, or a lost focus would pass too.
+    await waitFor(() => expect(document.activeElement).not.toBe(document.body))
+    expect(document.activeElement).toContainElement(totalLabel)
+  })
+
+  it('keeps focus on the retry button when the retry fails again', async () => {
+    fetchMock.mockResolvedValue(apiErrorResponse(503))
+
+    renderWithQueryClient(<TransparencyStats />)
+    const retry = await screen.findByRole('button', { name: 'Tentar de novo' })
+    await userEvent.click(retry)
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2))
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: 'Tentar de novo' })
+      ).toHaveFocus()
+    )
   })
 })

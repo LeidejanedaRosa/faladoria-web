@@ -2,7 +2,7 @@ import { buildPublicComplaint } from '@/test/fixtures/publicComplaints'
 import { apiErrorResponse, jsonResponse, stubApi } from '@/test/mockFetch'
 import { renderWithQueryClient } from '@/test/queryClient'
 
-import { screen, within } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {
   afterEach,
@@ -108,5 +108,23 @@ describe('InteractionsPanel', () => {
 
     expect(await screen.findAllByRole('listitem')).toHaveLength(1)
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('moves focus to the list after a retry that works', async () => {
+    fetchMock
+      .mockResolvedValueOnce(apiErrorResponse(500))
+      .mockResolvedValueOnce(
+        jsonResponse({ complaints: [buildPublicComplaint()] })
+      )
+
+    renderWithQueryClient(<InteractionsPanel />)
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Tentar de novo' })
+    )
+
+    const list = await screen.findByRole('list')
+    // <body> also contains the content: rule it out, or a lost focus would pass too.
+    await waitFor(() => expect(document.activeElement).not.toBe(document.body))
+    expect(document.activeElement).toContainElement(list)
   })
 })
