@@ -372,6 +372,32 @@ test.describe('TransparencySection', () => {
       await expect(section.locator('dl').first().locator('dt')).toHaveCount(4)
     })
 
+    test('should move keyboard focus to the totals after a retry that works', async ({
+      page,
+    }) => {
+      await mockPublicBoardDown(page)
+      await gotoSection(page)
+      const section = page.locator(SECTION_SELECTOR)
+      await expect(section.getByRole('alert')).toHaveCount(2, {
+        timeout: 15000,
+      })
+
+      await page.unrouteAll()
+      await mockPublicBoard(page)
+      await section
+        .getByRole('button', { name: 'Tentar de novo' })
+        .first()
+        .focus()
+      await page.keyboard.press('Enter')
+
+      // :focus never matches <body>: a lost focus leaves nothing to find here.
+      const focused = page.locator(':focus')
+      await expect(focused).toHaveCount(1)
+      await expect(focused.locator('dl dt').first()).toHaveText(
+        'Total de Demandas'
+      )
+    })
+
     test('should invite the first complaint when nothing is published yet', async ({
       page,
     }) => {
