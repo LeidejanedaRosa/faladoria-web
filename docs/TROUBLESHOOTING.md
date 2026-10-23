@@ -4,6 +4,25 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## Uma decisão some do `DECISIONS.md` depois de um merge, sem nenhum teste falhar
+
+**Data**: 2026-10-23
+
+**Sintoma**: a entrada "Auditoria: 5 avisos `high` novos fechados", do PR #57, não estava no
+`DECISIONS.md` da `main`, embora o `TROUBLESHOOTING.md` do mesmo PR estivesse.
+
+**Causa raiz**: o PR #56 e o PR #57 escreveram, cada um, uma entrada nova **no topo** do arquivo.
+No merge `60d3e90` (`main` → `chore/api-client`), o git marcou conflito nesse trecho, e a
+resolução manteve só um dos lados. Documentação não tem teste, então nada acusou.
+
+**Solução**: a entrada foi restaurada com o texto exato do commit do #57 (`git show
+dafb656:docs/DECISIONS.md`). Para os próximos conflitos neste arquivo: quando os dois lados
+**acrescentam** uma entrada no mesmo lugar, a resolução certa é quase sempre manter as duas, uma
+abaixo da outra. Antes de concluir o merge, conferir com `git diff <base>..HEAD -- docs/` que
+nenhuma seção sumiu.
+
+---
+
 ## E2E inteiro falha com "Executable doesn't exist" depois de `pnpm update`
 
 **Data**: 2026-10-22
