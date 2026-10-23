@@ -67,12 +67,25 @@ backend entregou `GET /api/public/complaints/stats` e `GET /api/public/complaint
   156px desktop, 148px celular, sem deslocamento de layout), erro com "Tentar de novo" em cada
   bloco, e vazio ("A sua pode ser a primeira"). O aviso de carregamento vai num `<output>` só com
   o texto para leitor de tela; o desenho do esqueleto fica `aria-hidden`.
-- **Textos corrigidos** (aprovados): "Atualizado em tempo real" → "Dados de até 1 minuto atrás";
-  as legendas falavam de "administrador", mas quem move o status é o serviço de saúde. O selo
-  chegou a dizer "Atualizado a cada minuto", que a revisão apontou como falso: o `staleTime` só
-  marca o dado como velho, e nada busca de novo enquanto a página fica aberta. A alternativa de
-  tornar a promessa verdadeira (`refetchInterval` de 60s) foi rejeitada: duas chamadas por minuto
-  por aba aberta, numa página que não precisa disso.
+- **Textos corrigidos** (aprovados): as legendas falavam de "administrador", mas quem move o
+  status é o serviço de saúde.
+- **Selo do cabeçalho: o horário da leitura, não uma promessa de atualização.** Era "Atualizado
+  em tempo real". Duas trocas foram derrubadas na revisão, pelo mesmo motivo: o `staleTime` só
+  marca o dado como velho, e nada busca de novo enquanto a página fica em foco.
+
+  ```
+  "Atualizado a cada minuto"      ❌ nada recarrega sozinho
+  "Dados de até 1 minuto atrás"   ❌ vale ao abrir; 10 min depois, o dado tem 11 min
+  "Atualizado às 14:32"           ✅ continua verdadeiro com a aba aberta por horas
+  ```
+
+  `DataFreshnessBadge` usa o `dataUpdatedAt` da mesma consulta dos cartões (mesma chave, nenhuma
+  chamada a mais), no fuso de quem visita. Existe nos três estados ("Atualizando…", o horário,
+  "Não foi possível atualizar") para o cabeçalho manter a altura no celular (medido: 166px nos
+  três). Saiu o `aria-live`: com o texto mudando sozinho, o leitor de tela interromperia quem
+  está lendo outra parte da página. **Rejeitado**: recarregar a cada 60s (`refetchInterval`),
+  que tornaria verdadeiro um texto de prazo ao custo de duas chamadas por minuto por pessoa
+  olhando a página.
 
 **E2E**: o build do Playwright recebe `VITE_API_URL=https://api.e2e.test`, fixo no `webServer.env`
 do `playwright.config.ts`, e não lido do `.env`: o `.env.local` de quem roda não pode mudar o que o
