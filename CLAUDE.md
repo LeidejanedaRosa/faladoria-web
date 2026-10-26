@@ -56,7 +56,7 @@ src/
 │       └── pages/
 └── shared/
     ├── components/
-    │   ├── ui/            # Reusable UI (icons, AccessibleLink, WhatsAppCTA, etc.)
+    │   ├── ui/            # Reusable UI (icons, AccessibleLink, WhatsAppCTA, Button, TextField, PasswordField, FormAlert)
     │   ├── layout/        # Header, Footer, Container, PageShell
     │   ├── error/         # ErrorBoundary, SectionErrorFallback
     │   └── seo/           # JsonLdScript, BreadcrumbSchema

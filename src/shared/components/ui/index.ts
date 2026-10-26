@@ -3,6 +3,10 @@ export { MainContent } from './MainContent'
 export { ScreenReaderOnly } from './ScreenReaderOnly'
 export { AccessibleLink } from './AccessibleLink'
 export { WhatsAppCTA } from './WhatsAppCTA'
+export { Button } from './Button'
+export { TextField } from './TextField'
+export { PasswordField } from './PasswordField'
+export { FormAlert } from './FormAlert'
 
 export {
   ActivityIcon,
@@ -17,6 +21,8 @@ export {
   ClipboardIcon,
   CloseIcon,
   EmailIcon,
+  EyeIcon,
+  EyeOffIcon,
   FistIcon,
   GlobeIcon,
   HeartIcon,
