@@ -8,6 +8,8 @@ interface DocumentMeta {
   canonical?: string
   ogType?: 'website' | 'article'
   twitterCard?: 'summary' | 'summary_large_image'
+  /** Written on every page: in a SPA, a noindex left by one page would stick to the next. */
+  robots?: 'index, follow' | 'noindex, nofollow'
 }
 
 function setMetaName(name: string, content: string) {
@@ -48,11 +50,13 @@ export const useDocumentMeta = ({
   canonical,
   ogType = 'website',
   twitterCard = 'summary',
+  robots = 'index, follow',
 }: DocumentMeta) => {
   useEffect(() => {
     const fullTitle = COMPANY_INFO.seo.titleTemplate.replace('%s', title)
 
     document.title = fullTitle
+    setMetaName('robots', robots)
 
     if (description) {
       setMetaName('description', description)
@@ -85,5 +89,5 @@ export const useDocumentMeta = ({
       document.querySelector('meta[property="og:description"]')?.remove()
       document.querySelector('meta[name="twitter:description"]')?.remove()
     }
-  }, [title, description, canonical, ogType, twitterCard])
+  }, [title, description, canonical, ogType, twitterCard, robots])
 }
