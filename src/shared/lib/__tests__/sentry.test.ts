@@ -107,4 +107,38 @@ describe('initSentry', () => {
       expect(beforeSend(event, {})).toBe(event)
     })
   })
+
+  describe('session replay', () => {
+    const integrationsOfInit = () => {
+      const [options] = vi.mocked(Sentry.init).mock.calls[0]
+      return options?.integrations
+    }
+
+    afterEach(() => {
+      window.history.replaceState({}, '', '/')
+    })
+
+    it('records the public site, masked', () => {
+      vi.stubEnv('VITE_SENTRY_DSN', 'https://key@example.ingest.sentry.io/1')
+
+      initSentry()
+
+      expect(integrationsOfInit()).toContain('replayIntegration')
+      expect(Sentry.replayIntegration).toHaveBeenCalledWith({
+        maskAllText: true,
+        blockAllMedia: true,
+      })
+    })
+
+    it('never records the panel, where health data about real people is on screen', () => {
+      vi.stubEnv('VITE_SENTRY_DSN', 'https://key@example.ingest.sentry.io/1')
+      window.history.replaceState({}, '', '/dashboard/entrar')
+
+      initSentry()
+
+      expect(integrationsOfInit()).not.toContain('replayIntegration')
+      expect(Sentry.replayIntegration).not.toHaveBeenCalled()
+      expect(integrationsOfInit()).toContain('browserTracingIntegration')
+    })
+  })
 })
