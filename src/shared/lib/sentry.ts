@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/react'
+import { isPanelPath } from '@shared/data/routes'
 
 const BROWSER_EXTENSION_SCHEMES = ['chrome-extension://', 'moz-extension://']
 
@@ -37,10 +38,16 @@ export function initSentry() {
     environment,
     integrations: [
       Sentry.browserTracingIntegration(),
-      Sentry.replayIntegration({
-        maskAllText: true,
-        blockAllMedia: true,
-      }),
+      // The panel shows health data about real people: its screen is never recorded. It is only
+      // reached by typing the address (a full page load), so checking at start-up is enough.
+      ...(isPanelPath(window.location.pathname)
+        ? []
+        : [
+            Sentry.replayIntegration({
+              maskAllText: true,
+              blockAllMedia: true,
+            }),
+          ]),
     ],
 
     // Performance Monitoring
