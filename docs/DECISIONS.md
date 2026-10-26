@@ -6,6 +6,98 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-10-25 — Painel: tema claro, endereços em português, uma feature por domínio e formulários com React Hook Form + Zod
+
+**Contexto**: começo do painel (`/dashboard`), usado por horas pela equipe e pelos gestores de
+saúde, com muitos formulários.
+
+**Decisão** (da Leidejane):
+
+- **Tema claro, com o roxo da marca** nos botões e destaques. A landing continua roxo-escuro.
+  Leitura longa e formulário cansam menos sobre fundo claro, e o contraste WCAG é mais fácil de
+  garantir. Separa "site público" de "ferramenta de trabalho".
+- **Endereços em português** (`/dashboard/entrar`, `/dashboard/trocar-senha`), como o resto do
+  site. A raiz fica em `PANEL_ROUTES` (`shared/data/routes.ts`), e cada feature deriva as suas.
+- **Uma feature por domínio da API** (`auth`, depois `complaints`, `users`, `service-areas`,
+  `notifications`), em vez de uma pasta `dashboard` com tudo: uma tela de usuários não depende de
+  nada de reclamações.
+- **React Hook Form + Zod**: a validação fica declarada num esquema, e os limites que vêm da API
+  (senha de 8 a 128 caracteres) têm uma fonte só (`features/auth/data/passwordRules.ts`), usada
+  pelo esquema e pelo texto de ajuda do campo.
+
+**Alternativas rejeitadas**:
+
+- **Painel escuro, igual à landing**: continuidade visual, ao custo de leitura e contraste.
+- **Formulários controlados à mão**: a lógica de erro e de envio se repetiria em cada tela.
+- **Uma feature `dashboard`**: tenderia a virar o "arquivo gigante" em forma de pasta.
+
+---
+
+## 2026-10-25 — Login e troca de senha: uma página, um cartão que troca de lado
+
+**Contexto**: a referência visual da Leidejane (pin "Responsive Animated Login and Signup Page",
+canal Soodacode) tem um cartão branco sobre uma faixa roxa, com "Sign up" do outro lado; ao
+clicar, o cartão desliza. Ela pediu a opção "Trocar a senha" no login, com essa animação.
+
+**Decisão**:
+
+- **Adaptação da referência**: "Sign Up" virou "Trocar a senha" (não há cadastro aberto, por
+  decisão do backend); o link "Forgot your password?" virou um texto dizendo que a administradora
+  gera uma senha nova (não há "esqueci minha senha", e um link prometeria esse autosserviço); os
+  campos têm rótulo visível, não só placeholder (WCAG 3.3.2). O logo, de letras quase brancas,
+  fica sempre sobre o roxo.
+- **Uma página para os dois endereços** (`AuthPage` com `mode`). Mesmo tipo de componente nas
+  duas rotas: o React mantém o cartão montado, e a troca de lado é uma transição de CSS. Cada lado
+  tem o seu endereço: o "voltar" do navegador e o link direto funcionam.
+- **Trocar a senha sem estar logada**: a API só troca a senha de quem tem sessão
+  (`POST /api/auth/change-password`). Sem sessão, o formulário pede e-mail e senha atual, entra e
+  troca em seguida (`useChangePassword`). É "trocar a senha que eu sei", não "esqueci a senha".
+  Depois do login com senha temporária, o mesmo lado aparece sem o e-mail, com "Crie a sua
+  senha", "Sair" e sem o "Entrar" na faixa. A troca pede `revokeOtherSessions`: a senha antiga
+  pode ter sido vista por outra pessoa.
+- **Acessibilidade da troca de lado**: o foco vai para o título do formulário novo (o botão
+  clicado fica na metade escondida); a metade escondida da faixa é `inert` (fora do Tab e do leitor
+  de tela, conferido na árvore de acessibilidade do Chrome); a faixa vem **depois** do cartão no
+  HTML, para o teclado chegar primeiro ao formulário; com `prefers-reduced-motion`, o cartão troca
+  de lado sem deslizar.
+- **Fora dos buscadores**: as duas páginas gravam `noindex, nofollow`. `useDocumentMeta` passou a
+  gravar o `robots` em toda página, com `index, follow` como padrão, para o `noindex` não ficar
+  grudado na próxima página da SPA.
+- **Sem gravação de tela no painel**: o Sentry não liga o Session Replay quando o site abre num
+  endereço do painel (`isPanelPath`), porque ali aparecem dados de saúde de pessoas reais. O
+  painel só é aberto digitando o endereço (recarga completa), então a checagem no início basta.
+  `isPanelPath` lê o endereço como o React Router o compara: **decodificado e sem diferenciar
+  maiúsculas** (`/Dashboard/Entrar` e `/%64ashboard/entrar` abrem o login, conferido no build de
+  produção). Sem isso, esses endereços abririam o painel com a gravação ligada (apontado na revisão
+  do CodeRabbit). Endereço que não decodifica conta como painel: na dúvida, não grava.
+- **O painel fica em pedaços próprios do JavaScript** (`lazy`): quem visita o site público não
+  baixa o painel.
+
+**Adiado para a branch do layout do painel** (`feat/dashboard-shell`): a guarda de rota do
+`/dashboard` (sem sessão → login; senha temporária → troca) e a página inicial. A página inicial é
+uma tela nova, que precisa de aprovação de layout; uma página provisória aqui seria código jogado
+fora. Pelo mesmo motivo saiu o "voltar para onde a pessoa estava" depois do login: quem preenche
+esse endereço é a guarda, que ainda não existe. Até lá, depois do login, `/dashboard` mostra a
+página de "não encontrada", dentro da branch guarda-chuva `feat/dashboard`, que não vai para a
+`main` sem o resto.
+
+**Alternativas rejeitadas**:
+
+- **Duas páginas separadas**: cada troca de rota desmontaria o cartão, e não haveria deslize.
+- **Trocar de lado só com estado local, sem mudar o endereço**: o "voltar" e o link direto para a
+  troca de senha deixariam de funcionar.
+- **Esconder a metade inativa da faixa só com `opacity: 0`**: o leitor de tela e o Tab ainda
+  chegariam ao botão invisível.
+
+**Testes**: unitários do kit, dos esquemas, do mapa de erros, dos quatro hooks, dos dois
+formulários e da página (troca de lado, foco, navegação depois do login, troca obrigatória, sair);
+`isPanelPath`, o `robots` e o Sentry sem gravação no painel. E2E em `tests/auth/auth-pages.spec.ts`
+nos 5 projetos: axe WCAG 2.1 AA nas duas páginas, ordem do Tab sem a metade `inert`, posição do
+cartão (48px de cada borda), faixa escondida no celular, alvos de 48px e transição desligada com
+movimento reduzido.
+
+---
+
 ## 2026-10-25 — Kit de formulário em `shared/components/ui`
 
 **Contexto**: o painel vai ter cerca de dez formulários (login, troca de senha, usuário, cidade,
