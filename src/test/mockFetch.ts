@@ -30,3 +30,24 @@ export const deferredResponse = () => {
   })
   return { promise, release: (response: Response) => release(response) }
 }
+
+type RouteHandler = () => Response | Promise<Response>
+
+/**
+ * Answers each API path with its own handler. A path the test did not plan for throws: a
+ * silent default would let a test pass while the code called the wrong route.
+ */
+export const routeApi = (
+  fetchMock: ReturnType<typeof stubApi>,
+  routes: Record<string, RouteHandler>
+) => {
+  fetchMock.mockImplementation(async input => {
+    const { pathname } = new URL(String(input))
+    const handler = routes[pathname]
+    if (!handler) throw new Error(`Unexpected API call: ${pathname}`)
+    return handler()
+  })
+}
+
+export const calledPaths = (fetchMock: ReturnType<typeof stubApi>) =>
+  fetchMock.mock.calls.map(([input]) => new URL(String(input)).pathname)
