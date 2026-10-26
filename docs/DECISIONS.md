@@ -31,9 +31,14 @@ usa esse caminho. A `main` inteira falhava no CI, não só um PR.
   renomeou para `issues`: um comando inválido vira `TypeError` em vez do
   `InvalidArgumentException` que o `zod` 3 produzia.
 - **O Lighthouse não carrega o `chromium-bidi`**: ele usa o protocolo CDP, e o `chromium-bidi` só
-  serve ao protocolo BiDi. Um rastreador de `require` registrou 0 arquivos do pacote durante o
-  `pnpm lighthouse` completo (4 páginas, 12 execuções, todas as metas cumpridas); o mesmo
-  rastreador registra 14 arquivos quando o pacote é carregado de propósito (controle positivo).
+  serve ao protocolo BiDi. A medida usou `module.registerHooks` (Node 24), que vê a resolução tanto
+  de `require` quanto de `import` e `import()`, passado aos processos filhos por
+  `NODE_OPTIONS=--import`. Durante o `pnpm lighthouse` completo (4 páginas, 12 execuções, todas as
+  metas cumpridas), o `chromium-bidi` teve 0 resoluções, enquanto o `puppeteer-core`, que o
+  Lighthouse usa, teve 6.606 (pela versão ESM): o rastreador estava ativo onde importa. Controles
+  positivos: carregar o pacote de propósito registra 14 arquivos por `require` e 14 por `import()`.
+  Uma primeira medida, só com um gancho de `require` (`Module._load`), não via `import` ESM, e o
+  Lighthouse 12 é ESM; a revisão do CodeRabbit apontou a lacuna, e a medida foi refeita.
 
 Ou seja: o código vulnerável deixa de estar instalado, e a incompatibilidade fica num caminho que
 o nosso uso nunca executa.
