@@ -126,6 +126,52 @@ carregamento, descrição acessível com dica e erro, `aria-pressed`, `role="ale
 
 ---
 
+## 2026-10-25 — Auditoria: `zod` 4 forçado só para o `chromium-bidi` do Lighthouse
+
+**Contexto**: o passo "Security audit (all dependencies)" do CI passou a falhar com um aviso
+`high` novo (`GHSA-mrhx-c7xc-m3w5`, "Zod can exhaust memory while validating oversized
+constrained collections", versões < 4.6.6). O `zod` afetado é o 3.25.76, que só existe dentro do
+Lighthouse CI:
+
+```
+@lhci/cli 0.15.1 → lighthouse 12.6.1 → puppeteer-core 24 → chromium-bidi 14 → zod ^3
+```
+
+A correção só existe no `zod` 4; o `chromium-bidi` 14 pede `^3`, e o `@lhci/cli` mais novo ainda
+usa esse caminho. A `main` inteira falhava no CI, não só um PR.
+
+**Decisão** (da Leidejane, opção "a" com a condição de o Lighthouse continuar rodando):
+`pnpm.overrides` `"chromium-bidi>zod": "^4.6.6"`, a forma mais estreita: só o `zod` que o
+`chromium-bidi` usa muda.
+
+**O que a verificação mostrou**:
+
+- O `chromium-bidi` 14 **não é totalmente compatível** com o `zod` 4. A validação de um comando
+  correto funciona, mas no caminho de erro ele lê `parseResult.error.errors`, campo que o `zod` 4
+  renomeou para `issues`: um comando inválido vira `TypeError` em vez do
+  `InvalidArgumentException` que o `zod` 3 produzia.
+- **O Lighthouse não carrega o `chromium-bidi`**: ele usa o protocolo CDP, e o `chromium-bidi` só
+  serve ao protocolo BiDi. A medida usou `module.registerHooks` (Node 24), que vê a resolução tanto
+  de `require` quanto de `import` e `import()`, passado aos processos filhos por
+  `NODE_OPTIONS=--import`. Durante o `pnpm lighthouse` completo (4 páginas, 12 execuções, todas as
+  metas cumpridas), o `chromium-bidi` teve 0 resoluções, enquanto o `puppeteer-core`, que o
+  Lighthouse usa, teve 6.606 (pela versão ESM): o rastreador estava ativo onde importa. Controles
+  positivos: carregar o pacote de propósito registra 14 arquivos por `require` e 14 por `import()`.
+  Uma primeira medida, só com um gancho de `require` (`Module._load`), não via `import` ESM, e o
+  Lighthouse 12 é ESM; a revisão do CodeRabbit apontou a lacuna, e a medida foi refeita.
+
+Ou seja: o código vulnerável deixa de estar instalado, e a incompatibilidade fica num caminho que
+o nosso uso nunca executa.
+
+**Alternativa rejeitada**: incluir o aviso no `ignoreGhsas`. Funcionaria, mas manteria instalado o
+código vulnerável; a allowlist fica para o que não tem saída (`extract-zip`).
+
+**Quando revisitar**: se um dia o projeto usar o Puppeteer com BiDi, ou quando o `@lhci/cli` subir
+para um Lighthouse com `puppeteer-core` 25 (que já traz um `chromium-bidi` com `zod` 4). Aí o
+`override` sai.
+
+---
+
 ## 2026-10-23 — TanStack Query para o estado do servidor
 
 **Contexto**: o quadro de Transparência e, em seguida, o painel passam a ler dados da API. O
