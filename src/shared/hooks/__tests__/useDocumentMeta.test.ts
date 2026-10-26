@@ -18,7 +18,7 @@ afterEach(() => {
   document.title = ''
   document
     .querySelectorAll(
-      'meta[name="description"], meta[property^="og:"], meta[name^="twitter:"], link[rel="canonical"]'
+      'meta[name="description"], meta[name="robots"], meta[property^="og:"], meta[name^="twitter:"], link[rel="canonical"]'
     )
     .forEach(el => el.remove())
 })
@@ -245,6 +245,38 @@ describe('useDocumentMeta', () => {
       expect(
         document.querySelector('meta[name="twitter:description"]')
       ).toBeNull()
+    })
+  })
+
+  describe('robots', () => {
+    const robots = () =>
+      document.querySelector<HTMLMetaElement>('meta[name="robots"]')?.content
+
+    it('lets search engines index a page by default', () => {
+      renderHook(() => useDocumentMeta({ title: 'Início' }))
+
+      expect(robots()).toBe('index, follow')
+    })
+
+    it('keeps a panel page out of search engines', () => {
+      renderHook(() =>
+        useDocumentMeta({ title: 'Entrar', robots: 'noindex, nofollow' })
+      )
+
+      expect(robots()).toBe('noindex, nofollow')
+    })
+
+    it('does not let a noindex stick to the next page of the SPA', () => {
+      const { rerender } = renderHook(props => useDocumentMeta(props), {
+        initialProps: {
+          title: 'Entrar',
+          robots: 'noindex, nofollow' as const,
+        } as Parameters<typeof useDocumentMeta>[0],
+      })
+
+      rerender({ title: 'Início' })
+
+      expect(robots()).toBe('index, follow')
     })
   })
 })

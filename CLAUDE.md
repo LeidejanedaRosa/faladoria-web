@@ -15,6 +15,7 @@
 - React
 - Vite
 - TanStack Query (server state)
+- React Hook Form + Zod (forms and validation)
 - TypeScript
 - Tailwind CSS
 - Path Aliases
@@ -46,21 +47,22 @@ src/
 │   │   ├── components/
 │   │   ├── data/
 │   │   └── pages/
-│   ├── auth/              # future
-│   │   ├── components/
-│   │   ├── hooks/
-│   │   └── pages/
-│   └── dashboard/         # future
-│       ├── components/
-│       ├── hooks/
-│       └── pages/
+│   ├── auth/              # Panel login and password change (/dashboard/entrar, /trocar-senha)
+│   │   ├── components/    # AuthLayout (sliding card), LoginCard, ChangePasswordCard, forms
+│   │   ├── data/          # authContent (copy, routes), passwordRules
+│   │   ├── hooks/         # useSession, useSignIn, useChangePassword(Form), useSignOut
+│   │   ├── pages/         # AuthPage (one page, two modes)
+│   │   ├── schemas/       # Zod schemas for the forms
+│   │   ├── services/      # Calls to /api/auth/*
+│   │   └── utils/         # authErrorMessage (API code → Portuguese text)
+│   └── complaints/, users/, service-areas/, notifications/   # future: one feature per API domain
 └── shared/
     ├── components/
     │   ├── ui/            # Reusable UI (icons, AccessibleLink, WhatsAppCTA, Button, TextField, PasswordField, FormAlert)
     │   ├── layout/        # Header, Footer, Container, PageShell
     │   ├── error/         # ErrorBoundary, SectionErrorFallback
     │   └── seo/           # JsonLdScript, BreadcrumbSchema
-    ├── data/              # Global constants (COMPANY_INFO, structuredData, etc.)
+    ├── data/              # Global constants (COMPANY_INFO, structuredData, PANEL_ROUTES, UI_CONTENT, etc.)
     ├── hooks/             # Shared hooks (useDocumentMeta, useFocusTrap, etc.)
     ├── lib/               # Sentry, api/ (HTTP client for faladoria-backend)
     ├── types/
@@ -77,7 +79,7 @@ src/
 | `components/forms/`    | When the feature has multiple distinct form components                                            |
 | `components/` (flat)   | Components that don't share a common structural role — keep flat until a natural grouping emerges |
 
-Add a `hooks/` subdirectory only when the feature has more than one custom hook. A single hook lives directly in the feature root (e.g., `features/guide/useGuide.ts`), alongside `index.ts`. The target structure shows `hooks/` in `auth/` and `dashboard/` because those features are expected to have multiple hooks by nature.
+Add a `hooks/` subdirectory only when the feature has more than one custom hook. A single hook lives directly in the feature root (e.g., `features/guide/useGuide.ts`), alongside `index.ts`. The panel features (`auth/` and the ones to come) have `hooks/` because they have several hooks by nature.
 
 ## Naming Conventions
 

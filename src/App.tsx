@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 
+import { AUTH_ROUTES } from '@features/auth/data/authContent'
 import {
   HomePage,
   NotFoundPage,
@@ -31,6 +32,13 @@ const GuideArticlePage = lazy(() =>
   }))
 )
 
+// The panel lives in its own chunks: a visitor of the public site never downloads it.
+const AuthPage = lazy(() =>
+  import('./features/auth/pages/AuthPage').then(m => ({
+    default: m.AuthPage,
+  }))
+)
+
 function App() {
   return (
     <ErrorBoundary>
@@ -51,6 +59,12 @@ function App() {
             element={<PrivacyPolicyPage />}
           />
           <Route path='/termos-de-uso' element={<TermsOfUsePage />} />
+          {/* Same element type on both: React keeps the card mounted, and it slides. */}
+          <Route path={AUTH_ROUTES.login} element={<AuthPage mode='login' />} />
+          <Route
+            path={AUTH_ROUTES.changePassword}
+            element={<AuthPage mode='changePassword' />}
+          />
           <Route path='*' element={<NotFoundPage />} />
         </Routes>
       </Suspense>

@@ -4,6 +4,72 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## "does not provide an export named …" no `pnpm dev`, com o arquivo certo no disco
+
+**Data**: 2026-10-25
+
+**Sintoma**: a página do painel cai no `ErrorBoundary` ("Algo deu errado"), e o console diz que
+`AuthLayout.tsx` não exporta `AuthLayout`. O arquivo exporta. O build de produção funciona.
+
+**Causa raiz**: o arquivo foi regravado com o `pnpm dev` aberto e ficou vazio no disco por um
+instante. O observador do Vite leu nesse instante e guardou a versão vazia: o módulo servido tinha
+171 bytes, só o mapa de código (`sourcesContent: [""]`).
+
+**Solução**: recarregar a página; se continuar, alterar a data do arquivo (`touch`) ou reiniciar o
+`pnpm dev`. Para confirmar, baixar o módulo do servidor (`curl
+http://localhost:5173/src/.../Arquivo.tsx`) e procurar o `export`.
+
+---
+
+## O teste acha dois botões "Entrar", e o leitor de tela só um
+
+**Data**: 2026-10-25
+
+**Sintoma**: no login, `getByRole('button', { name: 'Entrar' })` falha com "resolved to 2
+elements", no Playwright e no Testing Library.
+
+**Causa raiz**: o segundo "Entrar" é o botão de trocar de lado, na metade escondida da faixa, que
+está dentro de um elemento `inert`. O navegador tira essa metade da árvore de acessibilidade
+(conferido na árvore do Chrome via CDP), mas o seletor por papel do Playwright não consulta o
+`inert`, e o jsdom não aplica CSS (os dois lados da faixa e a cópia do celular existem).
+
+**Solução**: procurar o botão dentro do formulário (`form.getByRole(...)`) ou dentro da faixa
+(`aside`). Não é defeito da página: quem usa leitor de tela só recebe os botões do lado visível.
+
+---
+
+## axe acusa contraste de 1.1 só no WebKit, em cores que não existem no layout
+
+**Data**: 2026-10-25
+
+**Sintoma**: o teste WCAG das páginas de login falha no WebKit e no Mobile Safari com contraste
+de 1.1 e 1.2 (`#ffffff` sobre `#f3f3fe`, `#9694b0` sobre `#8684ae`). No Chromium passa.
+
+**Causa raiz**: o axe rodou no meio da animação de entrada do cartão, com ele ainda
+semitransparente. O WebKit carregou mais devagar e pegou esse momento.
+
+**Solução**: esperar o fim das animações do próprio elemento antes de medir
+(`element.getAnimations().map(a => a.finished)`), em vez de um tempo fixo. Vale para qualquer
+medida de cor ou de posição de um elemento animado.
+
+---
+
+## Teste de Tab no Firefox lê o mesmo botão várias vezes
+
+**Data**: 2026-10-25
+
+**Sintoma**: apertando Tab 8 vezes, o Firefox devolve o último botão da página repetido.
+
+**Causa raiz**: depois do último elemento focável, o Tab do Firefox sai da página para a interface
+do navegador, e o `document.activeElement` continua apontando para o último elemento. O Chromium
+volta ao `<body>`.
+
+**Solução**: o teste aperta Tab só o número de vezes que a página tem de elementos e compara a
+ordem. Foi esse teste que mostrou um defeito real: a faixa vinha antes do cartão no HTML, e o
+primeiro Tab ia para "Trocar a senha" em vez do e-mail (corrigido; ver `DECISIONS.md`).
+
+---
+
 ## "Tentar de novo" perde o foco no navegador, mas o teste de componente passa
 
 **Data**: 2026-10-23
