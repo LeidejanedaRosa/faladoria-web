@@ -6,6 +6,34 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-10-25 — Kit de formulário em `shared/components/ui`
+
+**Contexto**: o painel vai ter cerca de dez formulários (login, troca de senha, usuário, cidade,
+aprovação, rejeição, mudança de status, nota, mensagem). Usados por duas ou mais features, os
+componentes de formulário vão para `shared/`, pelo critério do projeto.
+
+**Decisão**: quatro componentes, cada um garantindo sozinho uma regra que, espalhada pelas telas,
+seria esquecida em alguma:
+
+- `Button`: 48px de altura (alvo de toque) e estado de carregamento com `aria-disabled` e texto
+  próprio, não `disabled`: um botão desabilitado perde o foco, a lição do "Tentar de novo" do
+  quadro. O clique é ignorado durante o carregamento, inclusive o envio do formulário.
+- `TextField`: rótulo acima e ligado ao campo, dica e erro em `aria-describedby`, `aria-invalid`,
+  fonte de 16px (abaixo disso o iPhone dá zoom no campo).
+- `PasswordField`: mostrar/esconder num botão de verdade, com `aria-pressed`.
+- `FormAlert`: erro do formulário inteiro, com `role="alert"`.
+
+Os textos do kit ficam em `shared/data/uiContent.ts`, não dentro dos componentes.
+
+**Alternativas rejeitadas**: uma biblioteca de componentes pronta (Radix, shadcn): quatro
+componentes simples não justificam a dependência, e as regras acima continuariam sendo do projeto.
+
+**Testes**: `Button`, `TextField`, `PasswordField` e `FormAlert` em
+`shared/components/ui/__tests__`, cada um conferindo a regra que promete (foco mantido durante o
+carregamento, descrição acessível com dica e erro, `aria-pressed`, `role="alert"`).
+
+---
+
 ## 2026-10-23 — TanStack Query para o estado do servidor
 
 **Contexto**: o quadro de Transparência e, em seguida, o painel passam a ler dados da API. O
