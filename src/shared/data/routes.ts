@@ -8,6 +8,7 @@ export const GUIDE_ROUTES = {
 /** The administrative panel. Its pages are only reached by typing the address. */
 export const PANEL_ROUTES = {
   root: '/dashboard',
+  serviceAreas: '/dashboard/cidades',
 } as const
 
 // Reads the address the way React Router matches it: decoded and case-insensitive, so

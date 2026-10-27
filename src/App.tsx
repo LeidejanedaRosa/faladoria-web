@@ -51,6 +51,12 @@ const PanelHomePage = lazy(() =>
   }))
 )
 
+const ServiceAreasRoute = lazy(() =>
+  import('./features/service-areas/pages/ServiceAreasRoute').then(m => ({
+    default: m.ServiceAreasRoute,
+  }))
+)
+
 function App() {
   return (
     <ErrorBoundary>
@@ -79,6 +85,10 @@ function App() {
           />
           <Route path={PANEL_ROUTES.root} element={<PanelRoot />}>
             <Route index element={<PanelHomePage />} />
+            <Route
+              path={PANEL_ROUTES.serviceAreas}
+              element={<ServiceAreasRoute />}
+            />
           </Route>
           <Route path='*' element={<NotFoundPage />} />
         </Routes>
