@@ -6,6 +6,26 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-10-27 — `.d.ts` do `tsconfig.node.json` gravados fora do código (`declarationDir`)
+
+**Contexto**: issue #59. Num clone novo, `pnpm build` seguido de `pnpm lint` falhava num arquivo
+gerado, `tests/helpers/publicBoardApi.d.ts` (ver TROUBLESHOOTING).
+
+**Decisão**: o `tsconfig.node.json` ganhou `"declarationDir": "./node_modules/.tmp/node-declarations"`,
+como o `tsconfig.app.json` e o `tsconfig.test.json` já tinham. Os três projetos composite agora
+gravam as declarações em `node_modules/.tmp/`, e nenhum arquivo gerado chega à árvore do código.
+As regras `*.config.d.ts` e `tests/helpers/*.d.ts` saíram do `.gitignore`: não há mais o que
+esconder.
+
+**Alternativas rejeitadas**:
+
+- **Ignorar `*.d.ts` no ESLint**: trata o sintoma. Os arquivos continuariam no editor e na busca,
+  e cada helper novo importado pelo `playwright.config.ts` pediria outra regra no `.gitignore`.
+- **Tirar o `composite` e usar `noEmit`**: o `tsc -b` e as referências entre os tsconfigs
+  dependem do projeto composite (ver o `TS6310` neste arquivo); mudança maior, sem ganho aqui.
+
+---
+
 ## 2026-10-26 — Layout do painel: menu lateral, página inicial por papel e nada que não exista
 
 **Contexto**: depois do login, `/dashboard` precisava de uma moldura (cabeçalho, menu, conteúdo) e
