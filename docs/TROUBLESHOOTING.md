@@ -4,6 +4,33 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## `pnpm lint` falha num `.d.ts` gerado, só num clone novo
+
+**Data**: 2026-10-27
+
+**Sintoma**: num clone novo, `pnpm build` e depois `pnpm lint` acusam erros do Prettier em
+`tests/helpers/publicBoardApi.d.ts`, um arquivo que ninguém escreveu. Na máquina de quem já tinha
+o projeto, o mesmo comando passa.
+
+**Causa raiz**: o `tsconfig.node.json` é composite com `emitDeclarationOnly` e não tinha
+`declarationDir`, então o `tsc -b` gravava cada `.d.ts` ao lado do `.ts`. O `.gitignore` escondia
+esses arquivos do git, mas o ESLint não lê o `.gitignore`. A diferença entre as máquinas vinha do
+build incremental: com o `tsconfig.node.tsbuildinfo` em cache, o `tsc -b` considera o projeto
+atualizado e não grava de novo o `.d.ts`; só um clone novo (sem cache) o gerava.
+
+**Solução**: `declarationDir` em `node_modules/.tmp/node-declarations`, como os outros dois
+tsconfigs (ver DECISIONS, 2026-10-27).
+
+Quem já tinha o projeto ainda tem os `.d.ts` gravados pela configuração antiga. Como eles saíram do
+`.gitignore`, aparecem no `git status` e o `pnpm lint` falha neles. Apagar uma vez (não commitar):
+`rm -f *.config.d.ts tests/helpers/*.d.ts`.
+
+Para validar a correção como num clone novo, sem o cache incremental:
+`rm -f node_modules/.tmp/tsconfig.node.tsbuildinfo && pnpm build && pnpm lint`. Nenhum `.d.ts`
+novo deve aparecer no `git status`.
+
+---
+
 ## "Tentar de novo" perde o foco no navegador, mas o teste de componente passa
 
 **Data**: 2026-10-23
