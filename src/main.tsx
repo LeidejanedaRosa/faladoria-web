@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { SESSION_QUERY_KEY } from '@features/auth/hooks/useSession'
 import '@fontsource-variable/inter'
 import { createQueryClient } from '@shared/lib/queryClient'
 import { initSentry } from '@shared/lib/sentry'
@@ -15,7 +16,12 @@ if (import.meta.env.PROD) {
   initSentry()
 }
 
-const queryClient = createQueryClient()
+// A request that finds the session gone re-reads it, and the panel guard sends the person to
+// the login from there.
+const queryClient = createQueryClient({
+  onSessionLost: () =>
+    void queryClient.invalidateQueries({ queryKey: SESSION_QUERY_KEY }),
+})
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
