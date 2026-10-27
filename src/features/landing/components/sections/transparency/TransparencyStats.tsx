@@ -1,5 +1,6 @@
+import { useRecoveryFocus } from '@shared/hooks/useRecoveryFocus'
+
 import { usePublicComplaintStats } from '../../../hooks/usePublicComplaintStats'
-import { useRecoveryFocus } from '../../../hooks/useRecoveryFocus'
 import { buildTransparencyStats } from '../../../utils/buildTransparencyStats'
 import { StatsGrid } from './StatsGrid'
 import { StatsGridSkeleton } from './StatsGridSkeleton'

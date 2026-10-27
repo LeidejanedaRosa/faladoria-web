@@ -1,9 +1,10 @@
+import { useRecoveryFocus } from '@shared/hooks/useRecoveryFocus'
+
 import {
   LATEST_COMPLAINTS_LIMIT,
   TRANSPARENCY_CONTENT,
 } from '../../../data/transparencyContent'
 import { useLatestPublicComplaints } from '../../../hooks/useLatestPublicComplaints'
-import { useRecoveryFocus } from '../../../hooks/useRecoveryFocus'
 import { InteractionItem } from './InteractionItem'
 import { InteractionsListSkeleton } from './InteractionsListSkeleton'
 import { TransparencyLoadError } from './TransparencyLoadError'
