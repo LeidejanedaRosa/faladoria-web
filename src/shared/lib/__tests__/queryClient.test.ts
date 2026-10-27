@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { ApiError } from '../api'
-import { createQueryClient, shouldRetry } from '../queryClient'
+import { createQueryClient, isSessionLost, shouldRetry } from '../queryClient'
 
 const apiError = (status: number) =>
   new ApiError({ status, code: 'X', message: 'x' })
@@ -37,5 +37,85 @@ describe('createQueryClient', () => {
     const client = createQueryClient()
 
     expect(client.getDefaultOptions().queries?.retry).toBe(shouldRetry)
+  })
+})
+
+describe('isSessionLost', () => {
+  it.each([
+    [401, 'UNAUTHENTICATED'],
+    [403, 'MUST_CHANGE_PASSWORD'],
+  ])('treats %i %s as a lost session', (status, code) => {
+    expect(isSessionLost(new ApiError({ status, code, message: 'x' }))).toBe(
+      true
+    )
+  })
+
+  it.each([
+    [401, 'INVALID_CREDENTIALS'],
+    [403, 'FORBIDDEN'],
+    [403, 'COMPLAINT_OUT_OF_SCOPE'],
+    [500, 'INTERNAL_ERROR'],
+  ])('keeps the session on %i %s', (status, code) => {
+    expect(isSessionLost(new ApiError({ status, code, message: 'x' }))).toBe(
+      false
+    )
+  })
+
+  it('ignores errors that are not from the API', () => {
+    expect(isSessionLost(new Error('x'))).toBe(false)
+  })
+})
+
+describe('createQueryClient: lost session', () => {
+  const lostSession = new ApiError({
+    status: 401,
+    code: 'UNAUTHENTICATED',
+    message: 'x',
+  })
+
+  it('tells the app when a query finds the session gone', async () => {
+    const onSessionLost = vi.fn()
+    const client = createQueryClient({ onSessionLost })
+
+    await client
+      .fetchQuery({
+        queryKey: ['counts'],
+        queryFn: () => Promise.reject(lostSession),
+        retry: false,
+      })
+      .catch(() => undefined)
+
+    expect(onSessionLost).toHaveBeenCalledTimes(1)
+  })
+
+  it('tells the app when a mutation finds the session gone', async () => {
+    const onSessionLost = vi.fn()
+    const client = createQueryClient({ onSessionLost })
+
+    await client
+      .getMutationCache()
+      .build(client, { mutationFn: () => Promise.reject(lostSession) })
+      .execute(undefined)
+      .catch(() => undefined)
+
+    expect(onSessionLost).toHaveBeenCalledTimes(1)
+  })
+
+  it('stays quiet on any other error', async () => {
+    const onSessionLost = vi.fn()
+    const client = createQueryClient({ onSessionLost })
+
+    await client
+      .fetchQuery({
+        queryKey: ['counts'],
+        queryFn: () =>
+          Promise.reject(
+            new ApiError({ status: 500, code: 'X', message: 'x' })
+          ),
+        retry: false,
+      })
+      .catch(() => undefined)
+
+    expect(onSessionLost).not.toHaveBeenCalled()
   })
 })
