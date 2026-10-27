@@ -19,8 +19,15 @@ build incremental: com o `tsconfig.node.tsbuildinfo` em cache, o `tsc -b` consid
 atualizado e não grava de novo o `.d.ts`; só um clone novo (sem cache) o gerava.
 
 **Solução**: `declarationDir` em `node_modules/.tmp/node-declarations`, como os outros dois
-tsconfigs (ver DECISIONS, 2026-10-27). Para reproduzir um clone novo sem clonar:
-`rm node_modules/.tmp/tsconfig.node.tsbuildinfo && pnpm build`.
+tsconfigs (ver DECISIONS, 2026-10-27).
+
+Quem já tinha o projeto ainda tem os `.d.ts` gravados pela configuração antiga. Como eles saíram do
+`.gitignore`, aparecem no `git status` e o `pnpm lint` falha neles. Apagar uma vez (não commitar):
+`rm -f *.config.d.ts tests/helpers/*.d.ts`.
+
+Para validar a correção como num clone novo, sem o cache incremental:
+`rm -f node_modules/.tmp/tsconfig.node.tsbuildinfo && pnpm build && pnpm lint`. Nenhum `.d.ts`
+novo deve aparecer no `git status`.
 
 ---
 
