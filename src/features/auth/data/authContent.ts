@@ -53,6 +53,12 @@ export const AUTH_CONTENT = {
     asideNote:
       'A senha nova vale na hora: se a sua conta estiver aberta em outro lugar com a senha antiga, ela é encerrada.',
   },
+  guard: {
+    checking: 'Carregando o painel…',
+    checkFailed: 'Não foi possível verificar o seu acesso agora.',
+    retry: 'Tentar de novo',
+    retrying: 'Tentando de novo…',
+  },
   validation: {
     emailRequired: 'Informe o e-mail.',
     emailInvalid: 'Digite um e-mail válido, como nome@exemplo.com.',
