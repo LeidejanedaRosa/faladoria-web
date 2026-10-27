@@ -180,4 +180,47 @@ describe('AuthPage', () => {
 
     await waitFor(() => expect(location()).toBe('/dashboard'))
   })
+
+  it('sends someone already signed in away from the login, to the panel', async () => {
+    routeApi(stubApi(), {
+      '/api/auth/get-session': () => jsonResponse(buildSession()),
+    })
+
+    renderWithRouter(ROUTES, '/dashboard/entrar')
+
+    await waitFor(() => expect(location()).toBe('/dashboard'))
+  })
+
+  it('keeps a voluntary password change open for someone signed in', async () => {
+    routeApi(stubApi(), {
+      '/api/auth/get-session': () => jsonResponse(buildSession()),
+    })
+
+    renderWithRouter(ROUTES, '/dashboard/trocar-senha')
+
+    expect(
+      await screen.findByRole('heading', { name: 'Trocar a senha' })
+    ).toBeInTheDocument()
+    expect(location()).toBe('/dashboard/trocar-senha')
+  })
+
+  it('after signing in, returns to the panel page the guard had saved', async () => {
+    let isSignedIn = false
+    routeApi(stubApi(), {
+      '/api/auth/sign-in/email': () => {
+        isSignedIn = true
+        return jsonResponse({ user: buildSessionUser() })
+      },
+      '/api/auth/get-session': () =>
+        jsonResponse(isSignedIn ? buildSession() : null),
+    })
+    renderWithRouter(ROUTES, {
+      pathname: '/dashboard/entrar',
+      state: { from: '/dashboard/reclamacoes?status=open' },
+    })
+
+    await signIn()
+
+    await waitFor(() => expect(location()).toBe('/dashboard/reclamacoes'))
+  })
 })

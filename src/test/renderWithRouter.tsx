@@ -11,12 +11,15 @@ export const LocationProbe = () => {
   return <output data-testid='location'>{pathname}</output>
 }
 
+/** A path, or a path with the navigation state the session guard leaves for the login. */
+type InitialEntry = string | { pathname: string; state: unknown }
+
 export const renderWithRouter = (
   routes: { path: string; element: ReactElement }[],
-  initialPath: string
+  initialEntry: InitialEntry
 ): ReturnType<typeof render> =>
   render(
-    <MemoryRouter initialEntries={[initialPath]}>
+    <MemoryRouter initialEntries={[initialEntry]}>
       <Routes>
         {routes.map(({ path, element }) => (
           <Route key={path} path={path} element={element} />
