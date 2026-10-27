@@ -7,6 +7,8 @@ const VARIANT_STYLES = {
     'bg-purple-dark text-white hover:bg-purple-medium aria-disabled:hover:bg-purple-dark',
   secondary:
     'border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 aria-disabled:hover:bg-white',
+  danger:
+    'bg-red-700 text-white hover:bg-red-800 aria-disabled:hover:bg-red-700',
 } as const
 
 interface ButtonProps extends ComponentProps<'button'> {

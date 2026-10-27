@@ -7,6 +7,9 @@ export { Button } from './Button'
 export { TextField } from './TextField'
 export { PasswordField } from './PasswordField'
 export { FormAlert } from './FormAlert'
+export { SelectField } from './SelectField'
+export { Combobox } from './Combobox'
+export { ConfirmDialog } from './ConfirmDialog'
 
 export {
   ActivityIcon,
