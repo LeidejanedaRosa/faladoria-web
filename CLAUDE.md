@@ -48,13 +48,19 @@ src/
 │   │   ├── data/
 │   │   └── pages/
 │   ├── auth/              # Panel login and password change (/dashboard/entrar, /trocar-senha)
-│   │   ├── components/    # AuthLayout (sliding card), LoginCard, ChangePasswordCard, forms
+│   │   ├── components/    # AuthLayout (sliding card), Login/ChangePassword cards, forms, RequirePanelSession (guard)
 │   │   ├── data/          # authContent (copy, routes), passwordRules
 │   │   ├── hooks/         # useSession, useSignIn, useChangePassword(Form), useSignOut
 │   │   ├── pages/         # AuthPage (one page, two modes)
 │   │   ├── schemas/       # Zod schemas for the forms
 │   │   ├── services/      # Calls to /api/auth/*
-│   │   └── utils/         # authErrorMessage (API code → Portuguese text)
+│   │   └── utils/         # authErrorMessage (API code → Portuguese text), returnPath
+│   ├── panel/             # Panel shell (layout, menu) and home page (/dashboard)
+│   │   ├── components/    # PanelLayout, PanelHeader, PanelNav, PanelMobileMenu, ComplaintCounts
+│   │   ├── data/          # panelContent (copy, role labels)
+│   │   ├── hooks/         # usePanelUser (outlet context), useComplaintCounts
+│   │   ├── pages/         # PanelRoot (guard + layout), PanelHomePage
+│   │   └── services/      # Calls to /api/complaints/counts
 │   └── complaints/, users/, service-areas/, notifications/   # future: one feature per API domain
 └── shared/
     ├── components/
@@ -63,7 +69,7 @@ src/
     │   ├── error/         # ErrorBoundary, SectionErrorFallback
     │   └── seo/           # JsonLdScript, BreadcrumbSchema
     ├── data/              # Global constants (COMPANY_INFO, structuredData, PANEL_ROUTES, UI_CONTENT, etc.)
-    ├── hooks/             # Shared hooks (useDocumentMeta, useFocusTrap, etc.)
+    ├── hooks/             # Shared hooks (useDocumentMeta, useFocusTrap, useRecoveryFocus, useSidebar, etc.)
     ├── lib/               # Sentry, api/ (HTTP client for faladoria-backend)
     ├── types/
     └── utils/             # cn, slugify, formatPercentage, reportWebVitals

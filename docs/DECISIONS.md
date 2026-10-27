@@ -6,6 +6,140 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-10-26 — Layout do painel: menu lateral, página inicial por papel e nada que não exista
+
+**Contexto**: depois do login, `/dashboard` precisava de uma moldura (cabeçalho, menu, conteúdo) e
+de uma página inicial. Ainda não existe nenhuma outra página do painel.
+
+**Decisão** (layout aprovado pela Leidejane):
+
+- **Menu lateral fixo no desktop; no celular, um diálogo modal aberto pelo ☰** (o mesmo padrão
+  do menu do site público, com `useSidebar`: foco preso dentro, Escape e a camada escura fecham,
+  e o foco volta ao ☰). O conteúdo fica centralizado e limitado a `max-w-6xl`: em tela muito larga
+  ele não estica de borda a borda.
+- **O menu só lista páginas que existem** (`PANEL_NAV_ITEMS`, hoje só "Início"). Cada página nova
+  entra na lista na mesma branch em que é criada, com os papéis que podem vê-la
+  (`navItemsFor(role)`). Um item que leva a uma página em construção ensina a pessoa a não
+  confiar no menu.
+- **O papel aparece em português, pelo que a pessoa faz**: `admin` → "Administração",
+  `assistant` → "Assistente", `manager` → "Gestão de saúde" (`ROLE_LABELS`).
+- **A página inicial mostra o que a API devolve para o papel** (`GET /api/complaints/counts`). A
+  equipe vê "O que precisa de você" (aguardando moderação, não lidas, comigo, sem responsável) e o
+  total por status; o gestor vê só os quatro status publicados. A tela decide pelo formato da
+  resposta (`isTeamCounts`), não pelo papel: quem decide o que cada um pode ver é o backend.
+- **Sem cidade atribuída, sem chamada à API**: assistente ou gestor sem cidade veem um aviso que
+  explica o motivo e quem resolve. Mostrar "0" em tudo diria "não há reclamações", que é falso.
+  A administração vê "todas as cidades".
+- **Carregamento e erro na região dos números**, não na página inteira: esqueleto anunciado num
+  `<output>`, e no erro um botão "Tentar de novo" que mantém o foco enquanto tenta
+  (`useRecoveryFocus`).
+- **O SkipLink do site inteiro foi corrigido**: usava `focus:bg-primary focus:text-secondary`,
+  cores que não existem no tema. O link aparecia com fundo transparente ao receber o foco. Agora
+  usa `focus:bg-purple-dark focus:text-white` (ver TROUBLESHOOTING).
+
+**Alternativas rejeitadas**:
+
+- **Menu com todos os itens futuros, desabilitados ou com "em breve"**: promete o que não existe
+  e polui a navegação de quem usa leitor de tela.
+- **Página inicial igual para todos, escondendo cartões pelo papel no front**: duplicaria uma
+  regra de permissão que já é do backend.
+- **Gaveta do celular sem `aria-modal` e sem foco preso**: o Tab sairia para a página escondida
+  atrás da camada escura.
+
+**Testes**: unitários do menu (itens por papel, `aria-current`, diálogo, foco, Escape, fechar ao
+escolher), da página inicial (primeiro nome, cidades, administração, sem cidade sem chamada, sem
+indexação), das contagens (equipe, gestor, carregando, erro com foco) e do botão de sair (sai
+mesmo com a API falhando). E2E em `tests/panel/panel-shell.spec.ts` nos 5 projetos: axe na
+página da equipe e do gestor, foco preso no menu, menu lateral só no desktop, conteúdo
+centralizado em 2560px e a cor do SkipLink com foco, no painel e no site público.
+
+---
+
+## 2026-10-26 — Guarda de rota do painel: declarativa, com retorno seguro e reação à sessão perdida
+
+**Contexto**: todas as páginas do painel exigem sessão, e quem tem senha temporária precisa
+trocá-la antes de qualquer outra coisa. Depois do login, a pessoa deve voltar para onde tentou ir.
+E a sessão pode acabar no meio do uso (expirou, a administradora desativou a conta).
+
+**Decisão**:
+
+- **Uma guarda só, declarativa** (`RequirePanelSession`, em `features/auth`). A ordem é a regra:
+  erro ao checar → aviso com "Tentar de novo"; checando → "Carregando o painel…"; sem sessão →
+  `<Navigate>` para o login, guardando `pathname + search` em `state.from`; senha temporária →
+  troca de senha; senão, a página. Recebe `render(user)`: o layout recebe a pessoa já garantida, e
+  as páginas a leem com `usePanelUser()` (contexto do `<Outlet>`), sem checar `null` de novo.
+- **O redirecionamento depois do login também é declarativo**, na `AuthPage`: com sessão no modo
+  login, ela renderiza `<Navigate>` para a troca de senha ou para o endereço guardado. Antes, o
+  `LoginCard` navegava no `onSuccess` da mutação, e corria com a atualização da sessão. Agora há
+  um único lugar que decide, a partir do estado, e quem já está logado e abre `/dashboard/entrar`
+  também é levado ao painel.
+- **O retorno só aceita endereço do painel** (`returnPathFrom`): `from` precisa passar em
+  `isPanelPath` e não pode ser o próprio login ou a troca de senha. Qualquer outra coisa vai para
+  `/dashboard`. Assim, um `state` montado por outra página não vira redirecionamento aberto
+  (OWASP: Unvalidated Redirects) nem um laço de login.
+- **Sessão perdida no meio do uso, pela inversão de dependência**: o `createQueryClient`
+  (`shared/lib`) recebe `onSessionLost` e o chama quando uma consulta ou mutação falha com
+  `UNAUTHENTICATED` ou `MUST_CHANGE_PASSWORD`. Quem passa a função é o `main.tsx`, que invalida
+  a sessão; a guarda, ao reler a sessão vazia, leva ao login. `shared` não conhece `auth`, e a
+  regra fica num lugar só, em vez de um `if (401)` em cada tela.
+- **A guarda não usa `disabled` no botão de tentar de novo**, e sim `aria-disabled`: um botão
+  `disabled` perde o foco, e quem usa teclado ficaria no `<body>`.
+
+**Alternativas rejeitadas**:
+
+- **`loader` do React Router (modo dados)**: o projeto usa o modo declarativo, e a sessão já é
+  uma consulta do TanStack Query. Dois caches para a mesma informação.
+- **Checar a sessão dentro de cada página**: a primeira página esquecida fica aberta.
+- **Redirecionar no `onError` de cada consulta**: espalha a regra e acopla cada feature ao login.
+- **Aceitar qualquer `from`**: abre redirecionamento para fora do painel.
+
+**Testes**: `returnPathFrom` (painel, login, troca, site público, endereço externo, sem
+`state`), `isSessionLost` e `onSessionLost` em consulta e mutação, a guarda em cada estado
+(com foco no "Tentar de novo"), a `AuthPage` (logado vai ao painel, troca voluntária continua
+aberta, volta ao endereço guardado). E2E: sem sessão → login → de volta ao painel; senha
+temporária → troca; logado em `/dashboard/entrar` → painel; `401` nas contagens → login.
+
+---
+
+## 2026-10-26 — `useRecoveryFocus` vai para `shared/hooks`
+
+**Contexto**: o hook que resgata o foco quando o botão "Tentar de novo" some nasceu no quadro de
+transparência (`features/landing/hooks`). A guarda do painel e as contagens precisam dele também.
+
+**Decisão**: mover para `shared/hooks/useRecoveryFocus.ts` com `git mv` (o histórico do arquivo
+continua), junto com o teste. É o critério de divisão do projeto: duas features usam, vai para
+`shared`.
+
+**Alternativa rejeitada**: o painel importar de `features/landing`, que cria dependência entre
+features: uma mudança no quadro público poderia quebrar o painel.
+
+---
+
+## 2026-10-26 — Configuração padrão do GitHub aplicada pelo `setup-github.mjs`
+
+**Contexto**: o PR #61 foi mesclado na branch errada, e as branches mescladas ficavam no remoto.
+O padrão da conta (ruleset, apagar branch após o merge, Dependabot, secret scanning) estava só em
+parte aplicado.
+
+**Decisão**: rodar o `scripts/setup-github.mjs` do `react-vite-template` com
+`--check quality --check e2e --check Vercel`. Resultado conferido pela API:
+
+- **Ruleset "Proteger branches de integração"** na branch padrão e na `feat/dashboard`: sem push
+  direto, sem apagar, sem reescrever histórico; merge só por PR e só por "merge commit"; os checks
+  `quality`, `e2e` e `Vercel` obrigatórios.
+- **`delete_branch_on_merge`**: a branch some do remoto depois do merge.
+- **Secret scanning com bloqueio no push** e **Dependabot security updates** ligados.
+
+A proteção antiga da `main` (2026-09-15, com `enforce_admins`) continua ligada junto com o
+ruleset; as duas valem ao mesmo tempo, e a mais restrita prevalece. O `e2e`, que era
+`continue-on-error`, agora é exigido: a suíte foi saneada desde então.
+
+**Consequência**: os PRs das sub-branches do painel apontam para `feat/dashboard`, que agora
+também só recebe código por PR. Job de CI novo ou renomeado exige rodar o script de novo, senão o
+merge trava esperando um check que não existe.
+
+---
+
 ## 2026-10-25 — Painel: tema claro, endereços em português, uma feature por domínio e formulários com React Hook Form + Zod
 
 **Contexto**: começo do painel (`/dashboard`), usado por horas pela equipe e pelos gestores de
@@ -73,7 +207,7 @@ clicar, o cartão desliza. Ela pediu a opção "Trocar a senha" no login, com es
 - **O painel fica em pedaços próprios do JavaScript** (`lazy`): quem visita o site público não
   baixa o painel.
 
-**Adiado para a branch do layout do painel** (`feat/dashboard-shell`): a guarda de rota do
+**Adiado para a branch do layout do painel** (`feat/dashboard-shell`, feito: ver "Guarda de rota do painel", 2026-10-26): a guarda de rota do
 `/dashboard` (sem sessão → login; senha temporária → troca) e a página inicial. A página inicial é
 uma tela nova, que precisa de aprovação de layout; uma página provisória aqui seria código jogado
 fora. Pelo mesmo motivo saiu o "voltar para onde a pessoa estava" depois do login: quem preenche

@@ -10,14 +10,9 @@ import { useForm } from 'react-hook-form'
 import { AUTH_CONTENT } from '../data/authContent'
 import { useSignIn } from '../hooks/useSignIn'
 import { loginSchema, type LoginValues } from '../schemas/authSchemas'
-import type { SessionUser } from '../services/authApi'
 import { authErrorMessage } from '../utils/authErrorMessage'
 
-interface LoginFormProps {
-  onSignedIn: (user: SessionUser) => void
-}
-
-export const LoginForm = ({ onSignedIn }: LoginFormProps) => {
+export const LoginForm = () => {
   const {
     register,
     handleSubmit,
@@ -26,10 +21,8 @@ export const LoginForm = ({ onSignedIn }: LoginFormProps) => {
   const signInMutation = useSignIn()
   const { login } = AUTH_CONTENT
 
-  const onSubmit = (values: LoginValues) =>
-    signInMutation.mutate(values, {
-      onSuccess: ({ user }) => onSignedIn(user),
-    })
+  // On success the session query refreshes, and AuthPage redirects from it.
+  const onSubmit = (values: LoginValues) => signInMutation.mutate(values)
 
   return (
     <form

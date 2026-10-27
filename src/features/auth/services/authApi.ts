@@ -1,6 +1,6 @@
 import { apiRequest } from '@shared/lib/api'
 
-type UserRole = 'admin' | 'assistant' | 'manager'
+export type UserRole = 'admin' | 'assistant' | 'manager'
 
 export interface SessionUser {
   id: string

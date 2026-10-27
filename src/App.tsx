@@ -8,7 +8,7 @@ import {
   TermsOfUsePage,
 } from '@features/landing/pages'
 import { ErrorBoundary } from '@shared/components/error'
-import { GUIDE_ROUTES } from '@shared/data'
+import { GUIDE_ROUTES, PANEL_ROUTES } from '@shared/data'
 import { Route, Routes } from 'react-router-dom'
 
 // Intentional: imports from internal feature paths to enable per-page code splitting.
@@ -39,6 +39,18 @@ const AuthPage = lazy(() =>
   }))
 )
 
+const PanelRoot = lazy(() =>
+  import('./features/panel/pages/PanelRoot').then(m => ({
+    default: m.PanelRoot,
+  }))
+)
+
+const PanelHomePage = lazy(() =>
+  import('./features/panel/pages/PanelHomePage').then(m => ({
+    default: m.PanelHomePage,
+  }))
+)
+
 function App() {
   return (
     <ErrorBoundary>
@@ -65,6 +77,9 @@ function App() {
             path={AUTH_ROUTES.changePassword}
             element={<AuthPage mode='changePassword' />}
           />
+          <Route path={PANEL_ROUTES.root} element={<PanelRoot />}>
+            <Route index element={<PanelHomePage />} />
+          </Route>
           <Route path='*' element={<NotFoundPage />} />
         </Routes>
       </Suspense>

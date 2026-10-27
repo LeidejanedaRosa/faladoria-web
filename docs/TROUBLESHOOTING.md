@@ -4,6 +4,33 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## SkipLink sem fundo ao receber o foco, com o teste unitário passando
+
+**Data**: 2026-10-26
+
+**Sintoma**: no site público e no painel, o primeiro Tab mostra "Pular para o conteúdo principal"
+sem fundo, com o texto sobre o conteúdo da página. O teste do `SkipLink` passava.
+
+**Causa raiz**: duas, uma escondendo a outra.
+
+1. O componente usava `focus:bg-primary focus:text-secondary`. O tema do Tailwind v4
+   (`@theme` em `index.css`) não define `primary` nem `secondary`. **Classe com cor inexistente
+   não dá erro**: o Tailwind simplesmente não gera a regra, e o build e o lint passam.
+2. O teste afirmava `toHaveClass('focus:bg-primary', ...)`. Ele conferia o **nome** da classe,
+   não o efeito, e por isso protegia o defeito: qualquer correção o quebraria. O jsdom não aplica
+   CSS, então um teste unitário não tem como ver a cor.
+
+**Solução**: trocar para cores do tema (`focus:bg-purple-dark focus:text-white`) e conferir a
+**cor pintada** no navegador real, no E2E (`toHaveCSS('background-color', ...)` com o link
+focado, em `tests/panel/panel-shell.spec.ts`). Prova inversa: com as classes antigas de volta, os
+dois testes E2E falham com `rgba(0, 0, 0, 0)`.
+
+**Lição**: ao revisar um componente, procurar classes de cor que não estão no `@theme`
+(`grep` por `bg-primary`, `text-secondary` e afins). Teste de classe CSS só vale para classes
+que mudam comportamento (`sr-only`), não para cores.
+
+---
+
 ## "does not provide an export named …" no `pnpm dev`, com o arquivo certo no disco
 
 **Data**: 2026-10-25

@@ -25,6 +25,7 @@ export {
   EyeOffIcon,
   FistIcon,
   GlobeIcon,
+  HomeIcon,
   HeartIcon,
   LocationIcon,
   LockIcon,

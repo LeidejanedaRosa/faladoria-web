@@ -28,8 +28,10 @@ describe('SkipLink', () => {
       'focus:top-0',
       'focus:left-0',
       'focus:z-[1600]',
-      'focus:bg-primary',
-      'focus:text-secondary'
+      // Colours that exist in the theme: the old ones (primary, secondary) did not, and the
+      // focused link showed no background. The painted colour is checked in the E2E.
+      'focus:bg-purple-dark',
+      'focus:text-white'
     )
   })
 })

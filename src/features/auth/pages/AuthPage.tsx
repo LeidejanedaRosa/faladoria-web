@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 
 import { useDocumentMeta } from '@shared/hooks/useDocumentMeta'
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 
 import {
   type AuthAsidePanel,
@@ -12,6 +12,7 @@ import { ChangePasswordCard } from '../components/ChangePasswordCard'
 import { LoginCard } from '../components/LoginCard'
 import { AUTH_CONTENT, AUTH_ROUTES } from '../data/authContent'
 import { useSession } from '../hooks/useSession'
+import { returnPathFrom } from '../utils/returnPath'
 
 interface AuthPageProps {
   mode: AuthMode
@@ -23,6 +24,7 @@ interface AuthPageProps {
  */
 export const AuthPage = ({ mode }: AuthPageProps) => {
   const navigate = useNavigate()
+  const location = useLocation()
   const { data: session } = useSession()
   const headingRef = useRef<HTMLHeadingElement>(null)
   const previousModeRef = useRef(mode)
@@ -63,6 +65,15 @@ export const AuthPage = ({ mode }: AuthPageProps) => {
           switchLabel: changePassword.switchButton,
           onSwitch: () => navigate(AUTH_ROUTES.login),
         },
+  }
+
+  // The one place that decides where a signed-in person goes from the login: right after
+  // signing in, and when someone already signed in opens the login address.
+  if (mode === 'login' && session) {
+    const target = session.user.mustChangePassword
+      ? AUTH_ROUTES.changePassword
+      : returnPathFrom(location.state)
+    return <Navigate to={target} replace />
   }
 
   return (
