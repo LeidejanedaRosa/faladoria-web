@@ -68,11 +68,20 @@ src/
 │   │   ├── pages/         # ServiceAreasPage, ServiceAreasRoute (RequireRole + page, one lazy chunk)
 │   │   ├── schemas/       # cityLocationSchema
 │   │   ├── services/      # /api/service-areas/*, IBGE localities
-│   │   └── utils/         # serviceAreaErrorMessage, formatDay
-│   └── complaints/, users/, notifications/   # future: one feature per API domain
+│   │   ├── utils/         # serviceAreaErrorMessage, formatDay
+│   │   └── index.ts       # Public API for other features (useServiceAreas, ServiceArea)
+│   ├── users/             # Team accounts (/dashboard/equipe, admin only)
+│   │   ├── components/    # AccountList/Item, StatusBadge, NewAccountForm, RoleField, CityTagsField, TemporaryPasswordDialog
+│   │   ├── data/          # usersContent, accountRules
+│   │   ├── hooks/         # useUsers, useCreateUser, useNewAccountForm, useNewAccountFlow
+│   │   ├── pages/         # TeamPage, TeamRoute (RequireRole + page, one lazy chunk)
+│   │   ├── schemas/       # newAccountSchema
+│   │   ├── services/      # /api/users
+│   │   └── utils/         # userErrorMessage
+│   └── complaints/, notifications/   # future: one feature per API domain
 └── shared/
     ├── components/
-    │   ├── ui/            # Reusable UI (icons, AccessibleLink, WhatsAppCTA, Button, TextField, PasswordField, SelectField, Combobox, ConfirmDialog, FormAlert)
+    │   ├── ui/            # Reusable UI (icons, AccessibleLink, WhatsAppCTA, Button, TextField, PasswordField, SelectField, Combobox, ConfirmDialog, FormAlert, StatusMessage)
     │   ├── layout/        # Header, Footer, Container, PageShell
     │   ├── error/         # ErrorBoundary, SectionErrorFallback
     │   └── seo/           # JsonLdScript, BreadcrumbSchema
@@ -84,6 +93,8 @@ src/
 ```
 
 **Splitting criterion**: If only one feature uses it → goes into that feature. If two or more features use it → goes into `shared/`.
+
+**Cross-feature imports**: a feature uses another only through that feature's `index.ts` (e.g. `@features/service-areas`), never its internal folders. Data a feature owns (its query and cache) stays in it and is exported there, instead of moving to `shared/`.
 
 **Internal subfolder criterion**: Features organize their `components/` directory based on the nature of their components — not by count:
 

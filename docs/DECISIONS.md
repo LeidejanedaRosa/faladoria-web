@@ -6,6 +6,100 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-10-28 — Equipe: lista de contas, criação e senha temporária mostrada uma vez
+
+**Contexto**: a tela `/dashboard/equipe` (só `admin`) lista as contas do painel e cria contas
+novas. A API (`POST /api/users`) devolve uma senha temporária **só nessa resposta**: ela não guarda
+cópia legível, a senha vale 24 horas e a pessoa troca no primeiro acesso. O papel decide o que a
+pessoa vê: assistente e gestão só veem as reclamações das cidades da conta. A tela foi dividida
+em dois PRs: este (lista + criar) e o próximo (editar, nova senha, desativar/reativar).
+
+**Decisão** (UX aprovada pela Leidejane):
+
+- **Papel em cartões de rádio, com o que cada um permite**, não num `<select>`: a diferença entre
+  os papéis precisa estar à vista antes da escolha, não escondida numa lista fechada.
+- **Cidades por busca + etiquetas**: a busca só oferece as cidades atendidas (a API recusa outras
+  com `ASSIGNED_CITY_NOT_SERVED`); cada escolha vira uma etiqueta com × ("Tirar Varginha/MG"), e a
+  busca esvazia para a próxima. Cidade já escolhida aparece marcada ("já escolhida") e não pode
+  ser escolhida de novo. Tirar uma etiqueta devolve o foco à busca, não ao `<body>`.
+- **Assistente e gestão precisam de pelo menos uma cidade**, embora a API aceite zero: sem cidade
+  a pessoa entra e não vê nada. **Administração não escolhe cidade** (vê todas): o campo some, e o
+  formulário envia `assignedCities: []` mesmo se cidades tinham sido escolhidas antes de trocar o
+  papel.
+- **Sem cidades atendidas ainda**: em vez de uma busca vazia, um aviso com link para
+  `/dashboard/cidades`.
+- **A senha aparece num diálogo modal que só fecha em "Já anotei a senha"**: Escape e clique fora
+  não fecham (`onCancel` com `preventDefault`), porque perder a senha obrigaria a gerar outra. Ela
+  aparece em fonte monoespaçada e espaçada (vai ser ditada ou digitada), com "Copiar senha" e o
+  resultado da cópia numa região `role="status"`; se o navegador recusar, a mensagem diz como
+  copiar à mão. O foco começa em "Copiar senha" e, ao fechar, volta para "Nova conta".
+- **A senha vive só no estado do fluxo** (`useNewAccountFlow`) e é descartada ao fechar o diálogo:
+  nada de cache do TanStack Query, `localStorage` ou log.
+- **"Nova conta" é um disclosure** (`aria-expanded` + `aria-controls`): o mesmo botão abre e fecha
+  o formulário e continua visível. Ao cancelar, o foco volta a ele.
+- **Erros da API no campo certo**: e-mail repetido (`USER_EMAIL_ALREADY_EXISTS`) vai para o campo
+  de e-mail, e cidade que deixou de ser atendida (`ASSIGNED_CITY_NOT_SERVED`, com a lista em
+  `details.cities`) vai para as cidades, os dois com foco. O resto vai para o alerta acima do
+  formulário.
+- **Lista: cartão no celular, colunas a partir de `lg`**. Cada valor tem seu rótulo (`<dt>`),
+  visível no celular e só para leitores de tela no desktop, onde há um cabeçalho visual
+  (`aria-hidden`). As colunas usam `grid-cols-subgrid`, e não `display: contents`, que em alguns
+  navegadores tira a `<dl>` da árvore de acessibilidade. A situação é um selo com cor **e** texto
+  (WCAG 1.4.1). A conta logada aparece com "(você)".
+
+**Alternativas rejeitadas**:
+
+- **`<select multiple>` ou lista de checkboxes para as cidades**: o primeiro é ruim de usar no
+  celular e pelo teclado; o segundo vira uma parede de opções quando há muitas cidades.
+- **Senha num aviso na página** (sem diálogo): some com qualquer clique ou navegação.
+- **Página separada para criar conta**: o formulário é curto, e voltar para a lista depois da
+  senha seria um passo a mais.
+- **Mandar a senha por e-mail pelo painel**: depende do backend, e a senha ficaria em mais um lugar.
+
+**Testes**: unitários do esquema (nome no limite da API, e-mail vazio × inválido, cidade por papel,
+erros juntos), do mapa de erros, do serviço, dos hooks (recarga de `['users']` só quando cria,
+fluxo da senha), dos componentes (lista com rótulos e "Tentar de novo" com foco, etiquetas,
+formulário com erros da API no campo, diálogo que ignora Escape e devolve o foco) e da página com
+uma API falsa com estado (`src/test/fakeUsersApi.ts`). E2E em `tests/panel/team.spec.ts` nos 5
+projetos: axe na lista, com erros e busca aberta, e no diálogo; criar conta só pelo teclado; Escape
+não fecha o diálogo e o foco fica preso nele; menu só para a administração; colunas no desktop,
+cartões sem rolagem lateral no celular; alvo de toque de 48px no ×.
+
+---
+
+## 2026-10-28 — Peças compartilhadas da equipe: API pública por feature, `StatusMessage`, `clearOnChoose`
+
+**Contexto**: a tela de equipe precisou das cidades atendidas (da feature `service-areas`), da
+mesma mensagem de resultado que a tela de cidades já tinha e de um `Combobox` que escolhe várias
+opções seguidas.
+
+**Decisão**:
+
+- **Uma feature usa outra só pelo `index.ts` dela**: `features/service-areas/index.ts` exporta
+  `useServiceAreas` e o tipo `ServiceArea`, e `users` importa de `@features/service-areas`. As
+  pastas internas continuam livres para mudar; o `index.ts` é o contrato. O hook continua em
+  `service-areas`, e não em `shared/`, porque é a fonte dos dados dessa feature, que segue dona da
+  consulta e do cache.
+- **`StatusMessage` foi para `shared/ui`**: era o `Announcement` local da tela de cidades. Com duas
+  telas usando, vale o critério do projeto. A região `role="status"` fica sempre na página, vazia
+  e `sr-only` até haver mensagem: uma região que aparece junto com o texto muitas vezes não é lida.
+- **`Combobox` ganhou `clearOnChoose`**: depois de cada escolha o campo esvazia, para escolher
+  várias seguidas. Nesse modo o pai guarda as escolhas em outro lugar (as etiquetas) e passa
+  `value=''`.
+- **Alvo de toque maior que o desenho**: o × da etiqueta é desenhado com 36px para caber na
+  etiqueta, e um `::after` com `-inset-1.5` leva a área de toque a 48px (regra do projeto), sem
+  mudar o visual aprovado.
+
+**Alternativas rejeitadas**:
+
+- **Importar `@features/service-areas/hooks/useServiceAreas` direto**: funciona, mas prende a
+  equipe à estrutura interna da outra feature.
+- **Mover `useServiceAreas` para `shared/`**: tiraria da feature a consulta que ela mesma invalida
+  ao adicionar ou remover cidades.
+- **Aumentar o × para 48px desenhados**: a etiqueta ficaria mais alta que o texto pede.
+
+---
+
 ## 2026-10-27 — Cidades atendidas: lista do IBGE, repetidas bloqueadas e aviso das contas antes de remover
 
 **Contexto**: a tela `/dashboard/cidades` (só `admin`) mantém a lista de cidades em que a
