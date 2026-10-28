@@ -179,6 +179,33 @@ describe('Combobox', () => {
     })
   })
 
+  it('empties the field after each choice when picking several in a row', async () => {
+    // Like the city tags: the choices live elsewhere, so the field's own value stays ''.
+    const onChange = vi.fn()
+    render(
+      <Combobox
+        label='Cidade'
+        options={CITIES}
+        value=''
+        onChange={onChange}
+        clearOnChoose
+        noMatchText=''
+        resultsText={() => ''}
+        moreResultsText={() => ''}
+      />
+    )
+
+    await userEvent.type(field(), 'alf')
+    await userEvent.keyboard('{ArrowDown}{Enter}')
+    await userEvent.type(field(), 'vargem')
+    await userEvent.click(screen.getByRole('option', { name: 'Vargem Alegre' }))
+
+    expect(onChange.mock.calls).toEqual([['Alfenas'], ['Vargem Alegre']])
+    expect(field()).toHaveValue('')
+    expect(field()).toHaveFocus()
+    expect(field()).toHaveAttribute('aria-expanded', 'false')
+  })
+
   it('follows a value cleared from outside, as when another state is chosen', async () => {
     const Parent = () => {
       const [value, setValue] = useState('Varginha')
