@@ -1,6 +1,7 @@
 import { vi } from 'vitest'
 
 export const TEST_API_URL = 'https://api.test'
+export const TEST_IBGE_URL = 'https://ibge.test/localidades'
 
 export const jsonResponse = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -15,6 +16,7 @@ export const apiErrorResponse = (status: number, code = 'INTERNAL_ERROR') =>
 export const stubApi = () => {
   const fetchMock = vi.fn<typeof fetch>()
   vi.stubEnv('VITE_API_URL', TEST_API_URL)
+  vi.stubEnv('VITE_IBGE_API_URL', TEST_IBGE_URL)
   vi.stubGlobal('fetch', fetchMock)
   return fetchMock
 }
