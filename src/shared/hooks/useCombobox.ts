@@ -10,6 +10,8 @@ interface UseComboboxOptions {
   maxResults: number
   /** Options shown but not choosable (with the reason next to them, in the list). */
   isOptionDisabled?: (option: string) => boolean
+  /** Empties the field after each choice, to pick several options one after another. */
+  clearOnChoose?: boolean
 }
 
 const sameText = (a: string, b: string) =>
@@ -34,6 +36,7 @@ export const useCombobox = ({
   onChange,
   maxResults,
   isOptionDisabled = () => false,
+  clearOnChoose = false,
 }: UseComboboxOptions) => {
   const [text, setText] = useTextFollowingValue(value)
   const [isOpen, setIsOpen] = useState(false)
@@ -48,7 +51,7 @@ export const useCombobox = ({
 
   const choose = (option: string) => {
     if (isOptionDisabled(option)) return
-    setText(option)
+    setText(clearOnChoose ? '' : option)
     close()
     onChange(option)
   }
