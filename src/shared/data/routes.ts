@@ -9,6 +9,7 @@ export const GUIDE_ROUTES = {
 export const PANEL_ROUTES = {
   root: '/dashboard',
   serviceAreas: '/dashboard/cidades',
+  team: '/dashboard/equipe',
 } as const
 
 // Reads the address the way React Router matches it: decoded and case-insensitive, so

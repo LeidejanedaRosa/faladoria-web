@@ -51,6 +51,12 @@ const PanelHomePage = lazy(() =>
   }))
 )
 
+const TeamRoute = lazy(() =>
+  import('./features/users/pages/TeamRoute').then(m => ({
+    default: m.TeamRoute,
+  }))
+)
+
 const ServiceAreasRoute = lazy(() =>
   import('./features/service-areas/pages/ServiceAreasRoute').then(m => ({
     default: m.ServiceAreasRoute,
@@ -85,6 +91,7 @@ function App() {
           />
           <Route path={PANEL_ROUTES.root} element={<PanelRoot />}>
             <Route index element={<PanelHomePage />} />
+            <Route path={PANEL_ROUTES.team} element={<TeamRoute />} />
             <Route
               path={PANEL_ROUTES.serviceAreas}
               element={<ServiceAreasRoute />}

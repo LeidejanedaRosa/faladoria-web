@@ -19,6 +19,7 @@ export const PANEL_CONTENT = {
   nav: {
     label: 'Navegação do painel',
     home: 'Início',
+    team: 'Equipe',
     serviceAreas: 'Cidades atendidas',
   },
   forbidden: {
