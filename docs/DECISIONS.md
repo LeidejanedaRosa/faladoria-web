@@ -6,6 +6,115 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-10-27 — Cidades atendidas: lista do IBGE, repetidas bloqueadas e aviso das contas antes de remover
+
+**Contexto**: a tela `/dashboard/cidades` (só `admin`) mantém a lista de cidades em que a
+Faladoria atua. O bot do WhatsApp aceita reclamações só dessas cidades, e gestores e assistentes
+só podem receber cidades dela. O backend só tira espaços e compara sem maiúsculas e acentos: não
+confere se a cidade existe.
+
+**Decisão** (UX aprovada pela Leidejane):
+
+- **Cidade escolhida da lista oficial do IBGE**, depois do estado. Um erro de digitação
+  ("Varginah") seria gravado sem aviso, e quem é de Varginha teria a reclamação recusada pelo bot.
+  A API de localidades é pública, sem chave, responde com `Access-Control-Allow-Origin: *` e manda
+  guardar por 30 dias; Minas Gerais (853 cidades) chega com 19 KB comprimidos. Uma consulta por
+  estado na visita (`staleTime: Infinity`). O endereço fica em `VITE_IBGE_API_URL`, como toda URL
+  do projeto. A chamada usa `fetch` direto, não o `apiRequest`: é outro serviço, sem o nosso cookie
+  nem o nosso formato de erro.
+- **IBGE fora do ar: texto livre**, com a regra de grafia escrita no campo. Uma tentativa a mais e,
+  se falhar, o formulário segue, em vez de travar a administração.
+- **Cidade já atendida aparece marcada ("já atendida") e não pode ser escolhida** (prevenção de
+  erro, heurística 5 de Nielsen), comparando como a API compara. Na correção de uma cidade, a
+  própria cidade não conta como repetida. A API continua sendo a garantia: se outra pessoa
+  adicionar a mesma cidade nesse meio tempo, o `409` aparece no campo.
+- **Remover pede confirmação e diz quantas contas atendem a cidade**
+  (`GET /api/users?city=&state=`): remover não mexe nas contas, que continuam com uma cidade que o
+  bot não atende mais. O diálogo começa em "Cancelar".
+- **Depois de adicionar, o estado continua escolhido** e o foco volta à cidade: as cidades costumam
+  entrar em grupo, da mesma região.
+- **"Corrigir" é na própria linha**, com "Corrigindo Varginha/MG" em cima; ao salvar ou cancelar,
+  o foco volta ao botão "Corrigir".
+- **Ativas e removidas são dois endereços** (`?situacao=removidas`), não abas: o "voltar" do
+  navegador e o link compartilhado funcionam; `aria-current` marca a lista mostrada.
+- **Depois de remover ou reativar**, a linha some da lista mostrada, e o foco iria para o
+  `<body>`: ele vai para o título "Lista de cidades", e a mensagem aparece numa região
+  `role="status"`, sempre presente na página.
+- **Conflito ou cidade que mudou** (`SERVICE_AREA_CONCURRENT_CHANGE`, `…_NOT_FOUND`,
+  `…_ALREADY_REMOVED`, `…_NOT_REMOVED`): a mensagem explica, e as listas são recarregadas.
+
+**Alternativas rejeitadas**:
+
+- **Texto livre**: menos código e nenhuma dependência, mas a grafia errada só apareceria quando o
+  bot recusasse alguém.
+- **Lista de cidades embutida no código** (5.570 nomes): 100 KB a mais no painel e uma lista para
+  manter quando surgir município novo.
+- **Mostrar o erro de repetida só depois de enviar**: deixa a pessoa errar para depois corrigir.
+- **Abas ARIA (`role="tablist"`) em vez de links**: o estado ficaria só na memória da tela.
+
+**Testes**: unitários dos serviços (rotas, corpo, IBGE sem cookie, falha), do mapa de erros, do
+dia em horário de Brasília, do esquema, dos hooks (recarga das duas listas depois de mudar e
+depois de conflito, nenhuma consulta sem estado, uma tentativa a mais no IBGE) e da página inteira
+com uma API falsa com estado (adicionar, já atendida, trocar de estado, IBGE fora, corrigir,
+remover com aviso e foco, falha no diálogo, reativar). E2E em `tests/panel/service-areas.spec.ts`
+nos 5 projetos: axe com a lista, com a busca aberta e com o diálogo; tudo pelo teclado; foco preso
+no diálogo e devolvido no Escape; menu só para a administração; botões empilhados e lista dentro da
+tela no celular.
+
+---
+
+## 2026-10-27 — Kit do painel: `Combobox`, `SelectField` e `ConfirmDialog` em `shared/ui`
+
+**Contexto**: a tela de cidades precisou de uma busca com lista, de um seletor e de uma
+confirmação. A tela de equipe vai precisar dos três (escolher cidades da conta, desativar conta).
+
+**Decisão**:
+
+- **`Combobox`**: padrão WAI-ARIA 1.2 (campo `role="combobox"` + `listbox`). O foco fica no campo;
+  as setas movem o destaque (`aria-activedescendant`), Enter escolhe sem enviar o formulário,
+  Escape fecha. A lista abre ao digitar, clicar ou apertar ↓, não ao receber o foco (senão abriria
+  sozinha depois de cada cidade adicionada). Busca sem acento e sem maiúscula, primeiro o que começa
+  com o texto; mostra até 50 e pede para continuar digitando; a quantidade encontrada é anunciada
+  numa região `status`. Sair do campo com o nome exato digitado conta como escolher. Aceita opções
+  desabilitadas com o motivo ao lado: o componente não sabe o que é cidade; a regra fica na feature
+  (aberto/fechado). A lógica fica em `useCombobox`, a ordenação em `rankMatches`.
+- **`SelectField`**: `<select>` nativo. No celular abre o seletor do sistema, e teclado e leitor de
+  tela funcionam sem código nosso.
+- **`ConfirmDialog`**: `<dialog>` nativo com `showModal()`, que prende o foco, deixa a página atrás
+  inerte e fecha no Escape, sem script nosso para isso (`useModalDialog` só liga o estado do React
+  ao elemento). Fecha só em "Cancelar" e Escape: um clique fora não descarta uma decisão
+  destrutiva no meio. Devolve o foco a quem abriu, ou a `returnFocusRef` quando quem abriu some.
+- **`Button` ganhou a variante `danger`**, e `FieldMessages` passou a ser a dica e o erro de todo
+  campo (`TextField`, `SelectField`, `Combobox`), com `joinIds` para o `aria-describedby`.
+
+**Alternativas rejeitadas**:
+
+- **`<input list>` com `<datalist>`**: suporte desigual entre navegadores e leitores de tela, e sem
+  como marcar uma opção como indisponível.
+- **Biblioteca de componentes (Headless UI, Radix)**: uma dependência para três peças; as regras
+  acima ficariam espalhadas entre a biblioteca e o projeto.
+- **Diálogo feito à mão com `useFocusTrap`**: mais código para reproduzir o que o navegador já faz.
+
+**Exceção de lint, com motivo**: na lista do `Combobox`, `jsx-a11y/click-events-have-key-events`
+está desligada numa linha. O teclado fica no campo (o padrão ARIA), e a regra não enxerga isso.
+
+---
+
+## 2026-10-27 — Painel: guarda por papel e `Suspense` no layout
+
+**Decisão**:
+
+- **`RequireRole`** esconde uma página dos papéis que não a usam. O menu já não mostra o item;
+  a guarda cobre o endereço digitado, com "Acesso restrito" num `<h1>` e o link de volta ao
+  início. É orientação, não segurança: a API responde `403` de qualquer jeito. A guarda vai no
+  mesmo pedaço `lazy` da página (`ServiceAreasRoute`): importada no `App.tsx`, levaria código do
+  painel para o pacote que todo visitante do site baixa.
+- **`Suspense` em volta do `<Outlet>`**: com o único `Suspense` no topo do app, ao trocar de página
+  do painel tudo virava uma tela branca enquanto o código da página carregava. Agora o cabeçalho e
+  o menu ficam, e só o conteúdo mostra "Carregando a página…".
+
+---
+
 ## 2026-10-27 — `.d.ts` do `tsconfig.node.json` gravados fora do código (`declarationDir`)
 
 **Contexto**: issue #59. Num clone novo, `pnpm build` seguido de `pnpm lint` falhava num arquivo

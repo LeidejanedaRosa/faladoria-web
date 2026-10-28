@@ -56,23 +56,31 @@ src/
 │   │   ├── services/      # Calls to /api/auth/*
 │   │   └── utils/         # authErrorMessage (API code → Portuguese text), returnPath
 │   ├── panel/             # Panel shell (layout, menu) and home page (/dashboard)
-│   │   ├── components/    # PanelLayout, PanelHeader, PanelNav, PanelMobileMenu, ComplaintCounts
+│   │   ├── components/    # PanelLayout, PanelHeader, PanelNav, PanelMobileMenu, ComplaintCounts, RequireRole
 │   │   ├── data/          # panelContent (copy, role labels)
 │   │   ├── hooks/         # usePanelUser (outlet context), useComplaintCounts
 │   │   ├── pages/         # PanelRoot (guard + layout), PanelHomePage
 │   │   └── services/      # Calls to /api/complaints/counts
-│   └── complaints/, users/, service-areas/, notifications/   # future: one feature per API domain
+│   ├── service-areas/     # Served cities (/dashboard/cidades, admin only)
+│   │   ├── components/    # CityFields (state + IBGE city), add/edit forms, list, row, remove dialog
+│   │   ├── data/          # serviceAreasContent, brazilianStates
+│   │   ├── hooks/         # useServiceAreas, mutations, useIbgeCities, useAccountsInCity, actions
+│   │   ├── pages/         # ServiceAreasPage, ServiceAreasRoute (RequireRole + page, one lazy chunk)
+│   │   ├── schemas/       # cityLocationSchema
+│   │   ├── services/      # /api/service-areas/*, IBGE localities
+│   │   └── utils/         # serviceAreaErrorMessage, formatDay
+│   └── complaints/, users/, notifications/   # future: one feature per API domain
 └── shared/
     ├── components/
-    │   ├── ui/            # Reusable UI (icons, AccessibleLink, WhatsAppCTA, Button, TextField, PasswordField, FormAlert)
+    │   ├── ui/            # Reusable UI (icons, AccessibleLink, WhatsAppCTA, Button, TextField, PasswordField, SelectField, Combobox, ConfirmDialog, FormAlert)
     │   ├── layout/        # Header, Footer, Container, PageShell
     │   ├── error/         # ErrorBoundary, SectionErrorFallback
     │   └── seo/           # JsonLdScript, BreadcrumbSchema
     ├── data/              # Global constants (COMPANY_INFO, structuredData, PANEL_ROUTES, UI_CONTENT, etc.)
-    ├── hooks/             # Shared hooks (useDocumentMeta, useFocusTrap, useRecoveryFocus, useSidebar, etc.)
+    ├── hooks/             # Shared hooks (useDocumentMeta, useFocusTrap, useRecoveryFocus, useSidebar, useCombobox, useModalDialog, etc.)
     ├── lib/               # Sentry, api/ (HTTP client for faladoria-backend)
     ├── types/
-    └── utils/             # cn, slugify, formatPercentage, reportWebVitals
+    └── utils/             # cn, slugify, formatPercentage, reportWebVitals, normalizeForSearch, rankMatches, joinIds, mergeRefs
 ```
 
 **Splitting criterion**: If only one feature uses it → goes into that feature. If two or more features use it → goes into `shared/`.
