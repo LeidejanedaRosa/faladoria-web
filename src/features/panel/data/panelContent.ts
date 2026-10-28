@@ -19,9 +19,16 @@ export const PANEL_CONTENT = {
   nav: {
     label: 'Navegação do painel',
     home: 'Início',
+    serviceAreas: 'Cidades atendidas',
+  },
+  forbidden: {
+    title: 'Acesso restrito',
+    message: 'Esta página não está disponível para o seu perfil.',
+    backHome: 'Voltar ao início do painel',
   },
   skipLink: 'Pular para o conteúdo principal',
   loading: 'Carregando o painel…',
+  loadingPage: 'Carregando a página…',
   home: {
     metaTitle: 'Início do painel',
     greeting: (firstName: string) => `Olá, ${firstName}`,

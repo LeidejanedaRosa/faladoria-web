@@ -1,5 +1,6 @@
 import { defineConfig, devices } from '@playwright/test'
 
+import { E2E_IBGE_URL } from './tests/helpers/ibgeApi'
 import { E2E_API_URL } from './tests/helpers/publicBoardApi'
 
 export default defineConfig({
@@ -52,7 +53,7 @@ export default defineConfig({
     command: 'pnpm build && pnpm preview',
     // Fixed here, not read from .env: a developer's .env.local must not change what the
     // tests hit. Tests intercept this address with page.route.
-    env: { VITE_API_URL: E2E_API_URL },
+    env: { VITE_API_URL: E2E_API_URL, VITE_IBGE_API_URL: E2E_IBGE_URL },
     url: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:4173',
     reuseExistingServer: false,
   },

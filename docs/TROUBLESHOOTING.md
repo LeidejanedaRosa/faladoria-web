@@ -4,6 +4,120 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## Foco cai no `<body>` depois de "Tentar de novo", só quando a consulta vem por prop
+
+**Data**: 2026-10-27
+
+**Sintoma**: na lista de cidades, depois de um "Tentar de novo" que dá certo, o foco ia para o
+`<body>`. Nas contagens da página inicial, com o mesmo `useRecoveryFocus`, funcionava.
+
+**Causa raiz**: a página chamava `useServiceAreas` e passava o resultado como prop para a lista,
+que chamava o `useRecoveryFocus`. Quando a tentativa termina, o hook encerra o `isRetrying` e, no
+efeito seguinte, procura a lista para focar. Mas o TanStack Query avisa os componentes que
+observam a consulta com um pequeno atraso (`notifyManager`), e a página só repassa os dados novos
+um render depois. Nesse meio, a lista ainda recebia a prop antiga ("erro"), não estava montada, e
+o efeito não tinha o que focar.
+
+```
+contagens:  [useQuery + useRecoveryFocus]  → o render que encerra a tentativa já tem os dados
+cidades:    página [useQuery] → prop → lista [useRecoveryFocus]
+            render 1: tentativa encerrada, prop ainda "erro" → efeito: nada a focar
+            render 2: a prop chega com os dados              → efeito já rodou
+```
+
+**Solução**: a lista chama a própria consulta (a página lê o mesmo cache para as contagens das
+abas, sem pedido a mais). Regra: **a consulta e o `useRecoveryFocus` ficam no mesmo componente**.
+O teste "keeps the retry button focused while it retries, then focuses the list" falhava antes e
+passa depois.
+
+---
+
+## Um teste passa sozinho e falha depois de outro: a API falsa alterava a fixture
+
+**Data**: 2026-10-27
+
+**Sintoma**: os testes de remover "Varginha/MG" não achavam o botão, mas só quando rodavam depois
+do teste de correção, que troca Varginha por Vargem Alegre.
+
+**Causa raiz**: a API falsa (`src/test/fakeServiceAreasApi.ts`) copiava as listas
+(`[...active]`), mas não as cidades de dentro. A correção (`Object.assign`) mudou o objeto
+`VARGINHA` da fixture, e os testes seguintes começaram com "Vargem Alegre".
+
+**Solução**: copiar cada cidade (`active.map(area => ({ ...area }))`). Regra: um dublê com estado
+copia **os objetos**, não só o array.
+
+---
+
+## jsdom: `<dialog>` sem `showModal()` nem `close()`
+
+**Data**: 2026-10-27
+
+**Sintoma**: `TypeError: dialog.showModal is not a function` nos testes do `ConfirmDialog`.
+
+**Causa raiz**: o jsdom 25 tem o elemento e a propriedade `open`, mas não os métodos.
+
+**Solução**: em `src/test/setup.ts`, os dois métodos só alternam o atributo `open`. O que o
+navegador faz de verdade nesse modo (foco preso, página inerte, Escape) é conferido no E2E. No
+teste de unidade, o Escape é simulado com o evento `cancel`.
+
+---
+
+## Playwright não clica numa opção com `aria-disabled`
+
+**Data**: 2026-10-27
+
+**Sintoma**: o teste "should not let an already served city be chosen" estoura o tempo em
+`locator.click`.
+
+**Causa raiz**: o Playwright trata `aria-disabled="true"` como desabilitado e espera o elemento
+habilitar antes de clicar. O `force: true` resolveria, mas a regra `playwright/no-force-option`
+(e o `--max-warnings 0`) não deixa.
+
+**Solução**: `locator.dispatchEvent('click')`, que manda o clique direto, como o de uma pessoa.
+
+---
+
+## axe: contagem das abas com contraste 4,34:1
+
+**Data**: 2026-10-27
+
+**Sintoma**: o axe acusa `color-contrast` no "(1)" ao lado de "Removidas".
+
+**Causa raiz**: `text-slate-500` sobre `bg-slate-100` dá 4,34:1; texto de 14px pede 4,5:1. Sobre
+branco, o mesmo cinza passa (4,8:1), por isso não aparecia em outros lugares.
+
+**Solução**: `text-slate-600`. Regra: cinza claro sobre fundo cinza precisa ser conferido; sobre
+branco, `slate-500` é o limite.
+
+---
+
+## `pnpm lint` falha num `.d.ts` gerado, só num clone novo
+
+**Data**: 2026-10-27
+
+**Sintoma**: num clone novo, `pnpm build` e depois `pnpm lint` acusam erros do Prettier em
+`tests/helpers/publicBoardApi.d.ts`, um arquivo que ninguém escreveu. Na máquina de quem já tinha
+o projeto, o mesmo comando passa.
+
+**Causa raiz**: o `tsconfig.node.json` é composite com `emitDeclarationOnly` e não tinha
+`declarationDir`, então o `tsc -b` gravava cada `.d.ts` ao lado do `.ts`. O `.gitignore` escondia
+esses arquivos do git, mas o ESLint não lê o `.gitignore`. A diferença entre as máquinas vinha do
+build incremental: com o `tsconfig.node.tsbuildinfo` em cache, o `tsc -b` considera o projeto
+atualizado e não grava de novo o `.d.ts`; só um clone novo (sem cache) o gerava.
+
+**Solução**: `declarationDir` em `node_modules/.tmp/node-declarations`, como os outros dois
+tsconfigs (ver DECISIONS, 2026-10-27).
+
+Quem já tinha o projeto ainda tem os `.d.ts` gravados pela configuração antiga. Como eles saíram do
+`.gitignore`, aparecem no `git status` e o `pnpm lint` falha neles. Apagar uma vez (não commitar):
+`rm -f *.config.d.ts tests/helpers/*.d.ts`.
+
+Para validar a correção como num clone novo, sem o cache incremental:
+`rm -f node_modules/.tmp/tsconfig.node.tsbuildinfo && pnpm build && pnpm lint`. Nenhum `.d.ts`
+novo deve aparecer no `git status`.
+
+---
+
 ## SkipLink sem fundo ao receber o foco, com o teste unitário passando
 
 **Data**: 2026-10-26

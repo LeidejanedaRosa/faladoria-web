@@ -10,6 +10,18 @@ describe('navItemsFor', () => {
     }
   )
 
+  it('shows the served cities only to the administration', () => {
+    expect(navItemsFor('admin').map(item => item.to)).toContain(
+      '/dashboard/cidades'
+    )
+    expect(navItemsFor('assistant').map(item => item.to)).not.toContain(
+      '/dashboard/cidades'
+    )
+    expect(navItemsFor('manager').map(item => item.to)).not.toContain(
+      '/dashboard/cidades'
+    )
+  })
+
   it('only lists pages that exist: every item points inside the panel', () => {
     for (const item of PANEL_NAV_ITEMS) {
       expect(item.to.startsWith('/dashboard')).toBe(true)

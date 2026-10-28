@@ -1,6 +1,9 @@
 import { type ComponentProps, type ReactNode, useId } from 'react'
 
 import { cn } from '@shared/utils/cn'
+import { joinIds } from '@shared/utils/joinIds'
+
+import { FieldMessages } from './FieldMessages'
 
 export interface TextFieldProps extends ComponentProps<'input'> {
   label: string
@@ -9,9 +12,6 @@ export interface TextFieldProps extends ComponentProps<'input'> {
   /** Placed inside the field, on the right (e.g. the show-password button). */
   endAdornment?: ReactNode
 }
-
-const joinIds = (...ids: (string | false | undefined)[]) =>
-  ids.filter(Boolean).join(' ') || undefined
 
 export const TextField = ({
   label,
@@ -52,16 +52,12 @@ export const TextField = ({
           </div>
         )}
       </div>
-      {hint && (
-        <p id={hintId} className='text-sm text-slate-600'>
-          {hint}
-        </p>
-      )}
-      {error && (
-        <p id={errorId} className='text-sm font-medium text-red-700'>
-          {error}
-        </p>
-      )}
+      <FieldMessages
+        hintId={hintId}
+        hint={hint}
+        errorId={errorId}
+        error={error}
+      />
     </div>
   )
 }

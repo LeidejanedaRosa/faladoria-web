@@ -1,3 +1,5 @@
+import { Suspense } from 'react'
+
 import type { SessionUser } from '@features/auth/services/authApi'
 import { MainContent, SkipLink } from '@shared/components/ui'
 import { useSidebar } from '@shared/hooks/useSidebar'
@@ -39,7 +41,17 @@ export const PanelLayout = ({ user }: PanelLayoutProps) => {
         <MainContent className='min-w-0 flex-1'>
           {/* Centred and capped: on very wide screens the content does not stretch edge to edge. */}
           <div className='mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:py-8'>
-            <Outlet context={outletContext} />
+            {/* Here, not only at the top of the app: while a page's code loads, the header and
+                the menu stay on screen. */}
+            <Suspense
+              fallback={
+                <output className='text-base text-slate-600'>
+                  {PANEL_CONTENT.loadingPage}
+                </output>
+              }
+            >
+              <Outlet context={outletContext} />
+            </Suspense>
           </div>
         </MainContent>
       </div>
