@@ -27,6 +27,7 @@
     "vite.config.ts",
     "vitest.config.ts",
     "playwright.config.ts",
-    "tests/helpers/publicBoardApi.ts"
+    "tests/helpers/publicBoardApi.ts",
+    "tests/helpers/ibgeApi.ts"
   ]
 }
