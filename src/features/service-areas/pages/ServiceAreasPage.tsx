@@ -1,4 +1,4 @@
-import { FormAlert } from '@shared/components/ui'
+import { FormAlert, StatusMessage } from '@shared/components/ui'
 import { useDocumentMeta } from '@shared/hooks/useDocumentMeta'
 import { useSearchParams } from 'react-router-dom'
 
@@ -18,20 +18,6 @@ const SectionHeading = ({ id, children }: { id: string; children: string }) => (
   <h2 id={id} className='text-lg font-semibold text-slate-900'>
     {children}
   </h2>
-)
-
-// Always in the page, so screen readers announce each new message.
-const Announcement = ({ message }: { message: string }) => (
-  <p
-    role='status'
-    className={
-      message
-        ? 'rounded-lg border border-green-200 bg-green-50 p-3 text-base text-green-900'
-        : 'sr-only'
-    }
-  >
-    {message}
-  </p>
 )
 
 export const ServiceAreasPage = () => {
@@ -54,7 +40,7 @@ export const ServiceAreasPage = () => {
         <p className='max-w-3xl text-base text-slate-600'>{content.intro}</p>
       </header>
 
-      <Announcement message={announcement} />
+      <StatusMessage message={announcement} />
 
       <section
         aria-labelledby='add-service-area'

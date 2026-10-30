@@ -4,6 +4,74 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## Pre-commit barrado pelo gitleaks: senha inventada de teste tomada por segredo
+
+**Data**: 2026-10-28
+
+**Sintoma**: o commit dos testes da equipe não era criado. O `gitleaks protect --staged`
+acusava `generic-api-key` em `src/test/fixtures/users.ts` e `tests/panel/team.spec.ts`.
+
+**Causa raiz**: a regra `generic-api-key` junta duas pistas: uma palavra-chave no nome
+(`PASSWORD`) e um valor com **entropia** alta, isto é, caracteres variados como os de uma chave
+de verdade. A senha inventada `Xk3q-9fQa-2mPz` imitava bem demais uma senha gerada. O gitleaks
+não sabe que o valor é falso; só vê que ele tem cara de real.
+
+**Solução**: trocar o valor por `senha-de-teste`, que é legível e tem entropia baixa. Os testes
+só conferem que a senha aparece, não o formato dela. A alternativa de marcar a linha com
+`// gitleaks:allow` foi rejeitada: ensina o projeto a silenciar o scanner, e um segredo real
+colado ao lado da exceção também passaria.
+
+---
+
+## "Escolha pelo menos uma cidade" não aparecia com os outros erros: causa diagnosticada errado
+
+**Data**: 2026-10-28
+
+**Sintoma**: no print da equipe com o formulário enviado vazio, apareciam os erros de nome,
+e-mail e papel, mas não o de cidade.
+
+**Primeiro diagnóstico (errado)**: "o Zod pula o `.refine` enquanto qualquer campo é inválido".
+A correção foi a opção `when` do `refine`, que o fazia rodar quando papel e cidades eram válidos.
+Um teste com papel "gestão" e nome vazio mostrou os três erros, e a correção pareceu confirmada.
+
+**Como apareceu**: na prova inversa, tirar o `when` não quebrou nenhum teste. Uma sonda no Node
+mostrou que, no Zod 4, o `refine` **roda** depois de checagens que falham (`min`, formato de
+e-mail). Só um **erro de tipo** o pula, porque sem o tipo certo a regra não tem como confiar nos
+dados que recebe:
+
+```
+nome "" · e-mail "" · papel "manager" · 0 cidades  →  nome | e-mail | cidade   (sem `when`)
+nome "" · e-mail "" · SEM papel       · 0 cidades  →  nome | e-mail | papel    (sem `when`)
+```
+
+**Causa raiz**: o formulário vazio não tinha **papel**, e papel ausente é erro de tipo (o `enum`
+não aceita `undefined`). O `when` também exigia papel válido, então não mudava nada. E sem papel
+o comportamento está certo: não dá para saber se a cidade é obrigatória.
+
+**Solução**: o `when` saiu. Ficou o teste "shows the missing city together with the other errors",
+que protege o comportamento caso uma versão do Zod mude essa regra. **Lição**: o teste que
+"confirma" uma correção precisa reproduzir o cenário do sintoma (aqui, o formulário sem papel), e
+a prova inversa vale também para a correção: se tirá-la não quebra nada, ela não era necessária.
+
+---
+
+## Prova inversa que "pega" pelo motivo errado
+
+**Data**: 2026-10-28
+
+**Sintoma**: para provar que o item "Equipe" do menu é só da administração, a sabotagem apagou a
+linha `roles: ['admin']` do item. Os testes quebraram, mas foram os errados: "gives admin the
+panel home", "gives assistant the panel home"...
+
+**Causa raiz**: sem `roles`, `item.roles.includes(role)` lança erro para **qualquer** papel. A
+sabotagem quebrou o arquivo, não a regra; o teste da regra nem chegou a ser avaliado.
+
+**Solução**: sabotar trocando o valor por outro **válido** (`roles: EVERY_ROLE`). Aí só "shows the
+team only to the administration" falha. Regra: a sabotagem tem que deixar o código funcionando
+com a regra errada, e o teste que falha tem que ser o da regra, não um vizinho.
+
+---
+
 ## Foco cai no `<body>` depois de "Tentar de novo", só quando a consulta vem por prop
 
 **Data**: 2026-10-27

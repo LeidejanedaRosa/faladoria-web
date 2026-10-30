@@ -22,6 +22,8 @@ interface ComboboxProps {
   inputRef?: Ref<HTMLInputElement>
   /** How many matches the list shows at once; typing more narrows it down. */
   maxResults?: number
+  /** Empties the field after each choice, to pick several options one after another. */
+  clearOnChoose?: boolean
   /** Options listed but not choosable, e.g. a city already on the list. */
   isOptionDisabled?: (option: string) => boolean
   /** Why a disabled option cannot be chosen, shown (and read) next to it. */
@@ -221,6 +223,7 @@ export const Combobox = ({
   disabled = false,
   maxResults = 50,
   isOptionDisabled,
+  clearOnChoose,
   disabledOptionLabel,
   ...inputProps
 }: ComboboxProps) => {
@@ -238,6 +241,7 @@ export const Combobox = ({
     onChange,
     maxResults,
     isOptionDisabled,
+    clearOnChoose,
   })
   const isExpanded = combobox.isOpen && !disabled
   const hasActive = isExpanded && combobox.activeIndex >= 0
