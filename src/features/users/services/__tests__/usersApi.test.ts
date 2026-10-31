@@ -3,7 +3,7 @@ import { jsonResponse, stubApi, TEST_API_URL } from '@/test/mockFetch'
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { createUser, fetchUsers } from '../usersApi'
+import { createUser, fetchUsers, updateUser } from '../usersApi'
 
 afterEach(() => {
   vi.unstubAllEnvs()
@@ -40,5 +40,33 @@ describe('usersApi', () => {
     expect(String(input)).toBe(`${TEST_API_URL}/api/users`)
     expect(init?.method).toBe('POST')
     expect(JSON.parse(String(init?.body))).toEqual(account)
+  })
+})
+
+describe('updateUser', () => {
+  it('posts only the changes to the account route and gets the saved account back', async () => {
+    const fetchMock = stubApi()
+    const saved = { ...ANA, role: 'manager', complaintsOutOfReach: 2 }
+    fetchMock.mockResolvedValue(jsonResponse(saved))
+
+    await expect(updateUser('usr_ana', { role: 'manager' })).resolves.toEqual(
+      saved
+    )
+
+    const [input, init] = fetchMock.mock.calls[0]
+    expect(String(input)).toBe(`${TEST_API_URL}/api/users/usr_ana/update`)
+    expect(init?.method).toBe('POST')
+    expect(JSON.parse(String(init?.body))).toEqual({ role: 'manager' })
+  })
+
+  it('keeps an id with odd characters inside its path segment', async () => {
+    const fetchMock = stubApi()
+    fetchMock.mockResolvedValue(jsonResponse(ANA))
+
+    await updateUser('a/b', { name: 'Ana' })
+
+    expect(String(fetchMock.mock.calls[0][0])).toBe(
+      `${TEST_API_URL}/api/users/a%2Fb/update`
+    )
   })
 })

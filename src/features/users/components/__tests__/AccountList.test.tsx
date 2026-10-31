@@ -5,6 +5,7 @@ import { renderWithQueryClient } from '@/test/queryClient'
 
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { AccountList } from '../AccountList'
@@ -16,7 +17,11 @@ afterEach(() => {
 
 const renderList = (users = [ANA, BRUNO, CARLA, DORA]) => {
   fakeUsersApi(stubApi(), { users })
-  renderWithQueryClient(<AccountList selfId={CARLA.id} />)
+  renderWithQueryClient(
+    <MemoryRouter>
+      <AccountList selfId={CARLA.id} />
+    </MemoryRouter>
+  )
 }
 
 /** The account's values as a screen reader gets them: "label: value". */
@@ -91,7 +96,11 @@ describe('AccountList', () => {
     const fetchMock = stubApi()
     fetchMock.mockResolvedValueOnce(apiErrorResponse(500))
     fetchMock.mockResolvedValueOnce(jsonResponse([ANA, CARLA]))
-    renderWithQueryClient(<AccountList selfId={CARLA.id} />)
+    renderWithQueryClient(
+      <MemoryRouter>
+        <AccountList selfId={CARLA.id} />
+      </MemoryRouter>
+    )
 
     const alert = await screen.findByRole('alert')
     expect(alert).toHaveTextContent(
@@ -105,5 +114,15 @@ describe('AccountList', () => {
     await waitFor(() =>
       expect(screen.getByRole('list').parentElement).toHaveFocus()
     )
+  })
+
+  it('links each account to its own page, named after the person', async () => {
+    renderList([ANA, CARLA])
+
+    const edit = await screen.findByRole('link', {
+      name: 'Editar a conta de Ana Souza',
+    })
+    expect(edit).toHaveAttribute('href', '/dashboard/equipe/usr_ana')
+    expect(edit).toHaveTextContent('Editar')
   })
 })

@@ -136,4 +136,39 @@ describe('CityTagsField', () => {
     expect(within(group).getByRole('combobox')).toBe(search())
     await waitFor(() => expect(search()).toBeEnabled())
   })
+
+  // Kept removable: the API refuses to save an account with a city no longer served.
+  it('marks a city of the account that is no longer served, and lets it go', async () => {
+    renderField(
+      [VARGINHA],
+      [
+        { city: 'Varginha', state: 'MG' },
+        { city: 'Lavras', state: 'MG' },
+      ]
+    )
+
+    const lavras = (await screen.findByText(/deixou de ser atendida/)).closest(
+      'li'
+    )!
+    expect(lavras).toHaveTextContent('Lavras/MG')
+    expect(
+      screen.getByRole('button', { name: 'Tirar Varginha/MG' }).closest('li')
+    ).not.toHaveTextContent('deixou de ser atendida')
+
+    await userEvent.click(
+      within(lavras).getByRole('button', { name: 'Tirar Lavras/MG' })
+    )
+    expect(chosen()).toBe('Varginha/MG')
+  })
+
+  it('still shows the cities of an account when no city is served anymore', async () => {
+    renderField([], [{ city: 'Lavras', state: 'MG' }])
+
+    expect(
+      await screen.findByText(/deixou de ser atendida/)
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('link', { name: 'Cadastrar cidades atendidas' })
+    ).not.toBeInTheDocument()
+  })
 })
