@@ -50,8 +50,23 @@ export interface UpdatedAccount extends User {
   complaintsOutOfReach: number
 }
 
+const accountPath = (userId: string, action: string) =>
+  `/api/users/${encodeURIComponent(userId)}/${action}`
+
 export const updateUser = (userId: string, changes: AccountChanges) =>
-  apiRequest<UpdatedAccount>(
-    `/api/users/${encodeURIComponent(userId)}/update`,
-    { method: 'POST', body: changes }
+  apiRequest<UpdatedAccount>(accountPath(userId, 'update'), {
+    method: 'POST',
+    body: changes,
+  })
+
+/** Ends the person's open sessions; the new password is only in this answer. */
+export const resetUserPassword = (userId: string) =>
+  apiRequest<Pick<CreatedAccount, 'temporaryPassword'>>(
+    accountPath(userId, 'reset-password'),
+    { method: 'POST' }
   )
+
+export type AccessAction = 'deactivate' | 'reactivate'
+
+export const switchUserAccess = (userId: string, action: AccessAction) =>
+  apiRequest<User>(accountPath(userId, action), { method: 'POST' })

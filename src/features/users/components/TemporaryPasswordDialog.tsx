@@ -16,6 +16,8 @@ const { password: content } = USERS_CONTENT
 interface TemporaryPasswordDialogProps {
   /** `null` while there is no password to show. */
   account: { name: string; temporaryPassword: string } | null
+  /** "Conta criada" by default; a reset says "Nova senha gerada". */
+  title?: string
   onDone: () => void
   returnFocusRef?: RefObject<HTMLElement | null>
 }
@@ -26,6 +28,7 @@ interface TemporaryPasswordDialogProps {
  */
 export const TemporaryPasswordDialog = ({
   account,
+  title = content.title,
   onDone,
   returnFocusRef,
 }: TemporaryPasswordDialogProps) => {
@@ -58,7 +61,7 @@ export const TemporaryPasswordDialog = ({
       {account && (
         <div className='flex flex-col gap-4 p-6'>
           <h2 id={titleId} className='text-xl font-bold text-slate-900'>
-            {content.title}
+            {title}
           </h2>
           <p className='text-base text-slate-700'>
             {content.intro(account.name)}

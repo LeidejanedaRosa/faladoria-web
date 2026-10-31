@@ -5,8 +5,11 @@ import { useDocumentMeta } from '@shared/hooks/useDocumentMeta'
 import { useRecoveryFocus } from '@shared/hooks/useRecoveryFocus'
 import { Link, useParams } from 'react-router-dom'
 
+import { AccessSection } from '../components/AccessSection'
 import { AccountDetailsForm } from '../components/AccountDetailsForm'
+import { AccountSection } from '../components/AccountSection'
 import { LoadError } from '../components/LoadError'
+import { PasswordSection } from '../components/PasswordSection'
 import { StatusBadge } from '../components/StatusBadge'
 import { USERS_CONTENT } from '../data/usersContent'
 import { useUser } from '../hooks/useUsers'
@@ -26,7 +29,7 @@ const Breadcrumb = ({ current }: { current: string }) => (
         </Link>
         <ChevronRightIcon className='h-4 w-4' />
       </li>
-      <li aria-current='page' className='break-words'>
+      <li aria-current='page' className='wrap-words'>
         {current}
       </li>
     </ol>
@@ -38,7 +41,7 @@ const AccountHeader = ({ user, isSelf }: { user: User; isSelf: boolean }) => (
     <Breadcrumb current={user.name} />
     <div className='flex flex-col gap-2'>
       <div className='flex flex-wrap items-center gap-3'>
-        <h1 className='text-2xl font-bold break-words text-slate-900 sm:text-3xl'>
+        <h1 className='wrap-words wrap-words text-2x text-slate-900 sm:text-3xl'>
           {user.name}
           {isSelf && (
             <span className='ml-2 text-base font-normal text-slate-600'>
@@ -115,19 +118,12 @@ export const AccountPage = () => {
       className='flex flex-col gap-8 focus:outline-none'
     >
       <AccountHeader user={user} isSelf={isSelf} />
-      <section
-        aria-labelledby='account-details-heading'
-        className='flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 sm:p-5'
-      >
-        <h2
-          id='account-details-heading'
-          className='text-lg font-semibold text-slate-900'
-        >
-          {content.detailsHeading}
-        </h2>
-        {/* key: another account (or the same one refetched) starts a fresh form. */}
+      <AccountSection heading={content.detailsHeading}>
+        {/* key: another account starts a fresh form. */}
         <AccountDetailsForm key={user.id} user={user} isSelf={isSelf} />
-      </section>
+      </AccountSection>
+      <PasswordSection user={user} isSelf={isSelf} />
+      <AccessSection user={user} isSelf={isSelf} />
     </div>
   )
 }
