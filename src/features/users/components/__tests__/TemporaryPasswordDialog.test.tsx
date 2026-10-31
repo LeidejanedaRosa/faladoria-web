@@ -109,4 +109,18 @@ describe('TemporaryPasswordDialog', () => {
     expect(screen.queryByText(TEMPORARY_PASSWORD)).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Nova conta' })).toHaveFocus()
   })
+
+  it('takes another title for a password reset', () => {
+    render(
+      <TemporaryPasswordDialog
+        account={ACCOUNT}
+        title='Nova senha gerada'
+        onDone={() => {}}
+      />
+    )
+
+    expect(
+      screen.getByRole('dialog', { name: 'Nova senha gerada' })
+    ).toHaveTextContent(TEMPORARY_PASSWORD)
+  })
 })

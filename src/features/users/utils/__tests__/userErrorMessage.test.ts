@@ -52,7 +52,19 @@ describe('userErrorMessage', () => {
       'NO_ACTIVE_ADMIN_LEFT',
       'Outra pessoa da administração mudou contas ao mesmo tempo, e o painel ficaria sem administração ativa. Nada foi alterado: recarregue a página e tente de novo.',
     ],
-  ])('explains %s from editing an account in Portuguese', (code, text) => {
+    [
+      'CANNOT_DEACTIVATE_OWN_ACCOUNT',
+      'Você não pode desativar a própria conta.',
+    ],
+    [
+      'USER_ALREADY_DEACTIVATED',
+      'Esta conta já estava desativada. A página foi atualizada.',
+    ],
+    [
+      'USER_NOT_DEACTIVATED',
+      'Esta conta já estava ativa. A página foi atualizada.',
+    ],
+  ])('explains %s from managing an account in Portuguese', (code, text) => {
     expect(userErrorMessage(apiError(code))).toBe(text)
   })
 

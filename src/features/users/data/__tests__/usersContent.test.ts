@@ -22,4 +22,13 @@ describe('USERS_CONTENT.account', () => {
       'A administração vê todas as cidades. Ao salvar, Lavras/MG, Varginha/MG saem desta conta.'
     )
   })
+
+  it('agrees the cases that stay with a deactivated account with one or several', () => {
+    expect(USERS_CONTENT.accessSection.casesStay(1)).toBe(
+      '1 caso em andamento continua com esta pessoa até alguém passá-lo para outra.'
+    )
+    expect(USERS_CONTENT.accessSection.casesStay(3)).toBe(
+      '3 casos em andamento continuam com esta pessoa até alguém passá-los para outra.'
+    )
+  })
 })

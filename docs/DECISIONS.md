@@ -6,6 +6,57 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-10-31 — Equipe: nova senha, desativar e reativar na página da conta
+
+**Contexto**: a página da conta (`/dashboard/equipe/:userId`) ganha as ações que faltavam.
+`POST /api/users/:id/reset-password` gera uma senha temporária nova, que só vem nessa resposta, e
+encerra as sessões abertas da pessoa. `POST /api/users/:id/deactivate` encerra as sessões e bloqueia
+o login; os casos em andamento **continuam com a pessoa**. `.../reactivate` devolve o acesso com a
+mesma senha. A API recusa desativar a própria conta, mas **aceita** gerar senha para a própria conta
+e para uma conta desativada.
+
+**Decisão** (regras e UX aprovadas pela Leidejane):
+
+- **Duas seções novas**, "Senha" e "Acesso ao painel", abaixo de "Dados da conta", cada uma um
+  `<section>` com título (`AccountSection`).
+- **Gerar nova senha pede confirmação** ("A senha atual deixa de valer, e as sessões abertas da
+  pessoa são encerradas na hora."). Depois, o mesmo `TemporaryPasswordDialog` da criação, com o
+  título "Nova senha gerada": mostrada uma vez, só no estado da tela, descartada ao fechar.
+- **Conta desativada não recebe senha nova**: "Reative a conta para gerar uma nova senha." A API
+  aceitaria, mas a senha não serviria, porque o login continua recusado.
+- **Na própria conta, nada de gerar senha nem desativar**: gerar derrubaria a própria sessão, e a
+  API recusa desativar. A seção Senha leva a "Trocar a minha senha" (`/dashboard/trocar-senha`).
+  Para isso, `features/auth/index.ts` passou a exportar `AUTH_ROUTES` (regra de imports entre
+  features).
+- **Só desativar pede confirmação**, e ela diz quantos casos em andamento continuam com a pessoa.
+  Reativar só devolve o acesso e pode ser desfeito: é direto, com anúncio.
+- **Senha temporária vencida**: a seção Senha avisa por que gerar outra.
+- **Texto do diálogo da senha**: "cria a própria senha no primeiro acesso" virou "ao entrar". O
+  texto antigo não valia para uma senha refeita, e o novo serve aos dois casos.
+- **"Já estava desativada / ativa"** (outra admin agiu antes): a lista é buscada de novo também no
+  erro, e a mensagem diz que a página foi atualizada.
+- **`NO_ACTIVE_ADMIN_LEFT` ao desativar** tem texto próprio: a conta continua ativa, **mas as
+  sessões dela caíram**. O texto genérico ("Nada foi alterado") seria falso aqui.
+- **Foco sem código extra**:
+  - as confirmações começam em "Cancelar" (`ConfirmDialog`);
+  - ao fechar, o foco volta a quem abriu o diálogo;
+  - "Desativar" e "Reativar" são o mesmo `<Button>` nos dois lados de um `? :`. O React reaproveita
+    o elemento e só troca o texto, então o foco fica nele. A prova inversa mostrou que um
+    `returnFocusRef` e um efeito de foco que eu tinha escrito não mudavam nada. Foram removidos como
+    código morto, e o e2e confere o foco nos navegadores reais.
+- **Peças**: `storeSavedUser` (a conta salva entra na lista na hora, e a lista é buscada de novo),
+  usada pela edição e pelo acesso. No `userErrorMessage`, uma tabela de textos fixos por `code`
+  substituiu o `switch`, que tinha passado do limite de complexidade.
+
+**Alternativas rejeitadas**:
+
+- **Gerar senha sem confirmar**: um clique por engano tira alguém do painel no meio do trabalho.
+- **Confirmar também o reativar**: um passo a mais numa ação de baixo risco e reversível.
+- **Botão de confirmar não vermelho para nova senha**: exigiria uma variante nova no `ConfirmDialog`
+  compartilhado. O vermelho cabe, porque a ação derruba as sessões da pessoa.
+
+---
+
 ## 2026-10-30 — Equipe: editar uma conta numa página própria
 
 **Contexto**: a administração precisa corrigir uma conta: o nome, o papel e as cidades. A API

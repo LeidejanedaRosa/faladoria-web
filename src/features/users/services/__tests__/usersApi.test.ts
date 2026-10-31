@@ -3,7 +3,13 @@ import { jsonResponse, stubApi, TEST_API_URL } from '@/test/mockFetch'
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { createUser, fetchUsers, updateUser } from '../usersApi'
+import {
+  createUser,
+  fetchUsers,
+  resetUserPassword,
+  switchUserAccess,
+  updateUser,
+} from '../usersApi'
 
 afterEach(() => {
   vi.unstubAllEnvs()
@@ -69,4 +75,38 @@ describe('updateUser', () => {
       `${TEST_API_URL}/api/users/a%2Fb/update`
     )
   })
+})
+
+describe('account access', () => {
+  it('asks for a new password with an empty POST and gets it back', async () => {
+    const fetchMock = stubApi()
+    fetchMock.mockResolvedValue(
+      jsonResponse({ temporaryPassword: TEMPORARY_PASSWORD })
+    )
+
+    await expect(resetUserPassword('usr_ana')).resolves.toEqual({
+      temporaryPassword: TEMPORARY_PASSWORD,
+    })
+
+    const [input, init] = fetchMock.mock.calls[0]
+    expect(String(input)).toBe(
+      `${TEST_API_URL}/api/users/usr_ana/reset-password`
+    )
+    expect(init?.method).toBe('POST')
+    expect(init?.body).toBeUndefined()
+  })
+
+  it.each(['deactivate', 'reactivate'] as const)(
+    'posts to /%s and gets the account as it is now',
+    async action => {
+      const fetchMock = stubApi()
+      fetchMock.mockResolvedValue(jsonResponse(ANA))
+
+      await expect(switchUserAccess('usr_ana', action)).resolves.toEqual(ANA)
+
+      const [input, init] = fetchMock.mock.calls[0]
+      expect(String(input)).toBe(`${TEST_API_URL}/api/users/usr_ana/${action}`)
+      expect(init?.method).toBe('POST')
+    }
+  )
 })

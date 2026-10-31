@@ -52,7 +52,7 @@ export const USERS_CONTENT = {
     copied: 'Senha copiada.',
     copyFailed: 'Não foi possível copiar. Selecione a senha e copie.',
     onlyNow:
-      'Ela só aparece agora: a Faladoria não guarda a senha. Vale por 24 horas, e a pessoa cria a própria senha no primeiro acesso.',
+      'Ela só aparece agora: a Faladoria não guarda a senha. Vale por 24 horas, e a pessoa cria a própria senha ao entrar.',
     done: 'Já anotei a senha',
     created: (name: string) => `A conta de ${name} foi criada.`,
   },
@@ -99,6 +99,49 @@ export const USERS_CONTENT = {
       `A administração vê todas as cidades. Ao salvar, ${places.join(', ')} ${places.length === 1 ? 'sai' : 'saem'} desta conta.`,
     notServed: 'deixou de ser atendida',
   },
+  passwordSection: {
+    heading: 'Senha',
+    intro:
+      'Para quem esqueceu a senha ou deixou a senha temporária vencer. Gera uma senha temporária nova, que vale por 24 horas.',
+    expired:
+      'A senha temporária venceu antes do primeiro acesso: gere uma nova para a pessoa entrar.',
+    open: 'Gerar nova senha',
+    confirmTitle: (name: string) => `Gerar nova senha para ${name}?`,
+    confirmBody:
+      'A senha atual deixa de valer, e as sessões abertas da pessoa são encerradas na hora.',
+    confirm: 'Gerar nova senha',
+    confirming: 'Gerando…',
+    cancel: 'Cancelar',
+    dialogTitle: 'Nova senha gerada',
+    done: (name: string) => `A senha de ${name} foi trocada.`,
+    deactivated: 'Reative a conta para gerar uma nova senha.',
+    self: 'A sua própria senha você troca sem gerar uma temporária, e sem sair do painel.',
+    selfLink: 'Trocar a minha senha',
+  },
+  accessSection: {
+    heading: 'Acesso ao painel',
+    activeIntro:
+      'Para quem saiu da equipe. A conta não é apagada e pode ser reativada depois.',
+    deactivate: 'Desativar conta',
+    confirmTitle: (name: string) => `Desativar a conta de ${name}?`,
+    confirmBody:
+      'A pessoa sai do painel na hora e não consegue mais entrar. O histórico da conta continua guardado.',
+    casesStay: (count: number) =>
+      count === 1
+        ? '1 caso em andamento continua com esta pessoa até alguém passá-lo para outra.'
+        : `${count} casos em andamento continuam com esta pessoa até alguém passá-los para outra.`,
+    confirming: 'Desativando…',
+    cancel: 'Cancelar',
+    deactivated: (name: string) => `A conta de ${name} foi desativada.`,
+    deactivatedIntro:
+      'Esta conta está desativada: a pessoa não entra no painel. Reativar devolve o acesso com a mesma senha.',
+    reactivate: 'Reativar conta',
+    reactivating: 'Reativando…',
+    reactivated: (name: string) => `A conta de ${name} foi reativada.`,
+    self: 'Você não pode desativar a própria conta.',
+    noAdminLeft:
+      'Outra pessoa da administração mudou contas ao mesmo tempo, e o painel ficaria sem administração ativa. A conta continua ativa, mas as sessões dela foram encerradas.',
+  },
   statuses: {
     active: 'Ativa',
     pendingFirstAccess: 'Aguardando primeiro acesso',
@@ -120,6 +163,11 @@ export const USERS_CONTENT = {
     NO_ACTIVE_ADMIN_LEFT:
       'Outra pessoa da administração mudou contas ao mesmo tempo, e o painel ficaria sem administração ativa. Nada foi alterado: recarregue a página e tente de novo.',
     USER_NOT_FOUND: 'Esta conta não existe mais. Volte para a equipe.',
+    CANNOT_DEACTIVATE_OWN_ACCOUNT: 'Você não pode desativar a própria conta.',
+    USER_ALREADY_DEACTIVATED:
+      'Esta conta já estava desativada. A página foi atualizada.',
+    USER_NOT_DEACTIVATED:
+      'Esta conta já estava ativa. A página foi atualizada.',
     FORBIDDEN: 'Só a administração pode gerenciar contas.',
     generic: 'Não foi possível concluir agora. Tente de novo em instantes.',
   },

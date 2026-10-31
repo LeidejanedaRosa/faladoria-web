@@ -47,7 +47,7 @@ src/
 │   │   ├── components/
 │   │   ├── data/
 │   │   └── pages/
-│   ├── auth/              # Panel login and password change (/dashboard/entrar, /trocar-senha)
+│   ├── auth/              # Panel login and password change (/dashboard/entrar, /trocar-senha); index.ts exports AUTH_ROUTES
 │   │   ├── components/    # AuthLayout (sliding card), Login/ChangePassword cards, forms, RequirePanelSession (guard)
 │   │   ├── data/          # authContent (copy, routes), passwordRules
 │   │   ├── hooks/         # useSession, useSignIn, useChangePassword(Form), useSignOut
@@ -71,12 +71,12 @@ src/
 │   │   ├── utils/         # serviceAreaErrorMessage, formatDay
 │   │   └── index.ts       # Public API for other features (useServiceAreas, ServiceArea)
 │   ├── users/             # Team accounts (/dashboard/equipe and /dashboard/equipe/:userId, admin only)
-│   │   ├── components/    # AccountList/Item, StatusBadge, LoadError, NewAccountForm, AccountDetailsForm, AccountCitiesField, RoleField, CityTagsField, TemporaryPasswordDialog
+│   │   ├── components/    # AccountList/Item, StatusBadge, LoadError, NewAccountForm, AccountSection, AccountDetailsForm, AccountCitiesField, PasswordSection, AccessSection, RoleField, CityTagsField, TemporaryPasswordDialog
 │   │   ├── data/          # usersContent, accountRules
-│   │   ├── hooks/         # useUsers/useUser, useCreateUser, useUpdateUser, useNewAccountForm, useNewAccountFlow, useAccountDetailsForm
+│   │   ├── hooks/         # useUsers/useUser, useCreateUser, useUpdateUser, useAccountMutations (reset, deactivate/reactivate), usersCache, useNewAccountForm, useNewAccountFlow, useAccountDetailsForm, usePasswordResetFlow, useAccessFlow
 │   │   ├── pages/         # TeamPage/TeamRoute, AccountPage/AccountRoute (RequireRole + page, one lazy chunk each)
 │   │   ├── schemas/       # accountFields (shared rules), newAccountSchema, accountDetailsSchema
-│   │   ├── services/      # /api/users, /api/users/:id/update
+│   │   ├── services/      # /api/users, /api/users/:id/{update,reset-password,deactivate,reactivate}
 │   │   └── utils/         # userErrorMessage, fieldOfApiError, accountChanges
 │   └── complaints/, notifications/   # future: one feature per API domain
 └── shared/
