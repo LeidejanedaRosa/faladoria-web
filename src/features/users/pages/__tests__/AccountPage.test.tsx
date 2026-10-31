@@ -67,6 +67,18 @@ describe('AccountPage', () => {
     expect(document.title).toContain('Ana Souza · Equipe')
   })
 
+  it('groups the account in data, password and access, in that order', async () => {
+    openAccount(ANA.id)
+
+    await screen.findByRole('heading', { level: 1, name: 'Ana Souza' })
+    expect(
+      screen.getAllByRole('heading', { level: 2 }).map(h => h.textContent)
+    ).toEqual(['Dados da conta', 'Senha', 'Acesso ao painel'])
+    expect(
+      screen.getByRole('region', { name: 'Acesso ao painel' })
+    ).toContainElement(screen.getByRole('button', { name: 'Desativar conta' }))
+  })
+
   it('leads back to the team from the breadcrumb, marking where the person is', async () => {
     openAccount(ANA.id)
 

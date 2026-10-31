@@ -17,6 +17,8 @@ interface FakeOptions {
   failUpdateWith?: ApiFailure
   /** What the API counts after a change (cases the person can no longer act on). */
   complaintsOutOfReach?: number
+  /** Answers a password reset, a deactivation or a reactivation with this error. */
+  failAccessWith?: ApiFailure
 }
 
 interface ApiFailure {
@@ -28,7 +30,15 @@ interface ApiFailure {
 const failure = ({ status, code, details }: ApiFailure) =>
   jsonResponse({ statusCode: status, code, message: 'Erro.', details }, status)
 
-const UPDATE_PATH = /^\/api\/users\/([^/]+)\/update$/
+const ACCOUNT_PATH =
+  /^\/api\/users\/([^/]+)\/(update|reset-password|deactivate|reactivate)$/
+
+// The status each access action leaves the account in, as the API does.
+const STATUS_AFTER = {
+  'reset-password': 'pendingFirstAccess',
+  deactivate: 'deactivated',
+  reactivate: 'active',
+} as const
 
 /**
  * The users routes and the served cities, with state: a created or changed account really shows
@@ -42,12 +52,15 @@ export const fakeUsersApi = (
     failCreateWith,
     failUpdateWith,
     complaintsOutOfReach = 0,
+    failAccessWith,
   }: FakeOptions = {}
 ) => {
   const state = {
     users: users.map(user => ({ ...user })),
     sent: [] as NewAccount[],
     changes: [] as AccountChanges[],
+    /** Each access action asked, as "action usr_id". */
+    actions: [] as string[],
   }
 
   const update = (userId: string, changes: AccountChanges) => {
@@ -59,16 +72,35 @@ export const fakeUsersApi = (
     return jsonResponse({ ...user, complaintsOutOfReach })
   }
 
+  const switchAccess = (userId: string, action: keyof typeof STATUS_AFTER) => {
+    state.actions.push(`${action} ${userId}`)
+    if (failAccessWith) return failure(failAccessWith)
+    const user = state.users.find(({ id }) => id === userId)
+    if (!user) return failure({ status: 404, code: 'USER_NOT_FOUND' })
+    user.status = STATUS_AFTER[action]
+    return jsonResponse(
+      action === 'reset-password'
+        ? { temporaryPassword: TEMPORARY_PASSWORD }
+        : user
+    )
+  }
+
   fetchMock.mockImplementation(async (input, init) => {
     const url = new URL(String(input))
     if (url.pathname === '/api/service-areas') {
       return jsonResponse({ serviceAreas: servedAreas })
     }
-    const updated = UPDATE_PATH.exec(url.pathname)
-    if (updated) {
+    const [, userId, action] = ACCOUNT_PATH.exec(url.pathname) ?? []
+    if (action === 'update') {
       return update(
-        decodeURIComponent(updated[1]),
+        decodeURIComponent(userId),
         JSON.parse(String(init?.body)) as AccountChanges
+      )
+    }
+    if (action) {
+      return switchAccess(
+        decodeURIComponent(userId),
+        action as keyof typeof STATUS_AFTER
       )
     }
     if (url.pathname !== '/api/users') {
