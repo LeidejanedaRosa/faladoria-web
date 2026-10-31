@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { isPanelPath } from '../routes'
+import { isPanelPath, PANEL_ROUTES } from '../routes'
 
 describe('isPanelPath', () => {
   it.each(['/dashboard', '/dashboard/entrar', '/dashboard/reclamacoes/abc'])(
@@ -34,4 +34,14 @@ describe('isPanelPath', () => {
       expect(isPanelPath(path)).toBe(false)
     }
   )
+})
+
+describe('PANEL_ROUTES.account', () => {
+  it('builds the address of an account page under the team', () => {
+    expect(PANEL_ROUTES.account('usr_ana')).toBe('/dashboard/equipe/usr_ana')
+  })
+
+  it('keeps an id with a slash in one path segment', () => {
+    expect(PANEL_ROUTES.account('a/b')).toBe('/dashboard/equipe/a%2Fb')
+  })
 })

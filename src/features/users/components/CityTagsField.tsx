@@ -3,22 +3,24 @@ import { type Ref, useMemo, useRef } from 'react'
 import { useServiceAreas } from '@features/service-areas'
 import { CloseIcon, Combobox } from '@shared/components/ui'
 import { PANEL_ROUTES } from '@shared/data/routes'
+import { cn } from '@shared/utils/cn'
 import { mergeRefs } from '@shared/utils/mergeRefs'
 import { Link } from 'react-router-dom'
 
 import { USERS_CONTENT } from '../data/usersContent'
 import type { AssignedCity } from '../services/usersApi'
 
-const { cities: content } = USERS_CONTENT
+const { cities: content, account: accountContent } = USERS_CONTENT
 
 const placeOf = ({ city, state }: AssignedCity) => `${city}/${state}`
 
 interface CityTagListProps {
   cities: AssignedCity[]
+  isServed: (place: string) => boolean
   onRemove: (place: string) => void
 }
 
-const CityTagList = ({ cities, onRemove }: CityTagListProps) => {
+const CityTagList = ({ cities, isServed, onRemove }: CityTagListProps) => {
   if (cities.length === 0)
     return <p className='text-sm text-slate-600'>{content.none}</p>
 
@@ -26,12 +28,22 @@ const CityTagList = ({ cities, onRemove }: CityTagListProps) => {
     <ul className='flex flex-wrap gap-2'>
       {cities.map(city => {
         const place = placeOf(city)
+        const served = isServed(place)
         return (
           <li
             key={place}
-            className='bg-lavender-light text-purple-dark flex items-center gap-1 rounded-full py-1 pr-1 pl-3 text-base'
+            className={cn(
+              'flex items-center gap-1 rounded-full py-1 pr-1 pl-3 text-base',
+              served
+                ? 'bg-lavender-light text-purple-dark'
+                : 'border border-amber-300 bg-amber-50 text-amber-900'
+            )}
           >
             {place}
+            {/* Kept as a tag so it can be removed: the API refuses to save a city no longer served. */}
+            {!served && (
+              <span className='text-sm'>({accountContent.notServed})</span>
+            )}
             {/* Drawn at 36px to fit the tag; the ::after reaches the 48px touch target. */}
             <button
               type='button'
@@ -99,14 +111,17 @@ export const CityTagsField = ({
     searchRef.current?.focus()
   }
 
-  if (!isPending && byPlace.size === 0) return <NoServedCitiesNotice />
+  const isServed = (place: string) => isPending || byPlace.has(place)
+
+  if (!isPending && byPlace.size === 0 && value.length === 0)
+    return <NoServedCitiesNotice />
 
   return (
     <fieldset className='flex flex-col gap-2'>
       <legend className='mb-1.5 text-sm font-medium text-slate-800'>
         {content.label}
       </legend>
-      <CityTagList cities={value} onRemove={remove} />
+      <CityTagList cities={value} isServed={isServed} onRemove={remove} />
       <div className='max-w-md'>
         <Combobox
           inputRef={mergeRefs(searchRef, inputRef)}

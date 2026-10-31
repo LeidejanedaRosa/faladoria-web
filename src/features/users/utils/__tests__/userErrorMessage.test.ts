@@ -39,10 +39,21 @@ describe('userErrorMessage', () => {
     )
   })
 
-  it('says only the administration creates accounts', () => {
+  it('says only the administration manages accounts', () => {
     expect(userErrorMessage(apiError('FORBIDDEN'))).toBe(
-      'Só a administração pode criar contas.'
+      'Só a administração pode gerenciar contas.'
     )
+  })
+
+  it.each([
+    ['CANNOT_CHANGE_OWN_ROLE', 'Você não pode trocar o próprio papel.'],
+    ['USER_NOT_FOUND', 'Esta conta não existe mais. Volte para a equipe.'],
+    [
+      'NO_ACTIVE_ADMIN_LEFT',
+      'Outra pessoa da administração mudou contas ao mesmo tempo, e o painel ficaria sem administração ativa. Nada foi alterado: recarregue a página e tente de novo.',
+    ],
+  ])('explains %s from editing an account in Portuguese', (code, text) => {
+    expect(userErrorMessage(apiError(code))).toBe(text)
   })
 
   it('keeps the API text for a code it does not know', () => {

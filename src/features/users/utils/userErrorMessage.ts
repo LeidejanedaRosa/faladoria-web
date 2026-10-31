@@ -17,6 +17,9 @@ export const userErrorMessage = (error: unknown): string | undefined => {
   if (!isApiError(error)) return errors.generic
   switch (error.code) {
     case 'USER_EMAIL_ALREADY_EXISTS':
+    case 'CANNOT_CHANGE_OWN_ROLE':
+    case 'NO_ACTIVE_ADMIN_LEFT':
+    case 'USER_NOT_FOUND':
     case 'FORBIDDEN':
       return errors[error.code]
     case 'ASSIGNED_CITY_NOT_SERVED':

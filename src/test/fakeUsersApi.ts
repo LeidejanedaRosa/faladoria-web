@@ -1,5 +1,9 @@
 import type { ServiceArea } from '@features/service-areas/services/serviceAreasApi'
-import type { NewAccount, User } from '@features/users/services/usersApi'
+import type {
+  AccountChanges,
+  NewAccount,
+  User,
+} from '@features/users/services/usersApi'
 
 import { TEMPORARY_PASSWORD } from './fixtures/users'
 import { jsonResponse, type stubApi } from './mockFetch'
@@ -8,26 +12,64 @@ interface FakeOptions {
   users?: User[]
   servedAreas?: ServiceArea[]
   /** Answers the creation with this error instead of creating the account. */
-  failCreateWith?: { status: number; code: string; details?: unknown }
+  failCreateWith?: ApiFailure
+  /** Answers the change with this error instead of saving it. */
+  failUpdateWith?: ApiFailure
+  /** What the API counts after a change (cases the person can no longer act on). */
+  complaintsOutOfReach?: number
 }
 
+interface ApiFailure {
+  status: number
+  code: string
+  details?: unknown
+}
+
+const failure = ({ status, code, details }: ApiFailure) =>
+  jsonResponse({ statusCode: status, code, message: 'Erro.', details }, status)
+
+const UPDATE_PATH = /^\/api\/users\/([^/]+)\/update$/
+
 /**
- * The users routes and the served cities, with state: a created account really shows up in the
- * next list, so a test follows the whole flow the way the API would answer it.
+ * The users routes and the served cities, with state: a created or changed account really shows
+ * up in the next list, so a test follows the whole flow the way the API would answer it.
  */
 export const fakeUsersApi = (
   fetchMock: ReturnType<typeof stubApi>,
-  { users = [], servedAreas = [], failCreateWith }: FakeOptions = {}
+  {
+    users = [],
+    servedAreas = [],
+    failCreateWith,
+    failUpdateWith,
+    complaintsOutOfReach = 0,
+  }: FakeOptions = {}
 ) => {
   const state = {
     users: users.map(user => ({ ...user })),
     sent: [] as NewAccount[],
+    changes: [] as AccountChanges[],
+  }
+
+  const update = (userId: string, changes: AccountChanges) => {
+    state.changes.push(changes)
+    if (failUpdateWith) return failure(failUpdateWith)
+    const user = state.users.find(({ id }) => id === userId)
+    if (!user) return failure({ status: 404, code: 'USER_NOT_FOUND' })
+    Object.assign(user, changes)
+    return jsonResponse({ ...user, complaintsOutOfReach })
   }
 
   fetchMock.mockImplementation(async (input, init) => {
     const url = new URL(String(input))
     if (url.pathname === '/api/service-areas') {
       return jsonResponse({ serviceAreas: servedAreas })
+    }
+    const updated = UPDATE_PATH.exec(url.pathname)
+    if (updated) {
+      return update(
+        decodeURIComponent(updated[1]),
+        JSON.parse(String(init?.body)) as AccountChanges
+      )
     }
     if (url.pathname !== '/api/users') {
       throw new Error(`Unexpected call: ${url.pathname}`)
@@ -37,13 +79,7 @@ export const fakeUsersApi = (
     }
     const account = JSON.parse(String(init.body)) as NewAccount
     state.sent.push(account)
-    if (failCreateWith) {
-      const { status, code, details } = failCreateWith
-      return jsonResponse(
-        { statusCode: status, code, message: 'Erro.', details },
-        status
-      )
-    }
+    if (failCreateWith) return failure(failCreateWith)
     state.users.push({
       ...account,
       id: `usr_${state.users.length}`,

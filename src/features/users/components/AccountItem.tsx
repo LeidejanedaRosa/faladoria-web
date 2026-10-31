@@ -1,12 +1,14 @@
 import { ROLE_LABELS } from '@features/panel/data/panelContent'
+import { PANEL_ROUTES } from '@shared/data/routes'
 import { cn } from '@shared/utils/cn'
+import { Link } from 'react-router-dom'
 
 import { USERS_CONTENT } from '../data/usersContent'
 import type { User } from '../services/usersApi'
 import { ACCOUNT_COLUMNS } from './accountColumns'
 import { StatusBadge } from './StatusBadge'
 
-const { list } = USERS_CONTENT
+const { list, account } = USERS_CONTENT
 
 const citiesOf = (user: User) => {
   if (user.role === 'admin') return list.allCities
@@ -68,5 +70,12 @@ export const AccountItem = ({ user, isSelf }: AccountItemProps) => (
         </dd>
       </div>
     </dl>
+    <Link
+      to={PANEL_ROUTES.account(user.id)}
+      aria-label={account.editLabel(user.name)}
+      className='text-purple-dark inline-flex min-h-12 w-fit items-center rounded-lg border border-slate-300 bg-white px-4 text-base font-semibold hover:bg-slate-50'
+    >
+      {account.edit}
+    </Link>
   </li>
 )
