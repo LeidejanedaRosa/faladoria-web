@@ -1,32 +1,25 @@
 import { z } from 'zod'
 
-import { NAME_MAX_LENGTH } from '../data/accountRules'
 import { USERS_CONTENT } from '../data/usersContent'
+import {
+  accountFields,
+  CITIES_FOR_ROLE_ERROR,
+  hasCitiesForRole,
+} from './accountFields'
 
 const { errors } = USERS_CONTENT
 
 export const newAccountSchema = z
   .object({
-    name: z
-      .string()
-      .trim()
-      .min(1, errors.nameRequired)
-      .max(NAME_MAX_LENGTH, errors.nameTooLong),
+    name: accountFields.name,
     email: z
       .string()
       .trim()
       .min(1, errors.emailRequired)
       .pipe(z.email(errors.emailInvalid)),
-    role: z.enum(['admin', 'assistant', 'manager'], {
-      error: errors.roleRequired,
-    }),
-    assignedCities: z.array(z.object({ city: z.string(), state: z.string() })),
+    role: accountFields.role,
+    assignedCities: accountFields.assignedCities,
   })
-  // The API accepts a team member without a city, but that person would see nothing: the form
-  // asks for one. The administration sees every city, so it needs none (and gets none).
-  .refine(
-    account => account.role === 'admin' || account.assignedCities.length > 0,
-    { message: errors.citiesRequired, path: ['assignedCities'] }
-  )
+  .refine(hasCitiesForRole, CITIES_FOR_ROLE_ERROR)
 
 export type NewAccountValues = z.input<typeof newAccountSchema>

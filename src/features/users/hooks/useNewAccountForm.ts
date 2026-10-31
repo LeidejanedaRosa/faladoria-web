@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { isApiError } from '@shared/lib/api'
 import { useForm } from 'react-hook-form'
 
 import {
@@ -9,6 +8,7 @@ import {
   type NewAccountValues,
 } from '../schemas/newAccountSchema'
 import type { CreatedAccount } from '../services/usersApi'
+import { fieldOfApiError } from '../utils/fieldOfApiError'
 import { userErrorMessage } from '../utils/userErrorMessage'
 import { useCreateUser } from './useCreateUser'
 
@@ -18,10 +18,7 @@ const FIELD_OF_CODE = {
   ASSIGNED_CITY_NOT_SERVED: 'assignedCities',
 } as const
 
-const fieldOf = (error: unknown) =>
-  isApiError(error) && error.code in FIELD_OF_CODE
-    ? FIELD_OF_CODE[error.code as keyof typeof FIELD_OF_CODE]
-    : undefined
+const fieldOf = (error: unknown) => fieldOfApiError(error, FIELD_OF_CODE)
 
 export const useNewAccountForm = (
   onCreated: (account: CreatedAccount & { name: string }) => void
