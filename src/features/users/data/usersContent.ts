@@ -71,6 +71,34 @@ export const USERS_CONTENT = {
     status: 'Situação',
     openCases: 'Casos em andamento',
   },
+  account: {
+    breadcrumb: 'Trilha de navegação',
+    edit: 'Editar',
+    editLabel: (name: string) => `Editar a conta de ${name}`,
+    loading: 'Carregando a conta…',
+    loadError: 'Não foi possível carregar a conta agora.',
+    notFoundTitle: 'Conta não encontrada',
+    notFound:
+      'Esta conta não existe, ou o endereço está incompleto. Escolha a conta na lista da equipe.',
+    backToTeam: 'Voltar para a equipe',
+    emailLabel: 'E-mail (login)',
+    emailFixed:
+      'O e-mail é o login e não pode ser trocado. Para corrigir, desative esta conta e crie outra.',
+    detailsHeading: 'Dados da conta',
+    ownRole: 'Você não pode trocar o próprio papel.',
+    submit: 'Salvar alterações',
+    submitting: 'Salvando…',
+    cancel: 'Cancelar',
+    saved: (name: string) => `As alterações de ${name} foram salvas.`,
+    nothingChanged: 'Nada foi alterado.',
+    outOfReach: (count: number) =>
+      count === 1
+        ? '1 caso em andamento continua com esta pessoa, mas o papel e as cidades de agora não permitem tratá-lo. Ele precisa ser passado para outra pessoa.'
+        : `${count} casos em andamento continuam com esta pessoa, mas o papel e as cidades de agora não permitem tratá-los. Eles precisam ser passados para outra pessoa.`,
+    citiesRemoved: (places: string[]) =>
+      `A administração vê todas as cidades. Ao salvar, ${places.join(', ')} ${places.length === 1 ? 'sai' : 'saem'} desta conta.`,
+    notServed: 'deixou de ser atendida',
+  },
   statuses: {
     active: 'Ativa',
     pendingFirstAccess: 'Aguardando primeiro acesso',
@@ -88,7 +116,11 @@ export const USERS_CONTENT = {
     USER_EMAIL_ALREADY_EXISTS: 'Já existe uma conta com este e-mail.',
     ASSIGNED_CITY_NOT_SERVED: (places: string) =>
       `Estas cidades deixaram de ser atendidas: ${places}. Tire da lista e tente de novo.`,
-    FORBIDDEN: 'Só a administração pode criar contas.',
+    CANNOT_CHANGE_OWN_ROLE: 'Você não pode trocar o próprio papel.',
+    NO_ACTIVE_ADMIN_LEFT:
+      'Outra pessoa da administração mudou contas ao mesmo tempo, e o painel ficaria sem administração ativa. Nada foi alterado: recarregue a página e tente de novo.',
+    USER_NOT_FOUND: 'Esta conta não existe mais. Volte para a equipe.',
+    FORBIDDEN: 'Só a administração pode gerenciar contas.',
     generic: 'Não foi possível concluir agora. Tente de novo em instantes.',
   },
 } as const

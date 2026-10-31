@@ -39,3 +39,19 @@ export const fetchUsers = (signal?: AbortSignal) =>
 
 export const createUser = (account: NewAccount) =>
   apiRequest<CreatedAccount>('/api/users', { method: 'POST', body: account })
+
+export type AccountChanges = Partial<
+  Pick<NewAccount, 'name' | 'role' | 'assignedCities'>
+>
+
+export interface UpdatedAccount extends User {
+  /** Cases in progress with the person that the new role and cities no longer let them handle.
+   * The change is saved all the same; they stay with the person until someone reassigns them. */
+  complaintsOutOfReach: number
+}
+
+export const updateUser = (userId: string, changes: AccountChanges) =>
+  apiRequest<UpdatedAccount>(
+    `/api/users/${encodeURIComponent(userId)}/update`,
+    { method: 'POST', body: changes }
+  )

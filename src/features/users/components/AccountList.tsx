@@ -1,4 +1,3 @@
-import { Button } from '@shared/components/ui'
 import { useRecoveryFocus } from '@shared/hooks/useRecoveryFocus'
 import { cn } from '@shared/utils/cn'
 
@@ -6,6 +5,7 @@ import { USERS_CONTENT } from '../data/usersContent'
 import { useUsers } from '../hooks/useUsers'
 import { ACCOUNT_COLUMNS } from './accountColumns'
 import { AccountItem } from './AccountItem'
+import { LoadError } from './LoadError'
 
 const { list } = USERS_CONTENT
 
@@ -23,6 +23,7 @@ const ColumnHeader = () => (
     <span>{list.cities}</span>
     <span>{list.status}</span>
     <span className='text-right'>{list.openCases}</span>
+    <span />
   </div>
 )
 
@@ -50,20 +51,11 @@ export const AccountList = ({ selfId }: { selfId: string }) => {
 
   if (isRetrying || isError) {
     return (
-      <div
-        role='alert'
-        className='flex flex-col items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-5 sm:flex-row sm:items-center sm:justify-between'
-      >
-        <p className='text-base text-red-800'>{list.loadError}</p>
-        <Button
-          variant='secondary'
-          onClick={() => void retry()}
-          isLoading={isRetrying}
-          loadingText={list.retrying}
-        >
-          {list.retry}
-        </Button>
-      </div>
+      <LoadError
+        message={list.loadError}
+        isRetrying={isRetrying}
+        onRetry={() => void retry()}
+      />
     )
   }
   if (isPending) return <ListSkeleton />

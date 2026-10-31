@@ -57,6 +57,12 @@ const TeamRoute = lazy(() =>
   }))
 )
 
+const AccountRoute = lazy(() =>
+  import('./features/users/pages/AccountRoute').then(m => ({
+    default: m.AccountRoute,
+  }))
+)
+
 const ServiceAreasRoute = lazy(() =>
   import('./features/service-areas/pages/ServiceAreasRoute').then(m => ({
     default: m.ServiceAreasRoute,
@@ -92,6 +98,10 @@ function App() {
           <Route path={PANEL_ROUTES.root} element={<PanelRoot />}>
             <Route index element={<PanelHomePage />} />
             <Route path={PANEL_ROUTES.team} element={<TeamRoute />} />
+            <Route
+              path={`${PANEL_ROUTES.team}/:userId`}
+              element={<AccountRoute />}
+            />
             <Route
               path={PANEL_ROUTES.serviceAreas}
               element={<ServiceAreasRoute />}
