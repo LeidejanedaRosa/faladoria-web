@@ -23,4 +23,15 @@ describe('StatusMessage', () => {
     expect(region).toHaveTextContent('A conta de Bruno Lima foi criada.')
     expect(region).not.toHaveClass('sr-only')
   })
+
+  it('can warn instead of confirming, with the same announcement', () => {
+    render(
+      <StatusMessage tone='warning' message='2 casos continuam com Ana.' />
+    )
+
+    const region = screen.getByRole('status')
+    expect(region).toHaveTextContent('2 casos continuam com Ana.')
+    expect(region).toHaveClass('bg-amber-50')
+    expect(region).not.toHaveClass('bg-green-50')
+  })
 })
