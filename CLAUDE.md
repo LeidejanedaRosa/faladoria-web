@@ -70,14 +70,14 @@ src/
 │   │   ├── services/      # /api/service-areas/*, IBGE localities
 │   │   ├── utils/         # serviceAreaErrorMessage, formatDay
 │   │   └── index.ts       # Public API for other features (useServiceAreas, ServiceArea)
-│   ├── users/             # Team accounts (/dashboard/equipe, admin only)
-│   │   ├── components/    # AccountList/Item, StatusBadge, NewAccountForm, RoleField, CityTagsField, TemporaryPasswordDialog
+│   ├── users/             # Team accounts (/dashboard/equipe and /dashboard/equipe/:userId, admin only)
+│   │   ├── components/    # AccountList/Item, StatusBadge, LoadError, NewAccountForm, AccountDetailsForm, AccountCitiesField, RoleField, CityTagsField, TemporaryPasswordDialog
 │   │   ├── data/          # usersContent, accountRules
-│   │   ├── hooks/         # useUsers, useCreateUser, useNewAccountForm, useNewAccountFlow
-│   │   ├── pages/         # TeamPage, TeamRoute (RequireRole + page, one lazy chunk)
-│   │   ├── schemas/       # newAccountSchema
-│   │   ├── services/      # /api/users
-│   │   └── utils/         # userErrorMessage
+│   │   ├── hooks/         # useUsers/useUser, useCreateUser, useUpdateUser, useNewAccountForm, useNewAccountFlow, useAccountDetailsForm
+│   │   ├── pages/         # TeamPage/TeamRoute, AccountPage/AccountRoute (RequireRole + page, one lazy chunk each)
+│   │   ├── schemas/       # accountFields (shared rules), newAccountSchema, accountDetailsSchema
+│   │   ├── services/      # /api/users, /api/users/:id/update
+│   │   └── utils/         # userErrorMessage, fieldOfApiError, accountChanges
 │   └── complaints/, notifications/   # future: one feature per API domain
 └── shared/
     ├── components/

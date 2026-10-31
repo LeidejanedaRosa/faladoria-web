@@ -6,6 +6,61 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-10-30 — Equipe: editar uma conta numa página própria
+
+**Contexto**: a administração precisa corrigir uma conta: o nome, o papel e as cidades. A API
+(`POST /api/users/:id/update`) recebe só o que muda e **substitui** a lista de cidades. Ela recusa
+o e-mail (é o login), recusa que alguém troque o próprio papel (`CANNOT_CHANGE_OWN_ROLE`) e
+responde `complaintsOutOfReach`: quantos casos em andamento continuam com a pessoa sem que o novo
+papel e as novas cidades permitam tratá-los. A mudança é salva mesmo assim. Não há rota para ler
+uma conta só.
+
+**Decisão** (regra de negócio e UX aprovadas pela Leidejane):
+
+- **Regra: uma conta que vira administração perde as cidades.** A tela envia
+  `{ role: 'admin', assignedCities: [] }`. A administração vê todas as cidades: as cidades
+  guardadas não teriam efeito e poderiam voltar desatualizadas se o papel mudasse de novo (com uma
+  cidade que deixou de ser atendida, a API recusaria salvar). **O aviso vem antes de salvar**: ao
+  marcar Administração, o campo de cidades dá lugar a "Ao salvar, Varginha/MG, Lavras/MG saem desta
+  conta". Questão aberta em 2026-10-28 no BACKLOG.md e fechada aqui.
+- **Uma página por conta** (`/dashboard/equipe/:userId`), aberta pelo "Editar" de cada linha da
+  lista ("Editar a conta de Ana Souza" para o leitor de tela). A conta tem endereço próprio, o
+  Voltar do navegador funciona, e a página tem espaço para "nova senha" e "desativar" no próximo PR
+  sem mudar a lista.
+- **A conta vem da lista** (`useUser` = a consulta da lista com `select`). Aberta a partir da lista,
+  aparece na hora, e a lista é buscada de novo ao mesmo tempo.
+- **Só vai para a API o que a pessoa mudou, medido contra a conta como o formulário começou**, não
+  contra a cópia mais nova. Comparar com a mais nova faria o valor antigo de um campo que outra
+  admin acabou de mudar parecer uma mudança, e salvar desfaria a dela (_lost update_). Uma cópia
+  mais nova só substitui o formulário enquanto nada foi digitado. Nada mudou: "Nada foi
+  alterado.", sem chamada.
+- **E-mail como texto, com o motivo** ("O e-mail é o login e não pode ser trocado. Para corrigir,
+  desative esta conta e crie outra."), não um campo desligado.
+- **Na própria conta, o papel aparece como texto, com o motivo**, em vez de rádios desligados: um
+  controle desligado parece quebrado; o texto explica.
+- **Cidade que deixou de ser atendida** continua como etiqueta, marcada "(deixou de ser atendida)"
+  em âmbar, e removível: sem tirá-la, a API recusa salvar. O aviso "sem cidades atendidas" só
+  aparece quando a conta também não tem cidade, senão ele esconderia as etiquetas.
+- **Casos fora do alcance**: depois de salvar, um `StatusMessage` com `tone='warning'`, sempre na
+  página, para ser anunciado.
+- **Peças divididas entre criar e editar**: `accountFields` (nome, papel, cidades e a regra "pelo
+  menos uma cidade, menos para admin"), `fieldOfApiError` (o campo de cada `code`) e `LoadError`
+  (erro com "Tentar de novo", da lista e da página).
+- **Alvo de toque de 48px** nos links de texto da página (trilha "Equipe" e "Voltar para a
+  equipe"), com `::after`, como no × das etiquetas.
+
+**Alternativas rejeitadas**:
+
+- **Guardar as cidades de quem vira admin**: dado sem efeito, que volta desatualizado.
+- **Editar dentro da lista** (disclosure no cartão): quebra o alinhamento das colunas no desktop e
+  alonga a lista no celular.
+- **Diálogo modal**: apertado no celular, e a busca de cidade dentro do modal complica foco e
+  rolagem.
+- **Enviar todos os campos sempre**: a API aceitaria, mas reenviar o nome antigo também desfaria a
+  mudança de outra admin.
+
+---
+
 ## 2026-10-28 — Equipe: lista de contas, criação e senha temporária mostrada uma vez
 
 **Contexto**: a tela `/dashboard/equipe` (só `admin`) lista as contas do painel e cria contas
