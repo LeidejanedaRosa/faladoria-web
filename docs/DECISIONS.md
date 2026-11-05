@@ -6,6 +6,29 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-11-05 — Release do Sentry: commit real e só em produção
+
+**Contexto**: o Sentry mandava e-mail de "deploy" a cada build de preview da Vercel (inclusive PRs
+do Dependabot), com a release chamada literalmente `$VERCEL_GIT_COMMIT_SHA`. A variável
+`VITE_APP_VERSION` tinha sido cadastrada na Vercel com esse texto, mas a Vercel não expande
+`$VAR` dentro do valor de outra variável — todo build caía na mesma release.
+
+**Decisão**: a regra saiu do `vite.config.ts` para a função pura `resolveSentryBuild`
+(`src/shared/lib/sentryBuild.ts`), com testes:
+
+- release = `VITE_APP_VERSION` (se definida) ou `VERCEL_GIT_COMMIT_SHA`, variável de sistema da
+  Vercel; sem nenhuma, o plugin detecta o commit pelo git.
+- `VERCEL_ENV === 'preview'` não cria release nem envia source maps.
+- source maps só são gerados quando o plugin vai enviá-los (ele apaga os `.map` depois do
+  upload; sem ele, o build publicaria esses arquivos).
+
+**Pendência**: o passo "Upload source maps to Sentry" do CI envia os `.map` do build do próprio CI,
+que roda sem as variáveis do Sentry — com esta decisão, esse build não gera `.map`. O passo
+continua inativo (o repositório não tem os segredos) e o envio real já acontece no build de
+produção da Vercel; decidir se o passo sai do CI.
+
+---
+
 ## 2026-10-27 — `.d.ts` do `tsconfig.node.json` gravados fora do código (`declarationDir`)
 
 **Contexto**: issue #59. Num clone novo, `pnpm build` seguido de `pnpm lint` falhava num arquivo
