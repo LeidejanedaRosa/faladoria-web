@@ -90,33 +90,6 @@ jobs:
           uploadArtifacts: true
           temporaryPublicStorage: true
 
-      - name: Check Sentry configuration
-        id: sentry_check
-        # Só faz sentido publicar source maps a partir de um build que realmente vai para
-        # produção. A Vercel faz deploy automático a cada push (diferente do faladoria-backend,
-        # que não tem deploy automático) — subir source maps em toda PR aberta poluiria o
-        # histórico de releases do Sentry com builds que nunca chegam a produção.
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          if [ -n "${{ secrets.SENTRY_AUTH_TOKEN }}" ] && [ -n "${{ secrets.SENTRY_ORG }}" ] && [ -n "${{ secrets.SENTRY_PROJECT }}" ]; then
-            echo "configured=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "::notice::SENTRY_AUTH_TOKEN/SENTRY_ORG/SENTRY_PROJECT not all set yet — skipping source map upload."
-            echo "configured=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Upload source maps to Sentry
-        if: steps.sentry_check.outputs.configured == 'true'
-        uses: getsentry/action-release@v3
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-        with:
-          environment: production
-          sourcemaps: './dist'
-          set_commits: 'skip'
-
   e2e:
     runs-on: ubuntu-latest
     steps:
