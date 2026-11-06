@@ -25,6 +25,7 @@
   },
   "include": [
     "vite.config.ts",
+    "src/shared/lib/sentryBuild.ts",
     "vitest.config.ts",
     "playwright.config.ts",
     "tests/helpers/publicBoardApi.ts"
