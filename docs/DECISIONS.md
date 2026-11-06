@@ -18,6 +18,9 @@ do Dependabot), com a release chamada literalmente `$VERCEL_GIT_COMMIT_SHA`. A v
 
 - release = `VITE_APP_VERSION` (se definida) ou `VERCEL_GIT_COMMIT_SHA`, variável de sistema da
   Vercel; sem nenhuma, o plugin detecta o commit pelo git.
+- `VITE_APP_VERSION` com uma referência `$VAR`/`${VAR}` não expandida conta como ausente: o
+  defeito original volta se alguém cadastrar a variável assim de novo (achado do CodeRabbit no
+  PR #71, generalizado para qualquer referência, não só `$VERCEL_GIT_COMMIT_SHA`).
 - `VERCEL_ENV === 'preview'` não cria release nem envia source maps.
 - source maps só são gerados quando o plugin vai enviá-los (ele apaga os `.map` depois do
   upload; sem ele, o build publicaria esses arquivos).
