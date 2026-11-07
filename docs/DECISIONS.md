@@ -6,6 +6,29 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-11-06 — Upload de source maps só no build da Vercel
+
+**Contexto**: havia dois caminhos para enviar source maps ao Sentry: o plugin do Sentry no build
+da Vercel e um passo do CI (`getsentry/action-release`) que enviava o `dist/` do build do próprio
+CI. O passo do CI nunca rodou (o repositório não tem os segredos do Sentry) e, desde a entrada de
+2026-11-05, esse build nem gera `.map`.
+
+**Decisão**: removidos do `ci.yml` os passos "Check Sentry configuration" e "Upload source maps to
+Sentry". O envio fica só no build de produção da Vercel.
+
+**Por quê**:
+
+- O site no ar é o build da Vercel. O Sentry casa cada erro com o source map pelo debug ID gravado
+  no bundle; os mapas de um build do CI, que é descartado, nunca casariam com um erro real.
+- Ativar o passo exigiria o `SENTRY_AUTH_TOKEN` também nos segredos do GitHub — a mesma credencial
+  guardada em dois lugares sem necessidade.
+- Um passo que nunca roda, mas parece fazer o envio, engana quem lê o workflow.
+
+**Quando revisitar**: se o deploy passar a sair do próprio CI (`vercel deploy --prebuilt`), o build
+do CI vira o de produção e o envio volta a fazer sentido lá — e sai do build da Vercel.
+
+---
+
 ## 2026-11-05 — Release do Sentry: commit real e só em produção
 
 **Contexto**: o Sentry mandava e-mail de "deploy" a cada build de preview da Vercel (inclusive PRs
@@ -25,10 +48,7 @@ do Dependabot), com a release chamada literalmente `$VERCEL_GIT_COMMIT_SHA`. A v
 - source maps só são gerados quando o plugin vai enviá-los (ele apaga os `.map` depois do
   upload; sem ele, o build publicaria esses arquivos).
 
-**Pendência**: o passo "Upload source maps to Sentry" do CI envia os `.map` do build do próprio CI,
-que roda sem as variáveis do Sentry — com esta decisão, esse build não gera `.map`. O passo
-continua inativo (o repositório não tem os segredos) e o envio real já acontece no build de
-produção da Vercel; decidir se o passo sai do CI.
+**Pendência** (resolvida em 2026-11-06, ver entrada "Upload de source maps só no build da Vercel"): o passo "Upload source maps to Sentry" do CI ficava sem `.map` para enviar.
 
 ---
 
