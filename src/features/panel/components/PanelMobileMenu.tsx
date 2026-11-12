@@ -6,7 +6,7 @@ import { cn } from '@shared/utils/cn'
 
 import { PANEL_CONTENT, ROLE_LABELS } from '../data/panelContent'
 import { MOBILE_MENU_ID } from './PanelHeader'
-import { PanelNav } from './PanelNav'
+import { PanelSidebar } from './PanelSidebar'
 
 interface PanelMobileMenuProps {
   user: SessionUser
@@ -48,25 +48,27 @@ export const PanelMobileMenu = ({
       <div
         ref={menuRef}
         className={cn(
-          'absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col gap-6 bg-white p-4 shadow-xl transition-transform motion-reduce:transition-none',
+          'bg-purple-deep absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col gap-6 overflow-y-auto p-4 text-white shadow-xl transition-transform motion-reduce:transition-none',
           isOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
         <div className='flex items-start justify-between gap-2'>
           <div>
-            <p className='font-semibold text-slate-900'>{user.name}</p>
-            <p className='text-sm text-slate-600'>{ROLE_LABELS[user.role]}</p>
+            <p className='font-semibold'>{user.name}</p>
+            <p className='text-sm text-white/80'>{ROLE_LABELS[user.role]}</p>
           </div>
           <button
             type='button'
             onClick={onClose}
             aria-label={header.closeMenu}
-            className='flex h-12 w-12 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100'
+            className='flex h-12 w-12 items-center justify-center rounded-lg hover:bg-white/10'
           >
             <CloseIcon />
           </button>
         </div>
-        <PanelNav role={user.role} onNavigate={onClose} />
+        <div className='flex-1'>
+          <PanelSidebar role={user.role} onNavigate={onClose} />
+        </div>
       </div>
     </div>
   )

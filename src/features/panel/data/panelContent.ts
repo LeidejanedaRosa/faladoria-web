@@ -21,6 +21,7 @@ export const PANEL_CONTENT = {
     home: 'Início',
     team: 'Equipe',
     serviceAreas: 'Cidades atendidas',
+    settings: 'Configurações',
   },
   forbidden: {
     title: 'Acesso restrito',

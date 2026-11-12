@@ -133,7 +133,7 @@ test.describe('Panel shell', () => {
   })
 
   test.describe('Accessibility', () => {
-    for (const role of ['assistant', 'manager'] as const) {
+    for (const role of ['admin', 'assistant', 'manager'] as const) {
       test(`should have no axe violations on the ${role} home`, async ({
         page,
       }) => {
@@ -150,6 +150,25 @@ test.describe('Panel shell', () => {
         expect(results.violations).toEqual([])
       })
     }
+
+    test('should have no axe violations with the dark phone menu open', async ({
+      page,
+    }) => {
+      await page.setViewportSize(MOBILE)
+      await mockPanelApi(page, { signedInAs: user('admin') })
+      await page.goto(PANEL, { waitUntil: 'domcontentloaded' })
+      await panelReady(page)
+      await page.getByRole('button', { name: 'Abrir menu' }).click()
+      await expect(
+        page.getByRole('dialog', { name: 'Menu do painel' })
+      ).toBeVisible()
+
+      const results = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .analyze()
+
+      expect(results.violations).toEqual([])
+    })
 
     for (const [where, url] of [
       ['panel', PANEL],
@@ -203,6 +222,24 @@ test.describe('Panel shell', () => {
       }
     })
 
+    test('should keep 48px touch targets and no second logo in the menu', async ({
+      page,
+    }) => {
+      await page.getByRole('button', { name: 'Abrir menu' }).click()
+      const dialog = page.getByRole('dialog', { name: 'Menu do painel' })
+
+      for (const target of [
+        dialog.getByRole('link', { name: 'Início', exact: true }),
+        dialog.getByRole('button', { name: 'Sair' }),
+      ]) {
+        const box = (await target.boundingBox())!
+        expect(box.height).toBeGreaterThanOrEqual(48)
+      }
+      await expect(
+        dialog.getByRole('link', { name: 'Faladoria, início do painel' })
+      ).toBeHidden()
+    })
+
     test('should close on Escape and give focus back to ☰', async ({
       page,
     }) => {
@@ -229,11 +266,30 @@ test.describe('Panel shell', () => {
       await panelReady(page)
 
       await expect(
-        page.getByRole('complementary').getByRole('link', { name: 'Início' })
+        page
+          .getByRole('complementary')
+          .getByRole('link', { name: 'Início', exact: true })
       ).toBeVisible()
       await expect(
         page.getByRole('button', { name: 'Abrir menu' })
       ).toBeHidden()
+    })
+
+    test('should keep sign out at the foot of the sidebar on desktop', async ({
+      page,
+    }) => {
+      await page.setViewportSize(DESKTOP)
+      await page.goto(PANEL, { waitUntil: 'domcontentloaded' })
+      await panelReady(page)
+
+      const sidebar = (await page.getByRole('complementary').boundingBox())!
+      const signOut = (await page
+        .getByRole('complementary')
+        .getByRole('button', { name: 'Sair' })
+        .boundingBox())!
+      expect(
+        sidebar.y + sidebar.height - (signOut.y + signOut.height)
+      ).toBeLessThanOrEqual(24)
     })
 
     test('should hide the side navigation on mobile behind ☰', async ({

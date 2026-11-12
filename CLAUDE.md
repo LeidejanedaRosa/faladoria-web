@@ -56,11 +56,12 @@ src/
 │   │   ├── services/      # Calls to /api/auth/*
 │   │   └── utils/         # authErrorMessage (API code → Portuguese text), returnPath
 │   ├── panel/             # Panel shell (layout, menu) and home page (/dashboard)
-│   │   ├── components/    # PanelLayout, PanelHeader, PanelNav, PanelMobileMenu, ComplaintCounts, RequireRole
+│   │   ├── components/    # PanelLayout, PanelHeader (person badge), PanelSidebar (logo, nav, sign out; sidebar and phone menu), PanelNav (main + settings groups), PanelMobileMenu, ComplaintCounts, RequireRole
 │   │   ├── data/          # panelContent (copy, role labels)
 │   │   ├── hooks/         # usePanelUser (outlet context), useComplaintCounts
 │   │   ├── pages/         # PanelRoot (guard + layout), PanelHomePage
-│   │   └── services/      # Calls to /api/complaints/counts
+│   │   ├── services/      # Calls to /api/complaints/counts
+│   │   └── utils/         # initialsOf
 │   ├── service-areas/     # Served cities (/dashboard/cidades, admin only)
 │   │   ├── components/    # CityFields (state + IBGE city), add/edit forms, list, row, remove dialog
 │   │   ├── data/          # serviceAreasContent, brazilianStates
