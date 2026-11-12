@@ -105,15 +105,15 @@ test.describe('Account page', () => {
       await expect(page.locator('h1')).toHaveText('Ana Souza')
     })
 
-    test('should keep Team marked in the menu and lead back through the breadcrumb', async ({
+    test('should show no folders on the account, and lead back through the breadcrumb', async ({
       page,
     }) => {
       await page.setViewportSize(DESKTOP)
       await openAccount(page)
 
       await expect(
-        page.getByRole('complementary').getByRole('link', { name: 'Equipe' })
-      ).toHaveAttribute('aria-current', 'page')
+        page.getByRole('navigation', { name: 'Pastas do painel' })
+      ).toHaveCount(0)
       await page
         .getByRole('navigation', { name: 'Trilha de navegação' })
         .getByRole('link', { name: 'Equipe' })

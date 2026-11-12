@@ -139,14 +139,16 @@ test.describe('Team page', () => {
       await expect(page.getByText('(você)')).toBeVisible()
     })
 
-    test('should be in the menu of the administration, marked as current', async ({
+    test('should open as the team folder, marked as current', async ({
       page,
     }) => {
       await page.setViewportSize(DESKTOP)
       await openPage(page)
 
       await expect(
-        page.getByRole('complementary').getByRole('link', { name: 'Equipe' })
+        page
+          .getByRole('navigation', { name: 'Pastas do painel' })
+          .getByRole('link', { name: /^Equipe/ })
       ).toHaveAttribute('aria-current', 'page')
     })
 
@@ -273,6 +275,12 @@ test.describe('Team page', () => {
       await expect(
         page.getByRole('button', { name: 'Nova conta' })
       ).toBeFocused()
+      // A manager belongs to the managers folder, not to the team.
+      await expect(page.getByText('Bruno Lima', { exact: true })).toHaveCount(0)
+      await page
+        .getByRole('navigation', { name: 'Pastas do painel' })
+        .getByRole('link', { name: /^Gestores/ })
+        .click()
       await expect(page.getByText('Bruno Lima', { exact: true })).toBeVisible()
     })
   })
