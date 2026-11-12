@@ -63,7 +63,58 @@ describe('PanelLayout', () => {
     ).toHaveAttribute('aria-current', 'page')
   })
 
+  it('groups the settings under a named list, apart from the daily pages', () => {
+    renderLayout('admin')
+
+    const [desktopNav] = screen.getAllByRole('navigation', {
+      name: 'Navegação do painel',
+    })
+    const settings = within(desktopNav).getByRole('list', {
+      name: 'Configurações',
+    })
+    expect(
+      within(settings).getByRole('link', { name: 'Cidades atendidas' })
+    ).toHaveAttribute('href', '/dashboard/cidades')
+    expect(
+      within(settings).queryByRole('link', { name: 'Equipe' })
+    ).not.toBeInTheDocument()
+  })
+
+  it.each(['assistant', 'manager'] as const)(
+    'shows no settings group to the %s',
+    role => {
+      renderLayout(role)
+
+      expect(screen.queryByText('Configurações')).not.toBeInTheDocument()
+    }
+  )
+
+  it('shows the initials only to the eye: screen readers get the full name', () => {
+    renderLayout()
+
+    const header = screen.getByRole('banner')
+    expect(within(header).getByText('AS')).toHaveAttribute(
+      'aria-hidden',
+      'true'
+    )
+  })
+
   describe('mobile menu', () => {
+    it('names its settings group on its own, apart from the sidebar copy', async () => {
+      renderLayout('admin')
+      await userEvent.click(screen.getByRole('button', { name: 'Abrir menu' }))
+
+      // Both copies are named alike, so only the id shows whose label each list points at.
+      const dialog = screen.getByRole('dialog', { name: 'Menu do painel' })
+      const list = within(dialog).getByRole('list', { name: 'Configurações' })
+      const labelId = list.getAttribute('aria-labelledby') ?? ''
+      expect(document.querySelectorAll(`[id="${labelId}"]`)).toHaveLength(1)
+      expect(dialog).toContainElement(document.getElementById(labelId))
+      expect(
+        within(dialog).getByRole('button', { name: 'Sair' })
+      ).toBeInTheDocument()
+    })
+
     it('opens as a modal dialog, saying so on the ☰ button', async () => {
       renderLayout()
       const trigger = screen.getByRole('button', { name: 'Abrir menu' })
