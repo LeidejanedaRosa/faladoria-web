@@ -10,6 +10,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Outlet, Route, Routes } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import type { AccountGroup } from '../../data/accountGroups'
 import { TeamPage } from '../TeamPage'
 
 const SELF = buildSessionUser({
@@ -21,16 +22,16 @@ const SELF = buildSessionUser({
 })
 
 // The panel layout's part: the signed-in person reaches the page through the outlet context.
-const renderPage = () => {
+const renderPage = (group: AccountGroup = 'team') => {
   const api = fakeUsersApi(stubApi(), {
     users: [ANA, CARLA],
     servedAreas: [VARGINHA],
   })
   render(
-    <MemoryRouter initialEntries={['/dashboard/equipe']}>
+    <MemoryRouter initialEntries={['/dashboard/x']}>
       <Routes>
         <Route element={<Outlet context={{ user: SELF }} />}>
-          <Route path='/dashboard/equipe' element={<TeamPage />} />
+          <Route path='/dashboard/x' element={<TeamPage group={group} />} />
         </Route>
       </Routes>
     </MemoryRouter>,
@@ -78,10 +79,26 @@ describe('TeamPage', () => {
       'Equipe'
     )
     expect(await screen.findByText('Ana Souza')).toBeInTheDocument()
+    expect(document.title).toContain('Equipe')
     expect(openButton()).toHaveAttribute('aria-expanded', 'false')
     expect(
       screen.queryByRole('textbox', { name: 'Nome' })
     ).not.toBeInTheDocument()
+  })
+
+  it('titles the managers folder and explains who is in it', async () => {
+    renderPage('managers')
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'Gestores'
+    )
+    expect(
+      screen.getByText(/As contas dos gestores de saúde/)
+    ).toBeInTheDocument()
+    expect(
+      await screen.findByText('Nenhum gestor cadastrado ainda.')
+    ).toBeInTheDocument()
+    expect(document.title).toContain('Gestores')
   })
 
   it('opens the form from the button, which then says it is open', async () => {
@@ -108,9 +125,10 @@ describe('TeamPage', () => {
     expect(openButton()).toHaveFocus()
   })
 
+  // Bruno is a manager: he is listed in the managers folder, where the test runs.
   it('creates an account, shows the password once, then lists the account', async () => {
-    renderPage()
-    await screen.findByText('Ana Souza')
+    renderPage('managers')
+    await screen.findByText('Nenhum gestor cadastrado ainda.')
 
     await createBruno()
 

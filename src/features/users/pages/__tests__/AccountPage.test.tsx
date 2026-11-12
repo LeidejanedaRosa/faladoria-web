@@ -1,7 +1,7 @@
 import { fakeUsersApi } from '@/test/fakeUsersApi'
 import { VARGINHA } from '@/test/fixtures/serviceAreas'
 import { buildSessionUser } from '@/test/fixtures/session'
-import { ANA, CARLA } from '@/test/fixtures/users'
+import { ANA, BRUNO, CARLA } from '@/test/fixtures/users'
 import { apiErrorResponse, jsonResponse, stubApi } from '@/test/mockFetch'
 import { createQueryWrapper } from '@/test/queryClient'
 
@@ -34,7 +34,10 @@ const renderPage = (userId: string) =>
   )
 
 const openAccount = (userId: string) => {
-  fakeUsersApi(stubApi(), { users: [ANA, CARLA], servedAreas: [VARGINHA] })
+  fakeUsersApi(stubApi(), {
+    users: [ANA, BRUNO, CARLA],
+    servedAreas: [VARGINHA],
+  })
   renderPage(userId)
 }
 
@@ -93,6 +96,18 @@ describe('AccountPage', () => {
       'aria-current',
       'page'
     )
+  })
+
+  it('leads a manager back to the managers folder, not the team', async () => {
+    openAccount(BRUNO.id)
+
+    const trail = await screen.findByRole('navigation', {
+      name: 'Trilha de navegação',
+    })
+    expect(
+      within(trail).getByRole('link', { name: 'Gestores' })
+    ).toHaveAttribute('href', '/dashboard/gestores')
+    expect(document.title).toContain('Bruno Lima · Gestores')
   })
 
   it('marks the signed-in account and locks its role', async () => {
