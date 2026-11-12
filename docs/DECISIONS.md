@@ -6,6 +6,92 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-11-12 — Casca do painel: sidebar escura, grupo Configurações e pílula da pessoa
+
+**Contexto**: primeira branch do fichário (`feat/dashboard-layout-shell`). Troca só a moldura:
+sidebar, cabeçalho e menu do celular. O conteúdo das páginas continua como estava.
+
+**Decisão**:
+
+- **Sidebar no roxo da marca (`purple-deep`)**, arredondada e solta do canto. Ela leva o logo, o
+  menu e "Sair" no rodapé. O protótipo usava um azul-marinho, mas o logo tem letras quase brancas e
+  foi desenhado para o roxo. Fundo da página: o token novo `panel-canvas` (`#e9edf5`), para os
+  cartões brancos se destacarem.
+- **Um `PanelSidebar` para os dois lugares**: a sidebar do desktop e o menu do celular usam o mesmo
+  componente. Um item novo de menu entra num lugar só. No menu do celular o logo fica escondido,
+  porque a barra de cima já mostra um.
+- **Grupo "Configurações"**: cada item de `PANEL_NAV_ITEMS` tem um `group` (`main` | `settings`), e
+  `navItemsFor(role, group)` filtra pelos dois. O rótulo dá nome à lista por `aria-labelledby`. O
+  grupo some quando o papel não tem nenhum item nele (assistente e gestor).
+- **Id do rótulo com `useId`**: o menu é desenhado duas vezes. Com um id fixo, as duas listas
+  apontariam para o rótulo da primeira cópia. O nome lido continuaria certo, mas o HTML ficaria
+  inválido. A prova inversa mostrou que o teste antigo não pegava isso, e o teste passou a exigir
+  que cada lista aponte para um rótulo único, dentro da própria cópia.
+- **Um só `<header>` (banner)**: no celular, é a barra escura com ☰, logo e iniciais. No desktop,
+  é só a pílula da pessoa no canto direito, numa linha própria, acima do título da página. Assim
+  ela não disputa espaço com botões como "Nova conta".
+- **Iniciais (`initialsOf`) com `aria-hidden`**: o leitor de tela lê o nome completo, ao lado.
+- **Tamanhos**: os itens de menu têm 40px e 14px a partir de `lg`, onde se usa mouse. No celular,
+  continuam com 48px e 16px.
+
+**Alternativas rejeitadas**:
+
+- **Pílula na linha do título** (como no protótipo): economiza uns 60px, mas cada página precisaria
+  reservar espaço para ela ao lado dos próprios botões.
+- **Deixar as páginas delicadas nesta mesma branch**: misturaria moldura e conteúdo num PR só. Cada
+  tela ganha a escala nova na branch dela.
+
+---
+
+## 2026-11-12 — Painel em fichário: protótipo aprovado e divisão em branches
+
+**Contexto**: o painel cresceu tela por tela (início, equipe, conta, cidades), cada uma com o seu
+desenho. Antes de construir Reclamações, a Leidejane propôs reorganizar tudo como um fichário. O
+protótipo foi feito e iterado no Claude (artifact "Fichário"), com referências visuais do
+Pinterest, até ser aprovado.
+
+**Decisão** (produto, aprovada pela Leidejane):
+
+- **A admin trabalha em três pastas**: Reclamações, Equipe e Gestores, cada uma com a sua
+  contagem e a sua cor. Assistente e gestor não têm as pastas: veem direto as reclamações das suas
+  cidades.
+- **Cada situação é uma aba em forma de pasta** ("Em aberto", "Em andamento"...). Só as
+  novidades levam a bolinha vermelha com o número. Estar em "Em aberto" já diz que é preciso agir.
+- **Filtros dentro do painel da aba**: Estado → Cidade (desligada até escolher o estado) → Pessoa
+  → Busca. A lista é uma tabela que vira cartões no celular.
+- **Tudo abre num drawer, com uma tarefa por aba**:
+  - Reclamação: Resumo / Conversa / Tratar (1. classificar, 2. atualizar a situação) / Histórico
+    (só admin).
+  - O gestor não vê a conversa do WhatsApp: o Resumo dele mostra só o que a equipe enviou.
+  - Pessoa: Dados / Acesso.
+- **O drawer tem endereço**: `/dashboard/equipe/:userId` abre a lista com o drawer por cima.
+  Recarregar mantém o drawer aberto, Voltar fecha, e o link pode ser compartilhado.
+- **Configurações num grupo próprio no menu**: Cidades atendidas, e depois Classificações e
+  Locais de ocorrência (por cidade), cadastrados pela admin.
+- **Visual delicado**: texto de 14px e controles de 38 a 40px no desktop. No celular, 16px e 48px
+  (zoom do iOS e alvo de toque, WCAG 2.2).
+
+**Ordem das branches** (guarda-chuva `feat/dashboard-layout`, a partir de `feat/dashboard`):
+
+1. `feat/dashboard-layout-shell`: a casca (entrada acima).
+2. `feat/dashboard-layout-folders`: as três pastas da admin e o componente de abas em pasta.
+3. `feat/dashboard-layout-team`: Equipe e Gestores no fichário, com o drawer da pessoa. Reaproveita
+   `AccountDetailsForm`, `PasswordSection` e `AccessSection`.
+4. `feat/dashboard-layout-access-log`: o histórico na aba Acesso (`GET /api/staff-actions`).
+
+Reclamações vem depois, noutra guarda-chuva, porque depende do backend: filtro por cidade (F269),
+assistente mudando a situação (F273), cadastros de classificação e local (F271, F272), editar a
+classificação (F270), registro do que mudou (F275) e novidades do gestor (F274). Os itens estão no
+`docs/flows/FINDINGS.md` do faladoria-backend.
+
+**Alternativas rejeitadas**:
+
+- **Terminar o painel no desenho antigo e mudar depois**: cada tela nova seria refeita.
+- **Drawer só em memória**: recarregar fecharia o drawer, Voltar sairia da tela, e o link da conta
+  (`/dashboard/equipe/:userId`), que já existe, deixaria de funcionar.
+
+---
+
 ## 2026-10-31 — Equipe: nova senha, desativar e reativar na página da conta
 
 **Contexto**: a página da conta (`/dashboard/equipe/:userId`) ganha as ações que faltavam.
