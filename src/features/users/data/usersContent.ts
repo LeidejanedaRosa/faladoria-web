@@ -1,13 +1,27 @@
 import type { UserRole } from '@features/auth'
 
 import type { UserStatus } from '../services/usersApi'
+import type { AccountGroup } from './accountGroups'
 import { NAME_MAX_LENGTH } from './accountRules'
 
 export const USERS_CONTENT = {
-  metaTitle: 'Equipe',
-  title: 'Equipe',
-  intro:
-    'As contas de quem usa o painel: a equipe da Faladoria e os gestores de saúde. Cada pessoa vê só as reclamações das cidades que atende.',
+  groups: {
+    team: {
+      title: 'Equipe',
+      intro:
+        'As contas da equipe da Faladoria: administração e assistentes. As assistentes veem só as reclamações das cidades que atendem.',
+      empty: 'Nenhuma conta além da sua.',
+    },
+    managers: {
+      title: 'Gestores',
+      intro:
+        'As contas dos gestores de saúde. Cada gestor recebe só as reclamações enviadas pela equipe, das cidades que atende.',
+      empty: 'Nenhum gestor cadastrado ainda.',
+    },
+  } satisfies Record<
+    AccountGroup,
+    { title: string; intro: string; empty: string }
+  >,
   newAccount: {
     open: 'Nova conta',
     heading: 'Nova conta',
@@ -62,7 +76,6 @@ export const USERS_CONTENT = {
     loadError: 'Não foi possível carregar as contas agora.',
     retry: 'Tentar de novo',
     retrying: 'Tentando de novo…',
-    empty: 'Nenhuma conta além da sua.',
     you: 'você',
     role: 'Papel',
     cities: 'Cidades',

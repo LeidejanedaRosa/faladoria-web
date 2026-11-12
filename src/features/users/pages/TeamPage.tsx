@@ -5,14 +5,16 @@ import { useDocumentMeta } from '@shared/hooks/useDocumentMeta'
 import { AccountList } from '../components/AccountList'
 import { NewAccountForm } from '../components/NewAccountForm'
 import { TemporaryPasswordDialog } from '../components/TemporaryPasswordDialog'
+import type { AccountGroup } from '../data/accountGroups'
 import { USERS_CONTENT } from '../data/usersContent'
 import { useNewAccountFlow } from '../hooks/useNewAccountFlow'
 
 const content = USERS_CONTENT
 const FORM_ID = 'new-account'
 
-export const TeamPage = () => {
-  useDocumentMeta({ title: content.metaTitle, robots: 'noindex, nofollow' })
+export const TeamPage = ({ group }: { group: AccountGroup }) => {
+  const { title, intro } = content.groups[group]
+  useDocumentMeta({ title, robots: 'noindex, nofollow' })
   const self = usePanelUser()
   const flow = useNewAccountFlow()
 
@@ -21,9 +23,9 @@ export const TeamPage = () => {
       <header className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
         <div className='flex flex-col gap-2'>
           <h1 className='text-2xl font-bold text-slate-900 sm:text-3xl'>
-            {content.title}
+            {title}
           </h1>
-          <p className='max-w-3xl text-base text-slate-600'>{content.intro}</p>
+          <p className='max-w-3xl text-base text-slate-600'>{intro}</p>
         </div>
         {/* A disclosure: the same button opens and closes the form, and says which. */}
         <Button
@@ -68,7 +70,7 @@ export const TeamPage = () => {
         >
           {content.list.heading}
         </h2>
-        <AccountList selfId={self.id} />
+        <AccountList group={group} selfId={self.id} />
       </section>
 
       <TemporaryPasswordDialog
