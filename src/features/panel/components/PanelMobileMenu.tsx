@@ -55,7 +55,7 @@ export const PanelMobileMenu = ({
         <div className='flex items-start justify-between gap-2'>
           <div>
             <p className='font-semibold'>{user.name}</p>
-            <p className='text-sm text-white/80'>{ROLE_LABELS[user.role]}</p>
+            <p className='text-base text-white/80'>{ROLE_LABELS[user.role]}</p>
           </div>
           <button
             type='button'
