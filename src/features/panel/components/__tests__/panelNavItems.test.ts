@@ -11,10 +11,9 @@ describe('navItemsFor', () => {
     expect(paths(role, 'main')).toContain('/dashboard')
   })
 
-  it('shows the team only to the administration, in the main group', () => {
-    expect(paths('admin', 'main')).toEqual(['/dashboard', '/dashboard/equipe'])
-    expect(paths('assistant', 'main')).toEqual(['/dashboard'])
-    expect(paths('manager', 'main')).toEqual(['/dashboard'])
+  // The admin reaches Equipe and Gestores through the folders, not the side menu.
+  it.each(ROLES)('keeps the folders out of the side menu of %s', role => {
+    expect(paths(role, 'main')).toEqual(['/dashboard'])
   })
 
   it('puts the served cities under settings, for the administration only', () => {
