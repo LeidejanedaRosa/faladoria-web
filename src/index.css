@@ -8,6 +8,7 @@
   --color-lavender: #b3abf2;
   --color-lavender-light: #f5f2ff;
   --color-gray-light: #f7f0f7;
+  --color-panel-canvas: #e9edf5;
 
   --animate-glow-pulse: glow-pulse 3s ease-in-out infinite;
   --animate-card-in: card-in 400ms ease-out backwards;
