@@ -4,6 +4,29 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## axe acusa contraste na pasta aberta: `opacity` no texto branco
+
+**Data**: 2026-11-12
+
+**Sintoma**: o e2e do painel passou a falhar no axe (`color-contrast`, `serious`) na página
+inicial da admin, apontando a legenda "em aberto" da pasta Reclamações. O título da mesma pasta,
+também branco, passava.
+
+**Causa raiz**: a legenda tinha `opacity-90`. Sobre um fundo colorido, branco a 90% vira uma
+mistura do branco com o fundo, e o contraste cai. Calculado: o branco puro sobre `purple-medium`
+dá 5,03:1, e a 90% dá 4,39:1, abaixo dos 4,5:1 que texto pequeno exige. O âmbar das Gestores
+caía igual (5,02 → 4,39). O verde da Equipe passava raspando (4,75). O axe só pegou o roxo porque
+nenhum teste abria a pasta Gestores.
+
+**Solução**: tirar a `opacity-90`, e diferenciar a legenda só pelo tamanho. O e2e passou a rodar o
+axe com **cada uma** das três pastas aberta. A prova inversa (devolver a `opacity-90`) faz
+falhar exatamente as pastas roxa e âmbar.
+
+**Regra prática**: para "suavizar" texto sobre fundo colorido, calcule o contraste da cor
+resultante. Não confie no olho, nem em um teste que só cobre uma das cores.
+
+---
+
 ## Pre-commit barrado pelo gitleaks: senha inventada de teste tomada por segredo
 
 **Data**: 2026-10-28
