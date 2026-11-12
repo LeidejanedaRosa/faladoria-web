@@ -7,11 +7,15 @@ import type { IconProps } from '@shared/types/icon'
 
 import { PANEL_CONTENT } from '../data/panelContent'
 
+/** "settings" items go under the Configurações heading, apart from the daily work. */
+export type PanelNavGroup = 'main' | 'settings'
+
 export interface PanelNavItem {
   to: string
   label: string
   icon: ComponentType<IconProps>
   roles: readonly UserRole[]
+  group: PanelNavGroup
   /** Matches only the exact address (the home would otherwise be "current" everywhere). */
   end?: boolean
 }
@@ -26,6 +30,7 @@ export const PANEL_NAV_ITEMS: readonly PanelNavItem[] = [
     label: PANEL_CONTENT.nav.home,
     icon: HomeIcon,
     roles: EVERY_ROLE,
+    group: 'main',
     end: true,
   },
   {
@@ -33,14 +38,18 @@ export const PANEL_NAV_ITEMS: readonly PanelNavItem[] = [
     label: PANEL_CONTENT.nav.team,
     icon: UsersIcon,
     roles: ['admin'],
+    group: 'main',
   },
   {
     to: PANEL_ROUTES.serviceAreas,
     label: PANEL_CONTENT.nav.serviceAreas,
     icon: LocationIcon,
     roles: ['admin'],
+    group: 'settings',
   },
 ]
 
-export const navItemsFor = (role: UserRole) =>
-  PANEL_NAV_ITEMS.filter(item => item.roles.includes(role))
+export const navItemsFor = (role: UserRole, group: PanelNavGroup) =>
+  PANEL_NAV_ITEMS.filter(
+    item => item.roles.includes(role) && item.group === group
+  )
