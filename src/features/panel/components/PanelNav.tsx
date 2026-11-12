@@ -1,6 +1,6 @@
 import { useId } from 'react'
 
-import type { UserRole } from '@features/auth/services/authApi'
+import type { UserRole } from '@features/auth'
 import { cn } from '@shared/utils/cn'
 import { NavLink } from 'react-router-dom'
 

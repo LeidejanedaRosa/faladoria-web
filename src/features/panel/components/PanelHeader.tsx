@@ -1,7 +1,7 @@
 import type { Ref } from 'react'
 
 import logoFaladoria from '@assets/logo_faladoria.svg'
-import type { SessionUser } from '@features/auth/services/authApi'
+import type { SessionUser } from '@features/auth'
 import { MenuIcon } from '@shared/components/ui'
 import { PANEL_ROUTES } from '@shared/data/routes'
 import { Link } from 'react-router-dom'

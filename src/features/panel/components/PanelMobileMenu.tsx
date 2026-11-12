@@ -1,6 +1,6 @@
 import type { Ref } from 'react'
 
-import type { SessionUser } from '@features/auth/services/authApi'
+import type { SessionUser } from '@features/auth'
 import { CloseIcon } from '@shared/components/ui'
 import { cn } from '@shared/utils/cn'
 

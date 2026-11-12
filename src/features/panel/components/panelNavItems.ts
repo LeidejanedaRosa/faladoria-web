@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react'
 
-import type { UserRole } from '@features/auth/services/authApi'
+import type { UserRole } from '@features/auth'
 import { HomeIcon, LocationIcon, UsersIcon } from '@shared/components/ui'
 import { PANEL_ROUTES } from '@shared/data/routes'
 import type { IconProps } from '@shared/types/icon'

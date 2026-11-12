@@ -1,4 +1,4 @@
-import type { SessionUser } from '@features/auth/services/authApi'
+import type { SessionUser } from '@features/auth'
 import { useOutletContext } from 'react-router-dom'
 
 export interface PanelOutletContext {

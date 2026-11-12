@@ -1,4 +1,4 @@
-import type { UserRole } from '@features/auth/services/authApi'
+import type { UserRole } from '@features/auth'
 
 import type { UserStatus } from '../services/usersApi'
 import { NAME_MAX_LENGTH } from './accountRules'

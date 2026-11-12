@@ -1,4 +1,4 @@
-import type { UserRole } from '@features/auth/services/authApi'
+import type { UserRole } from '@features/auth'
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   admin: 'Administração',
