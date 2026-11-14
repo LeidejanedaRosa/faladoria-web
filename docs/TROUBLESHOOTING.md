@@ -4,6 +4,51 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## e2e que passa na máquina e falha no CI: duas corridas de tempo
+
+**Data**: 2026-11-14
+
+**Sintoma**: no CI do PR 74 (suíte inteira, 1 worker, ~31 min), dois testes que sempre passavam
+localmente falharam ou ficaram instáveis:
+
+- `auth-pages.spec.ts`, "card on the left for login and on the right for the change": esperava
+  48px de folga à direita e recebeu 400. Falhou no Mobile Chrome e foi instável no Chromium.
+- `team.spec.ts`, "axe with the errors and the city list open": a lista de cidades não apareceu.
+  Foi instável no Mobile Chrome.
+
+**Causa raiz** (as duas são do teste, não do app):
+
+1. **O cartão foi medido antes de começar a deslizar.** O `cardAtRest` espera as animações que
+   _existem_ no cartão (`getAnimations()`). O React Router 7 renderiza a troca de rota dentro de
+   uma transição, então logo depois do clique pode ainda não haver animação nenhuma: a lista vem
+   vazia, `Promise.all([])` resolve na hora, e o cartão é medido no lugar do login (400 = a folga
+   do lado oposto). Com a CPU 6× mais lenta (DevTools), não havia animação logo após o clique em 8
+   de 10 execuções.
+2. **O React Hook Form roubou o foco depois que o teste digitou.** Num envio com erro, ele foca o
+   primeiro campo inválido duas vezes: na hora e de novo num `setTimeout`. Os erros podem aparecer
+   na tela antes desse timer. O teste via "Escreva o nome.", digitava na busca de cidade, a lista
+   abria, e então o timer devolvia o foco ao "Nome". A busca perdia o foco e a lista fechava. O
+   retrato da página no relatório do CI mostrava exatamente isso: a busca com "a" e sem
+   `[expanded]`.
+
+**Solução**:
+
+1. Depois do clique, o teste espera o sinal certo antes de medir: a URL da troca de senha e o
+   cartão saindo da posição do login (`expect.poll`). Só então espera a animação acabar.
+2. Depois do erro, o teste espera um `setTimeout` vazio (`formFocusSettled`). Timers com o mesmo
+   atraso rodam na ordem em que foram agendados, então o do React Hook Form, agendado antes, já
+   rodou. É determinístico, sem `waitForTimeout` chutado.
+
+**Como foi provado**: as duas falhas não aparecem numa máquina rápida, então foram provocadas.
+Para o cartão, a CPU ficou 6× mais lenta: a espera nova deu 48px nas 10 execuções. Para o foco,
+os `setTimeout` de 0ms foram atrasados em 200ms, como num navegador ocupado: sem a correção, o
+teste falhou 3 de 3 vezes com o mesmo erro do CI; com ela, passou 3 de 3.
+
+**Regra prática**: "esperar as animações que existem" e "o texto de erro apareceu" não são o
+mesmo que "a tela terminou de reagir". Espere o efeito que o teste quer medir.
+
+---
+
 ## Pre-commit barrado pelo gitleaks: senha inventada de teste tomada por segredo
 
 **Data**: 2026-10-28
