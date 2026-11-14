@@ -1,4 +1,4 @@
-import type { UserRole } from '@features/auth/services/authApi'
+import type { UserRole } from '@features/auth'
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   admin: 'Administração',
@@ -19,9 +19,14 @@ export const PANEL_CONTENT = {
   nav: {
     label: 'Navegação do painel',
     home: 'Início',
-    team: 'Equipe',
     serviceAreas: 'Cidades atendidas',
     settings: 'Configurações',
+  },
+  folders: {
+    label: 'Pastas do painel',
+    complaints: { title: 'Reclamações', caption: 'em aberto' },
+    team: { title: 'Equipe', caption: 'contas ativas' },
+    managers: { title: 'Gestores', caption: 'gestores ativos' },
   },
   forbidden: {
     title: 'Acesso restrito',

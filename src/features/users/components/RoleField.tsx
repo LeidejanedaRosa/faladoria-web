@@ -1,4 +1,4 @@
-import type { UserRole } from '@features/auth/services/authApi'
+import type { UserRole } from '@features/auth'
 import { ROLE_LABELS } from '@features/panel/data/panelContent'
 import { FieldMessages } from '@shared/components/ui'
 import { cn } from '@shared/utils/cn'

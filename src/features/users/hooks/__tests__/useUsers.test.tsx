@@ -1,12 +1,12 @@
 import { fakeUsersApi } from '@/test/fakeUsersApi'
-import { ANA, CARLA } from '@/test/fixtures/users'
+import { ANA, BRUNO, buildUser, CARLA, DORA } from '@/test/fixtures/users'
 import { stubApi } from '@/test/mockFetch'
 import { createQueryWrapper, createTestQueryClient } from '@/test/queryClient'
 
 import { renderHook, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { USERS_QUERY_KEY, useUser } from '../useUsers'
+import { useActiveAccountCounts, USERS_QUERY_KEY, useUser } from '../useUsers'
 
 afterEach(() => {
   vi.unstubAllEnvs()
@@ -49,5 +49,35 @@ describe('useUser', () => {
 
     expect(result.current.data).toEqual(ANA)
     await waitFor(() => expect(result.current.data?.name).toBe('Ana Lima'))
+  })
+})
+
+describe('useActiveAccountCounts', () => {
+  it('counts only the active accounts of each folder', async () => {
+    const RITA = buildUser({ id: 'usr_rita', status: 'deactivated' })
+    const LUIS = buildUser({ id: 'usr_luis', role: 'manager' })
+    fakeUsersApi(stubApi(), { users: [ANA, CARLA, RITA, BRUNO, DORA, LUIS] })
+
+    const { result } = renderHook(() => useActiveAccountCounts(), {
+      wrapper: createQueryWrapper(),
+    })
+
+    // Team: Ana and Carla (Rita is deactivated). Managers: only Luis (Bruno and Dora have
+    // not signed in yet, so they are not active either).
+    await waitFor(() =>
+      expect(result.current.data).toEqual({ team: 2, managers: 1 })
+    )
+  })
+
+  it('counts zero in a folder with nobody active', async () => {
+    fakeUsersApi(stubApi(), { users: [CARLA] })
+
+    const { result } = renderHook(() => useActiveAccountCounts(), {
+      wrapper: createQueryWrapper(),
+    })
+
+    await waitFor(() =>
+      expect(result.current.data).toEqual({ team: 1, managers: 0 })
+    )
   })
 })

@@ -56,7 +56,7 @@ src/
 │   │   ├── services/      # Calls to /api/auth/*
 │   │   └── utils/         # authErrorMessage (API code → Portuguese text), returnPath
 │   ├── panel/             # Panel shell (layout, menu) and home page (/dashboard)
-│   │   ├── components/    # PanelLayout, PanelHeader (person badge), PanelSidebar (logo, nav, sign out; sidebar and phone menu), PanelNav (main + settings groups), PanelMobileMenu, ComplaintCounts, RequireRole
+│   │   ├── components/    # PanelLayout, PanelHeader (person badge), PanelSidebar (logo, nav, sign out; sidebar and phone menu), PanelNav (main + settings groups), PanelMobileMenu, PanelFoldersLayout (parent route: admin's folders + page), PanelFolders, ComplaintCounts, RequireRole
 │   │   ├── data/          # panelContent (copy, role labels)
 │   │   ├── hooks/         # usePanelUser (outlet context), useComplaintCounts
 │   │   ├── pages/         # PanelRoot (guard + layout), PanelHomePage
@@ -71,14 +71,15 @@ src/
 │   │   ├── services/      # /api/service-areas/*, IBGE localities
 │   │   ├── utils/         # serviceAreaErrorMessage, formatDay
 │   │   └── index.ts       # Public API for other features (useServiceAreas, ServiceArea)
-│   ├── users/             # Team accounts (/dashboard/equipe and /dashboard/equipe/:userId, admin only)
+│   ├── users/             # Accounts: team and managers folders (/dashboard/equipe, /dashboard/gestores) and /dashboard/equipe/:userId, admin only
 │   │   ├── components/    # AccountList/Item, StatusBadge, LoadError, NewAccountForm, AccountSection, AccountDetailsForm, AccountCitiesField, PasswordSection, AccessSection, RoleField, CityTagsField, TemporaryPasswordDialog
-│   │   ├── data/          # usersContent, accountRules
-│   │   ├── hooks/         # useUsers/useUser, useCreateUser, useUpdateUser, useAccountMutations (reset, deactivate/reactivate), usersCache, useNewAccountForm, useNewAccountFlow, useAccountDetailsForm, usePasswordResetFlow, useAccessFlow
-│   │   ├── pages/         # TeamPage/TeamRoute, AccountPage/AccountRoute (RequireRole + page, one lazy chunk each)
+│   │   ├── data/          # usersContent, accountRules, accountGroups (which roles each folder holds)
+│   │   ├── hooks/         # useUsers/useUser/useActiveAccountCounts, useCreateUser, useUpdateUser, useAccountMutations (reset, deactivate/reactivate), usersCache, useNewAccountForm, useNewAccountFlow, useAccountDetailsForm, usePasswordResetFlow, useAccessFlow
+│   │   ├── pages/         # TeamPage/TeamRoute (by group), AccountPage/AccountRoute (RequireRole + page, one lazy chunk each)
 │   │   ├── schemas/       # accountFields (shared rules), newAccountSchema, accountDetailsSchema
 │   │   ├── services/      # /api/users, /api/users/:id/{update,reset-password,deactivate,reactivate}
-│   │   └── utils/         # userErrorMessage, fieldOfApiError, accountChanges
+│   │   ├── utils/         # userErrorMessage, fieldOfApiError, accountChanges
+│   │   └── index.ts       # Public API for other features (useActiveAccountCounts, AccountGroup)
 │   └── complaints/, notifications/   # future: one feature per API domain
 └── shared/
     ├── components/

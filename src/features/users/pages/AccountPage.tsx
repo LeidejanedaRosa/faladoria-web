@@ -11,6 +11,7 @@ import { AccountSection } from '../components/AccountSection'
 import { LoadError } from '../components/LoadError'
 import { PasswordSection } from '../components/PasswordSection'
 import { StatusBadge } from '../components/StatusBadge'
+import { GROUP_ROUTES, groupOf } from '../data/accountGroups'
 import { USERS_CONTENT } from '../data/usersContent'
 import { useUser } from '../hooks/useUsers'
 import type { User } from '../services/usersApi'
@@ -20,25 +21,29 @@ const { account: content, list } = USERS_CONTENT
 const linkStyle =
   'text-purple-dark relative font-semibold underline underline-offset-4 after:absolute after:-inset-x-2 after:-inset-y-3.5'
 
-const Breadcrumb = ({ current }: { current: string }) => (
-  <nav aria-label={content.breadcrumb}>
-    <ol className='flex flex-wrap items-center gap-1 text-sm text-slate-600'>
-      <li className='flex items-center gap-1'>
-        <Link to={PANEL_ROUTES.team} className={linkStyle}>
-          {USERS_CONTENT.title}
-        </Link>
-        <ChevronRightIcon className='h-4 w-4' />
-      </li>
-      <li aria-current='page' className='wrap-words'>
-        {current}
-      </li>
-    </ol>
-  </nav>
-)
+// The trail leads back to the folder the account is in: Equipe or Gestores.
+const Breadcrumb = ({ user }: { user: User }) => {
+  const group = groupOf(user.role)
+  return (
+    <nav aria-label={content.breadcrumb}>
+      <ol className='flex flex-wrap items-center gap-1 text-sm text-slate-600'>
+        <li className='flex items-center gap-1'>
+          <Link to={GROUP_ROUTES[group]} className={linkStyle}>
+            {USERS_CONTENT.groups[group].title}
+          </Link>
+          <ChevronRightIcon className='h-4 w-4' />
+        </li>
+        <li aria-current='page' className='wrap-words'>
+          {user.name}
+        </li>
+      </ol>
+    </nav>
+  )
+}
 
 const AccountHeader = ({ user, isSelf }: { user: User; isSelf: boolean }) => (
   <header className='flex flex-col gap-3'>
-    <Breadcrumb current={user.name} />
+    <Breadcrumb user={user} />
     <div className='flex flex-col gap-2'>
       <div className='flex flex-wrap items-center gap-3'>
         <h1 className='wrap-words wrap-words text-2x text-slate-900 sm:text-3xl'>
@@ -94,7 +99,9 @@ export const AccountPage = () => {
   const { targetRef, isRetrying, retry } =
     useRecoveryFocus<HTMLDivElement>(refetch)
   useDocumentMeta({
-    title: user ? `${user.name} · ${USERS_CONTENT.title}` : USERS_CONTENT.title,
+    title: user
+      ? `${user.name} · ${USERS_CONTENT.groups[groupOf(user.role)].title}`
+      : USERS_CONTENT.groups.team.title,
     robots: 'noindex, nofollow',
   })
 

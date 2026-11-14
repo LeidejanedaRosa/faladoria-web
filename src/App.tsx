@@ -51,6 +51,12 @@ const PanelHomePage = lazy(() =>
   }))
 )
 
+const PanelFoldersLayout = lazy(() =>
+  import('./features/panel/components/PanelFoldersLayout').then(m => ({
+    default: m.PanelFoldersLayout,
+  }))
+)
+
 const TeamRoute = lazy(() =>
   import('./features/users/pages/TeamRoute').then(m => ({
     default: m.TeamRoute,
@@ -96,8 +102,17 @@ function App() {
             element={<AuthPage mode='changePassword' />}
           />
           <Route path={PANEL_ROUTES.root} element={<PanelRoot />}>
-            <Route index element={<PanelHomePage />} />
-            <Route path={PANEL_ROUTES.team} element={<TeamRoute />} />
+            <Route element={<PanelFoldersLayout />}>
+              <Route index element={<PanelHomePage />} />
+              <Route
+                path={PANEL_ROUTES.team}
+                element={<TeamRoute group='team' />}
+              />
+              <Route
+                path={PANEL_ROUTES.managers}
+                element={<TeamRoute group='managers' />}
+              />
+            </Route>
             <Route
               path={`${PANEL_ROUTES.team}/:userId`}
               element={<AccountRoute />}

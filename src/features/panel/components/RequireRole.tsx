@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import type { UserRole } from '@features/auth/services/authApi'
+import type { UserRole } from '@features/auth'
 import { PANEL_ROUTES } from '@shared/data/routes'
 import { useDocumentMeta } from '@shared/hooks/useDocumentMeta'
 import { Link } from 'react-router-dom'

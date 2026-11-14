@@ -1,6 +1,7 @@
 import { useRecoveryFocus } from '@shared/hooks/useRecoveryFocus'
 import { cn } from '@shared/utils/cn'
 
+import { type AccountGroup, GROUP_ROLES } from '../data/accountGroups'
 import { USERS_CONTENT } from '../data/usersContent'
 import { useUsers } from '../hooks/useUsers'
 import { ACCOUNT_COLUMNS } from './accountColumns'
@@ -43,9 +44,14 @@ const ListSkeleton = () => (
   </output>
 )
 
-export const AccountList = ({ selfId }: { selfId: string }) => {
+interface AccountListProps {
+  group: AccountGroup
+  selfId: string
+}
+
+export const AccountList = ({ group, selfId }: AccountListProps) => {
   // The list owns its query: useRecoveryFocus needs the data in the render that ends the retry.
-  const { data: users, isPending, isError, refetch } = useUsers()
+  const { data: all, isPending, isError, refetch } = useUsers()
   const { targetRef, isRetrying, retry } =
     useRecoveryFocus<HTMLDivElement>(refetch)
 
@@ -60,6 +66,10 @@ export const AccountList = ({ selfId }: { selfId: string }) => {
   }
   if (isPending) return <ListSkeleton />
 
+  const users = all.filter(user => GROUP_ROLES[group].includes(user.role))
+  // The signed-in admin is always in the team: "empty" means nobody else.
+  const hasOthers = users.some(user => user.id !== selfId)
+
   return (
     <div
       ref={targetRef}
@@ -72,9 +82,9 @@ export const AccountList = ({ selfId }: { selfId: string }) => {
           <AccountItem key={user.id} user={user} isSelf={user.id === selfId} />
         ))}
       </ul>
-      {users.length <= 1 && (
+      {!hasOthers && (
         <p className='border-t border-slate-100 p-4 text-base text-slate-600 sm:px-5'>
-          {list.empty}
+          {USERS_CONTENT.groups[group].empty}
         </p>
       )}
     </div>

@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import type { AccountGroup } from '../../data/accountGroups'
 import { AccountList } from '../AccountList'
 
 afterEach(() => {
@@ -15,11 +16,14 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-const renderList = (users = [ANA, BRUNO, CARLA, DORA]) => {
+const renderList = (
+  group: AccountGroup = 'team',
+  users = [ANA, BRUNO, CARLA, DORA]
+) => {
   fakeUsersApi(stubApi(), { users })
   renderWithQueryClient(
     <MemoryRouter>
-      <AccountList selfId={CARLA.id} />
+      <AccountList group={group} selfId={CARLA.id} />
     </MemoryRouter>
   )
 }
@@ -54,10 +58,28 @@ describe('AccountList', () => {
     ])
   })
 
-  it('names every status in words, not only by color', async () => {
-    renderList()
+  it('lists only the Faladoria team in the team folder', async () => {
+    renderList('team')
 
     await screen.findByText('Ana Souza')
+    expect(screen.getByText('Carla Dias')).toBeInTheDocument()
+    expect(screen.queryByText('Bruno Lima')).not.toBeInTheDocument()
+    expect(screen.queryByText('Dora Matos')).not.toBeInTheDocument()
+  })
+
+  it('lists only the health managers in the managers folder', async () => {
+    renderList('managers')
+
+    await screen.findByText('Bruno Lima')
+    expect(screen.getByText('Dora Matos')).toBeInTheDocument()
+    expect(screen.queryByText('Ana Souza')).not.toBeInTheDocument()
+    expect(screen.queryByText('Carla Dias')).not.toBeInTheDocument()
+  })
+
+  it('names every status in words, not only by color', async () => {
+    renderList('managers')
+
+    await screen.findByText('Bruno Lima')
     expect(valuesOf('Bruno Lima')).toContain(
       'Situação: Aguardando primeiro acesso'
     )
@@ -66,11 +88,17 @@ describe('AccountList', () => {
     )
   })
 
-  it('says the administration sees every city, and flags an account without one', async () => {
-    renderList()
+  it('says the administration sees every city', async () => {
+    renderList('team')
 
     await screen.findByText('Ana Souza')
     expect(valuesOf('Carla Dias')).toContain('Cidades: Todas')
+  })
+
+  it('flags an account without a city', async () => {
+    renderList('managers')
+
+    await screen.findByText('Bruno Lima')
     expect(valuesOf('Dora Matos')).toContain('Cidades: Nenhuma cidade')
   })
 
@@ -84,12 +112,30 @@ describe('AccountList', () => {
     expect(screen.getAllByText('(você)')).toHaveLength(1)
   })
 
-  it('says when the signed-in account is the only one', async () => {
-    renderList([CARLA])
+  it('says when the signed-in account is the only one in the team', async () => {
+    renderList('team', [CARLA, BRUNO])
 
     expect(
       await screen.findByText('Nenhuma conta além da sua.')
     ).toBeInTheDocument()
+  })
+
+  it('says when there is no manager yet, though the team has people', async () => {
+    renderList('managers', [ANA, CARLA])
+
+    expect(
+      await screen.findByText('Nenhum gestor cadastrado ainda.')
+    ).toBeInTheDocument()
+    expect(screen.queryByText('Ana Souza')).not.toBeInTheDocument()
+  })
+
+  it('says nothing about an empty folder when it has someone', async () => {
+    renderList('managers', [CARLA, BRUNO])
+
+    await screen.findByText('Bruno Lima')
+    expect(
+      screen.queryByText('Nenhum gestor cadastrado ainda.')
+    ).not.toBeInTheDocument()
   })
 
   it('offers a retry when the list fails, and moves focus to the list once it loads', async () => {
@@ -98,7 +144,7 @@ describe('AccountList', () => {
     fetchMock.mockResolvedValueOnce(jsonResponse([ANA, CARLA]))
     renderWithQueryClient(
       <MemoryRouter>
-        <AccountList selfId={CARLA.id} />
+        <AccountList group='team' selfId={CARLA.id} />
       </MemoryRouter>
     )
 
@@ -117,7 +163,7 @@ describe('AccountList', () => {
   })
 
   it('links each account to its own page, named after the person', async () => {
-    renderList([ANA, CARLA])
+    renderList('team', [ANA, CARLA])
 
     const edit = await screen.findByRole('link', {
       name: 'Editar a conta de Ana Souza',

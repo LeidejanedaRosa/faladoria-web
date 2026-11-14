@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page, test } from '@playwright/test'
 
+import { mockComplaintCounts } from '../helpers/complaintCountsApi'
 import { E2E_API_URL } from '../helpers/publicBoardApi'
 
 const MOBILE = { width: 390, height: 844 }
@@ -45,6 +46,7 @@ const mockApis = async (page: Page, anaStatus: Status = 'active') => {
       },
     })
   )
+  await mockComplaintCounts(page)
   await page.route(`${E2E_API_URL}/api/users`, route =>
     route.fulfill({ json: users })
   )

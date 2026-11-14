@@ -1,5 +1,4 @@
-import { AUTH_ROUTES } from '@features/auth/data/authContent'
-import { useSignOut } from '@features/auth/hooks/useSignOut'
+import { AUTH_ROUTES, useSignOut } from '@features/auth'
 import { Button } from '@shared/components/ui'
 import { useNavigate } from 'react-router-dom'
 

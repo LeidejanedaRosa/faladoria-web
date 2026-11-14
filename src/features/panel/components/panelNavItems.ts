@@ -1,7 +1,7 @@
 import type { ComponentType } from 'react'
 
-import type { UserRole } from '@features/auth/services/authApi'
-import { HomeIcon, LocationIcon, UsersIcon } from '@shared/components/ui'
+import type { UserRole } from '@features/auth'
+import { HomeIcon, LocationIcon } from '@shared/components/ui'
 import { PANEL_ROUTES } from '@shared/data/routes'
 import type { IconProps } from '@shared/types/icon'
 
@@ -32,13 +32,6 @@ export const PANEL_NAV_ITEMS: readonly PanelNavItem[] = [
     roles: EVERY_ROLE,
     group: 'main',
     end: true,
-  },
-  {
-    to: PANEL_ROUTES.team,
-    label: PANEL_CONTENT.nav.team,
-    icon: UsersIcon,
-    roles: ['admin'],
-    group: 'main',
   },
   {
     to: PANEL_ROUTES.serviceAreas,
