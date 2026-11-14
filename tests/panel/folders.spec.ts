@@ -1,27 +1,13 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page, test } from '@playwright/test'
 
+import { mockComplaintCounts } from '../helpers/complaintCountsApi'
 import { E2E_API_URL } from '../helpers/publicBoardApi'
 
 const MOBILE = { width: 390, height: 844 }
 const DESKTOP = { width: 1440, height: 900 }
 
 type Role = 'admin' | 'assistant' | 'manager'
-
-const COUNTS = {
-  byStatus: {
-    open: 2,
-    rejected: 1,
-    inReview: 3,
-    inProgress: 5,
-    resolved: 12,
-    unresolved: 1,
-    outOfServiceArea: 0,
-  },
-  unread: 4,
-  assignedToMe: 6,
-  unassigned: 7,
-}
 
 const account = (id: string, name: string, role: Role, status = 'active') => ({
   id,
@@ -59,9 +45,7 @@ const mockApis = async (page: Page, role: Role = 'admin') => {
       },
     })
   )
-  await page.route(`${E2E_API_URL}/api/complaints/counts`, route =>
-    route.fulfill({ json: COUNTS })
-  )
+  await mockComplaintCounts(page)
   await page.route(`${E2E_API_URL}/api/users`, route =>
     route.fulfill({ json: USERS })
   )

@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page, test } from '@playwright/test'
 
+import { mockComplaintCounts } from '../helpers/complaintCountsApi'
 import { E2E_API_URL } from '../helpers/publicBoardApi'
 
 const PAGE = '/dashboard/equipe'
@@ -93,6 +94,7 @@ const mockApis = async (
       },
     })
   })
+  await mockComplaintCounts(page)
   await page.route(`${E2E_API_URL}/api/service-areas**`, route =>
     route.fulfill({
       json: {
@@ -150,6 +152,11 @@ test.describe('Team page', () => {
           .getByRole('navigation', { name: 'Pastas do painel' })
           .getByRole('link', { name: /^Equipe/ })
       ).toHaveAttribute('aria-current', 'page')
+      await expect(
+        page
+          .getByRole('navigation', { name: 'Pastas do painel' })
+          .getByRole('link', { name: /^Reclamações/ })
+      ).toHaveText('Reclamações2em aberto')
     })
 
     test('should tell another role the page is not for them', async ({
