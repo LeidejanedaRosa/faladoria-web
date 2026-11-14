@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page, test } from '@playwright/test'
 
+import { mockComplaintCounts } from '../helpers/complaintCountsApi'
 import { E2E_API_URL } from '../helpers/publicBoardApi'
 
 const MOBILE = { width: 390, height: 844 }
@@ -53,6 +54,7 @@ const mockApis = async (
       },
     })
   )
+  await mockComplaintCounts(page)
   await page.route(`${E2E_API_URL}/api/users`, route =>
     route.fulfill({ json: users })
   )
@@ -105,15 +107,15 @@ test.describe('Account page', () => {
       await expect(page.locator('h1')).toHaveText('Ana Souza')
     })
 
-    test('should keep Team marked in the menu and lead back through the breadcrumb', async ({
+    test('should show no folders on the account, and lead back through the breadcrumb', async ({
       page,
     }) => {
       await page.setViewportSize(DESKTOP)
       await openAccount(page)
 
       await expect(
-        page.getByRole('complementary').getByRole('link', { name: 'Equipe' })
-      ).toHaveAttribute('aria-current', 'page')
+        page.getByRole('navigation', { name: 'Pastas do painel' })
+      ).toHaveCount(0)
       await page
         .getByRole('navigation', { name: 'Trilha de navegação' })
         .getByRole('link', { name: 'Equipe' })

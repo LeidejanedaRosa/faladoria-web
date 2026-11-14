@@ -10,6 +10,7 @@ export const PANEL_ROUTES = {
   root: '/dashboard',
   serviceAreas: '/dashboard/cidades',
   team: '/dashboard/equipe',
+  managers: '/dashboard/gestores',
   account: (userId: string) =>
     `/dashboard/equipe/${encodeURIComponent(userId)}`,
 } as const

@@ -1,7 +1,7 @@
 import type { Ref } from 'react'
 
 import logoFaladoria from '@assets/logo_faladoria.svg'
-import type { SessionUser } from '@features/auth/services/authApi'
+import type { SessionUser } from '@features/auth'
 import { MenuIcon } from '@shared/components/ui'
 import { PANEL_ROUTES } from '@shared/data/routes'
 import { Link } from 'react-router-dom'
@@ -27,8 +27,8 @@ const UserBadge = ({ user }: { user: SessionUser }) => (
       {initialsOf(user.name)}
     </span>
     <span className='hidden flex-col sm:flex'>
-      <span className='text-sm font-semibold'>{user.name}</span>
-      <span className='text-xs text-white/80 lg:text-slate-600'>
+      <span className='text-base font-semibold lg:text-sm'>{user.name}</span>
+      <span className='text-base text-white/80 lg:text-xs lg:text-slate-600'>
         {ROLE_LABELS[user.role]}
       </span>
     </span>

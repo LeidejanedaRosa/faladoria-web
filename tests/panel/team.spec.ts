@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page, test } from '@playwright/test'
 
+import { mockComplaintCounts } from '../helpers/complaintCountsApi'
 import { E2E_API_URL } from '../helpers/publicBoardApi'
 
 const PAGE = '/dashboard/equipe'
@@ -93,6 +94,7 @@ const mockApis = async (
       },
     })
   })
+  await mockComplaintCounts(page)
   await page.route(`${E2E_API_URL}/api/service-areas**`, route =>
     route.fulfill({
       json: {
@@ -139,15 +141,22 @@ test.describe('Team page', () => {
       await expect(page.getByText('(você)')).toBeVisible()
     })
 
-    test('should be in the menu of the administration, marked as current', async ({
+    test('should open as the team folder, marked as current', async ({
       page,
     }) => {
       await page.setViewportSize(DESKTOP)
       await openPage(page)
 
       await expect(
-        page.getByRole('complementary').getByRole('link', { name: 'Equipe' })
+        page
+          .getByRole('navigation', { name: 'Pastas do painel' })
+          .getByRole('link', { name: /^Equipe/ })
       ).toHaveAttribute('aria-current', 'page')
+      await expect(
+        page
+          .getByRole('navigation', { name: 'Pastas do painel' })
+          .getByRole('link', { name: /^Reclamações/ })
+      ).toHaveText('Reclamações2em aberto')
     })
 
     test('should tell another role the page is not for them', async ({
@@ -273,6 +282,12 @@ test.describe('Team page', () => {
       await expect(
         page.getByRole('button', { name: 'Nova conta' })
       ).toBeFocused()
+      // A manager belongs to the managers folder, not to the team.
+      await expect(page.getByText('Bruno Lima', { exact: true })).toHaveCount(0)
+      await page
+        .getByRole('navigation', { name: 'Pastas do painel' })
+        .getByRole('link', { name: /^Gestores/ })
+        .click()
       await expect(page.getByText('Bruno Lima', { exact: true })).toBeVisible()
     })
   })

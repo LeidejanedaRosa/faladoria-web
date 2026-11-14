@@ -6,6 +6,67 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-11-12 — Pastas da admin: Reclamações, Equipe e Gestores como rotas
+
+**Contexto**: segunda branch do fichário (`feat/dashboard-layout-folders`). A admin passa a ver
+três pastas no topo das páginas de trabalho. A lista de contas, que juntava equipe e gestores, é
+dividida em duas.
+
+**Decisão** (aprovada pela Leidejane):
+
+- **Cada pasta é uma rota**: Reclamações em `/dashboard`, Equipe em `/dashboard/equipe` e Gestores
+  em `/dashboard/gestores` (nova). Pela mesma razão do drawer com URL: recarregar mantém a pasta,
+  Voltar funciona, e o link de cada uma pode ser compartilhado. As pastas são links num `<nav>`
+  ("Pastas do painel"), com `aria-current="page"` na aberta.
+- **Rota-layout `PanelFoldersLayout`**: a rota pai desenha as pastas, e o `<Outlet>` desenha a
+  página. Nenhuma página sabe que as pastas existem. Ela repassa o contexto do `<Outlet>`, porque
+  as páginas leem a pessoa logada dele. A conta (`/dashboard/equipe/:userId`) e as Configurações
+  ficam fora dela: são detalhe e cadastro, não pastas.
+- **Só a admin vê as pastas.** Assistente e gestor veem a página de reclamações sozinha, e **não
+  disparam `GET /api/users`**, que a API recusa para eles (403). O teste confere as requisições.
+- **Números que pedem ação**: Reclamações mostra as em aberto. Equipe e Gestores mostram as contas
+  **ativas**: desativadas e quem ainda não entrou ficam na lista, mas fora do número.
+- **Sem requisição a mais**: as contagens das contas saem de `useActiveAccountCounts`, um `select`
+  sobre a mesma query da lista. As das reclamações reaproveitam a query da página inicial. Mesma
+  chave, mesmo cache.
+- **Quem é Equipe e quem é Gestor mora em `users`** (`data/accountGroups.ts`: `GROUP_ROLES`,
+  `GROUP_ROUTES`, `groupOf`). Equipe = administração e assistentes; Gestores = gestores. O painel
+  lê as contagens pelo `index.ts` de `users`, criado agora como a API pública da feature.
+- **Uma página, dois grupos**: `TeamPage` e `AccountList` recebem o `group`. Título, introdução e
+  texto de lista vazia vêm de `USERS_CONTENT.groups`. "Vazia" passou a ser "ninguém além de você",
+  regra que serve aos dois grupos: na Equipe a admin sempre aparece; em Gestores, nunca.
+- **A trilha da conta volta à pasta certa**: um gestor mostra "Gestores › Bruno Lima".
+- **"Equipe" saiu do menu lateral**: as pastas substituem o item. "Início" fica apagado em Equipe
+  e em Gestores, porque a pasta aberta já mostra onde a pessoa está.
+- **No celular, uma pasta por linha**: nome à esquerda, número à direita, 56px de altura. As três
+  lado a lado (o layout aprovado primeiro) não cabiam: "Reclamações" precisa de 101px, e a pasta
+  tinha 90px numa tela de 390px e 67px numa de 320px. O defeito só apareceu medindo o texto
+  (`scrollWidth` maior que `clientWidth`), e foi mostrado antes de o layout mudar. O e2e confere,
+  em 320 e 390px, uma pasta por linha e nenhum texto estourando. Do `sm` em diante, ficam lado a lado.
+- **Cores**: roxo da marca (Reclamações), `teal-700` (Equipe) e `amber-700` (Gestores), com texto
+  branco na pasta aberta, todos com contraste de 5,0:1 ou mais. As classes são escritas por
+  inteiro numa tabela, porque o Tailwind só gera as classes que encontra literalmente no código.
+
+- **Imports pela API pública do `auth`**: `panel` e `users` passaram a importar de `@features/auth`
+  (`AUTH_ROUTES`, `useSignOut`, `RequirePanelSession`, `SessionUser`, `UserRole`), nunca das
+  pastas internas. `App.tsx` e `main.tsx` continuam apontando para os arquivos: são a raiz de
+  composição, já conhecem todas as features, e importar o barril ali poderia levar código do
+  painel ao pacote inicial do site público. Os fixtures de teste também ficam como estão.
+
+**Alternativas rejeitadas**:
+
+- **Pastas como botões que trocam o conteúdo**: recarregar voltaria à primeira pasta, e Voltar
+  sairia do painel.
+- **Criar já o componente de abas em pasta**: sem nenhum uso nesta branch, seria código morto. Ele
+  nasce no drawer (branch 3), com o primeiro consumidor. A ordem das branches mudou por isso:
+  pastas → drawer → filtros → histórico de acesso.
+- **Cada página desenhar as pastas**: repetiria o mesmo bloco em três lugares.
+- **No celular, lado a lado só com o número, ou numa faixa com rolagem lateral**: a primeira ainda
+  estourava em 320px, a menos que a fonte caísse abaixo de 16px; na segunda, a terceira pasta
+  ficaria escondida para quem não desliza.
+
+---
+
 ## 2026-11-12 — Casca do painel: sidebar escura, grupo Configurações e pílula da pessoa
 
 **Contexto**: primeira branch do fichário (`feat/dashboard-layout-shell`). Troca só a moldura:
@@ -32,7 +93,9 @@ sidebar, cabeçalho e menu do celular. O conteúdo das páginas continua como es
   ela não disputa espaço com botões como "Nova conta".
 - **Iniciais (`initialsOf`) com `aria-hidden`**: o leitor de tela lê o nome completo, ao lado.
 - **Tamanhos**: os itens de menu têm 40px e 14px a partir de `lg`, onde se usa mouse. No celular,
-  continuam com 48px e 16px.
+  continuam com 48px e 16px. Ajuste da Leidejane na branch das pastas: os textos pequenos da casca
+  (nome e papel na pílula e no menu, rótulo "Configurações") também passaram a ter 16px no celular
+  (`text-base`) e só diminuem a partir de `lg`, seguindo a regra de 16px mínimos no celular.
 
 **Alternativas rejeitadas**:
 
@@ -73,11 +136,14 @@ Pinterest, até ser aprovado.
 
 **Ordem das branches** (guarda-chuva `feat/dashboard-layout`, a partir de `feat/dashboard`):
 
-1. `feat/dashboard-layout-shell`: a casca (entrada acima).
-2. `feat/dashboard-layout-folders`: as três pastas da admin e o componente de abas em pasta.
-3. `feat/dashboard-layout-team`: Equipe e Gestores no fichário, com o drawer da pessoa. Reaproveita
-   `AccountDetailsForm`, `PasswordSection` e `AccessSection`.
-4. `feat/dashboard-layout-access-log`: o histórico na aba Acesso (`GET /api/staff-actions`).
+1. `feat/dashboard-layout-shell`: a casca.
+2. `feat/dashboard-layout-folders`: as três pastas da admin, como rotas.
+3. `feat/dashboard-layout-drawer`: o drawer da pessoa com URL e as abas em pasta (Dados / Acesso).
+   Reaproveita `AccountDetailsForm`, `PasswordSection` e `AccessSection`.
+4. `feat/dashboard-layout-filters`: Estado → Cidade → Busca na lista.
+5. `feat/dashboard-layout-access-log`: o histórico na aba Acesso (`GET /api/staff-actions`).
+
+(Ordem revista em 2026-11-12, na entrada "Pastas da admin".)
 
 Reclamações vem depois, noutra guarda-chuva, porque depende do backend: filtro por cidade (F269),
 assistente mudando a situação (F273), cadastros de classificação e local (F271, F272), editar a

@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 
-import type { SessionUser } from '@features/auth/services/authApi'
+import type { SessionUser } from '@features/auth'
 import { MainContent, SkipLink } from '@shared/components/ui'
 import { useSidebar } from '@shared/hooks/useSidebar'
 import { Outlet } from 'react-router-dom'

@@ -1,6 +1,6 @@
 import { useId } from 'react'
 
-import type { UserRole } from '@features/auth/services/authApi'
+import type { UserRole } from '@features/auth'
 import { cn } from '@shared/utils/cn'
 import { NavLink } from 'react-router-dom'
 
@@ -58,7 +58,7 @@ export const PanelNav = ({ role, onNavigate }: PanelNavProps) => {
         <div className='flex flex-col gap-2'>
           <p
             id={settingsId}
-            className='px-3 text-xs font-semibold tracking-wider text-white/60 uppercase'
+            className='px-3 text-base font-semibold tracking-wider text-white/60 uppercase lg:text-xs'
           >
             {PANEL_CONTENT.nav.settings}
           </p>
