@@ -6,6 +6,51 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-11-14 — Auditoria: Dependabot destravado (`@lhci/cli` 0.16, `markdownlint-cli` removido)
+
+**Contexto**: as execuções do Dependabot na `main` falhavam desde 12/11 com
+`security_update_not_possible`. Havia 7 alertas abertos, todos de ferramentas de desenvolvimento
+(nada vai para o navegador): `basic-ftp`, `extract-zip` ×2, `minimatch`, `js-yaml`, `smol-toml` e
+`katex`. O Dependabot só sabe subir a dependência **direta**; aqui os pacotes vulneráveis estavam
+fundo na árvore, presos pela faixa de versão do pacote do meio. Para o `basic-ftp`, ele dizia que a
+maior versão possível era a 6.2.3, e a corrigida é a 6.2.4.
+
+**Decisão**:
+
+- **`@lhci/cli` 0.15 → 0.16.1**: traz o Lighthouse 13 e o puppeteer 25, cujo `@puppeteer/browsers`
+  trocou o `extract-zip` pelo `modern-tar`. Os dois alertas do `extract-zip`, que não tinham
+  correção publicada, somem. Com isso saem também o `auditConfig.ignoreGhsas`, a exceção aceita na
+  auditoria de 2026-10-22. O CI não usa esta dependência (roda a `treosh/lighthouse-ci-action`, que
+  traz o próprio Lighthouse); ela serve ao `pnpm lighthouse` local, que foi rodado com a
+  configuração do projeto: 12 execuções, todas as metas de nota passando.
+- **`markdownlint-cli` removido**: não tinha script, passo no CI, hook nem configuração. Entrou num
+  "update dependencies" em janeiro e nunca foi usado. Ele trazia o `js-yaml` 5.2, o `smol-toml` 1.7
+  e o `katex` 0.16. Se um dia o projeto quiser lint de Markdown, ele volta com configuração e passo
+  no CI.
+- **Overrides com faixa fechada (`^`)**: `basic-ftp@<6.2.4` → `^6.2.4` (o `proxy-agent` ainda é
+  peer do puppeteer) e `minimatch@>=7.0.0 <11.0.1` → `^11.0.1` (o `typescript-eslint`, o Lighthouse e
+  o plugin do Sentry pedem a 10, e não existe 10.x corrigida). Os dois overrides antigos, com `>=`
+  aberto, saíram: um `>=` deixaria o pnpm pular para uma major nova sem ninguém perceber.
+- **Overrides mortos removidos**: `tmp` (o pacote saiu da árvore) e `uuid` (o `@lhci/cli` 0.16 já
+  pede `^14.0.3`). O `chromium-bidi>zod` fica: o `chromium-bidi` ainda aceita a 4.6.5.
+
+**Resultado**: `pnpm audit` com 1 aviso, contra 8 antes. ESLint (com o `minimatch` 11 por
+baixo), tipos, testes e build verdes.
+
+**Fica para outra branch**: o `glob` 13 (moderado), via `@sentry/vite-plugin` 5.4.1. A correção
+pede o plugin 11, um salto de major. Esse plugin só roda no build da Vercel, quando há
+`SENTRY_AUTH_TOKEN`, e um erro nele derrubaria o deploy de produção. Por isso precisa de uma branch
+própria, testada num deploy de preview com o token. O CI só barra a partir de `high`, e o
+Dependabot não listou esse aviso.
+
+**Alternativas rejeitadas**:
+
+- **Override também para o `katex`, o `js-yaml` e o `smol-toml`**: manteria uma ferramenta que
+  ninguém usa só para remendar as dependências dela.
+- **Dispensar os alertas no GitHub como "risco tolerável"**: havia correção para todos.
+
+---
+
 ## 2026-11-06 — Upload de source maps só no build da Vercel
 
 **Contexto**: havia dois caminhos para enviar source maps ao Sentry: o plugin do Sentry no build
