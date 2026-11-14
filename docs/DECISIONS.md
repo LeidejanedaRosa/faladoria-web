@@ -34,6 +34,17 @@ maior versão possível era a 6.2.3, e a corrigida é a 6.2.4.
 - **Overrides mortos removidos**: `tmp` (o pacote saiu da árvore) e `uuid` (o `@lhci/cli` 0.16 já
   pede `^14.0.3`). O `chromium-bidi>zod` fica: o `chromium-bidi` ainda aceita a 4.6.5.
 
+- **Node 22.19+ (correção pós-review, CodeRabbit)**: o `@lhci/cli` 0.16 e o Lighthouse 13 declaram
+  `engines.node: ">=22.19.0"`, e o projeto declarava `>=20.0.0`, com o CI em Node 20. O CI passou
+  porque o pnpm não barra `engines` por padrão e porque ele nem usa esse pacote, mas o
+  `pnpm lighthouse` quebraria em Node 20. O CodeRabbit sugeriu voltar para o 0.15, o que traria de
+  volta os 2 alertas `high` do `extract-zip` (sem correção) e a exceção no `ignoreGhsas`. A escolha
+  foi o contrário: **o Node 20 está sem suporte (EOL) desde 30/04/2026**, sem correções de
+  segurança. `engines.node` passou para `>=22.19.0`, e os dois jobs do CI para `node-version: 22`.
+  Isso também suspende a restrição que travou o `@commitlint/cli` na série 20 e o `lint-staged` no
+  16 (entradas de 2026-10-22 e do commitlint). Subir esses dois fica para uma branch própria (o
+  `lint-staged` 17 ainda pede Node 22.22.1).
+
 **Resultado**: `pnpm audit` com 1 aviso, contra 8 antes. ESLint (com o `minimatch` 11 por
 baixo), tipos, testes e build verdes.
 
