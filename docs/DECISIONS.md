@@ -20,6 +20,15 @@ qualquer branch de destino) e `reviews.profile: chill`, o estilo que o próprio 
 gera como base. A linha `$schema` liga a validação e o autocompletar no editor. O arquivo passou
 no `coderabbit config validate`.
 
+**De onde o arquivo é lido (achado do CodeRabbit no #81)**: com a _Configuration source_ padrão
+(`Auto`), o CodeRabbit lê o `.coderabbit.yaml` da branch de origem do PR, não da `main`
+([docs](https://docs.coderabbit.ai/configuration/branch.md)). Um PR cuja branch não tem o arquivo
+segue sem revisão para destinos fora da `main`. Fica no `Auto`: o arquivo chega às guarda-chuvas
+pelas sincronizações com a `main`, que já acontecem por dependências e CI, e as branches do painel
+nascem delas. A opção _Default branch_ (ler sempre da `main`) foi rejeitada pelo mesmo motivo da
+interface web: seria uma regra fora do repositório. Até a sincronização, um PR afetado pode pedir
+revisão manual (`@coderabbitai review`).
+
 **Alternativas rejeitadas**:
 
 - **Listar as branches (`^feat/dashboard$`, `^feat/dashboard-layout$`)**: cada nova guarda-chuva
