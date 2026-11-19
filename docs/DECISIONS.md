@@ -49,10 +49,24 @@ maior versão possível era a 6.2.3, e a corrigida é a 6.2.4.
 baixo), tipos, testes e build verdes.
 
 **Fica para outra branch**: o `glob` 13 (moderado), via `@sentry/vite-plugin` 5.4.1. A correção
-pede o plugin 11, um salto de major. Esse plugin só roda no build da Vercel, quando há
+pede o plugin 11, um salto de major. Esse plugin só roda no build de produção, quando há
 `SENTRY_AUTH_TOKEN`, e um erro nele derrubaria o deploy de produção. Por isso precisa de uma branch
-própria, testada num deploy de preview com o token. O CI só barra a partir de `high`, e o
+própria, com validação controlada antes do merge. O CI só barra a partir de `high`, e o
 Dependabot não listou esse aviso.
+
+**Validação do plugin 11 (correção pós-review, CodeRabbit)**: o plano anterior era testar num
+deploy de preview com o token. Isso não exercita o plugin: no preview, `VERCEL_ENV === 'preview'`
+faz `resolveSentryBuild` devolver `null` (entrada de 2026-11-05), o plugin fica fora do build e o
+deploy passa sem ter testado nada. A validação é um build local de produção, fora da Vercel:
+
+1. `NODE_ENV=production`, com `SENTRY_AUTH_TOKEN`, `SENTRY_ORG` e `SENTRY_PROJECT` reais e
+   `VITE_APP_VERSION=validation-<sha curto>`, para a release de teste não se confundir com as
+   reais;
+2. `pnpm build` e conferir: o log do plugin mostra a release criada e o upload dos source maps; a
+   release `validation-…` aparece no Sentry com os arquivos; nenhum `.map` sobra em `dist/`;
+3. apagar a release `validation-…` no Sentry.
+
+Os previews continuam sem release, como decidido em 2026-11-05.
 
 **Alternativas rejeitadas**:
 
