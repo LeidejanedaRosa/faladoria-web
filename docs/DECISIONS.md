@@ -6,6 +6,35 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-11-19 — CodeRabbit: `.coderabbit.yaml` revisa PRs para qualquer branch
+
+**Contexto**: o CodeRabbit pulou o #79 ("Review skipped: auto reviews are disabled on base/target
+branches other than the default branch"). O repositório não tinha `.coderabbit.yaml`, e o padrão do
+CodeRabbit só revisa PRs para a `main`. Como o painel é feito em branches guarda-chuva
+(`feat/dashboard`, `feat/dashboard-layout`), a maior parte dos PRs ficava sem revisão automática.
+O padrão de todo repositório já previa a revisão nas branches de integração, mas ninguém tinha
+criado o arquivo aqui.
+
+**Decisão**: `.coderabbit.yaml` na raiz, com `reviews.auto_review.base_branches: ['.*']` (regex:
+qualquer branch de destino) e `reviews.profile: chill`, o estilo que o próprio CLI do CodeRabbit
+gera como base. A linha `$schema` liga a validação e o autocompletar no editor. O arquivo passou
+no `coderabbit config validate`.
+
+**Alternativas rejeitadas**:
+
+- **Listar as branches (`^feat/dashboard$`, `^feat/dashboard-layout$`)**: cada nova guarda-chuva
+  exigiria editar o arquivo, e esquecer significaria PRs sem revisão de novo.
+- **`^feat/`**: deixaria de fora PRs para branches `fix/` ou `chore/` de integração.
+- **Configurar pela interface web do CodeRabbit**: funciona, mas fica fora do repositório, sem
+  histórico nem revisão.
+- **`profile: assertive`**: mais comentários, muitos de preferência. Como cada achado passa por
+  triagem antes de virar mudança, o volume extra seria ruído.
+- **Copiar o `.coderabbit.yaml` do `generate-certificate-frontend`**: as chaves dele
+  (`review:`, `coding_guidelines:`, `feedback:`) não existem no schema e são ignoradas em
+  silêncio.
+
+---
+
 ## 2026-11-14 — Auditoria: Dependabot destravado (`@lhci/cli` 0.16, `markdownlint-cli` removido)
 
 **Contexto**: as execuções do Dependabot na `main` falhavam desde 12/11 com
