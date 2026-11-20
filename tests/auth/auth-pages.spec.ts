@@ -227,6 +227,16 @@ test.describe('Auth pages', () => {
         .locator('aside')
         .getByRole('button', { name: 'Trocar a senha' })
         .click()
+      // The route change renders in a transition: right after the click the slide may not have
+      // started, and cardAtRest would measure the card still in the login spot. So wait for the
+      // card to reach its final spot, 48px off the band's right edge, before measuring.
+      await expect(page).toHaveURL(CHANGE)
+      await expect
+        .poll(async () => {
+          const card = (await page.locator('section').boundingBox())!
+          return Math.round(band.x + band.width - (card.x + card.width))
+        })
+        .toBe(48)
       const changeCard = await cardAtRest(page)
 
       expect(loginCard.x).toBeLessThan(

@@ -111,6 +111,12 @@ const openPage = async (
   await page.locator('h1').waitFor({ timeout: 15000 })
 }
 
+/** React Hook Form focuses the first invalid field again in a setTimeout after a failed submit.
+ * Timers with the same delay run in order, so once this one fires, that focus has happened and
+ * will not pull focus away from a field the test is typing in. */
+const formFocusSettled = (page: Page) =>
+  page.evaluate(() => new Promise(resolve => setTimeout(resolve)))
+
 const citySearch = (page: Page) =>
   page.getByRole('combobox', { name: 'Buscar cidade atendida' })
 
@@ -184,6 +190,7 @@ test.describe('Team page', () => {
       await page.getByRole('radio', { name: /Assistente/ }).check()
       await page.getByRole('button', { name: 'Criar conta' }).click()
       await expect(page.getByText('Escreva o nome.')).toBeVisible()
+      await formFocusSettled(page)
       await citySearch(page).fill('a')
       await expect(page.getByRole('listbox')).toBeVisible()
 
