@@ -1,9 +1,9 @@
-import type { ReactNode } from 'react'
+import { type ReactNode, useEffect } from 'react'
 
 import { Drawer, Tabs } from '@shared/components/ui'
 import { useDocumentMeta } from '@shared/hooks/useDocumentMeta'
 import { useRecoveryFocus } from '@shared/hooks/useRecoveryFocus'
-import { Navigate, useLocation, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import { AccessSection } from '../components/AccessSection'
 import { AccountDetailsForm } from '../components/AccountDetailsForm'
@@ -97,6 +97,7 @@ export const AccountDrawerPage = () => {
   const { userId = '' } = useParams()
   const { user: self, group } = useFolderContext()
   const close = useCloseDrawer(group)
+  const navigate = useNavigate()
   const location = useLocation()
   // The drawer owns its query: useRecoveryFocus needs the data in the render that ends the retry.
   const { data: user, isPending, isError, refetch } = useUser(userId)
@@ -110,15 +111,16 @@ export const AccountDrawerPage = () => {
   })
 
   // The address names the folder: an old link, or a role just changed, moves to the right one.
-  if (user && groupOf(user.role) !== group) {
-    return (
-      <Navigate
-        to={accountRoute(groupOf(user.role), user.id)}
-        replace
-        state={location.state}
-      />
-    )
-  }
+  // From an effect, with the drawer still drawn: the form stays mounted, so the save message and
+  // the cases-out-of-reach warning travel with it to the other folder.
+  const ownGroup = user ? groupOf(user.role) : group
+  useEffect(() => {
+    if (!user || ownGroup === group) return
+    void navigate(accountRoute(ownGroup, user.id), {
+      replace: true,
+      state: location.state,
+    })
+  }, [user, ownGroup, group, navigate, location.state])
 
   const shell = (title: string, body: ReactNode) => (
     <Drawer title={title} closeLabel={drawer.close} onClose={close}>
