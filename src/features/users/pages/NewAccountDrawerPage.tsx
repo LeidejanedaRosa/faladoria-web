@@ -1,18 +1,23 @@
 import { useEffect, useRef } from 'react'
 
 import { Drawer } from '@shared/components/ui'
+import { useDocumentMeta } from '@shared/hooks/useDocumentMeta'
 
 import { NewAccountForm } from '../components/NewAccountForm'
 import { USERS_CONTENT } from '../data/usersContent'
 import { useCloseDrawer } from '../hooks/useCloseDrawer'
 import { useFolderContext } from '../hooks/useFolderContext'
 
-const { newAccount, drawer } = USERS_CONTENT
+const { newAccount, drawer, groups } = USERS_CONTENT
 
 /** "Nova conta", in a drawer over the folder's list. The folder decides the roles offered. */
 export const NewAccountDrawerPage = () => {
   const { group, onAccountCreated } = useFolderContext()
   const close = useCloseDrawer(group)
+  useDocumentMeta({
+    title: `${newAccount.heading} · ${groups[group].title}`,
+    robots: 'noindex, nofollow',
+  })
   // The account may be created after the drawer was closed (Escape, ×, Back): the password still
   // reaches the list, but closing again would step back once more.
   const isOpen = useRef(false)
