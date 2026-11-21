@@ -155,8 +155,34 @@ describe('AccountDrawerPage', () => {
     openAccount(BRUNO.id)
 
     await drawerOf('Bruno Lima')
-    expect(currentPath()).toBe(`/dashboard/gestores/${BRUNO.id}`)
+    await waitFor(() =>
+      expect(currentPath()).toBe(`/dashboard/gestores/${BRUNO.id}`)
+    )
     expect(document.title).toContain('Bruno Lima · Gestores')
+  })
+
+  it('keeps the save message and the cases warning when a role change moves the account', async () => {
+    fakeUsersApi(stubApi(), {
+      users: [ANA, BRUNO, CARLA],
+      servedAreas: [VARGINHA],
+      complaintsOutOfReach: 2,
+    })
+    renderDrawer(`/dashboard/equipe/${ANA.id}`)
+    const drawer = await drawerOf('Ana Souza')
+
+    await userEvent.click(
+      within(drawer).getByRole('radio', { name: /Gestão de saúde/ })
+    )
+    await userEvent.click(
+      within(drawer).getByRole('button', { name: 'Salvar alterações' })
+    )
+
+    await waitFor(() =>
+      expect(currentPath()).toBe(`/dashboard/gestores/${ANA.id}`)
+    )
+    const statuses = screen.getAllByRole('status').map(s => s.textContent)
+    expect(statuses).toContain('As alterações de Ana Souza foram salvas.')
+    expect(statuses.join(' ')).toMatch(/2 casos em andamento continuam/)
   })
 
   it('stays in the folder when the account belongs to it', async () => {
