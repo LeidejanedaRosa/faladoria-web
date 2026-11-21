@@ -74,7 +74,10 @@ pasta, painel lateral, papel restrito pela pasta e "Nova conta" também no drawe
   se a admin sair da pasta inteira antes da resposta, e aí "Gerar nova senha" resolve.
 - **O título da pasta volta à aba quando o drawer fecha.** O `useDocumentMeta` não restaura nada
   ao desmontar, e o efeito da lista não rodava de novo. A lista põe o título num componente
-  (`FolderTitle`) montado só quando não há drawer.
+  (`FolderTitle`) montado só quando não há drawer. Por isso cada drawer dá o próprio título:
+  o da conta ("Ana Souza · Equipe") e o da conta nova ("Nova conta · Gestores"), ambos com
+  `noindex`. Antes, o drawer da conta nova herdava o da pasta; tirar essa herança deixava
+  `/nova` aberto direto com o título de index.html (achado na segunda rodada do review).
 - **O formulário da conta nova tem `key={group}`.** Não achei um caminho de navegação que leve de
   uma pasta à outra com o drawer aberto (a página atrás fica inerte), mas, se acontecer, o
   formulário recomeça com o papel da pasta nova em vez de guardar o da anterior.

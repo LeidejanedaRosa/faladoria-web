@@ -47,6 +47,25 @@ precisa atravessar a navegação, navegue num efeito.
 
 ---
 
+## `/nova` aberto direto ficava com o título de index.html
+
+**Data**: 2026-11-21
+
+**Sintoma** (segunda rodada do CodeRabbit no #85): abrir `/dashboard/gestores/nova` pelo endereço
+(ou recarregar ali) deixava a aba com o título inicial, sem o nome da pasta nem `noindex`.
+
+**Causa raiz**: uma regressão da correção do título da pasta. A lista passou a dar o título só
+quando não há drawer, mas o drawer da conta nova nunca teve título próprio: ele dependia de a
+lista sempre escrever "Equipe" ou "Gestores".
+
+**Solução**: o `NewAccountDrawerPage` chama `useDocumentMeta` ("Nova conta · Gestores",
+`noindex, nofollow`), como o drawer da conta já fazia. Ver DECISIONS (2026-11-21, drawer).
+
+**Regra prática**: ao tirar uma responsabilidade de um componente pai, procure os filhos que
+dependiam dela sem declarar.
+
+---
+
 ## `focus:outline-none` do Tailwind não tira o contorno de foco
 
 **Data**: 2026-11-21
