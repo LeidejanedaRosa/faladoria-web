@@ -6,6 +6,44 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-11-19 — CodeRabbit: `.coderabbit.yaml` revisa PRs para qualquer branch
+
+**Contexto**: o CodeRabbit pulou o #79 ("Review skipped: auto reviews are disabled on base/target
+branches other than the default branch"). O repositório não tinha `.coderabbit.yaml`, e o padrão do
+CodeRabbit só revisa PRs para a `main`. Como o painel é feito em branches guarda-chuva
+(`feat/dashboard`, `feat/dashboard-layout`), a maior parte dos PRs ficava sem revisão automática.
+O padrão de todo repositório já previa a revisão nas branches de integração, mas ninguém tinha
+criado o arquivo aqui.
+
+**Decisão**: `.coderabbit.yaml` na raiz, com `reviews.auto_review.base_branches: ['.*']` (regex:
+qualquer branch de destino) e `reviews.profile: chill`, o estilo que o próprio CLI do CodeRabbit
+gera como base. A linha `$schema` liga a validação e o autocompletar no editor. O arquivo passou
+no `coderabbit config validate`.
+
+**De onde o arquivo é lido (achado do CodeRabbit no #81)**: com a _Configuration source_ padrão
+(`Auto`), o CodeRabbit lê o `.coderabbit.yaml` da branch de origem do PR, não da `main`
+([docs](https://docs.coderabbit.ai/configuration/branch.md)). Um PR cuja branch não tem o arquivo
+segue sem revisão para destinos fora da `main`. Fica no `Auto`: o arquivo chega às guarda-chuvas
+pelas sincronizações com a `main`, que já acontecem por dependências e CI, e as branches do painel
+nascem delas. A opção _Default branch_ (ler sempre da `main`) foi rejeitada pelo mesmo motivo da
+interface web: seria uma regra fora do repositório. Até a sincronização, um PR afetado pode pedir
+revisão manual (`@coderabbitai review`).
+
+**Alternativas rejeitadas**:
+
+- **Listar as branches (`^feat/dashboard$`, `^feat/dashboard-layout$`)**: cada nova guarda-chuva
+  exigiria editar o arquivo, e esquecer significaria PRs sem revisão de novo.
+- **`^feat/`**: deixaria de fora PRs para branches `fix/` ou `chore/` de integração.
+- **Configurar pela interface web do CodeRabbit**: funciona, mas fica fora do repositório, sem
+  histórico nem revisão.
+- **`profile: assertive`**: mais comentários, muitos de preferência. Como cada achado passa por
+  triagem antes de virar mudança, o volume extra seria ruído.
+- **Copiar o `.coderabbit.yaml` do `generate-certificate-frontend`**: as chaves dele
+  (`review:`, `coding_guidelines:`, `feedback:`) não existem no schema e são ignoradas em
+  silêncio.
+
+---
+
 ## 2026-11-14 — Auditoria: Dependabot destravado (`@lhci/cli` 0.16, `markdownlint-cli` removido)
 
 **Contexto**: as execuções do Dependabot na `main` falhavam desde 12/11 com
@@ -49,10 +87,24 @@ maior versão possível era a 6.2.3, e a corrigida é a 6.2.4.
 baixo), tipos, testes e build verdes.
 
 **Fica para outra branch**: o `glob` 13 (moderado), via `@sentry/vite-plugin` 5.4.1. A correção
-pede o plugin 11, um salto de major. Esse plugin só roda no build da Vercel, quando há
+pede o plugin 11, um salto de major. Esse plugin só roda no build de produção, quando há
 `SENTRY_AUTH_TOKEN`, e um erro nele derrubaria o deploy de produção. Por isso precisa de uma branch
-própria, testada num deploy de preview com o token. O CI só barra a partir de `high`, e o
+própria, com validação controlada antes do merge. O CI só barra a partir de `high`, e o
 Dependabot não listou esse aviso.
+
+**Validação do plugin 11 (correção pós-review, CodeRabbit)**: o plano anterior era testar num
+deploy de preview com o token. Isso não exercita o plugin: no preview, `VERCEL_ENV === 'preview'`
+faz `resolveSentryBuild` devolver `null` (entrada de 2026-11-05), o plugin fica fora do build e o
+deploy passa sem ter testado nada. A validação é um build local de produção, fora da Vercel:
+
+1. `NODE_ENV=production`, com `SENTRY_AUTH_TOKEN`, `SENTRY_ORG` e `SENTRY_PROJECT` reais e
+   `VITE_APP_VERSION=validation-<sha curto>`, para a release de teste não se confundir com as
+   reais;
+2. `pnpm build` e conferir: o log do plugin mostra a release criada e o upload dos source maps; a
+   release `validation-…` aparece no Sentry com os arquivos; nenhum `.map` sobra em `dist/`;
+3. apagar a release `validation-…` no Sentry.
+
+Os previews continuam sem release, como decidido em 2026-11-05.
 
 **Alternativas rejeitadas**:
 
