@@ -3,7 +3,7 @@ import { Suspense } from 'react'
 import { usePanelUser } from '@features/panel/hooks/usePanelUser'
 import { StatusMessage } from '@shared/components/ui'
 import { useDocumentMeta } from '@shared/hooks/useDocumentMeta'
-import { Link, Outlet } from 'react-router-dom'
+import { Link, useOutlet } from 'react-router-dom'
 
 import { AccountList } from '../components/AccountList'
 import { TemporaryPasswordDialog } from '../components/TemporaryPasswordDialog'
@@ -15,10 +15,15 @@ import { useNewAccountFlow } from '../hooks/useNewAccountFlow'
 
 const content = USERS_CONTENT
 
+// Mounted whenever no drawer is open: closing one puts the folder's title back on the tab.
+const FolderTitle = ({ title }: { title: string }) => {
+  useDocumentMeta({ title, robots: 'noindex, nofollow' })
+  return null
+}
+
 /** A folder's list. The drawers (an account, a new account) are child routes drawn over it. */
 export const TeamPage = ({ group }: { group: AccountGroup }) => {
   const { title, intro } = content.groups[group]
-  useDocumentMeta({ title, robots: 'noindex, nofollow' })
   const self = usePanelUser()
   const flow = useNewAccountFlow()
   const drawerContext: FolderOutletContext = {
@@ -26,6 +31,7 @@ export const TeamPage = ({ group }: { group: AccountGroup }) => {
     group,
     onAccountCreated: flow.onCreated,
   }
+  const drawer = useOutlet(drawerContext)
 
   return (
     <div className='flex flex-col gap-8'>
@@ -61,10 +67,9 @@ export const TeamPage = ({ group }: { group: AccountGroup }) => {
         <AccountList group={group} selfId={self.id} />
       </section>
 
+      {!drawer && <FolderTitle title={title} />}
       {/* Its own boundary: a drawer's chunk loading keeps the list on screen. */}
-      <Suspense fallback={null}>
-        <Outlet context={drawerContext} />
-      </Suspense>
+      <Suspense fallback={null}>{drawer}</Suspense>
 
       <TemporaryPasswordDialog
         account={flow.createdAccount}
