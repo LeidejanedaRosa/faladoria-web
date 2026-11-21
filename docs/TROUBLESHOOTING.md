@@ -4,6 +4,49 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## Callback do `mutate()` não roda: a senha temporária nunca aparecia
+
+**Data**: 2026-11-21
+
+**Sintoma** (achado do CodeRabbit no #85): fechando o drawer "Nova conta" enquanto aparecia
+"Criando…", a conta era criada, mas a senha temporária nunca era mostrada.
+
+**Causa raiz**: no TanStack Query, os callbacks passados a `mutate(variables, { onSuccess })` só
+rodam enquanto o componente que chamou continua na tela. Fechado o drawer, o formulário saía, e o
+`onSuccess` era descartado em silêncio. Os callbacks do `useMutation({ onSuccess })` (atualizar o
+cache) continuam rodando, por isso a conta aparecia na lista.
+
+**Solução**: `await mutateAsync(...)`, que resolve a promessa mesmo depois de o componente sair, e a
+senha vai para a lista, que continua na tela. Teste: o `fakeUsersApi` ganhou `holdCreate`, para o
+teste fechar o drawer antes de a API responder.
+
+**Regra prática**: resultado que precisa sobreviver ao componente (senha, aviso, navegação) não fica
+num callback de `mutate()`.
+
+---
+
+## Aviso de "salvo" sumia quando a conta mudava de pasta
+
+**Data**: 2026-11-21
+
+**Sintoma** (achado do CodeRabbit no #85): ao trocar o papel de alguém de Assistente para Gestão e
+salvar, o drawer ia para `/dashboard/gestores/:id`, mas as regiões de status ficavam vazias: sem
+"salvo" e sem o aviso de casos fora do alcance.
+
+**Causa raiz**: no render em que a pasta não batia, a página devolvia `<Navigate>` no lugar do
+drawer. Isso desmontava o drawer e o formulário, e a outra pasta montava tudo de novo, com o estado
+vazio. Um teste com uma asserção feita para falhar mostrou o que estava na tela:
+`[ '', '', '' ]`.
+
+**Solução**: a página continua desenhando o drawer e navega num `useEffect`. A árvore tem a mesma
+forma nas duas pastas, e o React reaproveita o formulário com a mensagem. Ver DECISIONS
+(2026-11-21, drawer).
+
+**Regra prática**: `<Navigate>` no render desmonta tudo o que estava no lugar dele. Se o estado
+precisa atravessar a navegação, navegue num efeito.
+
+---
+
 ## `focus:outline-none` do Tailwind não tira o contorno de foco
 
 **Data**: 2026-11-21

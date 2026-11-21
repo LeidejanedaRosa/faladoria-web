@@ -60,6 +60,25 @@ pasta, painel lateral, papel restrito pela pasta e "Nova conta" também no drawe
   para o leitor de tela anunciar onde a pessoa chegou (o título do drawer, o conteúdo depois de
   "Tentar de novo"), e não são controles.
 
+**Correções pós-review (CodeRabbit, #85)**:
+
+- **O redirecionamento de pasta acontece num efeito, com o drawer ainda desenhado.** Devolver
+  `<Navigate>` no render tirava o drawer da tela por um instante, e a outra pasta montava um
+  formulário novo: a mensagem "salvo" e o aviso de casos fora do alcance se perdiam quando a
+  admin trocava o papel de alguém. Com a árvore no lugar, o React reaproveita o formulário e o
+  aviso vai junto, já numa região de status existente (que o leitor de tela anuncia).
+- **A conta nova usa `mutateAsync`.** Os callbacks passados ao `mutate()` não rodam se o
+  formulário sair da tela, e o drawer pode ser fechado enquanto a conta é criada: a conta existiria
+  sem a senha temporária ter sido mostrada. A senha chega à lista mesmo com o drawer já fechado; o
+  drawer só fecha se ainda estiver aberto (senão voltaria um passo a mais no histórico). Só se perde
+  se a admin sair da pasta inteira antes da resposta, e aí "Gerar nova senha" resolve.
+- **O título da pasta volta à aba quando o drawer fecha.** O `useDocumentMeta` não restaura nada
+  ao desmontar, e o efeito da lista não rodava de novo. A lista põe o título num componente
+  (`FolderTitle`) montado só quando não há drawer.
+- **O formulário da conta nova tem `key={group}`.** Não achei um caminho de navegação que leve de
+  uma pasta à outra com o drawer aberto (a página atrás fica inerte), mas, se acontecer, o
+  formulário recomeça com o papel da pasta nova em vez de guardar o da anterior.
+
 **Alternativas rejeitadas**:
 
 - **Só `/equipe/:id` para todas as contas**: a URL diria "equipe" enquanto a tela mostra Gestores.
