@@ -43,29 +43,27 @@ export const useNewAccountForm = (
     nameRef.current?.focus()
   }, [])
 
-  const submit = form.handleSubmit(values =>
-    createMutation.mutate(
-      {
+  // mutateAsync, not mutate with callbacks: those are dropped once the form unmounts, and the
+  // drawer can be closed while the account is being created. The password must still arrive.
+  const submit = form.handleSubmit(async values => {
+    try {
+      const created = await createMutation.mutateAsync({
         ...values,
         // The administration sees every city: a list sent along would mean nothing.
         assignedCities: values.role === 'admin' ? [] : values.assignedCities,
-      },
-      {
-        onSuccess: created =>
-          onCreated({ ...created, name: values.name.trim() }),
-        onError: error => {
-          const field = fieldOf(error)
-          if (field) {
-            form.setError(
-              field,
-              { message: userErrorMessage(error) },
-              { shouldFocus: true }
-            )
-          }
-        },
+      })
+      onCreated({ ...created, name: values.name.trim() })
+    } catch (error) {
+      const field = fieldOf(error)
+      if (field) {
+        form.setError(
+          field,
+          { message: userErrorMessage(error) },
+          { shouldFocus: true }
+        )
       }
-    )
-  )
+    }
+  })
 
   return {
     form,

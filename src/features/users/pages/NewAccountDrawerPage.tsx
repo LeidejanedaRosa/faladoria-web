@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react'
+
 import { Drawer } from '@shared/components/ui'
 
 import { NewAccountForm } from '../components/NewAccountForm'
@@ -11,6 +13,15 @@ const { newAccount, drawer } = USERS_CONTENT
 export const NewAccountDrawerPage = () => {
   const { group, onAccountCreated } = useFolderContext()
   const close = useCloseDrawer(group)
+  // The account may be created after the drawer was closed (Escape, ×, Back): the password still
+  // reaches the list, but closing again would step back once more.
+  const isOpen = useRef(false)
+  useEffect(() => {
+    isOpen.current = true
+    return () => {
+      isOpen.current = false
+    }
+  }, [])
 
   return (
     <Drawer
@@ -18,12 +29,14 @@ export const NewAccountDrawerPage = () => {
       closeLabel={drawer.close}
       onClose={close}
     >
+      {/* key: another folder starts a fresh form, with that folder's role. */}
       <NewAccountForm
+        key={group}
         group={group}
         onCreated={account => {
           // The list shows the password once the drawer is gone: it outlives the form.
           onAccountCreated(account)
-          close()
+          if (isOpen.current) close()
         }}
         onCancel={close}
       />
