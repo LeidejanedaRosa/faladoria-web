@@ -9,13 +9,17 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import type { AccountGroup } from '../../data/accountGroups'
 import { NewAccountForm } from '../NewAccountForm'
 
 type FakeOptions = Parameters<typeof fakeUsersApi>[1]
 
 const LAVRAS = { ...LAVRAS_REMOVED, removedAt: null }
 
-const renderForm = (options: FakeOptions = {}) => {
+const renderForm = (
+  options: FakeOptions = {},
+  group: AccountGroup = 'team'
+) => {
   const api = fakeUsersApi(stubApi(), {
     servedAreas: [LAVRAS, VARGINHA],
     ...options,
@@ -24,7 +28,7 @@ const renderForm = (options: FakeOptions = {}) => {
   const onCancel = vi.fn()
   render(
     <MemoryRouter>
-      <NewAccountForm onCreated={onCreated} onCancel={onCancel} />
+      <NewAccountForm group={group} onCreated={onCreated} onCancel={onCancel} />
     </MemoryRouter>,
     { wrapper: createQueryWrapper() }
   )
@@ -38,10 +42,10 @@ const search = () =>
 const submit = () =>
   userEvent.click(screen.getByRole('button', { name: 'Criar conta' }))
 
+// In the managers folder: the role comes with the folder, only the cities are chosen.
 const fillManager = async () => {
   await userEvent.type(nameField(), ' Fernanda Alves ')
   await userEvent.type(emailField(), 'fernanda@saude.lavras.mg.gov.br')
-  await userEvent.click(screen.getByRole('radio', { name: /Gestão de saúde/ }))
   await waitFor(() => expect(search()).toBeEnabled())
   await userEvent.type(search(), 'lav')
   await userEvent.click(screen.getByRole('option', { name: 'Lavras/MG' }))
@@ -79,13 +83,37 @@ describe('NewAccountForm', () => {
     expect(api.sent).toEqual([])
   })
 
+  it('offers the team only its own roles: assistant and administration', () => {
+    renderForm()
+
+    expect(screen.getAllByRole('radio')).toHaveLength(2)
+    expect(
+      screen.getByRole('radio', { name: /Assistente/ })
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('radio', { name: /Administração/ })
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('radio', { name: /Gestão de saúde/ })
+    ).not.toBeInTheDocument()
+  })
+
+  it('creates managers in their folder without asking for the role', async () => {
+    const { api } = renderForm({}, 'managers')
+
+    expect(screen.queryByRole('radio')).not.toBeInTheDocument()
+    expect(screen.getByText('Gestão de saúde')).toBeInTheDocument()
+    await submit()
+
+    expect(await screen.findByText('Escreva o nome.')).toBeInTheDocument()
+    expect(screen.queryByText('Escolha o papel.')).not.toBeInTheDocument()
+    expect(api.sent).toEqual([])
+  })
+
   it('asks for a city before sending a manager account', async () => {
-    const { api } = renderForm()
+    const { api } = renderForm({}, 'managers')
     await userEvent.type(nameField(), 'Fernanda Alves')
     await userEvent.type(emailField(), 'fernanda@saude.lavras.mg.gov.br')
-    await userEvent.click(
-      screen.getByRole('radio', { name: /Gestão de saúde/ })
-    )
 
     await submit()
 
@@ -96,7 +124,7 @@ describe('NewAccountForm', () => {
   })
 
   it('creates the account and hands over the trimmed name and the password', async () => {
-    const { api, onCreated } = renderForm()
+    const { api, onCreated } = renderForm({}, 'managers')
     await fillManager()
 
     await submit()
@@ -121,7 +149,12 @@ describe('NewAccountForm', () => {
 
   it('hides the cities for the administration and sends none, even if some were chosen', async () => {
     const { api, onCreated } = renderForm()
-    await fillManager()
+    await userEvent.type(nameField(), 'Fernanda Alves')
+    await userEvent.type(emailField(), 'fernanda@faladoria.org')
+    await userEvent.click(screen.getByRole('radio', { name: /Assistente/ }))
+    await waitFor(() => expect(search()).toBeEnabled())
+    await userEvent.type(search(), 'lav')
+    await userEvent.click(screen.getByRole('option', { name: 'Lavras/MG' }))
 
     await userEvent.click(screen.getByRole('radio', { name: /Administração/ }))
 
@@ -137,9 +170,12 @@ describe('NewAccountForm', () => {
   })
 
   it('puts a repeated e-mail on the e-mail field and focuses it', async () => {
-    const { onCreated } = renderForm({
-      failCreateWith: { status: 409, code: 'USER_EMAIL_ALREADY_EXISTS' },
-    })
+    const { onCreated } = renderForm(
+      {
+        failCreateWith: { status: 409, code: 'USER_EMAIL_ALREADY_EXISTS' },
+      },
+      'managers'
+    )
     await fillManager()
 
     await submit()
@@ -154,13 +190,16 @@ describe('NewAccountForm', () => {
   })
 
   it('puts a city that stopped being served on the cities field', async () => {
-    renderForm({
-      failCreateWith: {
-        status: 400,
-        code: 'ASSIGNED_CITY_NOT_SERVED',
-        details: { cities: [{ city: 'Lavras', state: 'MG' }] },
+    renderForm(
+      {
+        failCreateWith: {
+          status: 400,
+          code: 'ASSIGNED_CITY_NOT_SERVED',
+          details: { cities: [{ city: 'Lavras', state: 'MG' }] },
+        },
       },
-    })
+      'managers'
+    )
     await fillManager()
 
     await submit()
@@ -172,7 +211,10 @@ describe('NewAccountForm', () => {
   })
 
   it('shows any other failure above the form, keeping what was typed', async () => {
-    renderForm({ failCreateWith: { status: 500, code: 'INTERNAL_ERROR' } })
+    renderForm(
+      { failCreateWith: { status: 500, code: 'INTERNAL_ERROR' } },
+      'managers'
+    )
     await fillManager()
 
     await submit()
