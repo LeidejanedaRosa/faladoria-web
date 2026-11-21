@@ -29,6 +29,8 @@ export const USERS_CONTENT = {
     email: 'E-mail',
     emailHint: 'É o login da pessoa e não pode ser trocado depois.',
     role: 'Papel',
+    managerRole:
+      'Contas criadas em Gestores são de gestão de saúde. Para a equipe da Faladoria, use a pasta Equipe.',
     submit: 'Criar conta',
     submitting: 'Criando…',
     cancel: 'Cancelar',
@@ -84,20 +86,24 @@ export const USERS_CONTENT = {
     status: 'Situação',
     openCases: 'Casos em andamento',
   },
+  drawer: {
+    accountTitle: 'Conta',
+    close: 'Fechar',
+    tabs: 'Seções da conta',
+    details: 'Dados',
+    access: 'Acesso',
+  },
   account: {
-    breadcrumb: 'Trilha de navegação',
     edit: 'Editar',
     editLabel: (name: string) => `Editar a conta de ${name}`,
     loading: 'Carregando a conta…',
     loadError: 'Não foi possível carregar a conta agora.',
     notFoundTitle: 'Conta não encontrada',
     notFound:
-      'Esta conta não existe, ou o endereço está incompleto. Escolha a conta na lista da equipe.',
-    backToTeam: 'Voltar para a equipe',
+      'Esta conta não existe, ou o endereço está incompleto. Feche e escolha a conta na lista.',
     emailLabel: 'E-mail (login)',
     emailFixed:
       'O e-mail é o login e não pode ser trocado. Para corrigir, desative esta conta e crie outra.',
-    detailsHeading: 'Dados da conta',
     ownRole: 'Você não pode trocar o próprio papel.',
     submit: 'Salvar alterações',
     submitting: 'Salvando…',

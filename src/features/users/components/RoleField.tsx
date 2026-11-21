@@ -6,19 +6,38 @@ import type { UseFormRegisterReturn } from 'react-hook-form'
 
 import { USERS_CONTENT } from '../data/usersContent'
 
-const ROLES: readonly UserRole[] = ['assistant', 'manager', 'admin']
+const ALL_ROLES: readonly UserRole[] = ['assistant', 'manager', 'admin']
 const ERROR_ID = 'role-error'
 
-interface RoleFieldProps {
+export interface RoleFieldProps {
   registration: UseFormRegisterReturn<'role'>
   error?: string
+  /** The roles offered; every one by default. */
+  roles?: readonly UserRole[]
 }
+
+/** A role that cannot be chosen here, shown as text with the reason. */
+export const FixedRole = ({ role, hint }: { role: UserRole; hint: string }) => (
+  <div className='flex flex-col gap-1'>
+    <p className='text-sm font-medium text-slate-800'>
+      {USERS_CONTENT.newAccount.role}
+    </p>
+    <p className='text-base font-semibold text-slate-900'>
+      {ROLE_LABELS[role]}
+    </p>
+    <p className='text-sm text-slate-600'>{hint}</p>
+  </div>
+)
 
 /**
  * Radios, not a select: each role comes with what it allows, read before choosing. The person's
  * reach depends on it, so the difference must be visible, not hidden in a closed list.
  */
-export const RoleField = ({ registration, error }: RoleFieldProps) => (
+export const RoleField = ({
+  registration,
+  error,
+  roles = ALL_ROLES,
+}: RoleFieldProps) => (
   <fieldset
     aria-describedby={error ? ERROR_ID : undefined}
     className='flex flex-col gap-2'
@@ -26,8 +45,8 @@ export const RoleField = ({ registration, error }: RoleFieldProps) => (
     <legend className='mb-1.5 text-sm font-medium text-slate-800'>
       {USERS_CONTENT.newAccount.role}
     </legend>
-    <div className='grid grid-cols-1 gap-2 md:grid-cols-3'>
-      {ROLES.map(role => (
+    <div className='flex flex-col gap-2'>
+      {ALL_ROLES.filter(role => roles.includes(role)).map(role => (
         <label
           key={role}
           className={cn(

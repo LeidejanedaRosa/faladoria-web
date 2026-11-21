@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 
+import { type AccountGroup, GROUP_ROLES } from '../data/accountGroups'
 import {
   newAccountSchema,
   type NewAccountValues,
@@ -21,11 +22,19 @@ const FIELD_OF_CODE = {
 const fieldOf = (error: unknown) => fieldOfApiError(error, FIELD_OF_CODE)
 
 export const useNewAccountForm = (
+  group: AccountGroup,
   onCreated: (account: CreatedAccount & { name: string }) => void
 ) => {
+  const roles = GROUP_ROLES[group]
   const form = useForm<NewAccountValues>({
     resolver: zodResolver(newAccountSchema),
-    defaultValues: { name: '', email: '', assignedCities: [] },
+    // A folder with a single role has nothing to choose: the account is created with it.
+    defaultValues: {
+      name: '',
+      email: '',
+      role: roles.length === 1 ? roles[0] : undefined,
+      assignedCities: [],
+    },
   })
   const createMutation = useCreateUser()
   const nameRef = useRef<HTMLInputElement | null>(null)
@@ -62,6 +71,7 @@ export const useNewAccountForm = (
     form,
     submit,
     nameRef,
+    roles,
     isAdmin: form.watch('role') === 'admin',
     isSubmitting: createMutation.isPending,
     // A field error is already on its field; anything else goes to the alert.
