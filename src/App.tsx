@@ -7,6 +7,10 @@ import {
   PrivacyPolicyPage,
   TermsOfUsePage,
 } from '@features/landing/pages'
+import {
+  GROUP_ROUTES,
+  NEW_ACCOUNT_SEGMENT,
+} from '@features/users/data/accountGroups'
 import { ErrorBoundary } from '@shared/components/error'
 import { GUIDE_ROUTES, PANEL_ROUTES } from '@shared/data'
 import { Route, Routes } from 'react-router-dom'
@@ -63,9 +67,14 @@ const TeamRoute = lazy(() =>
   }))
 )
 
-const AccountRoute = lazy(() =>
-  import('./features/users/pages/AccountRoute').then(m => ({
-    default: m.AccountRoute,
+const AccountDrawerPage = lazy(() =>
+  import('./features/users/pages/AccountDrawerPage').then(m => ({
+    default: m.AccountDrawerPage,
+  }))
+)
+const NewAccountDrawerPage = lazy(() =>
+  import('./features/users/pages/NewAccountDrawerPage').then(m => ({
+    default: m.NewAccountDrawerPage,
   }))
 )
 
@@ -104,19 +113,20 @@ function App() {
           <Route path={PANEL_ROUTES.root} element={<PanelRoot />}>
             <Route element={<PanelFoldersLayout />}>
               <Route index element={<PanelHomePage />} />
-              <Route
-                path={PANEL_ROUTES.team}
-                element={<TeamRoute group='team' />}
-              />
-              <Route
-                path={PANEL_ROUTES.managers}
-                element={<TeamRoute group='managers' />}
-              />
+              {(['team', 'managers'] as const).map(group => (
+                <Route
+                  key={group}
+                  path={GROUP_ROUTES[group]}
+                  element={<TeamRoute group={group} />}
+                >
+                  <Route
+                    path={NEW_ACCOUNT_SEGMENT}
+                    element={<NewAccountDrawerPage />}
+                  />
+                  <Route path=':userId' element={<AccountDrawerPage />} />
+                </Route>
+              ))}
             </Route>
-            <Route
-              path={`${PANEL_ROUTES.team}/:userId`}
-              element={<AccountRoute />}
-            />
             <Route
               path={PANEL_ROUTES.serviceAreas}
               element={<ServiceAreasRoute />}
