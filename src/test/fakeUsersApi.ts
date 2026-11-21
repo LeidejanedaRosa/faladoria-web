@@ -19,6 +19,8 @@ interface FakeOptions {
   complaintsOutOfReach?: number
   /** Answers a password reset, a deactivation or a reactivation with this error. */
   failAccessWith?: ApiFailure
+  /** Holds the creation's answer until this settles: what happens while it is on its way. */
+  holdCreate?: Promise<void>
 }
 
 interface ApiFailure {
@@ -53,6 +55,7 @@ export const fakeUsersApi = (
     failUpdateWith,
     complaintsOutOfReach = 0,
     failAccessWith,
+    holdCreate,
   }: FakeOptions = {}
 ) => {
   const state = {
@@ -111,6 +114,7 @@ export const fakeUsersApi = (
     }
     const account = JSON.parse(String(init.body)) as NewAccount
     state.sent.push(account)
+    await holdCreate
     if (failCreateWith) return failure(failCreateWith)
     state.users.push({
       ...account,

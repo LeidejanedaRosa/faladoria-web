@@ -1,7 +1,13 @@
 import type { UserRole } from '@features/auth'
 import { describe, expect, it } from 'vitest'
 
-import { GROUP_ROLES, GROUP_ROUTES, groupOf } from '../accountGroups'
+import {
+  accountRoute,
+  GROUP_ROLES,
+  GROUP_ROUTES,
+  groupOf,
+  newAccountRoute,
+} from '../accountGroups'
 
 const ROLES: UserRole[] = ['admin', 'assistant', 'manager']
 
@@ -33,5 +39,21 @@ describe('accountGroups', () => {
       team: '/dashboard/equipe',
       managers: '/dashboard/gestores',
     })
+  })
+
+  it('opens an account inside its own folder', () => {
+    expect(accountRoute('team', 'usr_ana')).toBe('/dashboard/equipe/usr_ana')
+    expect(accountRoute('managers', 'usr_dora')).toBe(
+      '/dashboard/gestores/usr_dora'
+    )
+  })
+
+  it('keeps an id with a slash in one path segment', () => {
+    expect(accountRoute('team', 'a/b')).toBe('/dashboard/equipe/a%2Fb')
+  })
+
+  it('opens a new account inside each folder', () => {
+    expect(newAccountRoute('team')).toBe('/dashboard/equipe/nova')
+    expect(newAccountRoute('managers')).toBe('/dashboard/gestores/nova')
   })
 })

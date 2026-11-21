@@ -1,9 +1,10 @@
 import { ROLE_LABELS } from '@features/panel/data/panelContent'
-import { PANEL_ROUTES } from '@shared/data/routes'
 import { cn } from '@shared/utils/cn'
 import { Link } from 'react-router-dom'
 
+import { accountRoute, groupOf } from '../data/accountGroups'
 import { USERS_CONTENT } from '../data/usersContent'
+import { OPENED_FROM_LIST } from '../hooks/useCloseDrawer'
 import type { User } from '../services/usersApi'
 import { ACCOUNT_COLUMNS } from './accountColumns'
 import { StatusBadge } from './StatusBadge'
@@ -71,7 +72,8 @@ export const AccountItem = ({ user, isSelf }: AccountItemProps) => (
       </div>
     </dl>
     <Link
-      to={PANEL_ROUTES.account(user.id)}
+      to={accountRoute(groupOf(user.role), user.id)}
+      state={OPENED_FROM_LIST}
       aria-label={account.editLabel(user.name)}
       className='text-purple-dark inline-flex min-h-12 w-fit items-center rounded-lg border border-slate-300 bg-white px-4 text-base font-semibold hover:bg-slate-50'
     >

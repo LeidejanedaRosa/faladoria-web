@@ -47,3 +47,5 @@ export {
   WarningIcon,
   WhatsAppIcon,
 } from './icons'
+export { Drawer } from './Drawer'
+export { Tabs, type TabItem } from './Tabs'

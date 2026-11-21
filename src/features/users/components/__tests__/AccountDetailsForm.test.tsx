@@ -32,13 +32,14 @@ const renderForm = (
     servedAreas: [LAVRAS, VARGINHA],
     ...options,
   })
+  const onCancel = vi.fn()
   const ui = (account: User) => (
     <MemoryRouter>
-      <AccountDetailsForm user={account} isSelf={isSelf} />
+      <AccountDetailsForm user={account} isSelf={isSelf} onCancel={onCancel} />
     </MemoryRouter>
   )
   const { rerender } = render(ui(user), { wrapper: createQueryWrapper() })
-  return { api, rerender: (account: User) => rerender(ui(account)) }
+  return { api, onCancel, rerender: (account: User) => rerender(ui(account)) }
 }
 
 const nameField = () => screen.getByRole('textbox', { name: 'Nome' })
@@ -222,5 +223,16 @@ describe('AccountDetailsForm', () => {
 
       await waitFor(() => expect(api.changes).toEqual([{ role: 'manager' }]))
     })
+  })
+
+  it('cancels without sending, leaving the closing to the drawer', async () => {
+    const { api, onCancel } = renderForm()
+    await userEvent.clear(nameField())
+    await userEvent.type(nameField(), 'Ana Lima')
+
+    await userEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
+
+    expect(onCancel).toHaveBeenCalledOnce()
+    expect(api.changes).toEqual([])
   })
 })

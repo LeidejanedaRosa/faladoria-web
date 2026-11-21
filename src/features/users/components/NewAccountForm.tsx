@@ -1,26 +1,40 @@
 import { Button, FormAlert, TextField } from '@shared/components/ui'
 import { Controller } from 'react-hook-form'
 
+import type { AccountGroup } from '../data/accountGroups'
 import { NAME_MAX_LENGTH } from '../data/accountRules'
 import { USERS_CONTENT } from '../data/usersContent'
 import { useNewAccountForm } from '../hooks/useNewAccountForm'
 import type { CreatedAccount } from '../services/usersApi'
 import { CityTagsField } from './CityTagsField'
-import { RoleField } from './RoleField'
+import { FixedRole, RoleField, type RoleFieldProps } from './RoleField'
 
 const { newAccount, cities } = USERS_CONTENT
 
+// Each folder holds its own roles, so the new account shows up in the list it came from.
+const NewAccountRole = ({
+  roles,
+  ...field
+}: Required<Pick<RoleFieldProps, 'roles'>> & RoleFieldProps) =>
+  roles.length === 1 ? (
+    <FixedRole role={roles[0]} hint={newAccount.managerRole} />
+  ) : (
+    <RoleField {...field} roles={roles} />
+  )
+
 interface NewAccountFormProps {
+  group: AccountGroup
   onCreated: (account: CreatedAccount & { name: string }) => void
   onCancel: () => void
 }
 
 export const NewAccountForm = ({
+  group,
   onCreated,
   onCancel,
 }: NewAccountFormProps) => {
-  const { form, submit, nameRef, isAdmin, isSubmitting, formError } =
-    useNewAccountForm(onCreated)
+  const { form, submit, nameRef, roles, isAdmin, isSubmitting, formError } =
+    useNewAccountForm(group, onCreated)
   const {
     register,
     control,
@@ -35,7 +49,7 @@ export const NewAccountForm = ({
       className='flex flex-col gap-5'
     >
       <FormAlert message={formError} />
-      <div className='grid max-w-3xl grid-cols-1 gap-4 md:grid-cols-2'>
+      <div className='flex flex-col gap-4'>
         <TextField
           {...nameField}
           ref={element => {
@@ -56,7 +70,11 @@ export const NewAccountForm = ({
           error={errors.email?.message}
         />
       </div>
-      <RoleField registration={register('role')} error={errors.role?.message} />
+      <NewAccountRole
+        roles={roles}
+        registration={register('role')}
+        error={errors.role?.message}
+      />
       {isAdmin ? (
         <p className='text-base text-slate-700'>{cities.adminSeesAll}</p>
       ) : (

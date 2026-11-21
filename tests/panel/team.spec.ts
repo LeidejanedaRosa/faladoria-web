@@ -122,13 +122,17 @@ const formFocusSettled = (page: Page) =>
 const citySearch = (page: Page) =>
   page.getByRole('combobox', { name: 'Buscar cidade atendida' })
 
-const fillManager = async (page: Page) => {
-  await page.getByRole('button', { name: 'Nova conta' }).click()
+const newAccountLink = (page: Page) =>
+  page.getByRole('link', { name: 'Nova conta' })
+
+/** Bruno, an assistant: the team folder offers the team's roles only. */
+const fillAssistant = async (page: Page) => {
+  await newAccountLink(page).click()
   await page.getByRole('textbox', { name: 'Nome' }).fill('Bruno Lima')
   await page
     .getByRole('textbox', { name: /^E-mail/ })
-    .fill('bruno@saude.varginha.mg.gov.br')
-  await page.getByRole('radio', { name: /Gestão de saúde/ }).check()
+    .fill('bruno@faladoria.org')
+  await page.getByRole('radio', { name: /Assistente/ }).check()
   await expect(citySearch(page)).toBeEnabled()
   await citySearch(page).fill('varg')
   await page.getByRole('option', { name: 'Varginha/MG' }).click()
@@ -195,7 +199,7 @@ test.describe('Team page', () => {
       page,
     }) => {
       await openPage(page)
-      await page.getByRole('button', { name: 'Nova conta' }).click()
+      await newAccountLink(page).click()
       await page.getByRole('radio', { name: /Assistente/ }).check()
       await page.getByRole('button', { name: 'Criar conta' }).click()
       await expect(page.getByText('Escreva o nome.')).toBeVisible()
@@ -210,7 +214,7 @@ test.describe('Team page', () => {
       page,
     }) => {
       await openPage(page)
-      await fillManager(page)
+      await fillAssistant(page)
       await page.getByRole('button', { name: 'Criar conta' }).click()
       await expect(passwordDialog(page)).toBeVisible()
 
@@ -221,13 +225,16 @@ test.describe('Team page', () => {
       page,
     }) => {
       await openPage(page)
-      await page.getByRole('button', { name: 'Nova conta' }).focus()
+      await newAccountLink(page).focus()
 
       await page.keyboard.press('Enter')
+      await expect(
+        page.getByRole('dialog', { name: 'Nova conta' })
+      ).toBeVisible()
       await expect(page.getByRole('textbox', { name: 'Nome' })).toBeFocused()
       await page.keyboard.type('Bruno Lima')
       await page.keyboard.press('Tab')
-      await page.keyboard.type('bruno@saude.varginha.mg.gov.br')
+      await page.keyboard.type('bruno@faladoria.org')
       await page.keyboard.press('Tab')
       await page.keyboard.press('Space')
       await expect(
@@ -252,7 +259,7 @@ test.describe('Team page', () => {
       page,
     }) => {
       await openPage(page)
-      await fillManager(page)
+      await fillAssistant(page)
       await page.getByRole('button', { name: 'Criar conta' }).click()
       await expect(passwordDialog(page)).toBeVisible()
 
@@ -273,7 +280,7 @@ test.describe('Team page', () => {
       page,
     }) => {
       await openPage(page)
-      await fillManager(page)
+      await fillAssistant(page)
       await page.getByRole('button', { name: 'Criar conta' }).click()
       await expect(
         passwordDialog(page).getByText(TEMPORARY_PASSWORD)
@@ -286,16 +293,44 @@ test.describe('Team page', () => {
       await expect(
         page.getByRole('status').filter({ hasText: 'foi criada' })
       ).toHaveText('A conta de Bruno Lima foi criada.')
-      await expect(
-        page.getByRole('button', { name: 'Nova conta' })
-      ).toBeFocused()
-      // A manager belongs to the managers folder, not to the team.
-      await expect(page.getByText('Bruno Lima', { exact: true })).toHaveCount(0)
-      await page
-        .getByRole('navigation', { name: 'Pastas do painel' })
-        .getByRole('link', { name: /^Gestores/ })
-        .click()
+      await expect(newAccountLink(page)).toBeFocused()
+      await expect(page).toHaveURL(/\/dashboard\/equipe$/)
       await expect(page.getByText('Bruno Lima', { exact: true })).toBeVisible()
+    })
+  })
+
+  test.describe('Business rules', () => {
+    test('should offer the team only its own roles', async ({ page }) => {
+      await openPage(page)
+      await newAccountLink(page).click()
+
+      const drawer = page.getByRole('dialog', { name: 'Nova conta' })
+      await expect(drawer.getByRole('radio')).toHaveCount(2)
+      await expect(
+        drawer.getByRole('radio', { name: /Gestão de saúde/ })
+      ).toHaveCount(0)
+    })
+
+    test('should create a manager in Gestores without asking the role, and list it there', async ({
+      page,
+    }) => {
+      await mockApis(page)
+      await page.goto('/dashboard/gestores', { waitUntil: 'domcontentloaded' })
+      await newAccountLink(page).click()
+      await expect(page).toHaveURL(/\/dashboard\/gestores\/nova$/)
+
+      const drawer = page.getByRole('dialog', { name: 'Nova conta' })
+      await expect(drawer.getByRole('radio')).toHaveCount(0)
+      await drawer.getByRole('textbox', { name: 'Nome' }).fill('Bia Rocha')
+      await drawer
+        .getByRole('textbox', { name: /^E-mail/ })
+        .fill('bia@saude.alfenas.mg.gov.br')
+      await citySearch(page).fill('alf')
+      await page.getByRole('option', { name: 'Alfenas/MG' }).click()
+      await drawer.getByRole('button', { name: 'Criar conta' }).click()
+      await page.getByRole('button', { name: 'Já anotei a senha' }).click()
+
+      await expect(page.getByText('Bia Rocha', { exact: true })).toBeVisible()
     })
   })
 
@@ -344,7 +379,7 @@ test.describe('Team page', () => {
     }) => {
       await page.setViewportSize(MOBILE)
       await openPage(page)
-      await fillManager(page)
+      await fillAssistant(page)
 
       const remove = page.getByRole('button', { name: 'Tirar Varginha/MG' })
       const box = (await remove.boundingBox())!

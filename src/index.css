@@ -83,9 +83,18 @@ body {
   background: var(--color-purple-medium);
 }
 
-*:focus-visible {
+/* Not on tabindex="-1": those take focus from code, so a screen reader announces where the
+ * person landed (a drawer's title, content after a retry). They are not controls, and this rule,
+ * outside any layer, would beat their `focus:outline-none`. */
+*:focus-visible:not([tabindex='-1']) {
   outline: 2px solid var(--color-purple-medium);
   outline-offset: 2px;
+}
+
+/* A fixed scrollbar on the page behind a modal dialog takes width from it: WebKit drew the
+ * drawer 10px narrower than the screen. Hiding the page's overflow while one is open frees it. */
+html:has(dialog:modal) {
+  overflow: hidden;
 }
 
 ::selection {

@@ -77,11 +77,14 @@ const openAccount = async (
   await page.goto(`/dashboard/equipe/${userId}`, {
     waitUntil: 'domcontentloaded',
   })
-  await page
-    .getByRole('heading', { name: 'Acesso ao painel' })
-    .waitFor({ timeout: 15000 })
+  await page.getByRole('tab', { name: 'Acesso' }).click({ timeout: 15000 })
+  await page.getByRole('heading', { name: 'Acesso ao painel' }).waitFor()
   return actions
 }
+
+// By name: the account's drawer is a dialog too, under the confirmation.
+const deactivateConfirm = (page: Page) =>
+  page.getByRole('dialog', { name: 'Desativar a conta de Ana Souza?' })
 
 const expectNoViolations = async (page: Page) => {
   const results = await new AxeBuilder({ page })
@@ -92,16 +95,16 @@ const expectNoViolations = async (page: Page) => {
 
 test.describe('Account password and access', () => {
   test.describe('Rendering & Structure', () => {
-    test('should show data, password and access, in that order', async ({
+    test('should hold the password and the access in the Acesso tab, in that order', async ({
       page,
     }) => {
       await openAccount(page)
 
-      await expect(page.getByRole('heading', { level: 2 })).toHaveText([
-        'Dados da conta',
-        'Senha',
-        'Acesso ao painel',
-      ])
+      await expect(
+        page
+          .getByRole('tabpanel', { name: 'Acesso' })
+          .getByRole('heading', { level: 2 })
+      ).toHaveText(['Senha', 'Acesso ao painel'])
     })
 
     test('should point one’s own account to the change-password page', async ({
@@ -123,7 +126,11 @@ test.describe('Account password and access', () => {
       page,
     }) => {
       await openAccount(page, 'usr_ana', 'deactivated')
-      await expect(page.getByText('Desativada', { exact: true })).toBeVisible()
+      await expect(
+        page
+          .getByRole('dialog', { name: 'Ana Souza' })
+          .getByText('Desativada', { exact: true })
+      ).toBeVisible()
 
       await expectNoViolations(page)
     })
@@ -133,7 +140,7 @@ test.describe('Account password and access', () => {
     }) => {
       await openAccount(page)
       await page.getByRole('button', { name: 'Desativar conta' }).click()
-      await expect(page.getByRole('dialog')).toBeVisible()
+      await expect(deactivateConfirm(page)).toBeVisible()
 
       await expectNoViolations(page)
     })
@@ -174,8 +181,7 @@ test.describe('Account password and access', () => {
       const actions = await openAccount(page)
 
       await page.getByRole('button', { name: 'Desativar conta' }).click()
-      await page
-        .getByRole('dialog')
+      await deactivateConfirm(page)
         .getByRole('button', { name: 'Desativar conta' })
         .click()
 
@@ -223,16 +229,12 @@ test.describe('Account password and access', () => {
     }) => {
       await openAccount(page)
       await page.getByRole('button', { name: 'Desativar conta' }).click()
-      await page
-        .getByRole('dialog')
+      await deactivateConfirm(page)
         .getByRole('button', { name: 'Desativar conta' })
         .click()
       await expect(page.getByText('foi desativada')).toBeVisible()
 
-      await page
-        .getByRole('navigation', { name: 'Trilha de navegação' })
-        .getByRole('link', { name: 'Equipe' })
-        .click()
+      await page.getByRole('button', { name: 'Fechar' }).click()
 
       await expect(
         page.getByRole('listitem').filter({ hasText: 'Ana Souza' })
@@ -248,7 +250,7 @@ test.describe('Account password and access', () => {
       await openAccount(page)
       await page.getByRole('button', { name: 'Desativar conta' }).click()
 
-      const dialog = page.getByRole('dialog')
+      const dialog = deactivateConfirm(page)
       const box = (await dialog.boundingBox())!
       expect(box.x).toBeGreaterThanOrEqual(0)
       expect(box.x + box.width).toBeLessThanOrEqual(MOBILE.width)
