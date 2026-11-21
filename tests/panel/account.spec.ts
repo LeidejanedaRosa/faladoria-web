@@ -313,6 +313,10 @@ test.describe('Account drawer', () => {
       await expect(page).toHaveURL(/\/dashboard\/gestores\/usr_ana$/)
       await expect(drawer(page)).toBeVisible()
       await expect(page.locator('h1')).toHaveText('Gestores')
+      // The form travels with the account: what was saved is still said there.
+      await expect(
+        page.getByRole('status').filter({ hasText: 'foram salvas' })
+      ).toHaveText('As alterações de Ana Souza foram salvas.')
     })
 
     test('should not offer a change of one’s own role', async ({ page }) => {
