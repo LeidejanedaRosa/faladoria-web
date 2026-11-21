@@ -36,6 +36,7 @@ const mockApis = async (
   const users = [
     account('usr_ana', 'Ana Souza', 'assistant', ['Varginha', 'Lavras']),
     account('usr_carla', 'Carla Dias', 'admin', []),
+    account('usr_bia', 'Bia Rocha', 'manager', ['Alfenas']),
   ]
   const sent: unknown[] = []
   await page.route(`${E2E_API_URL}/api/auth/get-session`, route =>
@@ -84,57 +85,94 @@ const openAccount = async (
   await page.goto(`/dashboard/equipe/${userId}`, {
     waitUntil: 'domcontentloaded',
   })
-  await page.locator('h1').waitFor({ timeout: 15000 })
+  await page.getByRole('dialog').waitFor({ timeout: 15000 })
   return sent
+}
+
+const openFromList = async (page: Page) => {
+  await mockApis(page)
+  await page.goto('/dashboard/equipe', { waitUntil: 'domcontentloaded' })
+  const edit = page.getByRole('link', { name: 'Editar a conta de Ana Souza' })
+  await edit.click()
+  await page.getByRole('dialog', { name: 'Ana Souza' }).waitFor()
+  return edit
+}
+
+const drawer = (page: Page, name = 'Ana Souza') =>
+  page.getByRole('dialog', { name })
+
+/** The drawer slides in: its box is only final once the transition has finished. */
+const drawerAtRest = async (page: Page) => {
+  const element = drawer(page)
+  await element.evaluate(dialog =>
+    Promise.all(dialog.getAnimations().map(animation => animation.finished))
+  )
+  return (await element.boundingBox())!
 }
 
 const save = (page: Page) =>
   page.getByRole('button', { name: 'Salvar alterações' }).click()
 
-test.describe('Account page', () => {
+test.describe('Account drawer', () => {
   test.describe('Rendering & Structure', () => {
-    test('should open from the Edit link of the team list', async ({
+    test('should open from the Edit link over the team list, which stays behind it', async ({
+      page,
+    }) => {
+      await openFromList(page)
+
+      await expect(page).toHaveURL(/\/dashboard\/equipe\/usr_ana$/)
+      await expect(drawer(page)).toBeVisible()
+      await expect(page.locator('h1')).toHaveText('Equipe')
+    })
+
+    test('should keep the drawer open on reload: the address names it', async ({
+      page,
+    }) => {
+      await openFromList(page)
+
+      await page.reload({ waitUntil: 'domcontentloaded' })
+
+      await expect(drawer(page)).toBeVisible()
+    })
+
+    test('should close on Back, leaving the list', async ({ page }) => {
+      await openFromList(page)
+
+      await page.goBack()
+
+      await expect(page).toHaveURL(/\/dashboard\/equipe$/)
+      await expect(page.getByRole('dialog')).toHaveCount(0)
+    })
+
+    test('should move a manager opened under Equipe to Gestores', async ({
       page,
     }) => {
       await mockApis(page)
-      await page.goto('/dashboard/equipe', { waitUntil: 'domcontentloaded' })
+      await page.goto('/dashboard/equipe/usr_bia', {
+        waitUntil: 'domcontentloaded',
+      })
 
-      await page
-        .getByRole('link', { name: 'Editar a conta de Ana Souza' })
-        .click()
-
-      await expect(page).toHaveURL(/\/dashboard\/equipe\/usr_ana$/)
-      await expect(page.locator('h1')).toHaveText('Ana Souza')
-    })
-
-    test('should show no folders on the account, and lead back through the breadcrumb', async ({
-      page,
-    }) => {
-      await page.setViewportSize(DESKTOP)
-      await openAccount(page)
-
-      await expect(
-        page.getByRole('navigation', { name: 'Pastas do painel' })
-      ).toHaveCount(0)
-      await page
-        .getByRole('navigation', { name: 'Trilha de navegação' })
-        .getByRole('link', { name: 'Equipe' })
-        .click()
-      await expect(page).toHaveURL(/\/dashboard\/equipe$/)
+      await expect(drawer(page, 'Bia Rocha')).toBeVisible()
+      await expect(page).toHaveURL(/\/dashboard\/gestores\/usr_bia$/)
+      await expect(page.locator('h1')).toHaveText('Gestores')
     })
 
     test('should tell another role the page is not for them', async ({
       page,
     }) => {
-      await openAccount(page, 'usr_ana', { role: 'manager' })
+      await mockApis(page, { role: 'manager' })
+      await page.goto('/dashboard/equipe/usr_ana', {
+        waitUntil: 'domcontentloaded',
+      })
 
       await expect(page.locator('h1')).toHaveText('Acesso restrito')
+      await expect(page.getByRole('dialog')).toHaveCount(0)
     })
 
     test('should say when the account does not exist', async ({ page }) => {
       await openAccount(page, 'usr_nobody')
 
-      await expect(page.locator('h1')).toHaveText('Conta não encontrada')
+      await expect(drawer(page, 'Conta não encontrada')).toBeVisible()
     })
   })
 
@@ -151,6 +189,18 @@ test.describe('Account page', () => {
     }) => {
       await openAccount(page)
       await expect(page.getByText('(deixou de ser atendida)')).toBeVisible()
+
+      await expectNoViolations(page)
+    })
+
+    test('should have no axe violations on the Acesso tab', async ({
+      page,
+    }) => {
+      await openAccount(page)
+      await page.getByRole('tab', { name: 'Acesso' }).click()
+      await expect(
+        page.getByRole('button', { name: 'Desativar conta' })
+      ).toBeVisible()
 
       await expectNoViolations(page)
     })
@@ -174,6 +224,52 @@ test.describe('Account page', () => {
       await expect(page.getByText(/2 casos em andamento/)).toBeVisible()
 
       await expectNoViolations(page)
+    })
+
+    test('should start on the title and never let Tab reach the list behind', async ({
+      page,
+    }) => {
+      await openAccount(page)
+      await expect(
+        drawer(page).getByRole('heading', { name: 'Ana Souza' })
+      ).toBeFocused()
+
+      // More presses than the drawer has controls: focus cycles through it and never reaches
+      // the list behind. A native modal lets it pass through the browser's own controls (the
+      // address bar) on the way round, where the page sees <body>.
+      for (let press = 0; press < 25; press++) {
+        await page.keyboard.press('Tab')
+        const where = await page.evaluate(() => {
+          const element = document.activeElement
+          if (!element || element === document.body) return 'browser'
+          return element.closest('dialog') ? 'drawer' : 'page'
+        })
+        expect(where).not.toBe('page')
+      }
+    })
+
+    test('should close on Escape and give focus back to the Edit link', async ({
+      page,
+    }) => {
+      const edit = await openFromList(page)
+
+      await page.keyboard.press('Escape')
+
+      await expect(page.getByRole('dialog')).toHaveCount(0)
+      await expect(page).toHaveURL(/\/dashboard\/equipe$/)
+      await expect(edit).toBeFocused()
+    })
+
+    test('should switch tabs with the arrows', async ({ page }) => {
+      await openAccount(page)
+      await page.getByRole('tab', { name: 'Dados' }).focus()
+
+      await page.keyboard.press('ArrowRight')
+
+      await expect(page.getByRole('tab', { name: 'Acesso' })).toBeFocused()
+      await expect(
+        page.getByRole('heading', { name: 'Acesso ao painel' })
+      ).toBeVisible()
     })
 
     test('should rename an account with the keyboard only, and announce it', async ({
@@ -206,6 +302,19 @@ test.describe('Account page', () => {
       expect(sent).toEqual([{ role: 'admin', assignedCities: [] }])
     })
 
+    test('should follow the account to Gestores when it becomes a manager', async ({
+      page,
+    }) => {
+      await openAccount(page)
+
+      await page.getByRole('radio', { name: /Gestão de saúde/ }).check()
+      await save(page)
+
+      await expect(page).toHaveURL(/\/dashboard\/gestores\/usr_ana$/)
+      await expect(drawer(page)).toBeVisible()
+      await expect(page.locator('h1')).toHaveText('Gestores')
+    })
+
     test('should not offer a change of one’s own role', async ({ page }) => {
       await openAccount(page, 'usr_carla')
 
@@ -217,32 +326,43 @@ test.describe('Account page', () => {
   })
 
   test.describe('Responsive Layout', () => {
-    test('should fit the phone without sideways scrolling', async ({
+    test('should cover the whole phone, without sideways scrolling', async ({
       page,
     }) => {
       await page.setViewportSize(MOBILE)
       await openAccount(page)
 
+      const box = await drawerAtRest(page)
+      expect(box.x).toBe(0)
+      expect(box.width).toBe(MOBILE.width)
       const width = await page.evaluate(
         () => document.documentElement.scrollWidth
       )
       expect(width).toBeLessThanOrEqual(MOBILE.width)
     })
 
-    test('should give the breadcrumb link a 48px touch target on mobile', async ({
+    test('should sit on the right on desktop, leaving the list in sight', async ({
+      page,
+    }) => {
+      await page.setViewportSize(DESKTOP)
+      await openAccount(page)
+
+      const box = await drawerAtRest(page)
+      expect(Math.round(box.x + box.width)).toBe(DESKTOP.width)
+      expect(box.width).toBeLessThanOrEqual(512)
+    })
+
+    test('should give the × a 48px touch target on mobile', async ({
       page,
     }) => {
       await page.setViewportSize(MOBILE)
       await openAccount(page)
 
-      const link = page
-        .getByRole('navigation', { name: 'Trilha de navegação' })
-        .getByRole('link', { name: 'Equipe' })
-      const box = (await link.boundingBox())!
-      // The ::after reaches past the drawn text: a tap 10px below still follows the link.
-      await page.mouse.click(box.x + box.width / 2, box.y + box.height + 10)
-
-      await expect(page).toHaveURL(/\/dashboard\/equipe$/)
+      const box = (await page
+        .getByRole('button', { name: 'Fechar' })
+        .boundingBox())!
+      expect(box.width).toBeGreaterThanOrEqual(48)
+      expect(box.height).toBeGreaterThanOrEqual(48)
     })
   })
 })
