@@ -4,6 +4,69 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## `focus:outline-none` do Tailwind não tira o contorno de foco
+
+**Data**: 2026-11-21
+
+**Sintoma**: o título do drawer, que recebe foco ao abrir (`tabIndex={-1}`), aparecia com o
+contorno roxo, mesmo com a classe `focus:outline-none`.
+
+**Causa raiz**: camadas de CSS. A regra `*:focus-visible { outline: … }` do `src/index.css` fica
+fora de qualquer `@layer`, e o Tailwind v4 põe as utilidades em `@layer utilities`. Uma regra fora
+de camada vence qualquer regra dentro de uma, seja qual for a especificidade. A classe nunca
+funcionou: os alvos do `useRecoveryFocus` também ganhavam o contorno.
+
+**Solução**: a regra global passou a `*:focus-visible:not([tabindex='-1'])`. Esses elementos
+recebem foco por código, para o leitor de tela anunciar onde a pessoa chegou, e não são controles.
+Ver DECISIONS (2026-11-21, drawer).
+
+**Regra prática**: antes de culpar a especificidade, veja se as duas regras estão na mesma camada.
+
+---
+
+## e2e: o Tab "sai" do drawer modal
+
+**Data**: 2026-11-21
+
+**Sintoma**: o teste que apertava Tab 25 vezes esperando o foco sempre dentro do `<dialog>` falhava:
+a cada volta completa, `document.activeElement` era o `<body>`.
+
+**Causa raiz**: a premissa do teste estava errada. O `showModal()` deixa a página de trás inerte,
+mas não prende o foco dentro da aba: ao passar do último controle, o foco vai para a interface do
+próprio navegador (barra de endereço), e a página vê o `<body>`. Depois ele volta ao primeiro
+controle do diálogo. Um registro de cada Tab mostrou o ciclo: 9 no drawer, 1 no `<body>`, 9 no
+drawer.
+
+**Solução**: o teste afirma a regra que importa, "o foco nunca chega a um elemento da página fora do
+drawer", aceitando o `<body>`. A prova inversa (`show()` no lugar de `showModal()`) faz o teste
+falhar.
+
+---
+
+## Testes que passariam com o defeito: `accessibleName` e `api.sent`
+
+**Data**: 2026-11-21
+
+**Sintoma**: dois testes novos passaram de primeira, e um deles passaria mesmo se o código estivesse
+errado.
+
+**Causa raiz**:
+
+- `screen.getAllByRole('radio').map(radio => radio.accessibleName)`: o jsdom não implementa
+  `accessibleName`, e o snapshot gravou `[undefined, undefined]`. Qualquer par de radios passaria.
+- No teste do "Cancelar" da conta, `expect(api.sent).toEqual([])`: o `fakeUsersApi` guarda as
+  criações em `sent` e as alterações em `changes`. Um "Cancelar" que salvasse não apareceria em
+  `sent`.
+
+**Solução**: `getByRole('radio', { name: … })` para cada radio esperado, mais a contagem; e
+`api.changes`. A prova inversa (o botão "Cancelar" como `type='submit'`) passou a falhar com
+`expected [ { name: 'Ana Lima' } ] to deeply equal []`.
+
+**Regra prática**: um teste novo que passa de primeira ainda não provou nada. Quebre o código de
+propósito e veja o teste falhar.
+
+---
+
 ## e2e que passa na máquina e falha no CI: duas corridas de tempo
 
 **Data**: 2026-11-14

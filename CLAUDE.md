@@ -71,11 +71,11 @@ src/
 │   │   ├── services/      # /api/service-areas/*, IBGE localities
 │   │   ├── utils/         # serviceAreaErrorMessage, formatDay
 │   │   └── index.ts       # Public API for other features (useServiceAreas, ServiceArea)
-│   ├── users/             # Accounts: team and managers folders (/dashboard/equipe, /dashboard/gestores) and /dashboard/equipe/:userId, admin only
-│   │   ├── components/    # AccountList/Item, StatusBadge, LoadError, NewAccountForm, AccountSection, AccountDetailsForm, AccountCitiesField, PasswordSection, AccessSection, RoleField, CityTagsField, TemporaryPasswordDialog
-│   │   ├── data/          # usersContent, accountRules, accountGroups (which roles each folder holds)
-│   │   ├── hooks/         # useUsers/useUser/useActiveAccountCounts, useCreateUser, useUpdateUser, useAccountMutations (reset, deactivate/reactivate), usersCache, useNewAccountForm, useNewAccountFlow, useAccountDetailsForm, usePasswordResetFlow, useAccessFlow
-│   │   ├── pages/         # TeamPage/TeamRoute (by group), AccountPage/AccountRoute (RequireRole + page, one lazy chunk each)
+│   ├── users/             # Accounts: team and managers folders (/dashboard/equipe, /dashboard/gestores), each with drawers at /:userId and /nova, admin only
+│   │   ├── components/    # AccountList/Item, StatusBadge, LoadError, NewAccountForm, AccountSection, AccountDetailsForm, AccountCitiesField, PasswordSection, AccessSection, RoleField (+ FixedRole), CityTagsField, TemporaryPasswordDialog
+│   │   ├── data/          # usersContent, accountRules, accountGroups (which roles each folder holds, folder and drawer routes)
+│   │   ├── hooks/         # useUsers/useUser/useActiveAccountCounts, useCreateUser, useUpdateUser, useAccountMutations (reset, deactivate/reactivate), usersCache, useNewAccountForm, useNewAccountFlow, useAccountDetailsForm, usePasswordResetFlow, useAccessFlow, useCloseDrawer, useFolderContext
+│   │   ├── pages/         # TeamPage/TeamRoute (folder list + <Outlet> for the drawers, RequireRole), AccountDrawerPage (Dados / Acesso tabs), NewAccountDrawerPage (one lazy chunk each)
 │   │   ├── schemas/       # accountFields (shared rules), newAccountSchema, accountDetailsSchema
 │   │   ├── services/      # /api/users, /api/users/:id/{update,reset-password,deactivate,reactivate}
 │   │   ├── utils/         # userErrorMessage, fieldOfApiError, accountChanges
@@ -83,7 +83,7 @@ src/
 │   └── complaints/, notifications/   # future: one feature per API domain
 └── shared/
     ├── components/
-    │   ├── ui/            # Reusable UI (icons, AccessibleLink, WhatsAppCTA, Button, TextField, PasswordField, SelectField, Combobox, ConfirmDialog, FormAlert, StatusMessage)
+    │   ├── ui/            # Reusable UI (icons, AccessibleLink, WhatsAppCTA, Button, TextField, PasswordField, SelectField, Combobox, ConfirmDialog, Drawer, Tabs, FormAlert, StatusMessage)
     │   ├── layout/        # Header, Footer, Container, PageShell
     │   ├── error/         # ErrorBoundary, SectionErrorFallback
     │   └── seo/           # JsonLdScript, BreadcrumbSchema

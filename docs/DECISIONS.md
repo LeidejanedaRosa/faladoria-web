@@ -6,6 +6,73 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-11-21 — Drawer da conta e da conta nova, com endereço por pasta
+
+**Contexto**: terceira branch do fichário (`feat/dashboard-layout-drawer`). A conta abria numa
+página própria (`/dashboard/equipe/:userId`, com trilha de navegação), e "Nova conta" abria um
+formulário embaixo do título da lista. O protótipo aprovado pede que tudo abra num drawer, com
+abas. Quatro escolhas de produto foram feitas pela Leidejane antes do layout: um endereço por
+pasta, painel lateral, papel restrito pela pasta e "Nova conta" também no drawer.
+
+**Decisão**:
+
+- **O drawer é uma rota filha da lista.** `/dashboard/equipe/:userId`, `/dashboard/equipe/nova`
+  e os mesmos em `/dashboard/gestores`. A `TeamPage` tem um `<Outlet>`, e o drawer é desenhado por
+  cima dela. Recarregar mantém o drawer, Voltar fecha, e o link pode ser compartilhado. O segmento
+  `nova` é estático, então o React Router o prefere a `:userId`.
+- **Uma conta aberta na pasta errada muda de endereço** (`<Navigate replace>`): um link antigo de
+  gestor em `/equipe` vai para `/gestores`, e trocar o papel de alguém no drawer leva o drawer
+  junto para a outra pasta.
+- **Fechar volta um passo quando a lista abriu o drawer, e substitui o endereço quando não.** O
+  link da lista passa `state: { fromList: true }`. Sem isso, fechar com `navigate(-1)` um drawer
+  aberto por link colado tiraria a pessoa do site, e fechar com `navigate(lista)` deixaria o
+  drawer de volta no Voltar.
+- **`<dialog>` nativo com `showModal()`**: o navegador deixa a página de trás inerte, prende o Tab
+  e trata o Escape. O Tab passa pelos controles do próprio navegador (barra de endereço) ao dar a
+  volta, mas nunca chega à lista. Os diálogos de senha e de confirmação abrem por cima, na ordem do
+  _top layer_.
+- **Ao abrir, o foco vai para o título**, não para o ✕: o conteúdo é longo e é anunciado pelo nome
+  (padrão de diálogo do WAI-ARIA). Na conta nova, o formulário toma o foco para o campo Nome: o
+  drawer abre num `useLayoutEffect`, antes dos efeitos dos filhos.
+- **A barra de rolagem da página some com um diálogo modal aberto** (`html:has(dialog:modal)` com
+  `overflow: hidden`, no `index.css`, para todos os modais). Achado no e2e: no WebKit com barra de
+  rolagem fixa, a barra da página continuava atrás do drawer e ele ficava 10px mais estreito
+  (380px num celular de 390). A roda do mouse não era o problema: nos três motores, ela já não
+  rolava a página por trás de um modal nativo (testado sem a regra).
+- **Clicar fora não fecha.** Um clique sem querer na área escura apagaria o que foi digitado. Fecha
+  pelo ✕, pelo Escape, pelo "Cancelar" e pelo Voltar.
+- **Abas Dados / Acesso**, no padrão de abas do WAI-ARIA (setas, Home/End, um só tab na ordem do
+  Tab). O painel escondido continua montado (`hidden`), para o formulário de Dados não perder o que
+  foi digitado quando a pessoa olha Acesso.
+- **O papel vem da pasta.** Equipe oferece só assistente e administração; Gestores cria sempre
+  gestão de saúde, mostrada como texto (`FixedRole`, a mesma peça do "você não pode trocar o
+  próprio papel"). A conta nova sempre aparece na lista onde foi criada. Editar continua
+  oferecendo todos os papéis: promover alguém de uma pasta para outra é uma decisão válida.
+- **A senha temporária fica na lista, não no drawer.** A conta é criada, o drawer fecha e a lista
+  mostra a senha uma vez. Ela passa por uma função do contexto da pasta (`onAccountCreated`), nunca
+  pelo `state` da navegação, que fica guardado no histórico do navegador.
+- **`Drawer` e `Tabs` em `shared/ui`**, com uma feature só usando: são peças de interface sem
+  domínio, como o `ConfirmDialog`, e o drawer da reclamação (Resumo / Conversa / Tratar) já está
+  decidido no protótipo.
+- **O contorno de foco global não vale para `tabindex="-1"`.** A regra `*:focus-visible` do
+  `index.css` fica fora de qualquer `@layer` e por isso vence o `focus:outline-none` do Tailwind,
+  que fica numa camada (ver TROUBLESHOOTING). Elementos com `tabindex="-1"` recebem foco por código,
+  para o leitor de tela anunciar onde a pessoa chegou (o título do drawer, o conteúdo depois de
+  "Tentar de novo"), e não são controles.
+
+**Alternativas rejeitadas**:
+
+- **Só `/equipe/:id` para todas as contas**: a URL diria "equipe" enquanto a tela mostra Gestores.
+- **Modal centralizado**: cobre a lista inteira e fica apertado para um formulário longo com abas.
+- **Drawer só em memória** (já rejeitado no protótipo): recarregar e Voltar não funcionariam.
+- **Sugerir o papel, mas deixar trocar**: uma conta de gestor criada na Equipe sumiria da lista
+  onde foi criada.
+- **Senha temporária no `state` da navegação**: ficaria no histórico do navegador.
+- **Prender o Tab também fora da página** (com um `useFocusTrap` além do `<dialog>`): o navegador
+  já impede o Tab de chegar à lista, e tirar a barra de endereço de quem usa só teclado é pior.
+
+---
+
 ## 2026-11-19 — CodeRabbit: `.coderabbit.yaml` revisa PRs para qualquer branch
 
 **Contexto**: o CodeRabbit pulou o #79 ("Review skipped: auto reviews are disabled on base/target
