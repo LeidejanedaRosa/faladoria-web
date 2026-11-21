@@ -43,7 +43,8 @@ type FakeOptions = Parameters<typeof fakeUsersApi>[1]
 // As in App: the panel hands the signed-in person down; each folder has its drawers as children.
 const renderFolder = (
   group: AccountGroup = 'team',
-  options: FakeOptions = {}
+  options: FakeOptions = {},
+  address = GROUP_ROUTES[group]
 ) => {
   const api = fakeUsersApi(stubApi(), {
     users: [ANA, CARLA],
@@ -52,7 +53,7 @@ const renderFolder = (
   })
   render(
     // The panel home before the folder: stepping back twice would show it.
-    <MemoryRouter initialEntries={['/dashboard', GROUP_ROUTES[group]]}>
+    <MemoryRouter initialEntries={['/dashboard', address]}>
       <CurrentPath />
       <Routes>
         <Route element={<Outlet context={{ user: SELF }} />}>
@@ -153,6 +154,19 @@ describe('TeamPage', () => {
       'Equipe'
     )
     expect(within(drawer).getByRole('textbox', { name: 'Nome' })).toHaveFocus()
+  })
+
+  it('titles the tab and keeps it out of search when the new account drawer opens straight from its address', async () => {
+    document.title = ''
+    document.querySelector('meta[name="robots"]')?.remove()
+
+    renderFolder('managers', {}, '/dashboard/gestores/nova')
+
+    await screen.findByRole('dialog', { name: 'Nova conta' })
+    expect(document.title).toContain('Nova conta · Gestores')
+    expect(
+      document.querySelector('meta[name="robots"]')?.getAttribute('content')
+    ).toBe('noindex, nofollow')
   })
 
   it('goes back to the list on "Cancelar" and gives focus back to "Nova conta"', async () => {
