@@ -227,15 +227,24 @@ test.describe('Account history', () => {
       expect(results.violations).toEqual([])
     })
 
-    test('should move focus to the first action loaded when the button leaves', async ({
+    test('should move focus to the first action loaded, with a visible ring, when the button leaves', async ({
       page,
     }) => {
       await openAccess(page, 'usr_ana', 'Ana Souza')
 
+      // Reached with Tab, as a person would: browsers show a ring on code-moved focus only when
+      // the last focus change came from the keyboard.
       await loadMore(page).focus()
+      await page.keyboard.press('Shift+Tab')
+      await page.keyboard.press('Tab')
+      await expect(loadMore(page)).toBeFocused()
       await page.keyboard.press('Enter')
 
-      await expect(history(page).getByRole('listitem').nth(3)).toBeFocused()
+      const first = history(page).getByRole('listitem').nth(3)
+      await expect(first).toBeFocused()
+      // Mid-list, the ring is where the next Tab starts from (WCAG 2.4.7).
+      await expect(first).toHaveCSS('outline-style', 'solid')
+      await expect(first).toHaveCSS('outline-width', '2px')
     })
   })
 
