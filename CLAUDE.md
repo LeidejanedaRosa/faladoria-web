@@ -72,13 +72,13 @@ src/
 │   │   ├── utils/         # serviceAreaErrorMessage, formatDay
 │   │   └── index.ts       # Public API for other features (useServiceAreas, ServiceArea)
 │   ├── users/             # Accounts: team and managers folders (/dashboard/equipe, /dashboard/gestores), each with drawers at /:userId and /nova, admin only
-│   │   ├── components/    # AccountList/Item, StatusBadge, LoadError, NewAccountForm, AccountSection, AccountDetailsForm, AccountCitiesField, PasswordSection, AccessSection, RoleField (+ FixedRole), CityTagsField, TemporaryPasswordDialog
+│   │   ├── components/    # AccountList/Item, FilteredAccountList, AccountFilters (state → city → search), StatusBadge, LoadError, NewAccountForm, AccountSection, AccountDetailsForm, AccountCitiesField, PasswordSection, AccessSection, RoleField (+ FixedRole), CityTagsField, TemporaryPasswordDialog
 │   │   ├── data/          # usersContent, accountRules, accountGroups (which roles each folder holds, folder and drawer routes)
-│   │   ├── hooks/         # useUsers/useUser/useActiveAccountCounts, useCreateUser, useUpdateUser, useAccountMutations (reset, deactivate/reactivate), usersCache, useNewAccountForm, useNewAccountFlow, useAccountDetailsForm, usePasswordResetFlow, useAccessFlow, useCloseDrawer, useFolderContext
+│   │   ├── hooks/         # useUsers/useUser/useActiveAccountCounts, useCreateUser, useUpdateUser, useAccountMutations (reset, deactivate/reactivate), usersCache, useNewAccountForm, useNewAccountFlow, useAccountDetailsForm, usePasswordResetFlow, useAccessFlow, useCloseDrawer, useFolderContext, useAccountFilters (filters in the address)
 │   │   ├── pages/         # TeamPage/TeamRoute (folder list + <Outlet> for the drawers, RequireRole), AccountDrawerPage (Dados / Acesso tabs), NewAccountDrawerPage (one lazy chunk each)
 │   │   ├── schemas/       # accountFields (shared rules), newAccountSchema, accountDetailsSchema
 │   │   ├── services/      # /api/users, /api/users/:id/{update,reset-password,deactivate,reactivate}
-│   │   ├── utils/         # userErrorMessage, fieldOfApiError, accountChanges
+│   │   ├── utils/         # userErrorMessage, fieldOfApiError, accountChanges, accountFilters
 │   │   └── index.ts       # Public API for other features (useActiveAccountCounts, AccountGroup)
 │   └── complaints/, notifications/   # future: one feature per API domain
 └── shared/

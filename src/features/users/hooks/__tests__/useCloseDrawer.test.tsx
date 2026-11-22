@@ -19,7 +19,8 @@ let navigate: NavigateFunction
 const Probe = () => {
   close = useCloseDrawer('team')
   navigate = useNavigate()
-  return <p data-testid='path'>{useLocation().pathname}</p>
+  const { pathname, search } = useLocation()
+  return <p data-testid='path'>{pathname + search}</p>
 }
 
 const renderAt = (entries: (string | { pathname: string; state: unknown })[]) =>
@@ -53,5 +54,13 @@ describe('useCloseDrawer', () => {
 
     act(() => void navigate(-1))
     expect(path()).toBe('/elsewhere')
+  })
+
+  it('keeps the list’s filters when a drawer reached by a link closes', () => {
+    renderAt([`${DRAWER}?estado=MG&cidade=Varginha`])
+
+    act(() => close())
+
+    expect(path()).toBe('/dashboard/equipe?estado=MG&cidade=Varginha')
   })
 })

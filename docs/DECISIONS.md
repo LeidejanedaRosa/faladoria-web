@@ -6,6 +6,68 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-11-21 — Filtros da lista de contas: Estado → Cidade → Busca, na URL
+
+**Contexto**: quarta branch do fichário (`feat/dashboard-layout-filters`). As pastas Equipe e
+Gestores listavam todas as contas, sem como achar "quem atende Varginha?" ou a conta de um e-mail.
+A API devolve todas as contas numa resposta só, sem paginação nem filtro no servidor.
+
+**Decisão** (produto, aprovada pela Leidejane):
+
+- **O filtro roda no navegador.** Com dezenas de contas, a lista responde na hora, sem nenhum
+  pedido a mais. Se um dia forem milhares, o filtro passa para a API (`GET /api/users?cidade=`).
+- **Os filtros ficam na URL** (`?estado=MG&cidade=Varginha&busca=ana`), como em Cidades atendidas
+  (`?situacao=removidas`). Recarregar e compartilhar mantêm o filtro. Os links do drawer (conta e
+  conta nova) levam a query junto, e fechar o drawer volta para a mesma lista filtrada.
+- **Cada mudança substitui a entrada do histórico.** Voltar sai da lista, em vez de desfazer o
+  filtro letra por letra.
+- **A busca tem estado próprio, copiado para a URL.** O React Router 7 aplica as mudanças de
+  endereço como _transitions_ (`startTransition`), e um campo de texto controlado por uma
+  transition pode perder letras. Estado e Cidade são selects: leem direto da URL. Quando a URL
+  muda por outro caminho (o cartão da pasta, Voltar), a busca segue a URL, ajustada durante a
+  renderização (ver "Correções pós-review").
+- **As opções vêm das contas da pasta**: toda escolha devolve pelo menos uma conta. Um estado ou
+  uma cidade da URL que nenhuma conta tem (link antigo, digitação) é ignorado.
+- **A admin aparece em qualquer cidade.** O filtro responde "quem atende essa cidade?", e a admin
+  atende todas (`assignedCities: []` quer dizer todas, não nenhuma).
+- **A busca olha nome e e-mail**, sem diferenciar maiúsculas nem acentos (`normalizeForSearch`).
+- **Cidade fica desligada até escolher o estado**, com a dica "Escolha o estado primeiro." ligada
+  por `aria-describedby`. Trocar de estado zera a cidade.
+- **"Mostrando 2 de 4 contas" numa região de status sempre montada** (fora do layout sem filtro):
+  uma região que aparece junto com o texto costuma não ser anunciada. "Limpar filtros" devolve o
+  foco ao Estado, porque o botão some junto com os filtros.
+- **Sem filtros quando a admin está sozinha na pasta**: não há o que filtrar.
+- **Uma conta criada fora do filtro não aparece na lista**, mas o aviso "A conta de X foi criada"
+  confirma. Os filtros foram escolha da admin, e limpá-los sozinho mudaria a lista sem ela pedir.
+
+**Correções pós-review (CodeRabbit, #86)**:
+
+- **A busca segue a URL quando ela muda de fora.** O estado local só lia a URL ao montar: clicar no
+  cartão da pasta com filtros ativos zerava Estado e Cidade, mas a lista continuava filtrada pelo
+  texto antigo. O hook guarda o último valor visto da URL e, quando ele muda, compara com o texto
+  digitado sem os espaços das pontas: se for diferente, a mudança não veio da digitação, e o campo
+  segue a URL. O ajuste é feito durante a renderização (o padrão do React para "estado que
+  acompanha uma prop"), não num `useEffect`, que mostraria antes uma lista filtrada pelo texto
+  velho.
+- **Cada escrita parte da última URL escrita, não dos params da renderização** (achado pelo e2e
+  no Firefox, durante essa correção). `setSearchParams(atual => …)` recebe os params da última
+  renderização, e não enfileira como o `setState(prev => …)`: escolher o Estado e digitar logo
+  em seguida apagava o Estado. O hook guarda a última URL escrita num ref, que cada renderização
+  nova (inclusive uma mudança de fora) atualiza num efeito.
+
+**Alternativas rejeitadas**:
+
+- **Filtros só em memória**: recarregar, compartilhar ou voltar do drawer zerariam o filtro.
+- **Opções de todas as cidades atendidas**: mostraria cidades sem nenhuma conta (resultado vazio)
+  e pediria mais uma consulta.
+- **A admin só aparece com a cidade marcada na conta**: esconderia quem de fato atende a cidade.
+- **Esconder os filtros atrás de um botão "Filtrar" no celular**: um toque a mais sem ganho com
+  poucas contas por pasta. Volta à mesa quando as listas crescerem.
+- **`useTransitions={false}` no roteador**: resolveria o campo de texto, mas mudaria todas as
+  navegações do site por causa de um campo.
+
+---
+
 ## 2026-11-21 — Drawer da conta e da conta nova, com endereço por pasta
 
 **Contexto**: terceira branch do fichário (`feat/dashboard-layout-drawer`). A conta abria numa

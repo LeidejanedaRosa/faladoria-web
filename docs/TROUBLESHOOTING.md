@@ -4,6 +4,53 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## Estado do filtro sumia ao digitar logo depois de escolhê-lo
+
+**Data**: 2026-11-21
+
+**Sintoma**: no e2e, só no Firefox, escolher SP e preencher a busca deixava a URL em
+`?busca=jose`, sem `estado=SP`. Nos outros navegadores o mesmo teste passava.
+
+**Causa raiz**: o hook escrevia com `setSearchParams(atual => …)`. No React Router, `atual` são os
+params da **última renderização**, e não os da escrita anterior (a documentação do React Router
+avisa: a forma com função não enfileira como o `setState`). Como o React Router aplica a URL numa
+transition, a renderização com `estado=SP` ainda não tinha acontecido quando a busca foi escrita, e
+a busca partiu de uma URL sem o estado. O Firefox só deixou visível uma corrida que existia em todos.
+
+**Solução**: o hook guarda a última URL que escreveu num ref e parte dela em cada escrita. Um efeito
+atualiza o ref a cada renderização com params novos, para acompanhar mudanças de fora (o cartão da
+pasta, Voltar). Teste unitário: duas escritas no mesmo `act`, sem renderização entre elas.
+
+**Regra prática**: a função de `setSearchParams` não é um `setState`. Duas escritas seguidas, antes
+de a tela atualizar, precisam partir de um valor que a própria escrita mantém.
+
+---
+
+## Busca dos filtros continuava filtrando depois de clicar na pasta
+
+**Data**: 2026-11-21
+
+**Sintoma** (achado do CodeRabbit no #86): com `?estado=MG&busca=ana`, clicar no cartão "Equipe"
+levava a `/dashboard/equipe`. Estado e Cidade voltavam a "todos", mas o campo de busca continuava
+com "ana" e a lista, filtrada, enquanto a URL dizia que não havia filtro. Recarregar mudava o
+resultado.
+
+**Causa raiz**: a busca vive num `useState` (para não perder letras com as transitions do React
+Router), e o inicializador do `useState` só roda na montagem. A pasta é a mesma rota, então a
+lista não remonta: a URL mudou e o estado não soube.
+
+**Solução**: o hook guarda o último valor visto da URL e, quando ele muda, compara com o texto
+digitado sem os espaços das pontas. Diferente quer dizer que a mudança veio de fora, e o campo
+segue a URL. A comparação com o texto aparado evita que a própria digitação ("ana " na tela,
+"ana" na URL) apague o espaço que a pessoa acabou de digitar. Ver DECISIONS (2026-11-21,
+filtros).
+
+**Regra prática**: estado local inicializado a partir de algo que pode mudar (prop, URL) precisa
+de um caminho para acompanhar a mudança. Quando o componente não remonta, o inicializador não
+roda de novo.
+
+---
+
 ## Callback do `mutate()` não roda: a senha temporária nunca aparecia
 
 **Data**: 2026-11-21
