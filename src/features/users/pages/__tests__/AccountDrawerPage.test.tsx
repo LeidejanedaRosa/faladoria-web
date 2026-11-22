@@ -1,6 +1,7 @@
 import { fakeUsersApi } from '@/test/fakeUsersApi'
-import { VARGINHA } from '@/test/fixtures/serviceAreas'
+import { LAVRAS_REMOVED, VARGINHA } from '@/test/fixtures/serviceAreas'
 import { buildSessionUser } from '@/test/fixtures/session'
+import { buildStaffAction } from '@/test/fixtures/staffActions'
 import { ANA, BRUNO, CARLA } from '@/test/fixtures/users'
 import { apiErrorResponse, jsonResponse, stubApi } from '@/test/mockFetch'
 import { createQueryWrapper } from '@/test/queryClient'
@@ -130,7 +131,7 @@ describe('AccountDrawerPage', () => {
       within(access)
         .getAllByRole('heading', { level: 2 })
         .map(h => h.textContent)
-    ).toEqual(['Senha', 'Acesso ao painel'])
+    ).toEqual(['Senha', 'Acesso ao painel', 'Histórico de ações'])
     expect(
       within(access).getByRole('button', { name: 'Desativar conta' })
     ).toBeInTheDocument()
@@ -249,14 +250,56 @@ describe('AccountDrawerPage', () => {
     })
   })
 
+  it('shows in Acesso what the person did, naming accounts and cities, the removed ones too', async () => {
+    fakeUsersApi(stubApi(), {
+      users: [ANA, BRUNO, CARLA],
+      servedAreas: [VARGINHA, LAVRAS_REMOVED],
+      staffActions: [
+        buildStaffAction({
+          actorId: CARLA.id,
+          action: 'POST /api/users/:id/deactivate',
+          targetId: BRUNO.id,
+        }),
+        buildStaffAction({
+          actorId: CARLA.id,
+          action: 'POST /api/service-areas/remove',
+          targetId: LAVRAS_REMOVED.id,
+        }),
+        buildStaffAction({
+          actorId: ANA.id,
+          action: 'POST /api/auth/sign-out',
+          targetId: undefined,
+        }),
+      ],
+    })
+    renderDrawer(`/dashboard/equipe/${CARLA.id}`)
+    const drawer = await drawerOf('Carla Dias (você)')
+    await userEvent.click(within(drawer).getByRole('tab', { name: 'Acesso' }))
+
+    const history = within(drawer).getByRole('region', {
+      name: 'Histórico de ações',
+    })
+    expect(
+      await within(history).findByText('Desativou a conta de Bruno Lima')
+    ).toBeInTheDocument()
+    expect(
+      within(history).getByText('Removeu Lavras/MG das cidades atendidas')
+    ).toBeInTheDocument()
+    expect(
+      within(history).queryByText('Saiu do painel')
+    ).not.toBeInTheDocument()
+  })
+
   it('offers a retry when the account fails to load, and moves focus to it once it loads', async () => {
     const fetchMock = stubApi()
     fetchMock.mockResolvedValueOnce(apiErrorResponse(500))
-    fetchMock.mockImplementation(async input =>
-      new URL(String(input)).pathname === '/api/users'
-        ? jsonResponse([ANA, CARLA])
-        : jsonResponse({ serviceAreas: [VARGINHA] })
-    )
+    fetchMock.mockImplementation(async input => {
+      const { pathname } = new URL(String(input))
+      if (pathname === '/api/users') return jsonResponse([ANA, CARLA])
+      if (pathname === '/api/staff-actions')
+        return jsonResponse({ actions: [] })
+      return jsonResponse({ serviceAreas: [VARGINHA] })
+    })
     renderDrawer(`/dashboard/equipe/${ANA.id}`)
 
     const alert = await screen.findByRole('alert')
