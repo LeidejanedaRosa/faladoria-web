@@ -10,12 +10,17 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 **Contexto**: quarta branch do fichário (`feat/dashboard-layout-filters`). As pastas Equipe e
 Gestores listavam todas as contas, sem como achar "quem atende Varginha?" ou a conta de um e-mail.
-A API devolve todas as contas numa resposta só, sem paginação nem filtro no servidor.
+`GET /api/users` devolve todas as contas numa resposta só, sem paginação. Ela aceita `?role=` e
+`?city=&state=` (sempre juntos), mas não filtra só por estado nem busca por texto. (Corrigido em
+2026-11-22: a primeira versão desta entrada dizia que a API não filtrava nada.)
 
 **Decisão** (produto, aprovada pela Leidejane):
 
 - **O filtro roda no navegador.** Com dezenas de contas, a lista responde na hora, sem nenhum
-  pedido a mais. Se um dia forem milhares, o filtro passa para a API (`GET /api/users?cidade=`).
+  pedido a mais, sobre a lista que a pasta já carregou. O filtro da API não cobre a regra: não tem
+  estado sozinho nem busca, e deixa as admins de fora de uma cidade (elas não têm cidades
+  marcadas). E nem seria mais leve: o backend (`ListUsersInteractor`) carrega todas as contas e
+  filtra na memória do servidor.
 - **Os filtros ficam na URL** (`?estado=MG&cidade=Varginha&busca=ana`), como em Cidades atendidas
   (`?situacao=removidas`). Recarregar e compartilhar mantêm o filtro. Os links do drawer (conta e
   conta nova) levam a query junto, e fechar o drawer volta para a mesma lista filtrada.
@@ -58,6 +63,8 @@ A API devolve todas as contas numa resposta só, sem paginação nem filtro no s
 **Alternativas rejeitadas**:
 
 - **Filtros só em memória**: recarregar, compartilhar ou voltar do drawer zerariam o filtro.
+- **Usar `?city=&state=` da API**: um pedido a cada escolha, para um resultado que a lista já
+  tem; e a cidade deixaria as admins de fora. Estado sozinho e busca continuariam no navegador.
 - **Opções de todas as cidades atendidas**: mostraria cidades sem nenhuma conta (resultado vazio)
   e pediria mais uma consulta.
 - **A admin só aparece com a cidade marcada na conta**: esconderia quem de fato atende a cidade.
