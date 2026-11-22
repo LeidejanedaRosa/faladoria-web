@@ -62,6 +62,10 @@ const mockApis = async (page: Page, anaStatus: Status = 'active') => {
       return route.fulfill({ json: user })
     })
   }
+  // The Acesso tab reads the person's history; an empty one keeps these tests on their subject.
+  await page.route(`${E2E_API_URL}/api/staff-actions**`, route =>
+    route.fulfill({ json: { actions: [] } })
+  )
   await page.route(`${E2E_API_URL}/api/service-areas**`, route =>
     route.fulfill({ json: { serviceAreas: [] } })
   )
@@ -95,7 +99,7 @@ const expectNoViolations = async (page: Page) => {
 
 test.describe('Account password and access', () => {
   test.describe('Rendering & Structure', () => {
-    test('should hold the password and the access in the Acesso tab, in that order', async ({
+    test('should hold the password, the access and the history in the Acesso tab, in that order', async ({
       page,
     }) => {
       await openAccount(page)
@@ -104,7 +108,7 @@ test.describe('Account password and access', () => {
         page
           .getByRole('tabpanel', { name: 'Acesso' })
           .getByRole('heading', { level: 2 })
-      ).toHaveText(['Senha', 'Acesso ao painel'])
+      ).toHaveText(['Senha', 'Acesso ao painel', 'Histórico de ações'])
     })
 
     test('should point one’s own account to the change-password page', async ({
