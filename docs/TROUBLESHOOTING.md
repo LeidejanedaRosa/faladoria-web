@@ -4,6 +4,90 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## e2e: contorno de foco ausente só no Firefox, com o foco no lugar certo
+
+**Data**: 2026-11-22
+
+**Sintoma**: o teste "a linha nova mostra o contorno depois de carregar mais" passava no Chromium e
+no WebKit e falhava no Firefox: a linha tinha o foco, mas `outline-style` vinha `none`.
+
+**Causa raiz**: o contorno usa `:focus-visible`, e cada navegador decide quando um foco movido **por
+código** combina com ele. O Firefox olha se a última **mudança de foco** veio do teclado. O teste
+chegava ao botão com `locator.focus()` (foco por código) e só então apertava Enter: para o Firefox,
+nenhuma navegação pelo teclado tinha acontecido. Não era defeito do produto: chegando ao botão com
+Tab, como uma pessoa faz, o contorno aparece.
+
+**Solução**: o teste chega ao botão pelo teclado (`Shift+Tab` e `Tab`) antes do Enter. A prova
+inversa (sem o contorno) continua falhando no Chromium e no Firefox.
+
+**Regra prática**: teste de `:focus-visible` precisa reproduzir o caminho do teclado, não só o
+estado final. `locator.focus()` é foco por código, e a heurística de cada navegador trata isso de um
+jeito.
+
+---
+
+## Foco caía no `<body>` quando "Tentar de novo" trazia um histórico vazio
+
+**Data**: 2026-11-22
+
+**Sintoma** (achado do CodeRabbit no #88): o histórico falhava ao carregar, a pessoa usava "Tentar
+de novo" pelo teclado, e a resposta vinha sem nenhuma ação. A mensagem "Nenhuma ação registrada
+ainda." aparecia, mas o foco ia para o `<body>`.
+
+**Causa raiz**: o `useRecoveryFocus` leva o foco para o seu `targetRef` quando o retry dá certo. O
+`targetRef` só estava na lista; o estado vazio não tinha alvo. O botão de retry some quando a busca
+acaba, e o foco fica sem lugar.
+
+**Solução**: o estado vazio também recebe o `targetRef` (uma `div` com `tabIndex={-1}`). Teste:
+retry que responde vazio, com o foco conferido na mensagem.
+
+**Regra prática**: com `useRecoveryFocus`, **todo** estado que pode substituir o erro precisa ter o
+alvo: lista, vazio, o que mais houver.
+
+---
+
+## Foco no item novo falhava: a Promise do `fetchNextPage` resolve antes da tela
+
+**Data**: 2026-11-22
+
+**Sintoma**: ao escrever o "Carregar ações mais antigas" do histórico, a primeira versão fazia
+`await fetchNextPage()` e procurava o item novo logo depois, para dar foco a ele. No teste do hook,
+`result.current.data` logo depois do `act` também ainda tinha só a primeira página.
+
+**Causa raiz**: a Promise do `fetchNextPage` resolve quando a página chega ao cache do TanStack
+Query, e não quando o React desenha a lista nova. Entre as duas coisas, o item ainda não existe no
+DOM.
+
+**Solução**: o clique guarda o índice da primeira ação nova num ref, e um efeito que depende do
+total de ações dá o foco quando esse total passa do índice, já com o item na tela. No teste,
+`waitFor` em vez de ler o resultado logo depois do `act`. Ver DECISIONS (2026-11-22, histórico).
+
+**Regra prática**: "os dados chegaram" e "a tela mostrou" são momentos diferentes. Mexer no DOM
+depois de uma busca é trabalho de efeito, não do `await`.
+
+---
+
+## Testes do drawer quebraram com o histórico: a API falsa não conhecia a rota
+
+**Data**: 2026-11-22
+
+**Sintoma**: com o histórico na aba Acesso, os testes do drawer acusaram
+`Cannot read properties of undefined (reading 'length')` dentro do `ActionHistory`.
+
+**Causa raiz**: o `fakeUsersApi` (e um teste com `fetch` programado à mão) respondia rotas
+desconhecidas com outra coisa (a lista de cidades), e o componente leu `page.actions` de uma
+resposta fora do contrato.
+
+**Solução**: ensinar à API falsa a rota nova (`staffActions`, filtrando por `actorId`) e separar
+cidades ativas de removidas por `status`, como a API real. O componente não ganhou defesa contra
+uma resposta que a API nunca manda: isso seria código para o teste, não para o produto.
+
+**Regra prática**: quando um componente passa a chamar uma rota nova, toda API falsa que o
+renderiza precisa conhecê-la. Melhor ainda: a falsa lança erro em rota desconhecida, como o
+`routeApi` faz.
+
+---
+
 ## Estado do filtro sumia ao digitar logo depois de escolhê-lo
 
 **Data**: 2026-11-21

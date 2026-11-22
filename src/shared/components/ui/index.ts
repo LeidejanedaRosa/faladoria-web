@@ -12,6 +12,7 @@ export { StatusMessage } from './StatusMessage'
 export { SelectField } from './SelectField'
 export { Combobox } from './Combobox'
 export { ConfirmDialog } from './ConfirmDialog'
+export { LoadError } from './LoadError'
 
 export {
   ActivityIcon,

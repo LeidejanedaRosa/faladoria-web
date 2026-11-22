@@ -72,7 +72,7 @@ src/
 │   │   ├── utils/         # serviceAreaErrorMessage, formatDay
 │   │   └── index.ts       # Public API for other features (useServiceAreas, ServiceArea)
 │   ├── users/             # Accounts: team and managers folders (/dashboard/equipe, /dashboard/gestores), each with drawers at /:userId and /nova, admin only
-│   │   ├── components/    # AccountList/Item, FilteredAccountList, AccountFilters (state → city → search), StatusBadge, LoadError, NewAccountForm, AccountSection, AccountDetailsForm, AccountCitiesField, PasswordSection, AccessSection, RoleField (+ FixedRole), CityTagsField, TemporaryPasswordDialog
+│   │   ├── components/    # AccountList/Item, FilteredAccountList, AccountFilters (state → city → search), StatusBadge, LoadError, NewAccountForm, AccountSection, AccountDetailsForm, AccountCitiesField, PasswordSection, AccessSection, RoleField (+ FixedRole), CityTagsField, TemporaryPasswordDialog, HistorySection (staff-actions history with account and city names)
 │   │   ├── data/          # usersContent, accountRules, accountGroups (which roles each folder holds, folder and drawer routes)
 │   │   ├── hooks/         # useUsers/useUser/useActiveAccountCounts, useCreateUser, useUpdateUser, useAccountMutations (reset, deactivate/reactivate), usersCache, useNewAccountForm, useNewAccountFlow, useAccountDetailsForm, usePasswordResetFlow, useAccessFlow, useCloseDrawer, useFolderContext, useAccountFilters (filters in the address)
 │   │   ├── pages/         # TeamPage/TeamRoute (folder list + <Outlet> for the drawers, RequireRole), AccountDrawerPage (Dados / Acesso tabs), NewAccountDrawerPage (one lazy chunk each)
@@ -80,10 +80,17 @@ src/
 │   │   ├── services/      # /api/users, /api/users/:id/{update,reset-password,deactivate,reactivate}
 │   │   ├── utils/         # userErrorMessage, fieldOfApiError, accountChanges, accountFilters
 │   │   └── index.ts       # Public API for other features (useActiveAccountCounts, AccountGroup)
+│   ├── staff-actions/     # Staff action log (GET /api/staff-actions): ActionHistory, shown in the account drawer's Acesso tab
+│   │   ├── components/    # ActionHistory (states, load more), ActionDays (one heading per day), ActionItem (time, text, badge)
+│   │   ├── data/          # staffActionsContent (ACTION_TEXTS: one text per logged route)
+│   │   ├── services/      # /api/staff-actions (by actorId, cursor pages)
+│   │   ├── utils/         # describeAction (text + outcome, target names), groupByDay (Brasília time)
+│   │   ├── useStaffActions.ts  # Infinite query by cursor
+│   │   └── index.ts       # Public API (ActionHistory, TargetNames): the caller hands in the names of accounts and cities
 │   └── complaints/, notifications/   # future: one feature per API domain
 └── shared/
     ├── components/
-    │   ├── ui/            # Reusable UI (icons, AccessibleLink, WhatsAppCTA, Button, TextField, PasswordField, SelectField, Combobox, ConfirmDialog, Drawer, Tabs, FormAlert, StatusMessage)
+    │   ├── ui/            # Reusable UI (icons, AccessibleLink, WhatsAppCTA, Button, TextField, PasswordField, SelectField, Combobox, ConfirmDialog, Drawer, Tabs, FormAlert, StatusMessage, LoadError)
     │   ├── layout/        # Header, Footer, Container, PageShell
     │   ├── error/         # ErrorBoundary, SectionErrorFallback
     │   └── seo/           # JsonLdScript, BreadcrumbSchema

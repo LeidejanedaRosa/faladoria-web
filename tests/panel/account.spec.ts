@@ -68,6 +68,10 @@ const mockApis = async (
       json: { ...user, complaintsOutOfReach: outOfReach },
     })
   })
+  // The Acesso tab reads the person's history; an empty one keeps these tests on their subject.
+  await page.route(`${E2E_API_URL}/api/staff-actions**`, route =>
+    route.fulfill({ json: { actions: [] } })
+  )
   await page.route(`${E2E_API_URL}/api/service-areas**`, route =>
     route.fulfill({
       json: { serviceAreas: [area('Alfenas'), area('Varginha')] },

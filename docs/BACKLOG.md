@@ -28,3 +28,10 @@ Nenhuma no momento.
     abaixo.
 
   Ver DECISIONS (2026-11-21, filtros).
+
+- **"Tentar de novo" num lugar só** (pequeno, sem data). O `LoadError` de `shared/ui` usa
+  `UI_CONTENT.retry`, mas `ComplaintCounts` (painel) e `RequirePanelSession` (login) repetem o mesmo
+  texto e o mesmo botão com cópias próprias. Passar os dois para o `LoadError` tira três cópias.
+- **Histórico de quem mexeu na conta** (se fizer falta). Hoje a aba Acesso mostra o que a pessoa
+  fez (`?actorId=`). "Quem redefiniu a senha dela, quem a desativou" está em `?targetId=`, numa
+  segunda lista. Ver DECISIONS (2026-11-22, histórico).
