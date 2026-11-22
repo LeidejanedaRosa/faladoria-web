@@ -35,8 +35,12 @@ export const ActionItem = ({ action, names }: ActionItemProps) => {
   const badge = outcome === 'done' ? undefined : BADGES[outcome]
 
   return (
-    // tabIndex -1: "load more" sends focus to the first new action.
-    <li tabIndex={-1} className='flex gap-3 py-3 focus:outline-none sm:gap-4'>
+    // tabIndex -1: "load more" sends focus to the first new action. Unlike other code-focused
+    // targets it keeps a ring: it lands mid-list, and the ring is where the next Tab starts from.
+    <li
+      tabIndex={-1}
+      className='focus-visible:outline-purple-medium flex gap-3 rounded-md py-3 focus-visible:outline-2 focus-visible:outline-offset-2 sm:gap-4'
+    >
       <time
         dateTime={action.occurredAt}
         className='w-12 shrink-0 pt-0.5 text-sm text-slate-600 tabular-nums'
