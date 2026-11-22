@@ -61,7 +61,12 @@ export const ActionHistory = ({ actorId, targetNames }: ActionHistoryProps) => {
 
   const actions = query.data.pages.flatMap(page => page.actions)
   if (actions.length === 0) {
-    return <p className='text-base text-slate-600'>{content.empty}</p>
+    // Also where a retry lands when it brings nothing: the retry button is gone by then.
+    return (
+      <div ref={targetRef} tabIndex={-1} className='focus:outline-none'>
+        <p className='text-base text-slate-600'>{content.empty}</p>
+      </div>
+    )
   }
 
   const loadMore = () => {
