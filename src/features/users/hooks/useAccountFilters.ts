@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { useSearchParams } from 'react-router-dom'
 
@@ -38,19 +38,24 @@ export const useAccountFilters = (places: Places) => {
     places
   )
 
-  const write = (changes: Partial<AccountFilters>) =>
-    setParams(
-      current => {
-        const next = new URLSearchParams(current)
-        for (const [field, value] of Object.entries(changes)) {
-          const name = PARAMS[field as keyof AccountFilters]
-          if (value) next.set(name, value)
-          else next.delete(name)
-        }
-        return next
-      },
-      { replace: true, preventScrollReset: true }
-    )
+  // setParams(current => …) gets the params of the last render, not the last write: a choice
+  // still on its way to the screen would be lost by the next one (a state, then typing at once).
+  // Each write starts from the last address written, which a new render brings up to date.
+  const latest = useRef(params)
+  useEffect(() => {
+    latest.current = params
+  }, [params])
+
+  const write = (changes: Partial<AccountFilters>) => {
+    const next = new URLSearchParams(latest.current)
+    for (const [field, value] of Object.entries(changes)) {
+      const name = PARAMS[field as keyof AccountFilters]
+      if (value) next.set(name, value)
+      else next.delete(name)
+    }
+    latest.current = next
+    setParams(next, { replace: true, preventScrollReset: true })
+  }
 
   return {
     filters,
