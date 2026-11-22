@@ -3,7 +3,7 @@ import { Suspense } from 'react'
 import { usePanelUser } from '@features/panel/hooks/usePanelUser'
 import { StatusMessage } from '@shared/components/ui'
 import { useDocumentMeta } from '@shared/hooks/useDocumentMeta'
-import { Link, useOutlet } from 'react-router-dom'
+import { Link, useLocation, useOutlet } from 'react-router-dom'
 
 import { AccountList } from '../components/AccountList'
 import { TemporaryPasswordDialog } from '../components/TemporaryPasswordDialog'
@@ -32,6 +32,7 @@ export const TeamPage = ({ group }: { group: AccountGroup }) => {
     onAccountCreated: flow.onCreated,
   }
   const drawer = useOutlet(drawerContext)
+  const { search } = useLocation()
 
   return (
     <div className='flex flex-col gap-8'>
@@ -44,7 +45,7 @@ export const TeamPage = ({ group }: { group: AccountGroup }) => {
         </div>
         <Link
           ref={flow.newAccountLinkRef}
-          to={newAccountRoute(group)}
+          to={{ pathname: newAccountRoute(group), search }}
           state={OPENED_FROM_LIST}
           className='bg-purple-dark hover:bg-purple-medium inline-flex min-h-12 shrink-0 items-center justify-center self-start rounded-lg px-5 text-base font-semibold text-white transition-colors motion-reduce:transition-none'
         >

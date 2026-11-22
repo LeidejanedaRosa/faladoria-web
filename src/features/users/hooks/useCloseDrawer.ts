@@ -11,18 +11,23 @@ export const OPENED_FROM_LIST: DrawerLocationState = { fromList: true }
 
 /**
  * Closing goes back when the list opened the drawer, so Back afterwards does not reopen it. A
- * drawer reached by a pasted link or a reload has nothing behind it in the panel: closing
- * replaces it with the folder's list instead of leaving the site.
+ * drawer reached by a pasted link or a new tab has nothing behind it in the panel: closing replaces
+ * it with the folder's list (and its filters) instead of leaving the site. A reload keeps the
+ * history and its state, so a drawer opened from the list still steps back.
  */
 export const useCloseDrawer = (group: AccountGroup) => {
   const navigate = useNavigate()
-  const state = useLocation().state as DrawerLocationState | null
+  const location = useLocation()
+  const state = location.state as DrawerLocationState | null
 
   return () => {
     if (state?.fromList) {
       void navigate(-1)
       return
     }
-    void navigate(GROUP_ROUTES[group], { replace: true })
+    void navigate(
+      { pathname: GROUP_ROUTES[group], search: location.search },
+      { replace: true }
+    )
   }
 }
