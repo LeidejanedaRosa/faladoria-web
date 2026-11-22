@@ -17,3 +17,8 @@ Nenhuma no momento.
   `Button`, os radios do papel) têm 16px e 48px em todas as telas, e o formulário do drawer fica
   mais pesado que o resto. No celular continuam 16px e 48px (zoom do iOS e alvo de toque, WCAG
   2.2). Afeta todos os formulários do painel, inclusive login e cidades.
+
+- **Filtros das contas quando as listas crescerem** (sem data; gatilho: centenas de contas numa
+  pasta). Duas mudanças juntas: o filtro passa para a API (`GET /api/users?estado=&cidade=&busca=`,
+  com paginação), e no celular os filtros vão para trás de um botão "Filtrar", para a lista não
+  começar 250px abaixo. Ver DECISIONS (2026-11-21, filtros).
