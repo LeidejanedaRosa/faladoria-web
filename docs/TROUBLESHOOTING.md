@@ -4,6 +4,48 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## e2e: contorno de foco ausente só no Firefox, com o foco no lugar certo
+
+**Data**: 2026-11-22
+
+**Sintoma**: o teste "a linha nova mostra o contorno depois de carregar mais" passava no Chromium e
+no WebKit e falhava no Firefox: a linha tinha o foco, mas `outline-style` vinha `none`.
+
+**Causa raiz**: o contorno usa `:focus-visible`, e cada navegador decide quando um foco movido **por
+código** combina com ele. O Firefox olha se a última **mudança de foco** veio do teclado. O teste
+chegava ao botão com `locator.focus()` (foco por código) e só então apertava Enter: para o Firefox,
+nenhuma navegação pelo teclado tinha acontecido. Não era defeito do produto: chegando ao botão com
+Tab, como uma pessoa faz, o contorno aparece.
+
+**Solução**: o teste chega ao botão pelo teclado (`Shift+Tab` e `Tab`) antes do Enter. A prova
+inversa (sem o contorno) continua falhando no Chromium e no Firefox.
+
+**Regra prática**: teste de `:focus-visible` precisa reproduzir o caminho do teclado, não só o
+estado final. `locator.focus()` é foco por código, e a heurística de cada navegador trata isso de um
+jeito.
+
+---
+
+## Foco caía no `<body>` quando "Tentar de novo" trazia um histórico vazio
+
+**Data**: 2026-11-22
+
+**Sintoma** (achado do CodeRabbit no #88): o histórico falhava ao carregar, a pessoa usava "Tentar
+de novo" pelo teclado, e a resposta vinha sem nenhuma ação. A mensagem "Nenhuma ação registrada
+ainda." aparecia, mas o foco ia para o `<body>`.
+
+**Causa raiz**: o `useRecoveryFocus` leva o foco para o seu `targetRef` quando o retry dá certo. O
+`targetRef` só estava na lista; o estado vazio não tinha alvo. O botão de retry some quando a busca
+acaba, e o foco fica sem lugar.
+
+**Solução**: o estado vazio também recebe o `targetRef` (uma `div` com `tabIndex={-1}`). Teste:
+retry que responde vazio, com o foco conferido na mensagem.
+
+**Regra prática**: com `useRecoveryFocus`, **todo** estado que pode substituir o erro precisa ter o
+alvo: lista, vazio, o que mais houver.
+
+---
+
 ## Foco no item novo falhava: a Promise do `fetchNextPage` resolve antes da tela
 
 **Data**: 2026-11-22

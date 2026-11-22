@@ -43,6 +43,18 @@ por pessoa (`actorId`) ou por alvo (`targetId`), mas não por tipo de ação.
 - **O histórico é buscado ao abrir o drawer**, mesmo se a admin só olhar Dados: as abas ficam
   montadas (decisão do drawer). Um pedido pequeno por conta aberta, e a aba já abre pronta.
 
+**Correções pós-review (CodeRabbit, #88)**:
+
+- **O estado vazio também é alvo de foco.** Depois de "Tentar de novo", se o histórico viesse vazio,
+  o botão sumia sem um lugar para o foco ir, e ele caía no `<body>`. A mensagem "Nenhuma ação
+  registrada ainda." agora fica numa `div` com `tabIndex={-1}`, ligada ao `useRecoveryFocus`, como a
+  lista.
+- **A linha que recebe o foco depois de "carregar mais" mostra o contorno**, uma exceção à regra de
+  2026-11-21 ("tabindex -1 sem contorno"), decidida pela Leidejane. O título do drawer e o conteúdo
+  depois de "Tentar de novo" são começos óbvios. A linha nova fica no meio de uma lista longa, e o
+  contorno é a única pista de onde o próximo Tab sai (WCAG 2.4.7). Usa `focus-visible`, com o
+  contorno por fora da linha: aparece para quem chegou pelo teclado, não para quem clicou.
+
 **Alternativas rejeitadas**:
 
 - **O que fizeram na conta (`?targetId=`)**: responde "quem mexeu nesta conta?", mas não mostra se
@@ -175,7 +187,8 @@ pasta, painel lateral, papel restrito pela pasta e "Nova conta" também no drawe
   `index.css` fica fora de qualquer `@layer` e por isso vence o `focus:outline-none` do Tailwind,
   que fica numa camada (ver TROUBLESHOOTING). Elementos com `tabindex="-1"` recebem foco por código,
   para o leitor de tela anunciar onde a pessoa chegou (o título do drawer, o conteúdo depois de
-  "Tentar de novo"), e não são controles.
+  "Tentar de novo"), e não são controles. Exceção: a linha do histórico depois de "carregar mais"
+  (ver 2026-11-22, histórico).
 
 **Correções pós-review (CodeRabbit, #85)**:
 
