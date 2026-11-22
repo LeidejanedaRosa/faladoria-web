@@ -4,6 +4,48 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## Foco no item novo falhava: a Promise do `fetchNextPage` resolve antes da tela
+
+**Data**: 2026-11-22
+
+**Sintoma**: ao escrever o "Carregar ações mais antigas" do histórico, a primeira versão fazia
+`await fetchNextPage()` e procurava o item novo logo depois, para dar foco a ele. No teste do hook,
+`result.current.data` logo depois do `act` também ainda tinha só a primeira página.
+
+**Causa raiz**: a Promise do `fetchNextPage` resolve quando a página chega ao cache do TanStack
+Query, e não quando o React desenha a lista nova. Entre as duas coisas, o item ainda não existe no
+DOM.
+
+**Solução**: o clique guarda o índice da primeira ação nova num ref, e um efeito que depende do
+total de ações dá o foco quando esse total passa do índice, já com o item na tela. No teste,
+`waitFor` em vez de ler o resultado logo depois do `act`. Ver DECISIONS (2026-11-22, histórico).
+
+**Regra prática**: "os dados chegaram" e "a tela mostrou" são momentos diferentes. Mexer no DOM
+depois de uma busca é trabalho de efeito, não do `await`.
+
+---
+
+## Testes do drawer quebraram com o histórico: a API falsa não conhecia a rota
+
+**Data**: 2026-11-22
+
+**Sintoma**: com o histórico na aba Acesso, os testes do drawer acusaram
+`Cannot read properties of undefined (reading 'length')` dentro do `ActionHistory`.
+
+**Causa raiz**: o `fakeUsersApi` (e um teste com `fetch` programado à mão) respondia rotas
+desconhecidas com outra coisa (a lista de cidades), e o componente leu `page.actions` de uma
+resposta fora do contrato.
+
+**Solução**: ensinar à API falsa a rota nova (`staffActions`, filtrando por `actorId`) e separar
+cidades ativas de removidas por `status`, como a API real. O componente não ganhou defesa contra
+uma resposta que a API nunca manda: isso seria código para o teste, não para o produto.
+
+**Regra prática**: quando um componente passa a chamar uma rota nova, toda API falsa que o
+renderiza precisa conhecê-la. Melhor ainda: a falsa lança erro em rota desconhecida, como o
+`routeApi` faz.
+
+---
+
 ## Estado do filtro sumia ao digitar logo depois de escolhê-lo
 
 **Data**: 2026-11-21

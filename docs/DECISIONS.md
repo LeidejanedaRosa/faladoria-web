@@ -6,6 +6,54 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-11-22 — Histórico de ações na aba Acesso, numa feature própria
+
+**Contexto**: quinta branch do fichário (`feat/dashboard-layout-access-log`). A aba Acesso do drawer
+da conta mostrava senha e desativação, mas não o que a pessoa faz no painel. O backend já registra
+toda ação de quem está logado (`GET /api/staff-actions`, só admin), paginado por cursor, filtrável
+por pessoa (`actorId`) ou por alvo (`targetId`), mas não por tipo de ação.
+
+**Decisão** (produto, aprovada pela Leidejane):
+
+- **O histórico mostra o que a pessoa fez** (`?actorId=`): entradas, saídas, troca de senha, o que
+  ela fez nos casos, e as tentativas recusadas de entrar na conta dela (o backend registra o login
+  recusado sob a conta tentada). Responde "essa pessoa usa o painel? alguém tentou entrar na conta
+  dela?". Mostrar só entradas e saídas não dá: sem filtro por tipo na API, o filtro no navegador
+  sobre páginas de 20 deixaria páginas vazias (o mesmo problema do F269).
+- **Agrupado por dia, no horário de Brasília**: "Hoje", "Ontem", "19 de novembro de 2026", com a
+  hora em cada linha. Auditoria precisa da hora exata; tempo relativo ("há 2 horas") foi
+  rejeitado por isso.
+- **Selos em palavra e cor**: "Recusada" no login recusado, "Não concluída" em outra recusa da API,
+  "Sem permissão" no 403 (que também registra leituras barradas: "Tentou abrir uma área do
+  painel").
+- **Contas e cidades com nome; casos genéricos.** A API manda só o id do alvo. O drawer entrega um
+  dicionário `id → nome` com as contas e as cidades atendidas, ativas **e removidas** (remover uma
+  cidade é das ações mais sensíveis, e é justamente quando o nome some da lista ativa). Caso fica
+  "Assumiu um caso": a tela não tem nome de caso para dar. Ação que o painel ainda não conhece vira
+  "Fez uma ação no painel", nunca a rota crua.
+- **"Carregar ações mais antigas"**, não rolagem infinita: o fim da página continua alcançável, e o
+  teclado controla quando carregar. Na última página o botão some; o foco vai para a primeira ação
+  carregada, num efeito depois da renderização (a Promise do `fetchNextPage` resolve antes de a
+  tela mostrar a página).
+- **Feature própria, `features/staff-actions`**, porque é outro domínio da API e vai reaparecer no
+  histórico do caso (F275). Ela não importa `users`: quem a usa entrega o dicionário de nomes
+  (inversão de dependência). `users` importa `staff-actions`, e o contrário criaria um ciclo.
+- **`LoadError` foi para `shared/ui`**, com "Tentar de novo" em `UI_CONTENT`: duas features passaram
+  a usá-lo (critério de divisão do projeto).
+- **O histórico é buscado ao abrir o drawer**, mesmo se a admin só olhar Dados: as abas ficam
+  montadas (decisão do drawer). Um pedido pequeno por conta aberta, e a aba já abre pronta.
+
+**Alternativas rejeitadas**:
+
+- **O que fizeram na conta (`?targetId=`)**: responde "quem mexeu nesta conta?", mas não mostra se
+  a pessoa usa o painel. Pode virar uma segunda lista depois, se fizer falta.
+- **As duas listas na aba**: a aba Acesso ficaria longa no celular, com dois "Carregar mais".
+- **Nomes sempre genéricos**: a admin não saberia qual conta ou cidade foi alterada.
+- **Buscar o histórico só quando a aba Acesso abre**: economiza um pedido, mas a aba abriria com o
+  carregamento, e exigiria montar a aba sob demanda, ao contrário das outras.
+
+---
+
 ## 2026-11-21 — Filtros da lista de contas: Estado → Cidade → Busca, na URL
 
 **Contexto**: quarta branch do fichário (`feat/dashboard-layout-filters`). As pastas Equipe e
