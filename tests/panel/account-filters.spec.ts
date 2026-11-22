@@ -139,6 +139,33 @@ test.describe('Account filters', () => {
       await expect(accounts(page)).toHaveCount(1)
     })
 
+    test('should clear every filter, the typed text too, when the folder is opened again', async ({
+      page,
+    }) => {
+      await openPage(page, `${PAGE}?estado=MG&busca=ana`)
+      await expect(accounts(page)).toHaveCount(1)
+
+      await page
+        .getByRole('navigation', { name: 'Pastas do painel' })
+        .getByRole('link', { name: /^Equipe/ })
+        .click()
+
+      await expect(page).toHaveURL(/\/dashboard\/equipe$/)
+      await expect(stateField(page)).toHaveValue('')
+      await expect(searchField(page)).toHaveValue('')
+      await expect(accounts(page)).toHaveCount(4)
+    })
+
+    test('should keep every letter when typing fast', async ({ page }) => {
+      await openPage(page)
+
+      await searchField(page).pressSequentially('jose antonio')
+
+      await expect(searchField(page)).toHaveValue('jose antonio')
+      await expect(page).toHaveURL(/\?busca=jose\+antonio$/)
+      await expect(accounts(page)).toHaveCount(1)
+    })
+
     test('should leave the list on Back instead of undoing each filter', async ({
       page,
     }) => {
