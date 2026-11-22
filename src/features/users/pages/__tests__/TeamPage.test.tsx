@@ -316,4 +316,24 @@ describe('TeamPage', () => {
       '/dashboard/gestores/nova?estado=MG'
     )
   })
+
+  it('follows the address when it changes with the list on screen', async () => {
+    renderFolder('team', {}, '/dashboard/equipe?busca=ana')
+    const search = await screen.findByRole('searchbox', {
+      name: 'Buscar por nome ou e-mail',
+    })
+    expect(screen.queryByText('Carla Dias')).not.toBeInTheDocument()
+
+    act(() => void navigate('/dashboard/equipe?busca=carla'))
+
+    await waitFor(() => expect(search).toHaveValue('carla'))
+    expect(screen.getByText('Carla Dias')).toBeInTheDocument()
+    expect(screen.queryByText('Ana Souza')).not.toBeInTheDocument()
+
+    act(() => void navigate('/dashboard/equipe'))
+
+    await waitFor(() => expect(search).toHaveValue(''))
+    expect(screen.getByText('Ana Souza')).toBeInTheDocument()
+    expect(screen.getByText('Carla Dias')).toBeInTheDocument()
+  })
 })

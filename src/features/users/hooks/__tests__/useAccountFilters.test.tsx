@@ -66,6 +66,17 @@ describe('useAccountFilters', () => {
     expect(result.filters).toMatchObject({ state: 'MG', city: 'Varginha' })
   })
 
+  it('keeps a choice the screen has not shown yet when the next one comes', () => {
+    renderAt('/dashboard/equipe')
+
+    act(() => {
+      result.setState('SP')
+      result.setSearch('jose')
+    })
+
+    expect(address()).toBe('?estado=SP&busca=jose')
+  })
+
   it('starts another state with all of its cities', () => {
     renderAt('/dashboard/equipe?estado=MG&cidade=Varginha')
 
@@ -90,6 +101,16 @@ describe('useAccountFilters', () => {
     act(() => result.setState(''))
 
     expect(address()).toBe('')
+  })
+
+  it('follows the address when it changes from outside, as when the folder link is clicked', () => {
+    renderAt('/dashboard/equipe?estado=MG&busca=ana')
+
+    act(() => void navigate('/dashboard/equipe?busca=jose'))
+    expect(result.filters).toEqual({ state: '', city: '', search: 'jose' })
+
+    act(() => void navigate('/dashboard/equipe'))
+    expect(result.filters).toEqual({ state: '', city: '', search: '' })
   })
 
   it('clears every filter, the typed text too', () => {
