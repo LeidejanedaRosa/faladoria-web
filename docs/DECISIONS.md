@@ -23,7 +23,9 @@ A API devolve todas as contas numa resposta só, sem paginação nem filtro no s
   filtro letra por letra.
 - **A busca tem estado próprio, copiado para a URL.** O React Router 7 aplica as mudanças de
   endereço como _transitions_ (`startTransition`), e um campo de texto controlado por uma
-  transition pode perder letras. Estado e Cidade são selects: leem direto da URL.
+  transition pode perder letras. Estado e Cidade são selects: leem direto da URL. Quando a URL
+  muda por outro caminho (o cartão da pasta, Voltar), a busca segue a URL, ajustada durante a
+  renderização (ver "Correções pós-review").
 - **As opções vêm das contas da pasta**: toda escolha devolve pelo menos uma conta. Um estado ou
   uma cidade da URL que nenhuma conta tem (link antigo, digitação) é ignorado.
 - **A admin aparece em qualquer cidade.** O filtro responde "quem atende essa cidade?", e a admin
@@ -37,6 +39,21 @@ A API devolve todas as contas numa resposta só, sem paginação nem filtro no s
 - **Sem filtros quando a admin está sozinha na pasta**: não há o que filtrar.
 - **Uma conta criada fora do filtro não aparece na lista**, mas o aviso "A conta de X foi criada"
   confirma. Os filtros foram escolha da admin, e limpá-los sozinho mudaria a lista sem ela pedir.
+
+**Correções pós-review (CodeRabbit, #86)**:
+
+- **A busca segue a URL quando ela muda de fora.** O estado local só lia a URL ao montar: clicar no
+  cartão da pasta com filtros ativos zerava Estado e Cidade, mas a lista continuava filtrada pelo
+  texto antigo. O hook guarda o último valor visto da URL e, quando ele muda, compara com o texto
+  digitado sem os espaços das pontas: se for diferente, a mudança não veio da digitação, e o campo
+  segue a URL. O ajuste é feito durante a renderização (o padrão do React para "estado que
+  acompanha uma prop"), não num `useEffect`, que mostraria antes uma lista filtrada pelo texto
+  velho.
+- **Cada escrita parte da última URL escrita, não dos params da renderização** (achado pelo e2e
+  no Firefox, durante essa correção). `setSearchParams(atual => …)` recebe os params da última
+  renderização, e não enfileira como o `setState(prev => …)`: escolher o Estado e digitar logo
+  em seguida apagava o Estado. O hook guarda a última URL escrita num ref, que cada renderização
+  nova (inclusive uma mudança de fora) atualiza num efeito.
 
 **Alternativas rejeitadas**:
 
