@@ -35,7 +35,8 @@ let navigate: NavigateFunction
 
 const CurrentPath = () => {
   navigate = useNavigate()
-  return <p data-testid='path'>{useLocation().pathname}</p>
+  const { pathname, search } = useLocation()
+  return <p data-testid='path'>{pathname + search}</p>
 }
 
 type FakeOptions = Parameters<typeof fakeUsersApi>[1]
@@ -284,5 +285,35 @@ describe('TeamPage', () => {
     )
 
     await waitFor(() => expect(api.sent[0]).toMatchObject({ role: 'manager' }))
+  })
+
+  it('brings back the same filtered list when an account drawer closes', async () => {
+    renderFolder('team', {}, '/dashboard/equipe?busca=ana')
+    await userEvent.click(
+      await screen.findByRole('link', { name: 'Editar a conta de Ana Souza' })
+    )
+    const drawer = await screen.findByRole('dialog', { name: 'Ana Souza' })
+    expect(currentPath()).toBe('/dashboard/equipe/usr_ana?busca=ana')
+
+    await userEvent.click(
+      within(drawer).getByRole('button', { name: 'Fechar' })
+    )
+
+    await waitFor(() =>
+      expect(currentPath()).toBe('/dashboard/equipe?busca=ana')
+    )
+    expect(
+      screen.getByRole('searchbox', { name: 'Buscar por nome ou e-mail' })
+    ).toHaveValue('ana')
+    expect(screen.queryByText('Carla Dias')).not.toBeInTheDocument()
+  })
+
+  it('keeps the filters on the way to a new account', () => {
+    renderFolder('managers', {}, '/dashboard/gestores?estado=MG')
+
+    expect(newAccountLink()).toHaveAttribute(
+      'href',
+      '/dashboard/gestores/nova?estado=MG'
+    )
   })
 })
