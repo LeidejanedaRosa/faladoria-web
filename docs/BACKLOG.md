@@ -19,6 +19,12 @@ Nenhuma no momento.
   2.2). Afeta todos os formulários do painel, inclusive login e cidades.
 
 - **Filtros das contas quando as listas crescerem** (sem data; gatilho: centenas de contas numa
-  pasta). Duas mudanças juntas: o filtro passa para a API (`GET /api/users?estado=&cidade=&busca=`,
-  com paginação), e no celular os filtros vão para trás de um botão "Filtrar", para a lista não
-  começar 250px abaixo. Ver DECISIONS (2026-11-21, filtros).
+  pasta). Duas mudanças juntas:
+  - **Backend primeiro**: hoje `GET /api/users` carrega todas as contas e filtra na memória do
+    servidor, só por papel e cidade. Para escalar, precisaria filtrar no banco, aceitar estado
+    sozinho e busca por nome ou e-mail, incluir as admins em qualquer cidade e paginar. Só então o
+    painel passa o filtro para a API.
+  - **No celular**, os filtros vão para trás de um botão "Filtrar", para a lista não começar 250px
+    abaixo.
+
+  Ver DECISIONS (2026-11-21, filtros).
