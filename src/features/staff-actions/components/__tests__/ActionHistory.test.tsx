@@ -143,4 +143,17 @@ describe('ActionHistory', () => {
       ).toHaveFocus()
     )
   })
+
+  it('moves focus to the empty message when a retry brings no action', async () => {
+    renderHistory([[]], { failFirst: true })
+    const retry = within(await screen.findByRole('alert')).getByRole('button', {
+      name: 'Tentar de novo',
+    })
+    retry.focus()
+
+    await userEvent.click(retry)
+
+    const empty = await screen.findByText('Nenhuma ação registrada ainda.')
+    await waitFor(() => expect(empty.closest('[tabindex="-1"]')).toHaveFocus())
+  })
 })
