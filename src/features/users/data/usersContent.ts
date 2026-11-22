@@ -148,6 +148,9 @@ export const USERS_CONTENT = {
     self: 'A sua própria senha você troca sem gerar uma temporária, e sem sair do painel.',
     selfLink: 'Trocar a minha senha',
   },
+  historySection: {
+    heading: 'Histórico de ações',
+  },
   accessSection: {
     heading: 'Acesso ao painel',
     activeIntro:
