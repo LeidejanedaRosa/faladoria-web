@@ -1,32 +1,12 @@
 import { useRecoveryFocus } from '@shared/hooks/useRecoveryFocus'
-import { cn } from '@shared/utils/cn'
 
 import { type AccountGroup, GROUP_ROLES } from '../data/accountGroups'
 import { USERS_CONTENT } from '../data/usersContent'
 import { useUsers } from '../hooks/useUsers'
-import { ACCOUNT_COLUMNS } from './accountColumns'
-import { AccountItem } from './AccountItem'
+import { FilteredAccountList } from './FilteredAccountList'
 import { LoadError } from './LoadError'
 
 const { list } = USERS_CONTENT
-
-// Visual only: each row already names its values for screen readers (dt).
-const ColumnHeader = () => (
-  <div
-    aria-hidden='true'
-    className={cn(
-      'hidden border-b border-slate-200 px-5 py-3 text-sm font-medium text-slate-600',
-      ACCOUNT_COLUMNS
-    )}
-  >
-    <span>{USERS_CONTENT.newAccount.name}</span>
-    <span>{list.role}</span>
-    <span>{list.cities}</span>
-    <span>{list.status}</span>
-    <span className='text-right'>{list.openCases}</span>
-    <span />
-  </div>
-)
 
 const ListSkeleton = () => (
   <output className='block rounded-xl border border-slate-200 bg-white'>
@@ -66,27 +46,13 @@ export const AccountList = ({ group, selfId }: AccountListProps) => {
   }
   if (isPending) return <ListSkeleton />
 
-  const users = all.filter(user => GROUP_ROLES[group].includes(user.role))
-  // The signed-in admin is always in the team: "empty" means nobody else.
-  const hasOthers = users.some(user => user.id !== selfId)
-
   return (
-    <div
-      ref={targetRef}
-      tabIndex={-1}
-      className='rounded-xl border border-slate-200 bg-white focus:outline-none'
-    >
-      <ColumnHeader />
-      <ul>
-        {users.map(user => (
-          <AccountItem key={user.id} user={user} isSelf={user.id === selfId} />
-        ))}
-      </ul>
-      {!hasOthers && (
-        <p className='border-t border-slate-100 p-4 text-base text-slate-600 sm:px-5'>
-          {USERS_CONTENT.groups[group].empty}
-        </p>
-      )}
+    <div ref={targetRef} tabIndex={-1} className='focus:outline-none'>
+      <FilteredAccountList
+        users={all.filter(user => GROUP_ROLES[group].includes(user.role))}
+        group={group}
+        selfId={selfId}
+      />
     </div>
   )
 }

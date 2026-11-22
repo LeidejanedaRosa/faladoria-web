@@ -86,6 +86,19 @@ export const USERS_CONTENT = {
     status: 'Situação',
     openCases: 'Casos em andamento',
   },
+  filters: {
+    label: 'Filtrar contas',
+    state: 'Estado',
+    allStates: 'Todos os estados',
+    city: 'Cidade',
+    allCities: 'Todas as cidades',
+    cityHint: 'Escolha o estado primeiro.',
+    search: 'Buscar por nome ou e-mail',
+    clear: 'Limpar filtros',
+    empty: 'Nenhuma conta com esses filtros.',
+    showing: (shown: number, total: number) =>
+      `Mostrando ${shown} de ${total} ${total === 1 ? 'conta' : 'contas'}`,
+  },
   drawer: {
     accountTitle: 'Conta',
     close: 'Fechar',
