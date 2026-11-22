@@ -6,6 +6,225 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-11-22 — Histórico de ações na aba Acesso, numa feature própria
+
+**Contexto**: quinta branch do fichário (`feat/dashboard-layout-access-log`). A aba Acesso do drawer
+da conta mostrava senha e desativação, mas não o que a pessoa faz no painel. O backend já registra
+toda ação de quem está logado (`GET /api/staff-actions`, só admin), paginado por cursor, filtrável
+por pessoa (`actorId`) ou por alvo (`targetId`), mas não por tipo de ação.
+
+**Decisão** (produto, aprovada pela Leidejane):
+
+- **O histórico mostra o que a pessoa fez** (`?actorId=`): entradas, saídas, troca de senha, o que
+  ela fez nos casos, e as tentativas recusadas de entrar na conta dela (o backend registra o login
+  recusado sob a conta tentada). Responde "essa pessoa usa o painel? alguém tentou entrar na conta
+  dela?". Mostrar só entradas e saídas não dá: sem filtro por tipo na API, o filtro no navegador
+  sobre páginas de 20 deixaria páginas vazias (o mesmo problema do F269).
+- **Agrupado por dia, no horário de Brasília**: "Hoje", "Ontem", "19 de novembro de 2026", com a
+  hora em cada linha. Auditoria precisa da hora exata; tempo relativo ("há 2 horas") foi
+  rejeitado por isso.
+- **Selos em palavra e cor**: "Recusada" no login recusado, "Não concluída" em outra recusa da API,
+  "Sem permissão" no 403 (que também registra leituras barradas: "Tentou abrir uma área do
+  painel").
+- **Contas e cidades com nome; casos genéricos.** A API manda só o id do alvo. O drawer entrega um
+  dicionário `id → nome` com as contas e as cidades atendidas, ativas **e removidas** (remover uma
+  cidade é das ações mais sensíveis, e é justamente quando o nome some da lista ativa). Caso fica
+  "Assumiu um caso": a tela não tem nome de caso para dar. Ação que o painel ainda não conhece vira
+  "Fez uma ação no painel", nunca a rota crua.
+- **"Carregar ações mais antigas"**, não rolagem infinita: o fim da página continua alcançável, e o
+  teclado controla quando carregar. Na última página o botão some; o foco vai para a primeira ação
+  carregada, num efeito depois da renderização (a Promise do `fetchNextPage` resolve antes de a
+  tela mostrar a página).
+- **Feature própria, `features/staff-actions`**, porque é outro domínio da API e vai reaparecer no
+  histórico do caso (F275). Ela não importa `users`: quem a usa entrega o dicionário de nomes
+  (inversão de dependência). `users` importa `staff-actions`, e o contrário criaria um ciclo.
+- **`LoadError` foi para `shared/ui`**, com "Tentar de novo" em `UI_CONTENT`: duas features passaram
+  a usá-lo (critério de divisão do projeto).
+- **O histórico é buscado ao abrir o drawer**, mesmo se a admin só olhar Dados: as abas ficam
+  montadas (decisão do drawer). Um pedido pequeno por conta aberta, e a aba já abre pronta.
+
+**Correções pós-review (CodeRabbit, #88)**:
+
+- **O estado vazio também é alvo de foco.** Depois de "Tentar de novo", se o histórico viesse vazio,
+  o botão sumia sem um lugar para o foco ir, e ele caía no `<body>`. A mensagem "Nenhuma ação
+  registrada ainda." agora fica numa `div` com `tabIndex={-1}`, ligada ao `useRecoveryFocus`, como a
+  lista.
+- **A linha que recebe o foco depois de "carregar mais" mostra o contorno**, uma exceção à regra de
+  2026-11-21 ("tabindex -1 sem contorno"), decidida pela Leidejane. O título do drawer e o conteúdo
+  depois de "Tentar de novo" são começos óbvios. A linha nova fica no meio de uma lista longa, e o
+  contorno é a única pista de onde o próximo Tab sai (WCAG 2.4.7). Usa `focus-visible`, com o
+  contorno por fora da linha: aparece para quem chegou pelo teclado, não para quem clicou.
+
+**Alternativas rejeitadas**:
+
+- **O que fizeram na conta (`?targetId=`)**: responde "quem mexeu nesta conta?", mas não mostra se
+  a pessoa usa o painel. Pode virar uma segunda lista depois, se fizer falta.
+- **As duas listas na aba**: a aba Acesso ficaria longa no celular, com dois "Carregar mais".
+- **Nomes sempre genéricos**: a admin não saberia qual conta ou cidade foi alterada.
+- **Buscar o histórico só quando a aba Acesso abre**: economiza um pedido, mas a aba abriria com o
+  carregamento, e exigiria montar a aba sob demanda, ao contrário das outras.
+
+---
+
+## 2026-11-21 — Filtros da lista de contas: Estado → Cidade → Busca, na URL
+
+**Contexto**: quarta branch do fichário (`feat/dashboard-layout-filters`). As pastas Equipe e
+Gestores listavam todas as contas, sem como achar "quem atende Varginha?" ou a conta de um e-mail.
+`GET /api/users` devolve todas as contas numa resposta só, sem paginação. Ela aceita `?role=` e
+`?city=&state=` (sempre juntos), mas não filtra só por estado nem busca por texto. (Corrigido em
+2026-11-22: a primeira versão desta entrada dizia que a API não filtrava nada.)
+
+**Decisão** (produto, aprovada pela Leidejane):
+
+- **O filtro roda no navegador.** Com dezenas de contas, a lista responde na hora, sem nenhum
+  pedido a mais, sobre a lista que a pasta já carregou. O filtro da API não cobre a regra: não tem
+  estado sozinho nem busca, e deixa as admins de fora de uma cidade (elas não têm cidades
+  marcadas). E nem seria mais leve: o backend (`ListUsersInteractor`) carrega todas as contas e
+  filtra na memória do servidor.
+- **Os filtros ficam na URL** (`?estado=MG&cidade=Varginha&busca=ana`), como em Cidades atendidas
+  (`?situacao=removidas`). Recarregar e compartilhar mantêm o filtro. Os links do drawer (conta e
+  conta nova) levam a query junto, e fechar o drawer volta para a mesma lista filtrada.
+- **Cada mudança substitui a entrada do histórico.** Voltar sai da lista, em vez de desfazer o
+  filtro letra por letra.
+- **A busca tem estado próprio, copiado para a URL.** O React Router 7 aplica as mudanças de
+  endereço como _transitions_ (`startTransition`), e um campo de texto controlado por uma
+  transition pode perder letras. Estado e Cidade são selects: leem direto da URL. Quando a URL
+  muda por outro caminho (o cartão da pasta, Voltar), a busca segue a URL, ajustada durante a
+  renderização (ver "Correções pós-review").
+- **As opções vêm das contas da pasta**: toda escolha devolve pelo menos uma conta. Um estado ou
+  uma cidade da URL que nenhuma conta tem (link antigo, digitação) é ignorado.
+- **A admin aparece em qualquer cidade.** O filtro responde "quem atende essa cidade?", e a admin
+  atende todas (`assignedCities: []` quer dizer todas, não nenhuma).
+- **A busca olha nome e e-mail**, sem diferenciar maiúsculas nem acentos (`normalizeForSearch`).
+- **Cidade fica desligada até escolher o estado**, com a dica "Escolha o estado primeiro." ligada
+  por `aria-describedby`. Trocar de estado zera a cidade.
+- **"Mostrando 2 de 4 contas" numa região de status sempre montada** (fora do layout sem filtro):
+  uma região que aparece junto com o texto costuma não ser anunciada. "Limpar filtros" devolve o
+  foco ao Estado, porque o botão some junto com os filtros.
+- **Sem filtros quando a admin está sozinha na pasta**: não há o que filtrar.
+- **Uma conta criada fora do filtro não aparece na lista**, mas o aviso "A conta de X foi criada"
+  confirma. Os filtros foram escolha da admin, e limpá-los sozinho mudaria a lista sem ela pedir.
+
+**Correções pós-review (CodeRabbit, #86)**:
+
+- **A busca segue a URL quando ela muda de fora.** O estado local só lia a URL ao montar: clicar no
+  cartão da pasta com filtros ativos zerava Estado e Cidade, mas a lista continuava filtrada pelo
+  texto antigo. O hook guarda o último valor visto da URL e, quando ele muda, compara com o texto
+  digitado sem os espaços das pontas: se for diferente, a mudança não veio da digitação, e o campo
+  segue a URL. O ajuste é feito durante a renderização (o padrão do React para "estado que
+  acompanha uma prop"), não num `useEffect`, que mostraria antes uma lista filtrada pelo texto
+  velho.
+- **Cada escrita parte da última URL escrita, não dos params da renderização** (achado pelo e2e
+  no Firefox, durante essa correção). `setSearchParams(atual => …)` recebe os params da última
+  renderização, e não enfileira como o `setState(prev => …)`: escolher o Estado e digitar logo
+  em seguida apagava o Estado. O hook guarda a última URL escrita num ref, que cada renderização
+  nova (inclusive uma mudança de fora) atualiza num efeito.
+
+**Alternativas rejeitadas**:
+
+- **Filtros só em memória**: recarregar, compartilhar ou voltar do drawer zerariam o filtro.
+- **Usar `?city=&state=` da API**: um pedido a cada escolha, para um resultado que a lista já
+  tem; e a cidade deixaria as admins de fora. Estado sozinho e busca continuariam no navegador.
+- **Opções de todas as cidades atendidas**: mostraria cidades sem nenhuma conta (resultado vazio)
+  e pediria mais uma consulta.
+- **A admin só aparece com a cidade marcada na conta**: esconderia quem de fato atende a cidade.
+- **Esconder os filtros atrás de um botão "Filtrar" no celular**: um toque a mais sem ganho com
+  poucas contas por pasta. Volta à mesa quando as listas crescerem.
+- **`useTransitions={false}` no roteador**: resolveria o campo de texto, mas mudaria todas as
+  navegações do site por causa de um campo.
+
+---
+
+## 2026-11-21 — Drawer da conta e da conta nova, com endereço por pasta
+
+**Contexto**: terceira branch do fichário (`feat/dashboard-layout-drawer`). A conta abria numa
+página própria (`/dashboard/equipe/:userId`, com trilha de navegação), e "Nova conta" abria um
+formulário embaixo do título da lista. O protótipo aprovado pede que tudo abra num drawer, com
+abas. Quatro escolhas de produto foram feitas pela Leidejane antes do layout: um endereço por
+pasta, painel lateral, papel restrito pela pasta e "Nova conta" também no drawer.
+
+**Decisão**:
+
+- **O drawer é uma rota filha da lista.** `/dashboard/equipe/:userId`, `/dashboard/equipe/nova`
+  e os mesmos em `/dashboard/gestores`. A `TeamPage` tem um `<Outlet>`, e o drawer é desenhado por
+  cima dela. Recarregar mantém o drawer, Voltar fecha, e o link pode ser compartilhado. O segmento
+  `nova` é estático, então o React Router o prefere a `:userId`.
+- **Uma conta aberta na pasta errada muda de endereço** (`<Navigate replace>`): um link antigo de
+  gestor em `/equipe` vai para `/gestores`, e trocar o papel de alguém no drawer leva o drawer
+  junto para a outra pasta.
+- **Fechar volta um passo quando a lista abriu o drawer, e substitui o endereço quando não.** O
+  link da lista passa `state: { fromList: true }`. Sem isso, fechar com `navigate(-1)` um drawer
+  aberto por link colado tiraria a pessoa do site, e fechar com `navigate(lista)` deixaria o
+  drawer de volta no Voltar.
+- **`<dialog>` nativo com `showModal()`**: o navegador deixa a página de trás inerte, prende o Tab
+  e trata o Escape. O Tab passa pelos controles do próprio navegador (barra de endereço) ao dar a
+  volta, mas nunca chega à lista. Os diálogos de senha e de confirmação abrem por cima, na ordem do
+  _top layer_.
+- **Ao abrir, o foco vai para o título**, não para o ✕: o conteúdo é longo e é anunciado pelo nome
+  (padrão de diálogo do WAI-ARIA). Na conta nova, o formulário toma o foco para o campo Nome: o
+  drawer abre num `useLayoutEffect`, antes dos efeitos dos filhos.
+- **A barra de rolagem da página some com um diálogo modal aberto** (`html:has(dialog:modal)` com
+  `overflow: hidden`, no `index.css`, para todos os modais). Achado no e2e: no WebKit com barra de
+  rolagem fixa, a barra da página continuava atrás do drawer e ele ficava 10px mais estreito
+  (380px num celular de 390). A roda do mouse não era o problema: nos três motores, ela já não
+  rolava a página por trás de um modal nativo (testado sem a regra).
+- **Clicar fora não fecha.** Um clique sem querer na área escura apagaria o que foi digitado. Fecha
+  pelo ✕, pelo Escape, pelo "Cancelar" e pelo Voltar.
+- **Abas Dados / Acesso**, no padrão de abas do WAI-ARIA (setas, Home/End, um só tab na ordem do
+  Tab). O painel escondido continua montado (`hidden`), para o formulário de Dados não perder o que
+  foi digitado quando a pessoa olha Acesso.
+- **O papel vem da pasta.** Equipe oferece só assistente e administração; Gestores cria sempre
+  gestão de saúde, mostrada como texto (`FixedRole`, a mesma peça do "você não pode trocar o
+  próprio papel"). A conta nova sempre aparece na lista onde foi criada. Editar continua
+  oferecendo todos os papéis: promover alguém de uma pasta para outra é uma decisão válida.
+- **A senha temporária fica na lista, não no drawer.** A conta é criada, o drawer fecha e a lista
+  mostra a senha uma vez. Ela passa por uma função do contexto da pasta (`onAccountCreated`), nunca
+  pelo `state` da navegação, que fica guardado no histórico do navegador.
+- **`Drawer` e `Tabs` em `shared/ui`**, com uma feature só usando: são peças de interface sem
+  domínio, como o `ConfirmDialog`, e o drawer da reclamação (Resumo / Conversa / Tratar) já está
+  decidido no protótipo.
+- **O contorno de foco global não vale para `tabindex="-1"`.** A regra `*:focus-visible` do
+  `index.css` fica fora de qualquer `@layer` e por isso vence o `focus:outline-none` do Tailwind,
+  que fica numa camada (ver TROUBLESHOOTING). Elementos com `tabindex="-1"` recebem foco por código,
+  para o leitor de tela anunciar onde a pessoa chegou (o título do drawer, o conteúdo depois de
+  "Tentar de novo"), e não são controles. Exceção: a linha do histórico depois de "carregar mais"
+  (ver 2026-11-22, histórico).
+
+**Correções pós-review (CodeRabbit, #85)**:
+
+- **O redirecionamento de pasta acontece num efeito, com o drawer ainda desenhado.** Devolver
+  `<Navigate>` no render tirava o drawer da tela por um instante, e a outra pasta montava um
+  formulário novo: a mensagem "salvo" e o aviso de casos fora do alcance se perdiam quando a
+  admin trocava o papel de alguém. Com a árvore no lugar, o React reaproveita o formulário e o
+  aviso vai junto, já numa região de status existente (que o leitor de tela anuncia).
+- **A conta nova usa `mutateAsync`.** Os callbacks passados ao `mutate()` não rodam se o
+  formulário sair da tela, e o drawer pode ser fechado enquanto a conta é criada: a conta existiria
+  sem a senha temporária ter sido mostrada. A senha chega à lista mesmo com o drawer já fechado; o
+  drawer só fecha se ainda estiver aberto (senão voltaria um passo a mais no histórico). Só se perde
+  se a admin sair da pasta inteira antes da resposta, e aí "Gerar nova senha" resolve.
+- **O título da pasta volta à aba quando o drawer fecha.** O `useDocumentMeta` não restaura nada
+  ao desmontar, e o efeito da lista não rodava de novo. A lista põe o título num componente
+  (`FolderTitle`) montado só quando não há drawer. Por isso cada drawer dá o próprio título:
+  o da conta ("Ana Souza · Equipe") e o da conta nova ("Nova conta · Gestores"), ambos com
+  `noindex`. Antes, o drawer da conta nova herdava o da pasta; tirar essa herança deixava
+  `/nova` aberto direto com o título de index.html (achado na segunda rodada do review).
+- **O formulário da conta nova tem `key={group}`.** Não achei um caminho de navegação que leve de
+  uma pasta à outra com o drawer aberto (a página atrás fica inerte), mas, se acontecer, o
+  formulário recomeça com o papel da pasta nova em vez de guardar o da anterior.
+
+**Alternativas rejeitadas**:
+
+- **Só `/equipe/:id` para todas as contas**: a URL diria "equipe" enquanto a tela mostra Gestores.
+- **Modal centralizado**: cobre a lista inteira e fica apertado para um formulário longo com abas.
+- **Drawer só em memória** (já rejeitado no protótipo): recarregar e Voltar não funcionariam.
+- **Sugerir o papel, mas deixar trocar**: uma conta de gestor criada na Equipe sumiria da lista
+  onde foi criada.
+- **Senha temporária no `state` da navegação**: ficaria no histórico do navegador.
+- **Prender o Tab também fora da página** (com um `useFocusTrap` além do `<dialog>`): o navegador
+  já impede o Tab de chegar à lista, e tirar a barra de endereço de quem usa só teclado é pior.
+
+---
+
 ## 2026-11-19 — CodeRabbit: `.coderabbit.yaml` revisa PRs para qualquer branch
 
 **Contexto**: o CodeRabbit pulou o #79 ("Review skipped: auto reviews are disabled on base/target
@@ -111,6 +330,158 @@ Os previews continuam sem release, como decidido em 2026-11-05.
 - **Override também para o `katex`, o `js-yaml` e o `smol-toml`**: manteria uma ferramenta que
   ninguém usa só para remendar as dependências dela.
 - **Dispensar os alertas no GitHub como "risco tolerável"**: havia correção para todos.
+
+---
+
+## 2026-11-12 — Pastas da admin: Reclamações, Equipe e Gestores como rotas
+
+**Contexto**: segunda branch do fichário (`feat/dashboard-layout-folders`). A admin passa a ver
+três pastas no topo das páginas de trabalho. A lista de contas, que juntava equipe e gestores, é
+dividida em duas.
+
+**Decisão** (aprovada pela Leidejane):
+
+- **Cada pasta é uma rota**: Reclamações em `/dashboard`, Equipe em `/dashboard/equipe` e Gestores
+  em `/dashboard/gestores` (nova). Pela mesma razão do drawer com URL: recarregar mantém a pasta,
+  Voltar funciona, e o link de cada uma pode ser compartilhado. As pastas são links num `<nav>`
+  ("Pastas do painel"), com `aria-current="page"` na aberta.
+- **Rota-layout `PanelFoldersLayout`**: a rota pai desenha as pastas, e o `<Outlet>` desenha a
+  página. Nenhuma página sabe que as pastas existem. Ela repassa o contexto do `<Outlet>`, porque
+  as páginas leem a pessoa logada dele. A conta (`/dashboard/equipe/:userId`) e as Configurações
+  ficam fora dela: são detalhe e cadastro, não pastas.
+- **Só a admin vê as pastas.** Assistente e gestor veem a página de reclamações sozinha, e **não
+  disparam `GET /api/users`**, que a API recusa para eles (403). O teste confere as requisições.
+- **Números que pedem ação**: Reclamações mostra as em aberto. Equipe e Gestores mostram as contas
+  **ativas**: desativadas e quem ainda não entrou ficam na lista, mas fora do número.
+- **Sem requisição a mais**: as contagens das contas saem de `useActiveAccountCounts`, um `select`
+  sobre a mesma query da lista. As das reclamações reaproveitam a query da página inicial. Mesma
+  chave, mesmo cache.
+- **Quem é Equipe e quem é Gestor mora em `users`** (`data/accountGroups.ts`: `GROUP_ROLES`,
+  `GROUP_ROUTES`, `groupOf`). Equipe = administração e assistentes; Gestores = gestores. O painel
+  lê as contagens pelo `index.ts` de `users`, criado agora como a API pública da feature.
+- **Uma página, dois grupos**: `TeamPage` e `AccountList` recebem o `group`. Título, introdução e
+  texto de lista vazia vêm de `USERS_CONTENT.groups`. "Vazia" passou a ser "ninguém além de você",
+  regra que serve aos dois grupos: na Equipe a admin sempre aparece; em Gestores, nunca.
+- **A trilha da conta volta à pasta certa**: um gestor mostra "Gestores › Bruno Lima".
+- **"Equipe" saiu do menu lateral**: as pastas substituem o item. "Início" fica apagado em Equipe
+  e em Gestores, porque a pasta aberta já mostra onde a pessoa está.
+- **No celular, uma pasta por linha**: nome à esquerda, número à direita, 56px de altura. As três
+  lado a lado (o layout aprovado primeiro) não cabiam: "Reclamações" precisa de 101px, e a pasta
+  tinha 90px numa tela de 390px e 67px numa de 320px. O defeito só apareceu medindo o texto
+  (`scrollWidth` maior que `clientWidth`), e foi mostrado antes de o layout mudar. O e2e confere,
+  em 320 e 390px, uma pasta por linha e nenhum texto estourando. Do `sm` em diante, ficam lado a lado.
+- **Cores**: roxo da marca (Reclamações), `teal-700` (Equipe) e `amber-700` (Gestores), com texto
+  branco na pasta aberta, todos com contraste de 5,0:1 ou mais. As classes são escritas por
+  inteiro numa tabela, porque o Tailwind só gera as classes que encontra literalmente no código.
+
+- **Imports pela API pública do `auth`**: `panel` e `users` passaram a importar de `@features/auth`
+  (`AUTH_ROUTES`, `useSignOut`, `RequirePanelSession`, `SessionUser`, `UserRole`), nunca das
+  pastas internas. `App.tsx` e `main.tsx` continuam apontando para os arquivos: são a raiz de
+  composição, já conhecem todas as features, e importar o barril ali poderia levar código do
+  painel ao pacote inicial do site público. Os fixtures de teste também ficam como estão.
+
+**Alternativas rejeitadas**:
+
+- **Pastas como botões que trocam o conteúdo**: recarregar voltaria à primeira pasta, e Voltar
+  sairia do painel.
+- **Criar já o componente de abas em pasta**: sem nenhum uso nesta branch, seria código morto. Ele
+  nasce no drawer (branch 3), com o primeiro consumidor. A ordem das branches mudou por isso:
+  pastas → drawer → filtros → histórico de acesso.
+- **Cada página desenhar as pastas**: repetiria o mesmo bloco em três lugares.
+- **No celular, lado a lado só com o número, ou numa faixa com rolagem lateral**: a primeira ainda
+  estourava em 320px, a menos que a fonte caísse abaixo de 16px; na segunda, a terceira pasta
+  ficaria escondida para quem não desliza.
+
+---
+
+## 2026-11-12 — Casca do painel: sidebar escura, grupo Configurações e pílula da pessoa
+
+**Contexto**: primeira branch do fichário (`feat/dashboard-layout-shell`). Troca só a moldura:
+sidebar, cabeçalho e menu do celular. O conteúdo das páginas continua como estava.
+
+**Decisão**:
+
+- **Sidebar no roxo da marca (`purple-deep`)**, arredondada e solta do canto. Ela leva o logo, o
+  menu e "Sair" no rodapé. O protótipo usava um azul-marinho, mas o logo tem letras quase brancas e
+  foi desenhado para o roxo. Fundo da página: o token novo `panel-canvas` (`#e9edf5`), para os
+  cartões brancos se destacarem.
+- **Um `PanelSidebar` para os dois lugares**: a sidebar do desktop e o menu do celular usam o mesmo
+  componente. Um item novo de menu entra num lugar só. No menu do celular o logo fica escondido,
+  porque a barra de cima já mostra um.
+- **Grupo "Configurações"**: cada item de `PANEL_NAV_ITEMS` tem um `group` (`main` | `settings`), e
+  `navItemsFor(role, group)` filtra pelos dois. O rótulo dá nome à lista por `aria-labelledby`. O
+  grupo some quando o papel não tem nenhum item nele (assistente e gestor).
+- **Id do rótulo com `useId`**: o menu é desenhado duas vezes. Com um id fixo, as duas listas
+  apontariam para o rótulo da primeira cópia. O nome lido continuaria certo, mas o HTML ficaria
+  inválido. A prova inversa mostrou que o teste antigo não pegava isso, e o teste passou a exigir
+  que cada lista aponte para um rótulo único, dentro da própria cópia.
+- **Um só `<header>` (banner)**: no celular, é a barra escura com ☰, logo e iniciais. No desktop,
+  é só a pílula da pessoa no canto direito, numa linha própria, acima do título da página. Assim
+  ela não disputa espaço com botões como "Nova conta".
+- **Iniciais (`initialsOf`) com `aria-hidden`**: o leitor de tela lê o nome completo, ao lado.
+- **Tamanhos**: os itens de menu têm 40px e 14px a partir de `lg`, onde se usa mouse. No celular,
+  continuam com 48px e 16px. Ajuste da Leidejane na branch das pastas: os textos pequenos da casca
+  (nome e papel na pílula e no menu, rótulo "Configurações") também passaram a ter 16px no celular
+  (`text-base`) e só diminuem a partir de `lg`, seguindo a regra de 16px mínimos no celular.
+
+**Alternativas rejeitadas**:
+
+- **Pílula na linha do título** (como no protótipo): economiza uns 60px, mas cada página precisaria
+  reservar espaço para ela ao lado dos próprios botões.
+- **Deixar as páginas delicadas nesta mesma branch**: misturaria moldura e conteúdo num PR só. Cada
+  tela ganha a escala nova na branch dela.
+
+---
+
+## 2026-11-12 — Painel em fichário: protótipo aprovado e divisão em branches
+
+**Contexto**: o painel cresceu tela por tela (início, equipe, conta, cidades), cada uma com o seu
+desenho. Antes de construir Reclamações, a Leidejane propôs reorganizar tudo como um fichário. O
+protótipo foi feito e iterado no Claude (artifact "Fichário"), com referências visuais do
+Pinterest, até ser aprovado.
+
+**Decisão** (produto, aprovada pela Leidejane):
+
+- **A admin trabalha em três pastas**: Reclamações, Equipe e Gestores, cada uma com a sua
+  contagem e a sua cor. Assistente e gestor não têm as pastas: veem direto as reclamações das suas
+  cidades.
+- **Cada situação é uma aba em forma de pasta** ("Em aberto", "Em andamento"...). Só as
+  novidades levam a bolinha vermelha com o número. Estar em "Em aberto" já diz que é preciso agir.
+- **Filtros dentro do painel da aba**: Estado → Cidade (desligada até escolher o estado) → Pessoa
+  → Busca. A lista é uma tabela que vira cartões no celular.
+- **Tudo abre num drawer, com uma tarefa por aba**:
+  - Reclamação: Resumo / Conversa / Tratar (1. classificar, 2. atualizar a situação) / Histórico
+    (só admin).
+  - O gestor não vê a conversa do WhatsApp: o Resumo dele mostra só o que a equipe enviou.
+  - Pessoa: Dados / Acesso.
+- **O drawer tem endereço**: `/dashboard/equipe/:userId` abre a lista com o drawer por cima.
+  Recarregar mantém o drawer aberto, Voltar fecha, e o link pode ser compartilhado.
+- **Configurações num grupo próprio no menu**: Cidades atendidas, e depois Classificações e
+  Locais de ocorrência (por cidade), cadastrados pela admin.
+- **Visual delicado**: texto de 14px e controles de 38 a 40px no desktop. No celular, 16px e 48px
+  (zoom do iOS e alvo de toque, WCAG 2.2).
+
+**Ordem das branches** (guarda-chuva `feat/dashboard-layout`, a partir de `feat/dashboard`):
+
+1. `feat/dashboard-layout-shell`: a casca.
+2. `feat/dashboard-layout-folders`: as três pastas da admin, como rotas.
+3. `feat/dashboard-layout-drawer`: o drawer da pessoa com URL e as abas em pasta (Dados / Acesso).
+   Reaproveita `AccountDetailsForm`, `PasswordSection` e `AccessSection`.
+4. `feat/dashboard-layout-filters`: Estado → Cidade → Busca na lista.
+5. `feat/dashboard-layout-access-log`: o histórico na aba Acesso (`GET /api/staff-actions`).
+
+(Ordem revista em 2026-11-12, na entrada "Pastas da admin".)
+
+Reclamações vem depois, noutra guarda-chuva, porque depende do backend: filtro por cidade (F269),
+assistente mudando a situação (F273), cadastros de classificação e local (F271, F272), editar a
+classificação (F270), registro do que mudou (F275) e novidades do gestor (F274). Os itens estão no
+`docs/flows/FINDINGS.md` do faladoria-backend.
+
+**Alternativas rejeitadas**:
+
+- **Terminar o painel no desenho antigo e mudar depois**: cada tela nova seria refeita.
+- **Drawer só em memória**: recarregar fecharia o drawer, Voltar sairia da tela, e o link da conta
+  (`/dashboard/equipe/:userId`), que já existe, deixaria de funcionar.
 
 ---
 

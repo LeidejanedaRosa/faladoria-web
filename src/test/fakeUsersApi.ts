@@ -1,4 +1,5 @@
 import type { ServiceArea } from '@features/service-areas/services/serviceAreasApi'
+import type { StaffAction } from '@features/staff-actions/services/staffActionsApi'
 import type {
   AccountChanges,
   NewAccount,
@@ -19,6 +20,10 @@ interface FakeOptions {
   complaintsOutOfReach?: number
   /** Answers a password reset, a deactivation or a reactivation with this error. */
   failAccessWith?: ApiFailure
+  /** Holds the creation's answer until this settles: what happens while it is on its way. */
+  holdCreate?: Promise<void>
+  /** The history of every account, in one page (the drawer's Acesso tab reads it). */
+  staffActions?: StaffAction[]
 }
 
 interface ApiFailure {
@@ -41,7 +46,7 @@ const STATUS_AFTER = {
 } as const
 
 /**
- * The users routes and the served cities, with state: a created or changed account really shows
+ * The users routes, the served cities and the staff-actions log, with state: a created or changed account really shows
  * up in the next list, so a test follows the whole flow the way the API would answer it.
  */
 export const fakeUsersApi = (
@@ -53,6 +58,8 @@ export const fakeUsersApi = (
     failUpdateWith,
     complaintsOutOfReach = 0,
     failAccessWith,
+    holdCreate,
+    staffActions = [],
   }: FakeOptions = {}
 ) => {
   const state = {
@@ -88,7 +95,18 @@ export const fakeUsersApi = (
   fetchMock.mockImplementation(async (input, init) => {
     const url = new URL(String(input))
     if (url.pathname === '/api/service-areas') {
-      return jsonResponse({ serviceAreas: servedAreas })
+      const removed = url.searchParams.get('status') === 'removed'
+      return jsonResponse({
+        serviceAreas: servedAreas.filter(
+          area => (area.removedAt !== null) === removed
+        ),
+      })
+    }
+    if (url.pathname === '/api/staff-actions') {
+      const actorId = url.searchParams.get('actorId')
+      return jsonResponse({
+        actions: staffActions.filter(action => action.actorId === actorId),
+      })
     }
     const [, userId, action] = ACCOUNT_PATH.exec(url.pathname) ?? []
     if (action === 'update') {
@@ -111,6 +129,7 @@ export const fakeUsersApi = (
     }
     const account = JSON.parse(String(init.body)) as NewAccount
     state.sent.push(account)
+    await holdCreate
     if (failCreateWith) return failure(failCreateWith)
     state.users.push({
       ...account,

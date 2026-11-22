@@ -36,7 +36,7 @@ export const SelectField = ({
         aria-invalid={error ? true : undefined}
         aria-describedby={joinIds(hint && hintId, error && errorId)}
         className={cn(
-          'min-h-12 w-full rounded-lg border bg-white px-3 text-base text-slate-900',
+          'min-h-12 w-full rounded-lg border bg-white px-3 text-base text-slate-900 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-600',
           error ? 'border-red-600' : 'border-slate-300'
         )}
         {...selectProps}

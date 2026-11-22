@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page, test } from '@playwright/test'
 
+import { mockComplaintCounts } from '../helpers/complaintCountsApi'
 import { E2E_API_URL } from '../helpers/publicBoardApi'
 
 const PAGE = '/dashboard/equipe'
@@ -93,6 +94,7 @@ const mockApis = async (
       },
     })
   })
+  await mockComplaintCounts(page)
   await page.route(`${E2E_API_URL}/api/service-areas**`, route =>
     route.fulfill({
       json: {
@@ -120,13 +122,17 @@ const formFocusSettled = (page: Page) =>
 const citySearch = (page: Page) =>
   page.getByRole('combobox', { name: 'Buscar cidade atendida' })
 
-const fillManager = async (page: Page) => {
-  await page.getByRole('button', { name: 'Nova conta' }).click()
+const newAccountLink = (page: Page) =>
+  page.getByRole('link', { name: 'Nova conta' })
+
+/** Bruno, an assistant: the team folder offers the team's roles only. */
+const fillAssistant = async (page: Page) => {
+  await newAccountLink(page).click()
   await page.getByRole('textbox', { name: 'Nome' }).fill('Bruno Lima')
   await page
     .getByRole('textbox', { name: /^E-mail/ })
-    .fill('bruno@saude.varginha.mg.gov.br')
-  await page.getByRole('radio', { name: /Gestão de saúde/ }).check()
+    .fill('bruno@faladoria.org')
+  await page.getByRole('radio', { name: /Assistente/ }).check()
   await expect(citySearch(page)).toBeEnabled()
   await citySearch(page).fill('varg')
   await page.getByRole('option', { name: 'Varginha/MG' }).click()
@@ -145,15 +151,22 @@ test.describe('Team page', () => {
       await expect(page.getByText('(você)')).toBeVisible()
     })
 
-    test('should be in the menu of the administration, marked as current', async ({
+    test('should open as the team folder, marked as current', async ({
       page,
     }) => {
       await page.setViewportSize(DESKTOP)
       await openPage(page)
 
       await expect(
-        page.getByRole('complementary').getByRole('link', { name: 'Equipe' })
+        page
+          .getByRole('navigation', { name: 'Pastas do painel' })
+          .getByRole('link', { name: /^Equipe/ })
       ).toHaveAttribute('aria-current', 'page')
+      await expect(
+        page
+          .getByRole('navigation', { name: 'Pastas do painel' })
+          .getByRole('link', { name: /^Reclamações/ })
+      ).toHaveText('Reclamações2em aberto')
     })
 
     test('should tell another role the page is not for them', async ({
@@ -186,7 +199,7 @@ test.describe('Team page', () => {
       page,
     }) => {
       await openPage(page)
-      await page.getByRole('button', { name: 'Nova conta' }).click()
+      await newAccountLink(page).click()
       await page.getByRole('radio', { name: /Assistente/ }).check()
       await page.getByRole('button', { name: 'Criar conta' }).click()
       await expect(page.getByText('Escreva o nome.')).toBeVisible()
@@ -201,7 +214,7 @@ test.describe('Team page', () => {
       page,
     }) => {
       await openPage(page)
-      await fillManager(page)
+      await fillAssistant(page)
       await page.getByRole('button', { name: 'Criar conta' }).click()
       await expect(passwordDialog(page)).toBeVisible()
 
@@ -212,13 +225,16 @@ test.describe('Team page', () => {
       page,
     }) => {
       await openPage(page)
-      await page.getByRole('button', { name: 'Nova conta' }).focus()
+      await newAccountLink(page).focus()
 
       await page.keyboard.press('Enter')
+      await expect(
+        page.getByRole('dialog', { name: 'Nova conta' })
+      ).toBeVisible()
       await expect(page.getByRole('textbox', { name: 'Nome' })).toBeFocused()
       await page.keyboard.type('Bruno Lima')
       await page.keyboard.press('Tab')
-      await page.keyboard.type('bruno@saude.varginha.mg.gov.br')
+      await page.keyboard.type('bruno@faladoria.org')
       await page.keyboard.press('Tab')
       await page.keyboard.press('Space')
       await expect(
@@ -243,7 +259,7 @@ test.describe('Team page', () => {
       page,
     }) => {
       await openPage(page)
-      await fillManager(page)
+      await fillAssistant(page)
       await page.getByRole('button', { name: 'Criar conta' }).click()
       await expect(passwordDialog(page)).toBeVisible()
 
@@ -264,7 +280,7 @@ test.describe('Team page', () => {
       page,
     }) => {
       await openPage(page)
-      await fillManager(page)
+      await fillAssistant(page)
       await page.getByRole('button', { name: 'Criar conta' }).click()
       await expect(
         passwordDialog(page).getByText(TEMPORARY_PASSWORD)
@@ -277,10 +293,44 @@ test.describe('Team page', () => {
       await expect(
         page.getByRole('status').filter({ hasText: 'foi criada' })
       ).toHaveText('A conta de Bruno Lima foi criada.')
-      await expect(
-        page.getByRole('button', { name: 'Nova conta' })
-      ).toBeFocused()
+      await expect(newAccountLink(page)).toBeFocused()
+      await expect(page).toHaveURL(/\/dashboard\/equipe$/)
       await expect(page.getByText('Bruno Lima', { exact: true })).toBeVisible()
+    })
+  })
+
+  test.describe('Business rules', () => {
+    test('should offer the team only its own roles', async ({ page }) => {
+      await openPage(page)
+      await newAccountLink(page).click()
+
+      const drawer = page.getByRole('dialog', { name: 'Nova conta' })
+      await expect(drawer.getByRole('radio')).toHaveCount(2)
+      await expect(
+        drawer.getByRole('radio', { name: /Gestão de saúde/ })
+      ).toHaveCount(0)
+    })
+
+    test('should create a manager in Gestores without asking the role, and list it there', async ({
+      page,
+    }) => {
+      await mockApis(page)
+      await page.goto('/dashboard/gestores', { waitUntil: 'domcontentloaded' })
+      await newAccountLink(page).click()
+      await expect(page).toHaveURL(/\/dashboard\/gestores\/nova$/)
+
+      const drawer = page.getByRole('dialog', { name: 'Nova conta' })
+      await expect(drawer.getByRole('radio')).toHaveCount(0)
+      await drawer.getByRole('textbox', { name: 'Nome' }).fill('Bia Rocha')
+      await drawer
+        .getByRole('textbox', { name: /^E-mail/ })
+        .fill('bia@saude.alfenas.mg.gov.br')
+      await citySearch(page).fill('alf')
+      await page.getByRole('option', { name: 'Alfenas/MG' }).click()
+      await drawer.getByRole('button', { name: 'Criar conta' }).click()
+      await page.getByRole('button', { name: 'Já anotei a senha' }).click()
+
+      await expect(page.getByText('Bia Rocha', { exact: true })).toBeVisible()
     })
   })
 
@@ -329,7 +379,7 @@ test.describe('Team page', () => {
     }) => {
       await page.setViewportSize(MOBILE)
       await openPage(page)
-      await fillManager(page)
+      await fillAssistant(page)
 
       const remove = page.getByRole('button', { name: 'Tirar Varginha/MG' })
       const box = (await remove.boundingBox())!

@@ -1,4 +1,4 @@
-import type { UserRole } from '@features/auth/services/authApi'
+import type { UserRole } from '@features/auth'
 import { apiRequest } from '@shared/lib/api'
 
 export type UserStatus =

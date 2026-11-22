@@ -2,37 +2,32 @@ import { describe, expect, it } from 'vitest'
 
 import { navItemsFor, PANEL_NAV_ITEMS } from '../panelNavItems'
 
-describe('navItemsFor', () => {
-  it.each(['admin', 'assistant', 'manager'] as const)(
-    'gives %s the panel home',
-    role => {
-      expect(navItemsFor(role).map(item => item.to)).toContain('/dashboard')
-    }
-  )
+const ROLES = ['admin', 'assistant', 'manager'] as const
+const paths = (...args: Parameters<typeof navItemsFor>) =>
+  navItemsFor(...args).map(item => item.to)
 
-  it('shows the served cities only to the administration', () => {
-    expect(navItemsFor('admin').map(item => item.to)).toContain(
-      '/dashboard/cidades'
-    )
-    expect(navItemsFor('assistant').map(item => item.to)).not.toContain(
-      '/dashboard/cidades'
-    )
-    expect(navItemsFor('manager').map(item => item.to)).not.toContain(
-      '/dashboard/cidades'
-    )
+describe('navItemsFor', () => {
+  it.each(ROLES)('gives %s the panel home in the main group', role => {
+    expect(paths(role, 'main')).toContain('/dashboard')
   })
 
-  it('shows the team only to the administration, before the served cities', () => {
-    const adminPaths = navItemsFor('admin').map(item => item.to)
-    expect(adminPaths.indexOf('/dashboard/equipe')).toBeGreaterThan(-1)
-    expect(adminPaths.indexOf('/dashboard/equipe')).toBeLessThan(
-      adminPaths.indexOf('/dashboard/cidades')
-    )
-    expect(navItemsFor('assistant').map(item => item.to)).not.toContain(
-      '/dashboard/equipe'
-    )
-    expect(navItemsFor('manager').map(item => item.to)).not.toContain(
-      '/dashboard/equipe'
+  // The admin reaches Equipe and Gestores through the folders, not the side menu.
+  it.each(ROLES)('keeps the folders out of the side menu of %s', role => {
+    expect(paths(role, 'main')).toEqual(['/dashboard'])
+  })
+
+  it('puts the served cities under settings, for the administration only', () => {
+    expect(paths('admin', 'settings')).toEqual(['/dashboard/cidades'])
+    expect(paths('admin', 'main')).not.toContain('/dashboard/cidades')
+    expect(paths('assistant', 'settings')).toEqual([])
+    expect(paths('manager', 'settings')).toEqual([])
+  })
+
+  it.each(ROLES)('loses no item of %s by splitting them in groups', role => {
+    const allowed = PANEL_NAV_ITEMS.filter(item => item.roles.includes(role))
+
+    expect([...paths(role, 'main'), ...paths(role, 'settings')]).toEqual(
+      allowed.map(item => item.to)
     )
   })
 

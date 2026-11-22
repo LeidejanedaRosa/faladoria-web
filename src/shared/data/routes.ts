@@ -10,8 +10,7 @@ export const PANEL_ROUTES = {
   root: '/dashboard',
   serviceAreas: '/dashboard/cidades',
   team: '/dashboard/equipe',
-  account: (userId: string) =>
-    `/dashboard/equipe/${encodeURIComponent(userId)}`,
+  managers: '/dashboard/gestores',
 } as const
 
 // Reads the address the way React Router matches it: decoded and case-insensitive, so

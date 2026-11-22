@@ -1,31 +1,12 @@
+import { LoadError } from '@shared/components/ui'
 import { useRecoveryFocus } from '@shared/hooks/useRecoveryFocus'
-import { cn } from '@shared/utils/cn'
 
+import { type AccountGroup, GROUP_ROLES } from '../data/accountGroups'
 import { USERS_CONTENT } from '../data/usersContent'
 import { useUsers } from '../hooks/useUsers'
-import { ACCOUNT_COLUMNS } from './accountColumns'
-import { AccountItem } from './AccountItem'
-import { LoadError } from './LoadError'
+import { FilteredAccountList } from './FilteredAccountList'
 
 const { list } = USERS_CONTENT
-
-// Visual only: each row already names its values for screen readers (dt).
-const ColumnHeader = () => (
-  <div
-    aria-hidden='true'
-    className={cn(
-      'hidden border-b border-slate-200 px-5 py-3 text-sm font-medium text-slate-600',
-      ACCOUNT_COLUMNS
-    )}
-  >
-    <span>{USERS_CONTENT.newAccount.name}</span>
-    <span>{list.role}</span>
-    <span>{list.cities}</span>
-    <span>{list.status}</span>
-    <span className='text-right'>{list.openCases}</span>
-    <span />
-  </div>
-)
 
 const ListSkeleton = () => (
   <output className='block rounded-xl border border-slate-200 bg-white'>
@@ -43,9 +24,14 @@ const ListSkeleton = () => (
   </output>
 )
 
-export const AccountList = ({ selfId }: { selfId: string }) => {
+interface AccountListProps {
+  group: AccountGroup
+  selfId: string
+}
+
+export const AccountList = ({ group, selfId }: AccountListProps) => {
   // The list owns its query: useRecoveryFocus needs the data in the render that ends the retry.
-  const { data: users, isPending, isError, refetch } = useUsers()
+  const { data: all, isPending, isError, refetch } = useUsers()
   const { targetRef, isRetrying, retry } =
     useRecoveryFocus<HTMLDivElement>(refetch)
 
@@ -61,22 +47,12 @@ export const AccountList = ({ selfId }: { selfId: string }) => {
   if (isPending) return <ListSkeleton />
 
   return (
-    <div
-      ref={targetRef}
-      tabIndex={-1}
-      className='rounded-xl border border-slate-200 bg-white focus:outline-none'
-    >
-      <ColumnHeader />
-      <ul>
-        {users.map(user => (
-          <AccountItem key={user.id} user={user} isSelf={user.id === selfId} />
-        ))}
-      </ul>
-      {users.length <= 1 && (
-        <p className='border-t border-slate-100 p-4 text-base text-slate-600 sm:px-5'>
-          {list.empty}
-        </p>
-      )}
+    <div ref={targetRef} tabIndex={-1} className='focus:outline-none'>
+      <FilteredAccountList
+        users={all.filter(user => GROUP_ROLES[group].includes(user.role))}
+        group={group}
+        selfId={selfId}
+      />
     </div>
   )
 }

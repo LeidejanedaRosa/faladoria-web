@@ -4,6 +4,262 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## e2e: contorno de foco ausente só no Firefox, com o foco no lugar certo
+
+**Data**: 2026-11-22
+
+**Sintoma**: o teste "a linha nova mostra o contorno depois de carregar mais" passava no Chromium e
+no WebKit e falhava no Firefox: a linha tinha o foco, mas `outline-style` vinha `none`.
+
+**Causa raiz**: o contorno usa `:focus-visible`, e cada navegador decide quando um foco movido **por
+código** combina com ele. O Firefox olha se a última **mudança de foco** veio do teclado. O teste
+chegava ao botão com `locator.focus()` (foco por código) e só então apertava Enter: para o Firefox,
+nenhuma navegação pelo teclado tinha acontecido. Não era defeito do produto: chegando ao botão com
+Tab, como uma pessoa faz, o contorno aparece.
+
+**Solução**: o teste chega ao botão pelo teclado (`Shift+Tab` e `Tab`) antes do Enter. A prova
+inversa (sem o contorno) continua falhando no Chromium e no Firefox.
+
+**Regra prática**: teste de `:focus-visible` precisa reproduzir o caminho do teclado, não só o
+estado final. `locator.focus()` é foco por código, e a heurística de cada navegador trata isso de um
+jeito.
+
+---
+
+## Foco caía no `<body>` quando "Tentar de novo" trazia um histórico vazio
+
+**Data**: 2026-11-22
+
+**Sintoma** (achado do CodeRabbit no #88): o histórico falhava ao carregar, a pessoa usava "Tentar
+de novo" pelo teclado, e a resposta vinha sem nenhuma ação. A mensagem "Nenhuma ação registrada
+ainda." aparecia, mas o foco ia para o `<body>`.
+
+**Causa raiz**: o `useRecoveryFocus` leva o foco para o seu `targetRef` quando o retry dá certo. O
+`targetRef` só estava na lista; o estado vazio não tinha alvo. O botão de retry some quando a busca
+acaba, e o foco fica sem lugar.
+
+**Solução**: o estado vazio também recebe o `targetRef` (uma `div` com `tabIndex={-1}`). Teste:
+retry que responde vazio, com o foco conferido na mensagem.
+
+**Regra prática**: com `useRecoveryFocus`, **todo** estado que pode substituir o erro precisa ter o
+alvo: lista, vazio, o que mais houver.
+
+---
+
+## Foco no item novo falhava: a Promise do `fetchNextPage` resolve antes da tela
+
+**Data**: 2026-11-22
+
+**Sintoma**: ao escrever o "Carregar ações mais antigas" do histórico, a primeira versão fazia
+`await fetchNextPage()` e procurava o item novo logo depois, para dar foco a ele. No teste do hook,
+`result.current.data` logo depois do `act` também ainda tinha só a primeira página.
+
+**Causa raiz**: a Promise do `fetchNextPage` resolve quando a página chega ao cache do TanStack
+Query, e não quando o React desenha a lista nova. Entre as duas coisas, o item ainda não existe no
+DOM.
+
+**Solução**: o clique guarda o índice da primeira ação nova num ref, e um efeito que depende do
+total de ações dá o foco quando esse total passa do índice, já com o item na tela. No teste,
+`waitFor` em vez de ler o resultado logo depois do `act`. Ver DECISIONS (2026-11-22, histórico).
+
+**Regra prática**: "os dados chegaram" e "a tela mostrou" são momentos diferentes. Mexer no DOM
+depois de uma busca é trabalho de efeito, não do `await`.
+
+---
+
+## Testes do drawer quebraram com o histórico: a API falsa não conhecia a rota
+
+**Data**: 2026-11-22
+
+**Sintoma**: com o histórico na aba Acesso, os testes do drawer acusaram
+`Cannot read properties of undefined (reading 'length')` dentro do `ActionHistory`.
+
+**Causa raiz**: o `fakeUsersApi` (e um teste com `fetch` programado à mão) respondia rotas
+desconhecidas com outra coisa (a lista de cidades), e o componente leu `page.actions` de uma
+resposta fora do contrato.
+
+**Solução**: ensinar à API falsa a rota nova (`staffActions`, filtrando por `actorId`) e separar
+cidades ativas de removidas por `status`, como a API real. O componente não ganhou defesa contra
+uma resposta que a API nunca manda: isso seria código para o teste, não para o produto.
+
+**Regra prática**: quando um componente passa a chamar uma rota nova, toda API falsa que o
+renderiza precisa conhecê-la. Melhor ainda: a falsa lança erro em rota desconhecida, como o
+`routeApi` faz.
+
+---
+
+## Estado do filtro sumia ao digitar logo depois de escolhê-lo
+
+**Data**: 2026-11-21
+
+**Sintoma**: no e2e, só no Firefox, escolher SP e preencher a busca deixava a URL em
+`?busca=jose`, sem `estado=SP`. Nos outros navegadores o mesmo teste passava.
+
+**Causa raiz**: o hook escrevia com `setSearchParams(atual => …)`. No React Router, `atual` são os
+params da **última renderização**, e não os da escrita anterior (a documentação do React Router
+avisa: a forma com função não enfileira como o `setState`). Como o React Router aplica a URL numa
+transition, a renderização com `estado=SP` ainda não tinha acontecido quando a busca foi escrita, e
+a busca partiu de uma URL sem o estado. O Firefox só deixou visível uma corrida que existia em todos.
+
+**Solução**: o hook guarda a última URL que escreveu num ref e parte dela em cada escrita. Um efeito
+atualiza o ref a cada renderização com params novos, para acompanhar mudanças de fora (o cartão da
+pasta, Voltar). Teste unitário: duas escritas no mesmo `act`, sem renderização entre elas.
+
+**Regra prática**: a função de `setSearchParams` não é um `setState`. Duas escritas seguidas, antes
+de a tela atualizar, precisam partir de um valor que a própria escrita mantém.
+
+---
+
+## Busca dos filtros continuava filtrando depois de clicar na pasta
+
+**Data**: 2026-11-21
+
+**Sintoma** (achado do CodeRabbit no #86): com `?estado=MG&busca=ana`, clicar no cartão "Equipe"
+levava a `/dashboard/equipe`. Estado e Cidade voltavam a "todos", mas o campo de busca continuava
+com "ana" e a lista, filtrada, enquanto a URL dizia que não havia filtro. Recarregar mudava o
+resultado.
+
+**Causa raiz**: a busca vive num `useState` (para não perder letras com as transitions do React
+Router), e o inicializador do `useState` só roda na montagem. A pasta é a mesma rota, então a
+lista não remonta: a URL mudou e o estado não soube.
+
+**Solução**: o hook guarda o último valor visto da URL e, quando ele muda, compara com o texto
+digitado sem os espaços das pontas. Diferente quer dizer que a mudança veio de fora, e o campo
+segue a URL. A comparação com o texto aparado evita que a própria digitação ("ana " na tela,
+"ana" na URL) apague o espaço que a pessoa acabou de digitar. Ver DECISIONS (2026-11-21,
+filtros).
+
+**Regra prática**: estado local inicializado a partir de algo que pode mudar (prop, URL) precisa
+de um caminho para acompanhar a mudança. Quando o componente não remonta, o inicializador não
+roda de novo.
+
+---
+
+## Callback do `mutate()` não roda: a senha temporária nunca aparecia
+
+**Data**: 2026-11-21
+
+**Sintoma** (achado do CodeRabbit no #85): fechando o drawer "Nova conta" enquanto aparecia
+"Criando…", a conta era criada, mas a senha temporária nunca era mostrada.
+
+**Causa raiz**: no TanStack Query, os callbacks passados a `mutate(variables, { onSuccess })` só
+rodam enquanto o componente que chamou continua na tela. Fechado o drawer, o formulário saía, e o
+`onSuccess` era descartado em silêncio. Os callbacks do `useMutation({ onSuccess })` (atualizar o
+cache) continuam rodando, por isso a conta aparecia na lista.
+
+**Solução**: `await mutateAsync(...)`, que resolve a promessa mesmo depois de o componente sair, e a
+senha vai para a lista, que continua na tela. Teste: o `fakeUsersApi` ganhou `holdCreate`, para o
+teste fechar o drawer antes de a API responder.
+
+**Regra prática**: resultado que precisa sobreviver ao componente (senha, aviso, navegação) não fica
+num callback de `mutate()`.
+
+---
+
+## Aviso de "salvo" sumia quando a conta mudava de pasta
+
+**Data**: 2026-11-21
+
+**Sintoma** (achado do CodeRabbit no #85): ao trocar o papel de alguém de Assistente para Gestão e
+salvar, o drawer ia para `/dashboard/gestores/:id`, mas as regiões de status ficavam vazias: sem
+"salvo" e sem o aviso de casos fora do alcance.
+
+**Causa raiz**: no render em que a pasta não batia, a página devolvia `<Navigate>` no lugar do
+drawer. Isso desmontava o drawer e o formulário, e a outra pasta montava tudo de novo, com o estado
+vazio. Um teste com uma asserção feita para falhar mostrou o que estava na tela:
+`[ '', '', '' ]`.
+
+**Solução**: a página continua desenhando o drawer e navega num `useEffect`. A árvore tem a mesma
+forma nas duas pastas, e o React reaproveita o formulário com a mensagem. Ver DECISIONS
+(2026-11-21, drawer).
+
+**Regra prática**: `<Navigate>` no render desmonta tudo o que estava no lugar dele. Se o estado
+precisa atravessar a navegação, navegue num efeito.
+
+---
+
+## `/nova` aberto direto ficava com o título de index.html
+
+**Data**: 2026-11-21
+
+**Sintoma** (segunda rodada do CodeRabbit no #85): abrir `/dashboard/gestores/nova` pelo endereço
+(ou recarregar ali) deixava a aba com o título inicial, sem o nome da pasta nem `noindex`.
+
+**Causa raiz**: uma regressão da correção do título da pasta. A lista passou a dar o título só
+quando não há drawer, mas o drawer da conta nova nunca teve título próprio: ele dependia de a
+lista sempre escrever "Equipe" ou "Gestores".
+
+**Solução**: o `NewAccountDrawerPage` chama `useDocumentMeta` ("Nova conta · Gestores",
+`noindex, nofollow`), como o drawer da conta já fazia. Ver DECISIONS (2026-11-21, drawer).
+
+**Regra prática**: ao tirar uma responsabilidade de um componente pai, procure os filhos que
+dependiam dela sem declarar.
+
+---
+
+## `focus:outline-none` do Tailwind não tira o contorno de foco
+
+**Data**: 2026-11-21
+
+**Sintoma**: o título do drawer, que recebe foco ao abrir (`tabIndex={-1}`), aparecia com o
+contorno roxo, mesmo com a classe `focus:outline-none`.
+
+**Causa raiz**: camadas de CSS. A regra `*:focus-visible { outline: … }` do `src/index.css` fica
+fora de qualquer `@layer`, e o Tailwind v4 põe as utilidades em `@layer utilities`. Uma regra fora
+de camada vence qualquer regra dentro de uma, seja qual for a especificidade. A classe nunca
+funcionou: os alvos do `useRecoveryFocus` também ganhavam o contorno.
+
+**Solução**: a regra global passou a `*:focus-visible:not([tabindex='-1'])`. Esses elementos
+recebem foco por código, para o leitor de tela anunciar onde a pessoa chegou, e não são controles.
+Ver DECISIONS (2026-11-21, drawer).
+
+**Regra prática**: antes de culpar a especificidade, veja se as duas regras estão na mesma camada.
+
+---
+
+## e2e: o Tab "sai" do drawer modal
+
+**Data**: 2026-11-21
+
+**Sintoma**: o teste que apertava Tab 25 vezes esperando o foco sempre dentro do `<dialog>` falhava:
+a cada volta completa, `document.activeElement` era o `<body>`.
+
+**Causa raiz**: a premissa do teste estava errada. O `showModal()` deixa a página de trás inerte,
+mas não prende o foco dentro da aba: ao passar do último controle, o foco vai para a interface do
+próprio navegador (barra de endereço), e a página vê o `<body>`. Depois ele volta ao primeiro
+controle do diálogo. Um registro de cada Tab mostrou o ciclo: 9 no drawer, 1 no `<body>`, 9 no
+drawer.
+
+**Solução**: o teste afirma a regra que importa, "o foco nunca chega a um elemento da página fora do
+drawer", aceitando o `<body>`. A prova inversa (`show()` no lugar de `showModal()`) faz o teste
+falhar.
+
+---
+
+## Testes que passariam com o defeito: `accessibleName` e `api.sent`
+
+**Data**: 2026-11-21
+
+**Sintoma**: dois testes novos passaram de primeira, e um deles passaria mesmo se o código estivesse
+errado.
+
+**Causa raiz**:
+
+- `screen.getAllByRole('radio').map(radio => radio.accessibleName)`: o jsdom não implementa
+  `accessibleName`, e o snapshot gravou `[undefined, undefined]`. Qualquer par de radios passaria.
+- No teste do "Cancelar" da conta, `expect(api.sent).toEqual([])`: o `fakeUsersApi` guarda as
+  criações em `sent` e as alterações em `changes`. Um "Cancelar" que salvasse não apareceria em
+  `sent`.
+
+**Solução**: `getByRole('radio', { name: … })` para cada radio esperado, mais a contagem; e
+`api.changes`. A prova inversa (o botão "Cancelar" como `type='submit'`) passou a falhar com
+`expected [ { name: 'Ana Lima' } ] to deeply equal []`.
+
+**Regra prática**: um teste novo que passa de primeira ainda não provou nada. Quebre o código de
+propósito e veja o teste falhar.
+
+---
+
 ## e2e que passa na máquina e falha no CI: duas corridas de tempo
 
 **Data**: 2026-11-14
@@ -46,6 +302,29 @@ teste falhou 3 de 3 vezes com o mesmo erro do CI; com ela, passou 3 de 3.
 
 **Regra prática**: "esperar as animações que existem" e "o texto de erro apareceu" não são o
 mesmo que "a tela terminou de reagir". Espere o efeito que o teste quer medir.
+
+---
+
+## axe acusa contraste na pasta aberta: `opacity` no texto branco
+
+**Data**: 2026-11-12
+
+**Sintoma**: o e2e do painel passou a falhar no axe (`color-contrast`, `serious`) na página
+inicial da admin, apontando a legenda "em aberto" da pasta Reclamações. O título da mesma pasta,
+também branco, passava.
+
+**Causa raiz**: a legenda tinha `opacity-90`. Sobre um fundo colorido, branco a 90% vira uma
+mistura do branco com o fundo, e o contraste cai. Calculado: o branco puro sobre `purple-medium`
+dá 5,03:1, e a 90% dá 4,39:1, abaixo dos 4,5:1 que texto pequeno exige. O âmbar das Gestores
+caía igual (5,02 → 4,39). O verde da Equipe passava raspando (4,75). O axe só pegou o roxo porque
+nenhum teste abria a pasta Gestores.
+
+**Solução**: tirar a `opacity-90`, e diferenciar a legenda só pelo tamanho. O e2e passou a rodar o
+axe com **cada uma** das três pastas aberta. A prova inversa (devolver a `opacity-90`) faz
+falhar exatamente as pastas roxa e âmbar.
+
+**Regra prática**: para "suavizar" texto sobre fundo colorido, calcule o contraste da cor
+resultante. Não confie no olho, nem em um teste que só cobre uma das cores.
 
 ---
 

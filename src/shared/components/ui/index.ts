@@ -12,6 +12,7 @@ export { StatusMessage } from './StatusMessage'
 export { SelectField } from './SelectField'
 export { Combobox } from './Combobox'
 export { ConfirmDialog } from './ConfirmDialog'
+export { LoadError } from './LoadError'
 
 export {
   ActivityIcon,
@@ -47,3 +48,5 @@ export {
   WarningIcon,
   WhatsAppIcon,
 } from './icons'
+export { Drawer } from './Drawer'
+export { Tabs, type TabItem } from './Tabs'

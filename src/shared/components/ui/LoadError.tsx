@@ -1,8 +1,6 @@
-import { Button } from '@shared/components/ui'
+import { UI_CONTENT } from '@shared/data/uiContent'
 
-import { USERS_CONTENT } from '../data/usersContent'
-
-const { list } = USERS_CONTENT
+import { Button } from './Button'
 
 interface LoadErrorProps {
   message: string
@@ -10,6 +8,7 @@ interface LoadErrorProps {
   onRetry: () => void
 }
 
+/** A load that failed, with a retry that keeps focus on the button while it runs. */
 export const LoadError = ({ message, isRetrying, onRetry }: LoadErrorProps) => (
   <div
     role='alert'
@@ -20,9 +19,9 @@ export const LoadError = ({ message, isRetrying, onRetry }: LoadErrorProps) => (
       variant='secondary'
       onClick={onRetry}
       isLoading={isRetrying}
-      loadingText={list.retrying}
+      loadingText={UI_CONTENT.retrying}
     >
-      {list.retry}
+      {UI_CONTENT.retry}
     </Button>
   </div>
 )

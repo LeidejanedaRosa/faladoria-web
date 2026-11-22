@@ -1,13 +1,27 @@
-import type { UserRole } from '@features/auth/services/authApi'
+import type { UserRole } from '@features/auth'
 
 import type { UserStatus } from '../services/usersApi'
+import type { AccountGroup } from './accountGroups'
 import { NAME_MAX_LENGTH } from './accountRules'
 
 export const USERS_CONTENT = {
-  metaTitle: 'Equipe',
-  title: 'Equipe',
-  intro:
-    'As contas de quem usa o painel: a equipe da Faladoria e os gestores de saúde. Cada pessoa vê só as reclamações das cidades que atende.',
+  groups: {
+    team: {
+      title: 'Equipe',
+      intro:
+        'As contas da equipe da Faladoria: administração e assistentes. As assistentes veem só as reclamações das cidades que atendem.',
+      empty: 'Nenhuma conta além da sua.',
+    },
+    managers: {
+      title: 'Gestores',
+      intro:
+        'As contas dos gestores de saúde. Cada gestor recebe só as reclamações enviadas pela equipe, das cidades que atende.',
+      empty: 'Nenhum gestor cadastrado ainda.',
+    },
+  } satisfies Record<
+    AccountGroup,
+    { title: string; intro: string; empty: string }
+  >,
   newAccount: {
     open: 'Nova conta',
     heading: 'Nova conta',
@@ -15,6 +29,8 @@ export const USERS_CONTENT = {
     email: 'E-mail',
     emailHint: 'É o login da pessoa e não pode ser trocado depois.',
     role: 'Papel',
+    managerRole:
+      'Contas criadas em Gestores são de gestão de saúde. Para a equipe da Faladoria, use a pasta Equipe.',
     submit: 'Criar conta',
     submitting: 'Criando…',
     cancel: 'Cancelar',
@@ -60,9 +76,6 @@ export const USERS_CONTENT = {
     heading: 'Contas',
     loading: 'Carregando as contas…',
     loadError: 'Não foi possível carregar as contas agora.',
-    retry: 'Tentar de novo',
-    retrying: 'Tentando de novo…',
-    empty: 'Nenhuma conta além da sua.',
     you: 'você',
     role: 'Papel',
     cities: 'Cidades',
@@ -71,20 +84,37 @@ export const USERS_CONTENT = {
     status: 'Situação',
     openCases: 'Casos em andamento',
   },
+  filters: {
+    label: 'Filtrar contas',
+    state: 'Estado',
+    allStates: 'Todos os estados',
+    city: 'Cidade',
+    allCities: 'Todas as cidades',
+    cityHint: 'Escolha o estado primeiro.',
+    search: 'Buscar por nome ou e-mail',
+    clear: 'Limpar filtros',
+    empty: 'Nenhuma conta com esses filtros.',
+    showing: (shown: number, total: number) =>
+      `Mostrando ${shown} de ${total} ${total === 1 ? 'conta' : 'contas'}`,
+  },
+  drawer: {
+    accountTitle: 'Conta',
+    close: 'Fechar',
+    tabs: 'Seções da conta',
+    details: 'Dados',
+    access: 'Acesso',
+  },
   account: {
-    breadcrumb: 'Trilha de navegação',
     edit: 'Editar',
     editLabel: (name: string) => `Editar a conta de ${name}`,
     loading: 'Carregando a conta…',
     loadError: 'Não foi possível carregar a conta agora.',
     notFoundTitle: 'Conta não encontrada',
     notFound:
-      'Esta conta não existe, ou o endereço está incompleto. Escolha a conta na lista da equipe.',
-    backToTeam: 'Voltar para a equipe',
+      'Esta conta não existe, ou o endereço está incompleto. Feche e escolha a conta na lista.',
     emailLabel: 'E-mail (login)',
     emailFixed:
       'O e-mail é o login e não pode ser trocado. Para corrigir, desative esta conta e crie outra.',
-    detailsHeading: 'Dados da conta',
     ownRole: 'Você não pode trocar o próprio papel.',
     submit: 'Salvar alterações',
     submitting: 'Salvando…',
@@ -117,6 +147,9 @@ export const USERS_CONTENT = {
     deactivated: 'Reative a conta para gerar uma nova senha.',
     self: 'A sua própria senha você troca sem gerar uma temporária, e sem sair do painel.',
     selfLink: 'Trocar a minha senha',
+  },
+  historySection: {
+    heading: 'Histórico de ações',
   },
   accessSection: {
     heading: 'Acesso ao painel',

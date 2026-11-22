@@ -5,11 +5,22 @@ import { ANA, CARLA, TEMPORARY_PASSWORD } from '@/test/fixtures/users'
 import { stubApi } from '@/test/mockFetch'
 import { createQueryWrapper } from '@/test/queryClient'
 
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Outlet, Route, Routes } from 'react-router-dom'
+import {
+  MemoryRouter,
+  type NavigateFunction,
+  Outlet,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { type AccountGroup, GROUP_ROUTES } from '../../data/accountGroups'
+import { AccountDrawerPage } from '../AccountDrawerPage'
+import { NewAccountDrawerPage } from '../NewAccountDrawerPage'
 import { TeamPage } from '../TeamPage'
 
 const SELF = buildSessionUser({
@@ -20,17 +31,43 @@ const SELF = buildSessionUser({
   assignedCities: [],
 })
 
-// The panel layout's part: the signed-in person reaches the page through the outlet context.
-const renderPage = () => {
+let navigate: NavigateFunction
+
+const CurrentPath = () => {
+  navigate = useNavigate()
+  const { pathname, search } = useLocation()
+  return <p data-testid='path'>{pathname + search}</p>
+}
+
+type FakeOptions = Parameters<typeof fakeUsersApi>[1]
+
+// As in App: the panel hands the signed-in person down; each folder has its drawers as children.
+const renderFolder = (
+  group: AccountGroup = 'team',
+  options: FakeOptions = {},
+  address = GROUP_ROUTES[group]
+) => {
   const api = fakeUsersApi(stubApi(), {
     users: [ANA, CARLA],
     servedAreas: [VARGINHA],
+    ...options,
   })
   render(
-    <MemoryRouter initialEntries={['/dashboard/equipe']}>
+    // The panel home before the folder: stepping back twice would show it.
+    <MemoryRouter initialEntries={['/dashboard', address]}>
+      <CurrentPath />
       <Routes>
         <Route element={<Outlet context={{ user: SELF }} />}>
-          <Route path='/dashboard/equipe' element={<TeamPage />} />
+          {(['team', 'managers'] as const).map(folder => (
+            <Route
+              key={folder}
+              path={GROUP_ROUTES[folder]}
+              element={<TeamPage group={folder} />}
+            >
+              <Route path='nova' element={<NewAccountDrawerPage />} />
+              <Route path=':userId' element={<AccountDrawerPage />} />
+            </Route>
+          ))}
         </Route>
       </Routes>
     </MemoryRouter>,
@@ -39,30 +76,34 @@ const renderPage = () => {
   return api
 }
 
-const openButton = () => screen.getByRole('button', { name: 'Nova conta' })
+const newAccountLink = () => screen.getByRole('link', { name: 'Nova conta' })
+const currentPath = () => screen.getByTestId('path').textContent
 const announcement = () =>
   screen
     .getAllByRole('status')
     .find(element => element.tagName === 'P' && !element.closest('dialog'))!
 
+// In the managers folder: the role comes with the folder.
 const createBruno = async () => {
-  await userEvent.click(openButton())
+  await userEvent.click(newAccountLink())
+  const drawer = await screen.findByRole('dialog', { name: 'Nova conta' })
   await userEvent.type(
-    screen.getByRole('textbox', { name: 'Nome' }),
+    within(drawer).getByRole('textbox', { name: 'Nome' }),
     'Bruno Lima'
   )
   await userEvent.type(
-    screen.getByRole('textbox', { name: /^E-mail/ }),
+    within(drawer).getByRole('textbox', { name: /^E-mail/ }),
     'bruno@saude.varginha.mg.gov.br'
   )
-  await userEvent.click(screen.getByRole('radio', { name: /Gestão de saúde/ }))
-  const search = screen.getByRole('combobox', {
+  const search = within(drawer).getByRole('combobox', {
     name: 'Buscar cidade atendida',
   })
   await waitFor(() => expect(search).toBeEnabled())
   await userEvent.type(search, 'varg')
   await userEvent.click(screen.getByRole('option', { name: 'Varginha/MG' }))
-  await userEvent.click(screen.getByRole('button', { name: 'Criar conta' }))
+  await userEvent.click(
+    within(drawer).getByRole('button', { name: 'Criar conta' })
+  )
 }
 
 afterEach(() => {
@@ -71,54 +112,95 @@ afterEach(() => {
 })
 
 describe('TeamPage', () => {
-  it('lists the accounts under a single h1, with the form closed', async () => {
-    renderPage()
+  it('lists the accounts under a single h1, with no drawer open', async () => {
+    renderFolder()
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
       'Equipe'
     )
     expect(await screen.findByText('Ana Souza')).toBeInTheDocument()
-    expect(openButton()).toHaveAttribute('aria-expanded', 'false')
-    expect(
-      screen.queryByRole('textbox', { name: 'Nome' })
-    ).not.toBeInTheDocument()
+    expect(document.title).toContain('Equipe')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
-  it('opens the form from the button, which then says it is open', async () => {
-    renderPage()
+  it('titles the managers folder and explains who is in it', async () => {
+    renderFolder('managers')
 
-    await userEvent.click(openButton())
-
-    expect(openButton()).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'Gestores'
+    )
     expect(
-      document.getElementById(openButton().getAttribute('aria-controls')!)
-    ).toBe(screen.getByRole('region', { name: 'Nova conta' }))
-    expect(screen.getByRole('textbox', { name: 'Nome' })).toHaveFocus()
+      screen.getByText(/As contas dos gestores de saúde/)
+    ).toBeInTheDocument()
+    expect(
+      await screen.findByText('Nenhum gestor cadastrado ainda.')
+    ).toBeInTheDocument()
+    expect(document.title).toContain('Gestores')
   })
 
-  it('closes the form on "Cancelar" and gives focus back to the button', async () => {
-    renderPage()
-    await userEvent.click(openButton())
+  it('leads "Nova conta" to its own address in the folder', () => {
+    renderFolder('managers')
 
-    await userEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
-
-    expect(
-      screen.queryByRole('region', { name: 'Nova conta' })
-    ).not.toBeInTheDocument()
-    expect(openButton()).toHaveFocus()
+    expect(newAccountLink()).toHaveAttribute('href', '/dashboard/gestores/nova')
   })
 
-  it('creates an account, shows the password once, then lists the account', async () => {
-    renderPage()
-    await screen.findByText('Ana Souza')
+  it('opens the new account in a drawer over the list, starting on the name', async () => {
+    renderFolder()
+
+    await userEvent.click(newAccountLink())
+
+    const drawer = await screen.findByRole('dialog', { name: 'Nova conta' })
+    expect(currentPath()).toBe('/dashboard/equipe/nova')
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'Equipe'
+    )
+    expect(within(drawer).getByRole('textbox', { name: 'Nome' })).toHaveFocus()
+  })
+
+  it('titles the tab and keeps it out of search when the new account drawer opens straight from its address', async () => {
+    document.title = ''
+    document.querySelector('meta[name="robots"]')?.remove()
+
+    renderFolder('managers', {}, '/dashboard/gestores/nova')
+
+    await screen.findByRole('dialog', { name: 'Nova conta' })
+    expect(document.title).toContain('Nova conta · Gestores')
+    expect(
+      document.querySelector('meta[name="robots"]')?.getAttribute('content')
+    ).toBe('noindex, nofollow')
+  })
+
+  it('goes back to the list on "Cancelar" and gives focus back to "Nova conta"', async () => {
+    const api = renderFolder()
+    await userEvent.click(newAccountLink())
+    const drawer = await screen.findByRole('dialog', { name: 'Nova conta' })
+
+    await userEvent.click(
+      within(drawer).getByRole('button', { name: 'Cancelar' })
+    )
+
+    await waitFor(() => expect(currentPath()).toBe('/dashboard/equipe'))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(newAccountLink()).toHaveFocus()
+    expect(api.sent).toEqual([])
+  })
+
+  // Bruno is a manager: he is listed in the managers folder, where the test runs.
+  it('creates an account, closes the drawer, shows the password once, then lists the account', async () => {
+    const api = renderFolder('managers')
+    await screen.findByText('Nenhum gestor cadastrado ainda.')
 
     await createBruno()
 
     const dialog = await screen.findByRole('dialog', { name: 'Conta criada' })
     expect(within(dialog).getByText(TEMPORARY_PASSWORD)).toBeInTheDocument()
-    expect(
-      screen.queryByRole('region', { name: 'Nova conta' })
-    ).not.toBeInTheDocument()
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('dialog', { name: 'Nova conta' })
+      ).not.toBeInTheDocument()
+    )
+    expect(currentPath()).toBe('/dashboard/gestores')
+    expect(api.sent[0]).toMatchObject({ role: 'manager' })
 
     await userEvent.click(
       within(dialog).getByRole('button', { name: 'Já anotei a senha' })
@@ -128,10 +210,130 @@ describe('TeamPage', () => {
       'A conta de Bruno Lima foi criada.'
     )
     expect(screen.queryByText(TEMPORARY_PASSWORD)).not.toBeInTheDocument()
-    expect(openButton()).toHaveFocus()
+    expect(newAccountLink()).toHaveFocus()
     const bruno = (await screen.findByText('Bruno Lima')).closest('li')!
     expect(
       within(bruno).getByText('Aguardando primeiro acesso')
     ).toBeInTheDocument()
+  })
+
+  it('puts the folder title back on the tab once an account drawer closes', async () => {
+    renderFolder()
+    await userEvent.click(
+      await screen.findByRole('link', { name: 'Editar a conta de Ana Souza' })
+    )
+    const drawer = await screen.findByRole('dialog', { name: 'Ana Souza' })
+    expect(document.title).toContain('Ana Souza · Equipe')
+
+    await userEvent.click(
+      within(drawer).getByRole('button', { name: 'Fechar' })
+    )
+
+    await waitFor(() => expect(document.title).not.toContain('Ana Souza'))
+    expect(document.title).toContain('Equipe')
+  })
+
+  it('still shows the password when the drawer is closed while the account is being created, and stays on the list', async () => {
+    let answer = () => {}
+    renderFolder('managers', {
+      holdCreate: new Promise<void>(resolve => {
+        answer = resolve
+      }),
+    })
+    await screen.findByText('Nenhum gestor cadastrado ainda.')
+    await createBruno()
+    const drawer = screen.getByRole('dialog', { name: 'Nova conta' })
+
+    await userEvent.click(
+      within(drawer).getByRole('button', { name: 'Fechar' })
+    )
+    await waitFor(() => expect(currentPath()).toBe('/dashboard/gestores'))
+    act(() => answer())
+
+    const dialog = await screen.findByRole('dialog', { name: 'Conta criada' })
+    expect(within(dialog).getByText(TEMPORARY_PASSWORD)).toBeInTheDocument()
+    expect(currentPath()).toBe('/dashboard/gestores')
+  })
+
+  it('starts a fresh form with the new folder’s role when the address moves to another folder', async () => {
+    const api = renderFolder()
+    await userEvent.click(newAccountLink())
+    await screen.findByRole('dialog', { name: 'Nova conta' })
+
+    act(() => void navigate('/dashboard/gestores/nova'))
+
+    const drawer = await screen.findByRole('dialog', { name: 'Nova conta' })
+    await waitFor(() =>
+      expect(within(drawer).queryByRole('radio')).not.toBeInTheDocument()
+    )
+    await userEvent.type(
+      within(drawer).getByRole('textbox', { name: 'Nome' }),
+      'Bia Rocha'
+    )
+    await userEvent.type(
+      within(drawer).getByRole('textbox', { name: /^E-mail/ }),
+      'bia@saude.varginha.mg.gov.br'
+    )
+    const search = within(drawer).getByRole('combobox', {
+      name: 'Buscar cidade atendida',
+    })
+    await waitFor(() => expect(search).toBeEnabled())
+    await userEvent.type(search, 'varg')
+    await userEvent.click(screen.getByRole('option', { name: 'Varginha/MG' }))
+    await userEvent.click(
+      within(drawer).getByRole('button', { name: 'Criar conta' })
+    )
+
+    await waitFor(() => expect(api.sent[0]).toMatchObject({ role: 'manager' }))
+  })
+
+  it('brings back the same filtered list when an account drawer closes', async () => {
+    renderFolder('team', {}, '/dashboard/equipe?busca=ana')
+    await userEvent.click(
+      await screen.findByRole('link', { name: 'Editar a conta de Ana Souza' })
+    )
+    const drawer = await screen.findByRole('dialog', { name: 'Ana Souza' })
+    expect(currentPath()).toBe('/dashboard/equipe/usr_ana?busca=ana')
+
+    await userEvent.click(
+      within(drawer).getByRole('button', { name: 'Fechar' })
+    )
+
+    await waitFor(() =>
+      expect(currentPath()).toBe('/dashboard/equipe?busca=ana')
+    )
+    expect(
+      screen.getByRole('searchbox', { name: 'Buscar por nome ou e-mail' })
+    ).toHaveValue('ana')
+    expect(screen.queryByText('Carla Dias')).not.toBeInTheDocument()
+  })
+
+  it('keeps the filters on the way to a new account', () => {
+    renderFolder('managers', {}, '/dashboard/gestores?estado=MG')
+
+    expect(newAccountLink()).toHaveAttribute(
+      'href',
+      '/dashboard/gestores/nova?estado=MG'
+    )
+  })
+
+  it('follows the address when it changes with the list on screen', async () => {
+    renderFolder('team', {}, '/dashboard/equipe?busca=ana')
+    const search = await screen.findByRole('searchbox', {
+      name: 'Buscar por nome ou e-mail',
+    })
+    expect(screen.queryByText('Carla Dias')).not.toBeInTheDocument()
+
+    act(() => void navigate('/dashboard/equipe?busca=carla'))
+
+    await waitFor(() => expect(search).toHaveValue('carla'))
+    expect(screen.getByText('Carla Dias')).toBeInTheDocument()
+    expect(screen.queryByText('Ana Souza')).not.toBeInTheDocument()
+
+    act(() => void navigate('/dashboard/equipe'))
+
+    await waitFor(() => expect(search).toHaveValue(''))
+    expect(screen.getByText('Ana Souza')).toBeInTheDocument()
+    expect(screen.getByText('Carla Dias')).toBeInTheDocument()
   })
 })

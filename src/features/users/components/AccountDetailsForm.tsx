@@ -1,12 +1,9 @@
-import { ROLE_LABELS } from '@features/panel/data/panelContent'
 import {
   Button,
   FormAlert,
   StatusMessage,
   TextField,
 } from '@shared/components/ui'
-import { PANEL_ROUTES } from '@shared/data/routes'
-import { Link } from 'react-router-dom'
 
 import { NAME_MAX_LENGTH } from '../data/accountRules'
 import { USERS_CONTENT } from '../data/usersContent'
@@ -16,20 +13,9 @@ import {
 } from '../hooks/useAccountDetailsForm'
 import type { User } from '../services/usersApi'
 import { AccountCitiesField } from './AccountCitiesField'
-import { RoleField } from './RoleField'
+import { FixedRole, RoleField } from './RoleField'
 
 const { account: content, newAccount } = USERS_CONTENT
-
-// No radios: the API refuses a change of one's own role, so the form does not offer one.
-const OwnRole = ({ role }: { role: User['role'] }) => (
-  <div className='flex flex-col gap-1'>
-    <p className='text-sm font-medium text-slate-800'>{newAccount.role}</p>
-    <p className='text-base font-semibold text-slate-900'>
-      {ROLE_LABELS[role]}
-    </p>
-    <p className='text-sm text-slate-600'>{content.ownRole}</p>
-  </div>
-)
 
 // Both regions stay in the page, so each message is announced when it arrives.
 const SaveMessages = ({ result }: { result: SaveResult | null }) => {
@@ -48,11 +34,13 @@ const SaveMessages = ({ result }: { result: SaveResult | null }) => {
 interface AccountDetailsFormProps {
   user: User
   isSelf: boolean
+  onCancel: () => void
 }
 
 export const AccountDetailsForm = ({
   user,
   isSelf,
+  onCancel,
 }: AccountDetailsFormProps) => {
   const { form, submit, result, isSubmitting, formError, ...cities } =
     useAccountDetailsForm(user)
@@ -73,8 +61,9 @@ export const AccountDetailsForm = ({
         error={errors.name?.message}
         className='max-w-md'
       />
+      {/* No radios for oneself: the API refuses a change of one's own role. */}
       {isSelf ? (
-        <OwnRole role={user.role} />
+        <FixedRole role={user.role} hint={content.ownRole} />
       ) : (
         <RoleField
           registration={form.register('role')}
@@ -91,12 +80,9 @@ export const AccountDetailsForm = ({
         >
           {content.submit}
         </Button>
-        <Link
-          to={PANEL_ROUTES.team}
-          className='inline-flex min-h-12 items-center justify-center rounded-lg border border-slate-300 bg-white px-5 text-base font-semibold text-slate-800 hover:bg-slate-50'
-        >
+        <Button variant='secondary' onClick={onCancel}>
           {content.cancel}
-        </Link>
+        </Button>
       </div>
     </form>
   )

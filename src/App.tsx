@@ -7,6 +7,10 @@ import {
   PrivacyPolicyPage,
   TermsOfUsePage,
 } from '@features/landing/pages'
+import {
+  GROUP_ROUTES,
+  NEW_ACCOUNT_SEGMENT,
+} from '@features/users/data/accountGroups'
 import { ErrorBoundary } from '@shared/components/error'
 import { GUIDE_ROUTES, PANEL_ROUTES } from '@shared/data'
 import { Route, Routes } from 'react-router-dom'
@@ -51,15 +55,26 @@ const PanelHomePage = lazy(() =>
   }))
 )
 
+const PanelFoldersLayout = lazy(() =>
+  import('./features/panel/components/PanelFoldersLayout').then(m => ({
+    default: m.PanelFoldersLayout,
+  }))
+)
+
 const TeamRoute = lazy(() =>
   import('./features/users/pages/TeamRoute').then(m => ({
     default: m.TeamRoute,
   }))
 )
 
-const AccountRoute = lazy(() =>
-  import('./features/users/pages/AccountRoute').then(m => ({
-    default: m.AccountRoute,
+const AccountDrawerPage = lazy(() =>
+  import('./features/users/pages/AccountDrawerPage').then(m => ({
+    default: m.AccountDrawerPage,
+  }))
+)
+const NewAccountDrawerPage = lazy(() =>
+  import('./features/users/pages/NewAccountDrawerPage').then(m => ({
+    default: m.NewAccountDrawerPage,
   }))
 )
 
@@ -96,12 +111,22 @@ function App() {
             element={<AuthPage mode='changePassword' />}
           />
           <Route path={PANEL_ROUTES.root} element={<PanelRoot />}>
-            <Route index element={<PanelHomePage />} />
-            <Route path={PANEL_ROUTES.team} element={<TeamRoute />} />
-            <Route
-              path={`${PANEL_ROUTES.team}/:userId`}
-              element={<AccountRoute />}
-            />
+            <Route element={<PanelFoldersLayout />}>
+              <Route index element={<PanelHomePage />} />
+              {(['team', 'managers'] as const).map(group => (
+                <Route
+                  key={group}
+                  path={GROUP_ROUTES[group]}
+                  element={<TeamRoute group={group} />}
+                >
+                  <Route
+                    path={NEW_ACCOUNT_SEGMENT}
+                    element={<NewAccountDrawerPage />}
+                  />
+                  <Route path=':userId' element={<AccountDrawerPage />} />
+                </Route>
+              ))}
+            </Route>
             <Route
               path={PANEL_ROUTES.serviceAreas}
               element={<ServiceAreasRoute />}

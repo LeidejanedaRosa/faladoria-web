@@ -1,4 +1,4 @@
-import { RequirePanelSession } from '@features/auth/components/RequirePanelSession'
+import { RequirePanelSession } from '@features/auth'
 
 import { PanelLayout } from '../components/PanelLayout'
 
