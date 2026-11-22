@@ -76,8 +76,6 @@ export const USERS_CONTENT = {
     heading: 'Contas',
     loading: 'Carregando as contas…',
     loadError: 'Não foi possível carregar as contas agora.',
-    retry: 'Tentar de novo',
-    retrying: 'Tentando de novo…',
     you: 'você',
     role: 'Papel',
     cities: 'Cidades',

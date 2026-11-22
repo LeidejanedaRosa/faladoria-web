@@ -1,13 +1,12 @@
 import { type ReactNode, useEffect } from 'react'
 
-import { Drawer, Tabs } from '@shared/components/ui'
+import { Drawer, LoadError, Tabs } from '@shared/components/ui'
 import { useDocumentMeta } from '@shared/hooks/useDocumentMeta'
 import { useRecoveryFocus } from '@shared/hooks/useRecoveryFocus'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import { AccessSection } from '../components/AccessSection'
 import { AccountDetailsForm } from '../components/AccountDetailsForm'
-import { LoadError } from '../components/LoadError'
 import { PasswordSection } from '../components/PasswordSection'
 import { StatusBadge } from '../components/StatusBadge'
 import { accountRoute, groupOf } from '../data/accountGroups'

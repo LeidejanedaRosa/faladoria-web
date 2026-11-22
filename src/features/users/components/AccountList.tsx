@@ -1,10 +1,10 @@
+import { LoadError } from '@shared/components/ui'
 import { useRecoveryFocus } from '@shared/hooks/useRecoveryFocus'
 
 import { type AccountGroup, GROUP_ROLES } from '../data/accountGroups'
 import { USERS_CONTENT } from '../data/usersContent'
 import { useUsers } from '../hooks/useUsers'
 import { FilteredAccountList } from './FilteredAccountList'
-import { LoadError } from './LoadError'
 
 const { list } = USERS_CONTENT
 
