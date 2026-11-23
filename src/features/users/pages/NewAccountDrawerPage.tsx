@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Drawer } from '@shared/components/ui'
 import { useDocumentMeta } from '@shared/hooks/useDocumentMeta'
@@ -20,10 +20,12 @@ export const NewAccountDrawerPage = () => {
   })
   // The account may be created after the drawer was closed (Escape, ×, Back): the password still
   // reaches the list, but closing again would step back once more. Or after the address moved to
-  // the other folder: the folders share this drawer instance, and the drawer now open there is
-  // not the one the creation started in.
+  // another folder, and maybe back: the folders share this drawer instance, so each folder change
+  // starts a new form, with a number of its own. Only the form that started the creation closes.
+  const [form, setForm] = useState({ group, number: 0 })
+  if (form.group !== group) setForm({ group, number: form.number + 1 })
   const isOpen = useRef(false)
-  const openFolder = useRef(group)
+  const openForm = useRef(form.number)
   useEffect(() => {
     isOpen.current = true
     return () => {
@@ -31,8 +33,8 @@ export const NewAccountDrawerPage = () => {
     }
   }, [])
   useEffect(() => {
-    openFolder.current = group
-  }, [group])
+    openForm.current = form.number
+  }, [form.number])
 
   return (
     <Drawer
@@ -42,13 +44,13 @@ export const NewAccountDrawerPage = () => {
     >
       {/* key: another folder starts a fresh form, with that folder's role. */}
       <NewAccountForm
-        key={group}
+        key={form.number}
         group={group}
         onCreated={account => {
           // The list shows the password once the drawer is gone: it outlives the form.
           onAccountCreated(account)
-          // `group` is the folder of the render that started the creation.
-          if (isOpen.current && openFolder.current === group) close()
+          // `form.number` is the form of the render that started the creation.
+          if (isOpen.current && openForm.current === form.number) close()
         }}
         onCancel={close}
       />
