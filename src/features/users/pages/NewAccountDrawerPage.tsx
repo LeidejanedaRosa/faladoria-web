@@ -19,14 +19,20 @@ export const NewAccountDrawerPage = () => {
     robots: 'noindex, nofollow',
   })
   // The account may be created after the drawer was closed (Escape, ×, Back): the password still
-  // reaches the list, but closing again would step back once more.
+  // reaches the list, but closing again would step back once more. Or after the address moved to
+  // the other folder: the folders share this drawer instance, and the drawer now open there is
+  // not the one the creation started in.
   const isOpen = useRef(false)
+  const openFolder = useRef(group)
   useEffect(() => {
     isOpen.current = true
     return () => {
       isOpen.current = false
     }
   }, [])
+  useEffect(() => {
+    openFolder.current = group
+  }, [group])
 
   return (
     <Drawer
@@ -41,7 +47,8 @@ export const NewAccountDrawerPage = () => {
         onCreated={account => {
           // The list shows the password once the drawer is gone: it outlives the form.
           onAccountCreated(account)
-          if (isOpen.current) close()
+          // `group` is the folder of the render that started the creation.
+          if (isOpen.current && openFolder.current === group) close()
         }}
         onCancel={close}
       />
