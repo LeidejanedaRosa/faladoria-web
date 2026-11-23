@@ -156,4 +156,16 @@ describe('ActionHistory', () => {
     const empty = await screen.findByText('Nenhuma ação registrada ainda.')
     await waitFor(() => expect(empty.closest('[tabindex="-1"]')).toHaveFocus())
   })
+
+  it('moves focus to the end message when the last page brings no action', async () => {
+    renderHistory([TODAY, []])
+    await screen.findByRole('region', { name: 'Hoje' })
+
+    await userEvent.click(loadMore())
+
+    await waitFor(() =>
+      expect(screen.getByText('Não há ações mais antigas.')).toHaveFocus()
+    )
+    expect(rows()).toHaveLength(2)
+  })
 })
