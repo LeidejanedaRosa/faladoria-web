@@ -36,17 +36,22 @@ export const ActionHistory = ({ actorId, targetNames }: ActionHistoryProps) => {
     query.refetch
   )
   const listRef = useRef<HTMLDivElement>(null)
-  // "Load more" may leave with the last page: focus goes to the first action it brought, once
-  // that action is on screen (the fetch resolves before React draws it).
+  const endRef = useRef<HTMLParagraphElement>(null)
+  // "Load more" may leave with the last page: once the page is on screen (the fetch resolves
+  // before React draws it), focus goes to the first action it brought, or, if it brought none,
+  // to the "no older actions" message that replaced the button.
   const firstNewIndex = useRef<number | null>(null)
+  const { isFetchingNextPage, hasNextPage } = query
   const count =
     query.data?.pages.reduce((sum, page) => sum + page.actions.length, 0) ?? 0
   useEffect(() => {
     const index = firstNewIndex.current
-    if (index === null || count <= index) return
+    if (index === null || isFetchingNextPage) return
     firstNewIndex.current = null
-    listRef.current?.querySelectorAll('li').item(index)?.focus()
-  }, [count])
+    if (count > index)
+      listRef.current?.querySelectorAll('li').item(index)?.focus()
+    else if (!hasNextPage) endRef.current?.focus()
+  }, [count, isFetchingNextPage, hasNextPage])
 
   if (isRetrying || query.isError) {
     return (
@@ -86,14 +91,20 @@ export const ActionHistory = ({ actorId, targetNames }: ActionHistoryProps) => {
         <Button
           variant='secondary'
           className='self-start'
-          isLoading={query.isFetchingNextPage}
+          isLoading={isFetchingNextPage}
           loadingText={content.loadingMore}
           onClick={loadMore}
         >
           {content.loadMore}
         </Button>
       ) : (
-        <p className='text-sm text-slate-600'>{content.end}</p>
+        <p
+          ref={endRef}
+          tabIndex={-1}
+          className='text-sm text-slate-600 focus:outline-none'
+        >
+          {content.end}
+        </p>
       )}
     </div>
   )
