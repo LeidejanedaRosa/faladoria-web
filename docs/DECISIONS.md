@@ -19,17 +19,23 @@ própria (`fix/dashboard-layout-review`).
   Reclamações usa `end`, porque o endereço dela, `/dashboard`, é a raiz de todas as outras.
 - **As senhas temporárias ficam numa fila.** Uma criação podia terminar com outra senha ainda na
   tela, e a segunda apagava a primeira, que nunca mais apareceria. Cada senha aparece na sua vez.
-- **A criação só fecha o drawer da pasta em que começou.** As duas pastas de contas são rotas com
-  `key` no `<Route>`, mas a `key` não chega ao elemento desenhado: o React reaproveita a mesma
-  instância de `TeamRoute`, e o drawer de conta nova continua montado ao trocar de pasta. Uma
-  criação iniciada na Equipe, terminada com o drawer de Gestores aberto, voltava um passo e reabria
-  o da Equipe. O drawer guarda a pasta aberta e compara com a de quando a criação começou.
+- **A criação só fecha o drawer que a começou.** As duas pastas de contas são rotas com `key` no
+  `<Route>`, mas a `key` não chega ao elemento desenhado: o React reaproveita a mesma instância de
+  `TeamRoute`, e o drawer de conta nova continua montado ao trocar de pasta. Uma criação iniciada na
+  Equipe, terminada com o drawer de Gestores aberto, voltava um passo e reabria o da Equipe. Cada
+  troca de pasta começa um formulário novo, com um número próprio (que também serve de `key`), e a
+  criação só fecha o drawer se o formulário aberto ainda for o dela. A primeira versão comparava a
+  pasta, e falhava numa ida e volta (Equipe → Gestores → Equipe): achado na segunda rodada (#90).
 - **O redirecionamento de pasta leva os filtros.** Um link colado com filtros, de uma conta que
   mudou de pasta, chega à pasta certa com a mesma busca; o filtro ignora sozinho um lugar que não
   exista lá.
 - **Última página vazia: o foco vai para "Não há ações mais antigas."** Quando o total é múltiplo
   de 20, a última página pode vir sem nenhuma ação, e o botão some sem uma linha nova para receber
   o foco.
+- **O foco do "carregar mais" só é resgatado, nunca puxado** (segunda rodada, #90). Se a pessoa foi
+  para outro controle enquanto a página carregava, o foco fica lá. A pergunta "o foco se perdeu?"
+  (no `<body>` ou ainda no botão que disparou a carga) virou `isFocusLost`, em `shared/utils`,
+  usada também pelo `useRecoveryFocus`: uma regra, um lugar.
 - **As teclas das abas num `switch`**, numa função pura fora do componente, em vez de uma busca num
   objeto literal.
 - **O teste "sem número quando falha" espera as consultas terminarem**, e não o nome da pasta, que

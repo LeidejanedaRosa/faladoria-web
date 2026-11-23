@@ -98,7 +98,7 @@ src/
     ├── hooks/             # Shared hooks (useDocumentMeta, useFocusTrap, useRecoveryFocus, useSidebar, useCombobox, useModalDialog, etc.)
     ├── lib/               # Sentry, api/ (HTTP client for faladoria-backend)
     ├── types/
-    └── utils/             # cn, slugify, formatPercentage, reportWebVitals, normalizeForSearch, rankMatches, joinIds, mergeRefs
+    └── utils/             # cn, slugify, formatPercentage, reportWebVitals, normalizeForSearch, rankMatches, joinIds, mergeRefs, isFocusLost
 ```
 
 **Splitting criterion**: If only one feature uses it → goes into that feature. If two or more features use it → goes into `shared/`.
