@@ -35,7 +35,10 @@ const SELF = buildSessionUser({
   assignedCities: [],
 })
 
-const CurrentPath = () => <p data-testid='path'>{useLocation().pathname}</p>
+const CurrentPath = () => {
+  const { pathname, search } = useLocation()
+  return <p data-testid='path'>{pathname + search}</p>
+}
 
 // The folder's part: its list, and the context the drawer reads from it.
 const Folder = ({ group }: { group: AccountGroup }) => {
@@ -288,6 +291,16 @@ describe('AccountDrawerPage', () => {
     expect(
       within(history).queryByText('Saiu do painel')
     ).not.toBeInTheDocument()
+  })
+
+  it('keeps the list filters when an old link moves the account to its own folder', async () => {
+    openAccount(`${BRUNO.id}?estado=MG&busca=bruno`)
+
+    await waitFor(() =>
+      expect(currentPath()).toBe(
+        `/dashboard/gestores/${BRUNO.id}?estado=MG&busca=bruno`
+      )
+    )
   })
 
   it('offers a retry when the account fails to load, and moves focus to it once it loads', async () => {
