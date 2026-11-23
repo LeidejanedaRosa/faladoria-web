@@ -20,6 +20,22 @@ interface TabsProps {
   tabs: readonly TabItem[]
 }
 
+/** The tab a key leads to (arrows wrap around), or undefined for any other key. */
+const targetTab = (key: string, active: number, last: number) => {
+  switch (key) {
+    case 'ArrowRight':
+      return active === last ? 0 : active + 1
+    case 'ArrowLeft':
+      return active === 0 ? last : active - 1
+    case 'Home':
+      return 0
+    case 'End':
+      return last
+    default:
+      return undefined
+  }
+}
+
 /**
  * Folder-shaped tabs, following the WAI-ARIA tabs pattern: one tab in the Tab order, arrows and
  * Home/End move between them and show the panel at once. Hidden panels stay mounted, so a form
@@ -36,13 +52,7 @@ export const Tabs = ({ label, tabs }: TabsProps) => {
   }
 
   const onKeyDown = (event: KeyboardEvent) => {
-    const last = tabs.length - 1
-    const target = {
-      ArrowRight: active === last ? 0 : active + 1,
-      ArrowLeft: active === 0 ? last : active - 1,
-      Home: 0,
-      End: last,
-    }[event.key]
+    const target = targetTab(event.key, active, tabs.length - 1)
     if (target === undefined) return
     event.preventDefault()
     select(target)
