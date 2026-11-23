@@ -1,9 +1,9 @@
 import { MANAGER_COUNTS, TEAM_COUNTS } from '@/test/fixtures/complaintCounts'
 import { ANA, BRUNO, buildUser, CARLA } from '@/test/fixtures/users'
 import { apiErrorResponse, jsonResponse, stubApi } from '@/test/mockFetch'
-import { renderWithQueryClient } from '@/test/queryClient'
+import { createQueryWrapper, createTestQueryClient } from '@/test/queryClient'
 
-import { screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -24,12 +24,24 @@ const mockApi = ({ counts = TEAM_COUNTS as object, fail = false } = {}) =>
       : jsonResponse([ANA, CARLA, BRUNO, ACTIVE_MANAGER])
   })
 
-const renderFolders = (path = '/dashboard') =>
-  renderWithQueryClient(
+const renderFolders = (
+  path = '/dashboard',
+  client = createTestQueryClient()
+) => {
+  render(
     <MemoryRouter initialEntries={[path]}>
       <PanelFolders />
-    </MemoryRouter>
+    </MemoryRouter>,
+    { wrapper: createQueryWrapper(client) }
   )
+  return client
+}
+
+const openFolder = () =>
+  within(folders())
+    .getAllByRole('link')
+    .filter(link => link.getAttribute('aria-current') === 'page')
+    .map(link => link.querySelector('span:not([aria-hidden])')?.textContent)
 
 const folders = () =>
   screen.getByRole('navigation', { name: 'Pastas do painel' })
@@ -79,17 +91,27 @@ describe('PanelFolders', () => {
     ).toBeInTheDocument()
   })
 
-  it('shows no number until it arrives, and none when it fails', async () => {
-    mockApi({ fail: true })
+  it('shows no number while the counts are on their way', () => {
+    mockApi()
     renderFolders()
 
     expect(
       screen.getByRole('link', { name: 'Reclamações' })
     ).toBeInTheDocument()
-    // Still just the name once the requests have failed.
-    expect(
-      await screen.findByRole('link', { name: 'Equipe' })
-    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Equipe' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Gestores' })).toBeInTheDocument()
+  })
+
+  it('shows no number on any folder once both counts have failed', async () => {
+    mockApi({ fail: true })
+    const client = renderFolders()
+
+    // The names alone are no proof the requests ended: they read the same while loading.
+    await waitFor(() => {
+      const queries = client.getQueryCache().getAll()
+      expect(queries).toHaveLength(2)
+      expect(queries.every(query => query.state.status === 'error')).toBe(true)
+    })
     expect(
       screen.queryByText(/em aberto|ativas|ativos/)
     ).not.toBeInTheDocument()
@@ -103,5 +125,19 @@ describe('PanelFolders', () => {
     expect(
       screen.getByRole('link', { name: 'Reclamações' })
     ).toBeInTheDocument()
+  })
+
+  it('keeps Equipe open with one of its drawers over it', () => {
+    mockApi()
+    renderFolders('/dashboard/equipe/usr_ana')
+
+    expect(openFolder()).toEqual(['Equipe'])
+  })
+
+  it('opens Reclamações only on the panel home, not on every page under it', () => {
+    mockApi()
+    renderFolders('/dashboard/gestores/nova')
+
+    expect(openFolder()).toEqual(['Gestores'])
   })
 })
