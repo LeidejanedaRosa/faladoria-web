@@ -26,6 +26,12 @@ própria (`fix/dashboard-layout-review`).
   troca de pasta começa um formulário novo, com um número próprio (que também serve de `key`), e a
   criação só fecha o drawer se o formulário aberto ainda for o dela. A primeira versão comparava a
   pasta, e falhava numa ida e volta (Equipe → Gestores → Equipe): achado na segunda rodada (#90).
+  Na terceira rodada (#90), as duas guardas (`isOpen` e o formulário aberto) passaram a ser
+  atualizadas em `useLayoutEffect`. O `useEffect` roda depois da pintura, e numa navegação (uma
+  transition) o React não tem pressa: uma resposta de rede que chegasse nessa brecha leria o drawer
+  ou o formulário que acabou de sair da tela. Não há teste para isso: o `act()` dos testes roda o
+  commit e os efeitos juntos, a brecha não existe ali, e a prova inversa (voltar ao `useEffect`)
+  passa em todos. O que garante é o contrato do React: efeito de layout roda dentro do commit.
 - **O redirecionamento de pasta leva os filtros.** Um link colado com filtros, de uma conta que
   mudou de pasta, chega à pasta certa com a mesma busca; o filtro ignora sozinho um lugar que não
   exista lá.
