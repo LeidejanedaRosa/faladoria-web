@@ -106,6 +106,42 @@ const createBruno = async () => {
   )
 }
 
+/** In the team folder: fills a new account and sends it, holding the answer until `answer()`. */
+const startHeldTeamCreation = async () => {
+  let answer = () => {}
+  const api = renderFolder('team', {
+    holdCreate: new Promise<void>(resolve => {
+      answer = resolve
+    }),
+  })
+  await userEvent.click(newAccountLink())
+  const drawer = await screen.findByRole('dialog', { name: 'Nova conta' })
+  await userEvent.type(
+    within(drawer).getByRole('textbox', { name: 'Nome' }),
+    'Bia Rocha'
+  )
+  await userEvent.type(
+    within(drawer).getByRole('textbox', { name: /^E-mail/ }),
+    'bia@faladoria.org'
+  )
+  await userEvent.click(
+    within(drawer).getByRole('radio', { name: /Assistente/ })
+  )
+  const search = within(drawer).getByRole('combobox', {
+    name: 'Buscar cidade atendida',
+  })
+  await waitFor(() => expect(search).toBeEnabled())
+  await userEvent.type(search, 'varg')
+  await userEvent.click(screen.getByRole('option', { name: 'Varginha/MG' }))
+  await userEvent.click(
+    within(drawer).getByRole('button', { name: 'Criar conta' })
+  )
+
+  // The request is on its way before the address moves: that is the case in question.
+  await waitFor(() => expect(api.sent).toHaveLength(1))
+  return answer
+}
+
 afterEach(() => {
   vi.unstubAllEnvs()
   vi.unstubAllGlobals()
@@ -335,5 +371,40 @@ describe('TeamPage', () => {
     await waitFor(() => expect(search).toHaveValue(''))
     expect(screen.getByText('Ana Souza')).toBeInTheDocument()
     expect(screen.getByText('Carla Dias')).toBeInTheDocument()
+  })
+
+  // The folder routes share one TeamRoute instance, so the drawer stays mounted: the creation that
+  // ends must not close the drawer the admin opened in the other folder.
+  it('leaves the other folder’s drawer open when a creation started in the first one ends', async () => {
+    const answer = await startHeldTeamCreation()
+
+    act(() => void navigate('/dashboard/gestores/nova'))
+    await screen.findByRole('heading', { level: 1, name: 'Gestores' })
+    act(() => answer())
+
+    // Wait for the creation to end (its password shows up), then for any navigation it queued.
+    await screen.findByRole('dialog', { name: 'Conta criada' })
+    await act(async () => {})
+    expect(currentPath()).toBe('/dashboard/gestores/nova')
+    expect(
+      screen.getByRole('dialog', { name: 'Nova conta' })
+    ).toBeInTheDocument()
+  })
+
+  it('leaves a drawer reopened in the same folder after a round trip open', async () => {
+    const answer = await startHeldTeamCreation()
+
+    act(() => void navigate('/dashboard/gestores/nova'))
+    await screen.findByRole('heading', { level: 1, name: 'Gestores' })
+    act(() => void navigate('/dashboard/equipe/nova'))
+    await screen.findByRole('heading', { level: 1, name: 'Equipe' })
+    act(() => answer())
+
+    await screen.findByRole('dialog', { name: 'Conta criada' })
+    await act(async () => {})
+    expect(currentPath()).toBe('/dashboard/equipe/nova')
+    expect(
+      screen.getByRole('dialog', { name: 'Nova conta' })
+    ).toBeInTheDocument()
   })
 })

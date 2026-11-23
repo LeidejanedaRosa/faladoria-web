@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
+import { isFocusLost } from '@shared/utils/isFocusLost'
+
 type Refetch = () => Promise<{ isSuccess: boolean }>
 
 /**
@@ -22,11 +24,7 @@ export const useRecoveryFocus = <T extends HTMLElement>(refetch: Refetch) => {
   useEffect(() => {
     if (isRetrying || !shouldRestoreFocusRef.current) return
     shouldRestoreFocusRef.current = false
-    const active = document.activeElement
-    const focusWasLost =
-      active === null ||
-      active === document.body ||
-      active === retryTriggerRef.current
+    const focusWasLost = isFocusLost(retryTriggerRef.current)
     retryTriggerRef.current = null
     if (focusWasLost) targetRef.current?.focus()
   }, [isRetrying])

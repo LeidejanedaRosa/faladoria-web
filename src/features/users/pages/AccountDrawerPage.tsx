@@ -117,11 +117,12 @@ export const AccountDrawerPage = () => {
   const ownGroup = user ? groupOf(user.role) : group
   useEffect(() => {
     if (!user || ownGroup === group) return
-    void navigate(accountRoute(ownGroup, user.id), {
-      replace: true,
-      state: location.state,
-    })
-  }, [user, ownGroup, group, navigate, location.state])
+    // The filters ride along: a shared link keeps them in the account's own folder.
+    void navigate(
+      { pathname: accountRoute(ownGroup, user.id), search: location.search },
+      { replace: true, state: location.state }
+    )
+  }, [user, ownGroup, group, navigate, location.state, location.search])
 
   const shell = (title: string, body: ReactNode) => (
     <Drawer title={title} closeLabel={drawer.close} onClose={close}>

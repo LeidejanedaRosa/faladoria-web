@@ -4,6 +4,36 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## A `key` no `<Route>` não remonta a pasta, e um teste "provou" o contrário
+
+**Data**: 2026-11-22
+
+**Sintoma** (comentário do CodeRabbit no #89): uma criação de conta iniciada na Equipe, terminada
+com o drawer de Gestores aberto, fechava esse drawer e reabria o da Equipe. Na triagem, eu afirmei
+que não acontecia, porque cada pasta é uma rota com `key` própria e o drawer antigo desmontaria. O
+teste que escrevi para provar isso passou.
+
+**Causa raiz**: duas.
+
+1. A `key` está no `<Route>`, e o React Router desenha o `element` dele num lugar fixo da árvore. As
+   duas pastas usam o mesmo componente (`TeamRoute`), então o React reaproveita a instância: nada
+   desmonta, o `isOpen` do drawer continua `true`, e o `close()` da criação antiga roda.
+2. O teste conferia o endereço logo depois de a janela "Conta criada" aparecer, mas o `navigate(-1)`
+   que fecha o drawer é aplicado numa transition, depois. Lido cedo, o endereço ainda era o certo. A
+   prova inversa denunciou: sem a guarda, o teste continuava passando. Uma sonda (um valor gravado
+   no `globalThis` e lido num `expect` que falha de propósito) mostrou `onCreated` rodando com
+   `isOpen=true`.
+
+**Solução**: o drawer guarda a pasta aberta e só fecha se for a mesma de quando a criação começou.
+O teste espera a criação terminar e chama `await act(async () => {})`, que descarrega o trabalho
+pendente do React (inclusive a transition), antes de ler o endereço. Sem a correção, ele falha com
+`/dashboard/equipe/nova`. Ver DECISIONS (2026-11-22, revisão do #89).
+
+**Regra prática**: `key` só remonta o componente que a recebe. E um teste que deveria provar que
+algo **não** acontece precisa de uma prova inversa: se ele passa com o defeito, não prova nada.
+
+---
+
 ## e2e: contorno de foco ausente só no Firefox, com o foco no lugar certo
 
 **Data**: 2026-11-22

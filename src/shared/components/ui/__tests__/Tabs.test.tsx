@@ -75,6 +75,16 @@ describe('Tabs', () => {
     expect(tab('Dados')).toHaveFocus()
   })
 
+  it('ignores any other key, leaving the tab where it is', async () => {
+    renderTabs()
+    await userEvent.click(tab('Acesso'))
+
+    await userEvent.keyboard('a{ArrowDown}{Enter}')
+
+    expect(tab('Acesso')).toHaveFocus()
+    expect(tab('Acesso')).toHaveAttribute('aria-selected', 'true')
+  })
+
   it('keeps a hidden panel mounted, with what was typed in it', async () => {
     renderTabs()
     await userEvent.type(screen.getByRole('textbox', { name: 'Nome' }), 'Ana')

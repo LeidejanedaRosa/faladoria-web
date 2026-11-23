@@ -6,6 +6,57 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-11-22 — Revisão do PR de integração do fichário (#89)
+
+**Contexto**: o CodeRabbit revisou a `feat/dashboard-layout` inteira ao entrar na `feat/dashboard`
+e achou sete pontos que as revisões por branch não tinham visto. As correções vieram numa branch
+própria (`fix/dashboard-layout-review`).
+
+**Decisão**:
+
+- **A pasta continua aberta com um drawer por cima.** O `end` (casamento exato de endereço) valia
+  para as três pastas, e com `/dashboard/equipe/usr_ana` nenhuma aparecia aberta. Agora só
+  Reclamações usa `end`, porque o endereço dela, `/dashboard`, é a raiz de todas as outras.
+- **As senhas temporárias ficam numa fila.** Uma criação podia terminar com outra senha ainda na
+  tela, e a segunda apagava a primeira, que nunca mais apareceria. Cada senha aparece na sua vez.
+- **A criação só fecha o drawer que a começou.** As duas pastas de contas são rotas com `key` no
+  `<Route>`, mas a `key` não chega ao elemento desenhado: o React reaproveita a mesma instância de
+  `TeamRoute`, e o drawer de conta nova continua montado ao trocar de pasta. Uma criação iniciada na
+  Equipe, terminada com o drawer de Gestores aberto, voltava um passo e reabria o da Equipe. Cada
+  troca de pasta começa um formulário novo, com um número próprio (que também serve de `key`), e a
+  criação só fecha o drawer se o formulário aberto ainda for o dela. A primeira versão comparava a
+  pasta, e falhava numa ida e volta (Equipe → Gestores → Equipe): achado na segunda rodada (#90).
+  Na terceira rodada (#90), as duas guardas (`isOpen` e o formulário aberto) passaram a ser
+  atualizadas em `useLayoutEffect`. O `useEffect` roda depois da pintura, e numa navegação (uma
+  transition) o React não tem pressa: uma resposta de rede que chegasse nessa brecha leria o drawer
+  ou o formulário que acabou de sair da tela. Não há teste para isso: o `act()` dos testes roda o
+  commit e os efeitos juntos, a brecha não existe ali, e a prova inversa (voltar ao `useEffect`)
+  passa em todos. O que garante é o contrato do React: efeito de layout roda dentro do commit.
+- **O redirecionamento de pasta leva os filtros.** Um link colado com filtros, de uma conta que
+  mudou de pasta, chega à pasta certa com a mesma busca; o filtro ignora sozinho um lugar que não
+  exista lá.
+- **Última página vazia: o foco vai para "Não há ações mais antigas."** Quando o total é múltiplo
+  de 20, a última página pode vir sem nenhuma ação, e o botão some sem uma linha nova para receber
+  o foco.
+- **O foco do "carregar mais" só é resgatado, nunca puxado** (segunda rodada, #90). Se a pessoa foi
+  para outro controle enquanto a página carregava, o foco fica lá. A pergunta "o foco se perdeu?"
+  (no `<body>` ou ainda no botão que disparou a carga) virou `isFocusLost`, em `shared/utils`,
+  usada também pelo `useRecoveryFocus`: uma regra, um lugar.
+- **As teclas das abas num `switch`**, numa função pura fora do componente, em vez de uma busca num
+  objeto literal.
+- **O teste "sem número quando falha" espera as consultas terminarem**, e não o nome da pasta, que
+  é o mesmo enquanto carrega.
+
+**Alternativas rejeitadas**:
+
+- **Bloquear uma nova conta enquanto a senha anterior não foi anotada**: a janela da senha já é
+  modal; o caso só existe quando a criação termina depois de o drawer fechar, e a fila resolve sem
+  mudar o fluxo.
+- **Remontar a pasta a cada troca (`key` no elemento)**: resolveria a criação, mas perderia o estado
+  da lista (filtros digitados, a fila de senhas) ao trocar de pasta.
+
+---
+
 ## 2026-11-22 — Histórico de ações na aba Acesso, numa feature própria
 
 **Contexto**: quinta branch do fichário (`feat/dashboard-layout-access-log`). A aba Acesso do drawer
@@ -201,7 +252,9 @@ pasta, painel lateral, papel restrito pela pasta e "Nova conta" também no drawe
   formulário sair da tela, e o drawer pode ser fechado enquanto a conta é criada: a conta existiria
   sem a senha temporária ter sido mostrada. A senha chega à lista mesmo com o drawer já fechado; o
   drawer só fecha se ainda estiver aberto (senão voltaria um passo a mais no histórico). Só se perde
-  se a admin sair da pasta inteira antes da resposta, e aí "Gerar nova senha" resolve.
+  se a admin sair das pastas de contas (para o Início ou Cidades) antes da resposta, e aí "Gerar
+  nova senha" resolve. Trocar entre Equipe e Gestores não perde: as duas pastas compartilham a
+  mesma instância (corrigido em 2026-11-22; ver a revisão do #89).
 - **O título da pasta volta à aba quando o drawer fecha.** O `useDocumentMeta` não restaura nada
   ao desmontar, e o efeito da lista não rodava de novo. A lista põe o título num componente
   (`FolderTitle`) montado só quando não há drawer. Por isso cada drawer dá o próprio título:

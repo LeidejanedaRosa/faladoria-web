@@ -3,7 +3,7 @@ import { buildStaffAction } from '@/test/fixtures/staffActions'
 import { stubApi } from '@/test/mockFetch'
 import { renderWithQueryClient } from '@/test/queryClient'
 
-import { screen, waitFor, within } from '@testing-library/react'
+import { act, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -49,11 +49,33 @@ const OLDER = [
 
 const renderHistory = (
   pages: StaffAction[][],
-  options?: { failFirst?: boolean }
+  options?: Parameters<typeof fakeStaffActionsApi>[2]
 ) => {
   const requests = fakeStaffActionsApi(stubApi(), pages, options)
-  renderWithQueryClient(<ActionHistory actorId='usr_ana' targetNames={NAMES} />)
+  renderWithQueryClient(
+    <>
+      <ActionHistory actorId='usr_ana' targetNames={NAMES} />
+      {/* Somewhere else on the page the person may move to while a page loads. */}
+      <button type='button'>Outro controle</button>
+    </>
+  )
   return requests
+}
+
+/** Loads the next page, held, moves focus elsewhere, then lets the page arrive. */
+const loadMoreThenLeave = async (pages: StaffAction[][]) => {
+  let release = () => {}
+  renderHistory(pages, {
+    holdNext: new Promise<void>(resolve => {
+      release = resolve
+    }),
+  })
+  await screen.findByRole('region', { name: 'Hoje' })
+  await userEvent.click(loadMore())
+  const elsewhere = screen.getByRole('button', { name: 'Outro controle' })
+  elsewhere.focus()
+  act(() => release())
+  return elsewhere
 }
 
 /** Each action as read: its time, its text and its badge. */
@@ -93,7 +115,9 @@ describe('ActionHistory', () => {
     expect(
       await screen.findByText('Nenhuma ação registrada ainda.')
     ).toBeInTheDocument()
-    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Carregar ações mais antigas' })
+    ).not.toBeInTheDocument()
   })
 
   it('loads older actions on request, then says there are no more', async () => {
@@ -155,5 +179,33 @@ describe('ActionHistory', () => {
 
     const empty = await screen.findByText('Nenhuma ação registrada ainda.')
     await waitFor(() => expect(empty.closest('[tabindex="-1"]')).toHaveFocus())
+  })
+
+  it('moves focus to the end message when the last page brings no action', async () => {
+    renderHistory([TODAY, []])
+    await screen.findByRole('region', { name: 'Hoje' })
+
+    await userEvent.click(loadMore())
+
+    await waitFor(() =>
+      expect(screen.getByText('Não há ações mais antigas.')).toHaveFocus()
+    )
+    expect(rows()).toHaveLength(2)
+  })
+
+  it('leaves focus where the person moved while the next page was loading', async () => {
+    const elsewhere = await loadMoreThenLeave([TODAY, OLDER])
+
+    await screen.findByRole('region', { name: '19 de novembro de 2026' })
+    await act(async () => {})
+    expect(elsewhere).toHaveFocus()
+  })
+
+  it('leaves focus where the person moved when the last page brought nothing', async () => {
+    const elsewhere = await loadMoreThenLeave([TODAY, []])
+
+    await screen.findByText('Não há ações mais antigas.')
+    await act(async () => {})
+    expect(elsewhere).toHaveFocus()
   })
 })
