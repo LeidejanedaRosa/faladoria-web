@@ -53,7 +53,9 @@ const Folder = ({ id, count }: FolderProps) => {
   return (
     <NavLink
       to={FOLDER_ROUTES[id]}
-      end
+      // Reclamações is /dashboard, the root of every folder: exact match only. Equipe and Gestores
+      // stay open with one of their drawers over them (/dashboard/equipe/:id).
+      end={id === 'complaints'}
       className={({ isActive }) =>
         cn(
           'relative flex min-h-14 flex-1 items-center justify-between gap-3 rounded-2xl rounded-tl-none px-4 py-2 transition-shadow motion-reduce:transition-none sm:min-h-16 sm:flex-col sm:items-start sm:gap-1 sm:p-4',
