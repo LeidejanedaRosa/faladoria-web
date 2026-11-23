@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 
 import { Button, LoadError } from '@shared/components/ui'
 import { useRecoveryFocus } from '@shared/hooks/useRecoveryFocus'
+import { isFocusLost } from '@shared/utils/isFocusLost'
 
 import { STAFF_ACTIONS_CONTENT } from '../data/staffActionsContent'
 import { useStaffActions } from '../useStaffActions'
@@ -23,6 +24,50 @@ const HistorySkeleton = () => (
   </output>
 )
 
+interface LoadMoreState {
+  count: number
+  isFetchingNextPage: boolean
+  hasNextPage: boolean
+}
+
+/**
+ * "Load more" may leave with the last page: once the page is on screen (the fetch resolves before
+ * React draws it), focus goes to the first action it brought, or, if it brought none, to the "no
+ * older actions" message that replaced the button. Only to rescue a lost focus, as
+ * useRecoveryFocus does: if the person moved to another control while waiting, it stays there.
+ */
+const useLoadMoreFocus = ({
+  count,
+  isFetchingNextPage,
+  hasNextPage,
+}: LoadMoreState) => {
+  const listRef = useRef<HTMLDivElement>(null)
+  const endRef = useRef<HTMLParagraphElement>(null)
+  const firstNewIndex = useRef<number | null>(null)
+  const trigger = useRef<Element | null>(null)
+
+  useEffect(() => {
+    const index = firstNewIndex.current
+    if (index === null || isFetchingNextPage) return
+    firstNewIndex.current = null
+    const focusWasLost = isFocusLost(trigger.current)
+    trigger.current = null
+    if (!focusWasLost) return
+    if (count > index)
+      listRef.current?.querySelectorAll('li').item(index)?.focus()
+    else if (!hasNextPage) endRef.current?.focus()
+  }, [count, isFetchingNextPage, hasNextPage])
+
+  return {
+    listRef,
+    endRef,
+    onLoadMore: (shown: number) => {
+      firstNewIndex.current = shown
+      trigger.current = document.activeElement
+    },
+  }
+}
+
 interface ActionHistoryProps {
   actorId: string
   /** Names of the accounts and cities the caller knows: "Alterou a conta de Ana Souza". */
@@ -35,23 +80,14 @@ export const ActionHistory = ({ actorId, targetNames }: ActionHistoryProps) => {
   const { targetRef, isRetrying, retry } = useRecoveryFocus<HTMLDivElement>(
     query.refetch
   )
-  const listRef = useRef<HTMLDivElement>(null)
-  const endRef = useRef<HTMLParagraphElement>(null)
-  // "Load more" may leave with the last page: once the page is on screen (the fetch resolves
-  // before React draws it), focus goes to the first action it brought, or, if it brought none,
-  // to the "no older actions" message that replaced the button.
-  const firstNewIndex = useRef<number | null>(null)
   const { isFetchingNextPage, hasNextPage } = query
   const count =
     query.data?.pages.reduce((sum, page) => sum + page.actions.length, 0) ?? 0
-  useEffect(() => {
-    const index = firstNewIndex.current
-    if (index === null || isFetchingNextPage) return
-    firstNewIndex.current = null
-    if (count > index)
-      listRef.current?.querySelectorAll('li').item(index)?.focus()
-    else if (!hasNextPage) endRef.current?.focus()
-  }, [count, isFetchingNextPage, hasNextPage])
+  const { listRef, endRef, onLoadMore } = useLoadMoreFocus({
+    count,
+    isFetchingNextPage,
+    hasNextPage,
+  })
 
   if (isRetrying || query.isError) {
     return (
@@ -75,7 +111,7 @@ export const ActionHistory = ({ actorId, targetNames }: ActionHistoryProps) => {
   }
 
   const loadMore = () => {
-    firstNewIndex.current = actions.length
+    onLoadMore(actions.length)
     void query.fetchNextPage()
   }
 
