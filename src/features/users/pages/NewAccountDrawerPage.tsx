@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 
 import { Drawer } from '@shared/components/ui'
 import { useDocumentMeta } from '@shared/hooks/useDocumentMeta'
@@ -24,15 +24,17 @@ export const NewAccountDrawerPage = () => {
   // starts a new form, with a number of its own. Only the form that started the creation closes.
   const [form, setForm] = useState({ group, number: 0 })
   if (form.group !== group) setForm({ group, number: form.number + 1 })
+  // Layout effects: they run within the commit. A passive effect runs later, after paint, and a
+  // creation answering in between would still read the drawer or form that just left the screen.
   const isOpen = useRef(false)
   const openForm = useRef(form.number)
-  useEffect(() => {
+  useLayoutEffect(() => {
     isOpen.current = true
     return () => {
       isOpen.current = false
     }
   }, [])
-  useEffect(() => {
+  useLayoutEffect(() => {
     openForm.current = form.number
   }, [form.number])
 
