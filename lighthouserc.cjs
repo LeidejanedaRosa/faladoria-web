@@ -72,7 +72,8 @@ module.exports = {
       },
     },
     upload: {
-      target: 'temporary-public-storage',
+      target: 'filesystem',
+      outputDir: './.lighthouseci/reports',
     },
   },
 }
