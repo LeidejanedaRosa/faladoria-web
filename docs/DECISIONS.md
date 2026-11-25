@@ -32,7 +32,9 @@ Título do PR (Conventional Commits)          workflow pr-title.yml
 - Lighthouse: `upload.target` de `temporary-public-storage` para `filesystem`. O relatório vira
   artefato do GitHub, em vez de ir para um servidor público com link aberto.
 - Gitleaks: binário com versão e sha256 fixos, em vez da `gitleaks-action`, que pedia
-  `pull-requests: read` para listar os commits do PR.
+  `pull-requests: read` para listar os commits do PR. Ele roda antes do `pnpm audit`, e o audit
+  tem `if: !cancelled()`: um alerta de dependência não pode pular a busca por segredos (achado
+  pelo CodeRabbit neste PR; corrigido primeiro no template, react-vite-template #32).
 
 **Alternativas rejeitadas**: manter os dois jobs e alinhar só as práticas (cada repositório
 continuaria com checks de nomes diferentes).
