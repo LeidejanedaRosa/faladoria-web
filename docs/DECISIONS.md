@@ -41,6 +41,14 @@ continuaria com checks de nomes diferentes).
 `feat/dashboard`) muda o conteúdo do job, nunca o nome. Com os mesmos nomes, os checks exigidos são
 os mesmos em todo repositório, e o CI fica mais rápido com os jobs em paralelo.
 
+**Proteção da `main`**: além do ruleset, a `main` tinha uma proteção de branch clássica, anterior a
+ele, que também exigia `quality` e `e2e`. O `setup-github.mjs` só mexe no ruleset, então a troca dos
+nomes deixaria a `main` esperando checks que não existem mais. O ruleset recebeu os seis checks
+novos (os cinco do template + `Vercel`, na branch padrão e na `feat/dashboard`) e só depois a
+proteção clássica foi removida. Ela tinha uma regra que o ruleset não tem, a branch atualizada com
+a base antes do merge (`strict`); nenhum outro repositório do padrão usa, e duas configurações para
+a mesma proteção foi o que causou o problema.
+
 **Observação**: o Lighthouse local deu performance entre 54 e 82 na mesma página, com a máquina em
 load average 12; no CI (PR #90) o mesmo código passou. Performance local não é medida confiável.
 
