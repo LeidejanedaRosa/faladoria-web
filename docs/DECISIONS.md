@@ -17,7 +17,11 @@ template de PR tinha divergido do canônico e o VS Code não recomendava as exte
 - `pre-push` pula os testes quando o push só apaga branches (`scripts/push-only-deletes.sh`, com 7
   testes). Branch nova, push misto ou entrada estranha continuam rodando a suíte.
 - `pre-commit` com `gitleaks git --staged`, no lugar de `gitleaks protect --staged`, descontinuado
-  desde o gitleaks 8.19. Sai o fallback que procurava o binário em `~/.local/bin` fora do PATH: os
+  desde o gitleaks 8.19. Só que até a 8.19 o `git --staged` ignora o `--staged` e varre só o
+  histórico: um segredo novo passaria como "tudo limpo" (achado pelo CodeRabbit neste PR). O hook
+  exige um release 8.20 ou mais novo, com a checagem em `scripts/gitleaks-version-ok.sh`, com
+  testes, criada primeiro no template (react-vite-template #33). Sai o fallback que procurava o
+  binário em `~/.local/bin` fora do PATH: os
   commits são feitos pelo terminal, onde `~/.local/bin` já está no PATH, e nenhum registro dizia
   que o fallback corrigia um problema real.
 - `commitlint.config.js` (`export default`, já que o `package.json` é `"type": "module"`), com o
