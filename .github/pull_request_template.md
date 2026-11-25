@@ -11,8 +11,7 @@
 - [ ] ⚡ Refatoração / performance (refactor / perf)
 - [ ] 🧪 Testes (test)
 - [ ] 📚 Documentação (docs)
-- [ ] 🔧 Manutenção / configuração (chore)
-- [ ] 🔒 Segurança (security)
+- [ ] 🔧 Manutenção, build e CI (chore / build / ci)
 
 ## 🔍 O que foi feito? (Checklist Técnico)
 
@@ -20,12 +19,12 @@
 
 ## ✅ Checklist de qualidade (DoD)
 
-- [ ] Lint ok (`pnpm lint` — zero warnings)
-- [ ] Testes ok (unitários + E2E quando aplicável)
+- [ ] Lint ok
+- [ ] Testes ok (unitários + e2e quando aplicável)
 - [ ] Sem código morto / console.log / comentário desnecessário
 - [ ] SOLID e clean code respeitados
 - [ ] a11y verificada
-- [ ] Responsivo
+- [ ] Responsivo (quando frontend)
 - [ ] Segredos via variável de ambiente, nunca hardcoded
 - [ ] Documentação atualizada (`docs/DECISIONS.md` e/ou `docs/TROUBLESHOOTING.md` quando aplicável)
 
@@ -44,16 +43,18 @@
 ## ⚙️ Como testar?
 
 1. `git checkout <branch>`
-2. Instalar dependências (`pnpm install`)
-3. `pnpm dev`
+2. Instalar dependências
+3. Rodar migrações (se houver)
 4. Passos manuais...
 
 ## 🧪 Testes Realizados
 
-- [ ] Testes automatizados (`pnpm test`)
-- [ ] Testes E2E (Playwright, chromium/firefox/webkit) quando a mudança afeta comportamento visível
+- [ ] Testes automatizados (`npm run test`)
+- [ ] E2E Playwright (chromium / firefox / webkit) — cobre comportamento cross-browser,
+      incluindo o motor do Safari, sem precisar de Mac
 - [ ] Testado manualmente em: Chrome | Firefox
 
 ## 🚨 Impacto e Riscos
 
 - **Variáveis de ambiente novas:**
+- **Migração de banco:**
