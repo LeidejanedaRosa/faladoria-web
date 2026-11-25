@@ -6,6 +6,35 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-11-25 — Hooks, commitlint e template de PR no padrão do react-vite-template
+
+**Contexto**: depois do CI (#91), sobravam diferenças de padrão fora dos workflows: o pre-push
+rodava a suíte inteira até num push que só apaga branches, o commitlint estava em `.cjs`, o
+template de PR tinha divergido do canônico e o VS Code não recomendava as extensões de revisão.
+
+**Decisão**: os mesmos arquivos do template.
+
+- `pre-push` pula os testes quando o push só apaga branches (`scripts/push-only-deletes.sh`, com 7
+  testes). Branch nova, push misto ou entrada estranha continuam rodando a suíte.
+- `pre-commit` com `gitleaks git --staged`, no lugar de `gitleaks protect --staged`, descontinuado
+  desde o gitleaks 8.19. Sai o fallback que procurava o binário em `~/.local/bin` fora do PATH: os
+  commits são feitos pelo terminal, onde `~/.local/bin` já está no PATH, e nenhum registro dizia
+  que o fallback corrigia um problema real.
+- `commitlint.config.js` (`export default`, já que o `package.json` é `"type": "module"`), com o
+  limite de 72 do #91.
+- `.github/pull_request_template.md` canônico (o do `~/.claude/CLAUDE.md`): sai o tipo `security`,
+  que o commitlint recusa (o certo é `fix(security)`), entra `chore / build / ci`, e volta a linha
+  "Migração de banco", que se marca N/A em vez de apagar.
+- `.vscode/extensions.json` recomenda CodeRabbit e SonarLint.
+
+**Alternativas rejeitadas**: manter o fallback do gitleaks "por garantia" — sem um caso real, é
+código que ninguém sabe se ainda serve.
+
+**Raciocínio**: cada diferença de padrão sem motivo registrado é uma cópia que diverge em silêncio,
+como o template de PR já tinha divergido.
+
+---
+
 ## 2026-11-24 — CI no padrão do react-vite-template
 
 **Contexto**: o CI tinha dois jobs (`quality`, com Lighthouse dentro, e `e2e`), Node 22 escrito no
