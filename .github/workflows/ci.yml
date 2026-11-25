@@ -1,123 +1,139 @@
 name: CI
 
+# pull_request valida a branch ANTES do merge; push valida o que já entrou na main. Rodar em todo
+# push de toda branch duplicaria cada execução de PR.
 on:
+  pull_request:
   push:
     branches: [main]
-  pull_request:
+  workflow_dispatch:
+
+# Um push novo na mesma branch cancela a execução anterior, que já ficou obsoleta.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  HUSKY: 0
 
 jobs:
   quality:
+    name: Lint, tipos, testes e build
     runs-on: ubuntu-latest
-    # gitleaks-action no evento pull_request lista os commits do PR via API do GitHub — o
-    # default de permissão do repo (Settings > Actions > Workflow permissions) não inclui isso,
-    # causando 403 "Resource not accessible by integration" (mesmo achado do faladoria-backend).
-    permissions:
-      contents: read
-      pull-requests: read
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
+          persist-credentials: false
+          # O SonarCloud usa o histórico para saber o que é código novo em cada PR.
           fetch-depth: 0
-
-      - name: Secret scan
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Security audit (production dependencies)
-        run: pnpm audit --prod --audit-level high
-
-      - name: Security audit (all dependencies)
-        run: pnpm audit --audit-level high
-
-      - name: Type check
-        run: pnpm type-check
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Format check
-        run: pnpm format:check
-
-      - name: Run unit tests with coverage
-        run: pnpm test:coverage
-
-      - name: Check SonarCloud configuration
-        id: sonar_check
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run format:check
+      - run: pnpm run lint
+      - run: pnpm run type-check
+      - run: pnpm run test:coverage
+      - name: Verificar se o SonarCloud está configurado
+        id: sonar
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        # Sem o token (ex.: PR do Dependabot, que não recebe segredos) a análise é pulada em vez
+        # de quebrar o CI. As chaves seguem o padrão do SonarCloud ao importar do GitHub.
         run: |
-          if [ -n "${{ secrets.SONAR_TOKEN }}" ]; then
+          if [ -n "$SONAR_TOKEN" ]; then
             echo "configured=true" >> "$GITHUB_OUTPUT"
+            echo "organization=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
+            echo "project=${GITHUB_REPOSITORY_OWNER}_${GITHUB_REPOSITORY#*/}" >> "$GITHUB_OUTPUT"
           else
-            echo "::notice::SONAR_TOKEN not set yet — skipping SonarCloud scan."
+            echo "::notice::SONAR_TOKEN ausente: análise do SonarCloud pulada."
             echo "configured=false" >> "$GITHUB_OUTPUT"
           fi
-
-      - name: SonarCloud Scan
-        if: steps.sonar_check.outputs.configured == 'true'
+      - name: SonarCloud (análise e quality gate)
+        if: steps.sonar.outputs.configured == 'true'
         uses: SonarSource/sonarqube-scan-action@v8
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      - name: SonarCloud Quality Gate check
-        if: steps.sonar_check.outputs.configured == 'true'
-        uses: SonarSource/sonarqube-quality-gate-action@v1
         with:
-          pollingTimeoutSec: 300
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          args: >
+            -Dsonar.organization=${{ steps.sonar.outputs.organization }}
+            -Dsonar.projectKey=${{ steps.sonar.outputs.project }}
+            -Dsonar.qualitygate.wait=true
+      - run: pnpm run build
 
-      - name: Build
-        run: pnpm build
-
-      - name: Lighthouse CI
-        uses: treosh/lighthouse-ci-action@v12
-        with:
-          configPath: './lighthouserc.cjs'
-          uploadArtifacts: true
-          temporaryPublicStorage: true
-
-  e2e:
+  security:
+    name: Dependências e segredos
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
         with:
-          node-version: 22
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps
-
-      - name: Run E2E tests
-        run: pnpm test:e2e
-
-      - name: Upload Playwright report
+          persist-credentials: false
+          # O gitleaks varre o histórico inteiro, não só o último commit.
+          fetch-depth: 0
+      # Binário com versão e sha256 fixos, em vez de uma action de terceiros com acesso ao job.
+      - name: Secret scan (gitleaks)
+        env:
+          GITLEAKS_VERSION: 8.30.1
+          GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+        run: |
+          archive="$RUNNER_TEMP/gitleaks.tar.gz"
+          curl -sSfL -o "$archive" "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  $archive" | sha256sum --check
+          tar -xzf "$archive" -C "$RUNNER_TEMP" gitleaks
+          "$RUNNER_TEMP/gitleaks" git --redact --no-banner --verbose .
+      - uses: pnpm/action-setup@v6
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+      # Roda mesmo com o gitleaks falhando: uma verificação nunca esconde o resultado da outra.
+      - name: Dependências (pnpm audit)
+        if: ${{ !cancelled() }}
+        run: pnpm audit --audit-level high
+
+  e2e:
+    name: E2E (chromium, firefox, webkit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium firefox webkit
+      # Sem `pnpm run build` aqui: o webServer do playwright.config.ts já faz build + preview.
+      - run: pnpm run test:e2e
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
         with:
           name: playwright-report
-          path: playwright-report/
-          retention-days: 14
+          path: playwright-report
+          retention-days: 7
+
+  lighthouse:
+    name: Lighthouse (perf, a11y, boas práticas, SEO)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+      - run: pnpm run lighthouse
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: lighthouse-report
+          path: .lighthouseci/reports
+          retention-days: 7
