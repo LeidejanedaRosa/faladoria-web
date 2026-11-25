@@ -426,7 +426,8 @@ Formatação automática com `@trivago/prettier-plugin-sort-imports` + `prettier
   [Conventional Commits](https://www.conventionalcommits.org/) (`commitlint.config.js`) —
   bloqueia o commit se o tipo (`feat:`, `fix:`, `chore:`...) estiver ausente ou incorreto, ou se a
   primeira linha passar de 72 caracteres (o título do PR vira a mensagem do merge commit). O
-  workflow `pr-title.yml` aplica a mesma regra ao título do PR
+  workflow `pr-title.yml` aplica a mesma regra ao título do PR já com o ` (#N)` que o GitHub
+  acrescenta no merge: os 72 valem para a mensagem final, então o título em si tem uns 66
 
 **`pre-push`**:
 
