@@ -4,6 +4,45 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## e2e de CLS da Transparência falhando 1 vez em 40, só no firefox
+
+**Data**: 2026-11-26
+
+**Sintoma**: `transparency-section.spec.ts > should not shift the layout when the totals arrive`
+saiu como "flaky" no relatório do Playwright do CI (#95): falhou na primeira tentativa e passou na
+segunda, então o `retries: 2` deixou o CI verde. O erro não fala de layout:
+
+```
+TypeError: Cannot read properties of null (reading 'height')
+> const loadedHeight = (await firstCard.boundingBox())!.height
+```
+
+Reproduzido localmente: 1 falha em 40 rodadas (`--repeat-each 40 --retries 0 --workers 4`, só
+firefox). No `error-context.md` da falha, a seção está completa, com os quatro cards e os números.
+
+**Causa raiz**: corrida no teste, não defeito da aplicação. O teste mede a altura no primeiro
+instante em que o `<dl>` existe, mas `boundingBox()` devolve `null` quando o elemento ainda não tem
+caixa visível. A explicação mais provável, não provada, é que o firefox ainda não tinha calculado o
+layout do card recém-inserido. O `!` transformava esse "ainda não" num `TypeError`, que escondia o
+motivo.
+
+**Solução**: antes e depois da chegada dos totais, `expect.poll` repete a leitura só até existir
+uma altura (`toBeGreaterThan(0)`), guarda essa primeira altura e compara uma vez. Fazer polling até
+a altura ficar igual à do skeleton seria errado (apontado pelo CodeRabbit no #96): um card que
+aparece maior e depois se ajusta passaria, e o usuário teria visto o pulo. Provas:
+
+- 120 de 120 rodadas no firefox. Com a chance de falha de antes (1/40), passar em todas teria
+  ~5% de chance.
+- Prova inversa: sem o espaço da porcentagem no `StatsGridSkeleton`, o teste falha com
+  `Expected: 128, Received: 156`. O deslocamento real continua sendo pego, agora com uma mensagem
+  que diz o que aconteceu.
+
+**Regra prática**: o relatório do Playwright do CI mostra os "flaky" que o `retries` esconde. Vale
+olhar a cada PR. Medição de layout em e2e não lê `boundingBox()` uma vez só com `!`: espera até o
+valor existir.
+
+---
+
 ## Testes de formulário falhando só com a máquina ocupada
 
 **Data**: 2026-11-26

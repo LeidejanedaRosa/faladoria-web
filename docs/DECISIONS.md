@@ -74,6 +74,22 @@ cortaram: o ganho vem em boa parte dos 226 testes a menos (−9%). Hipótese, ai
 gargalo enquanto o outro worker fica ocioso. Próximo passo: medir o tempo por arquivo no relatório
 antes de ligar o `fullyParallel` ou dividir arquivos.
 
+**Medição por arquivo** (relatório do Playwright do #95, mesma configuração do #94):
+
+- `pnpm run test:e2e` levou **1242 s**, contra 1647 s no #94. A configuração é a mesma e a diferença
+  é de 25%: as máquinas do GitHub variam bastante entre execuções, e uma amostra só não é "o
+  tempo". A estimativa de 15 a 20 min acertou nesta execução.
+- **Hipótese do gargalo refutada.** A soma das durações de todos os testes é 2373 s. Dividida por
+  2 workers, dá 1187 s, e o passo levou 1242 s: os workers ficaram ocupados 95,5% do tempo. O maior
+  arquivo (`transparency-section`, 199 s) se espalha pelos 5 projetos, ~40 s cada. Ligar o
+  `fullyParallel` não traria ganho que valha a mudança.
+- O motor do Safari pesa mais: webkit (615 s) e Mobile Safari (565 s) somam 50% do tempo.
+
+**Velocidade fica como está**, entre 21 e 28 min de `test:e2e`. A opção que sobra para baixar mais
+é dividir o E2E em jobs paralelos (sharding), e ela foi rejeitada agora: muda o nome do job, que é
+contrato do ruleset (cada nome novo exige rodar o `setup-github.mjs` de novo); repete o build e a
+instalação dos navegadores em cada máquina; e o tempo atual não atrapalha o trabalho.
+
 ---
 
 ## 2026-11-26 — Limites de tempo dos testes unitários
