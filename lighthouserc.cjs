@@ -61,6 +61,12 @@ module.exports = {
         // com variância alta nesta máquina (TBT chegou a 1596ms numa rodada isolada da Home,
         // Speed Index chegou a 4464ms numa do artigo) — thresholds generosos de propósito,
         // servem pra pegar regressão real, não ruído de uma rodada isolada.
+        // Veio do E2E (2026-11-26). Aviso, não erro: o Lighthouse simula celular lento, e os 1800 ms do
+        // navegador sem limitação ainda não foram medidos aqui. Ver docs/DECISIONS.md.
+        'first-contentful-paint': [
+          'warn',
+          { maxNumericValue: 1800, aggregationMethod: 'median' },
+        ],
         'total-blocking-time': [
           'warn',
           { maxNumericValue: 600, aggregationMethod: 'median' },
