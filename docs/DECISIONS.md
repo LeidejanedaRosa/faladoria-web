@@ -6,6 +6,38 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-11-26 — E2E no CI: 2 workers e testes de HTML só no chromium
+
+**Contexto**: o job de E2E levava ~36 min (2142 s no PR #92), quase todo no `pnpm run test:e2e`:
+2485 testes (~497 × 5 projetos) rodando um por vez (`workers: 1` no CI), ~0,86 s cada. Os outros
+jobs terminam em menos de 3 min.
+
+**Decisão**:
+
+- `workers: 2` no CI. A máquina do GitHub para repositório público tem 4 núcleos; com
+  `fullyParallel` desligado no CI, os dois workers dividem arquivos inteiros e os testes de cada
+  arquivo continuam em ordem.
+- `tests/seo/metadata.spec.ts` e `tests/seo/semantic-html.spec.ts` só no chromium (`testIgnore`
+  nos outros projetos): leem o HTML (meta tags, JSON-LD, títulos, landmarks) e dão o mesmo
+  resultado em qualquer navegador. São 196 execuções a menos (2485 → 2289).
+- `accessibility.spec.ts` (axe) e `performance-keywords.spec.ts` continuam nos cinco: o axe pode
+  variar entre motores, e o `performance-keywords` usa as APIs de tempo de cada motor e mede o
+  tamanho dos botões na tela (`boundingBox`).
+
+**Alternativas rejeitadas**:
+
+- `workers: 4`: toda a CPU para os testes, disputando com o `vite preview` que serve o app; mais
+  risco de teste instável. Subir só depois de medir o 2.
+- Sharding (vários jobs em paralelo): mais rápido, mas o nome do check vira "E2E (1/4)"..., quebra
+  o contrato com o ruleset e exige um job agregador.
+
+**Raciocínio**: um teste que dá o mesmo resultado em todo navegador não prova nada a mais rodando
+cinco vezes. O tempo real fica medido no CI deste PR. Atenção: `retries: 2` no CI também esconde
+instabilidade (teste que passa na segunda tentativa conta como verde); o relatório do Playwright
+marca esses casos como "flaky".
+
+---
+
 ## 2026-11-26 — Limites de tempo dos testes unitários
 
 **Contexto**: dois testes de formulário falharam por tempo com a máquina ocupada, sem defeito na
