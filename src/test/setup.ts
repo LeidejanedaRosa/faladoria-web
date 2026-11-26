@@ -1,6 +1,11 @@
 import '@testing-library/jest-dom/vitest'
-import { cleanup } from '@testing-library/react'
+import { cleanup, configure } from '@testing-library/react'
 import { afterEach } from 'vitest'
+
+// waitFor/findBy desistem em 1 s por padrão, a ~1,5× do primeiro teste de um arquivo (que paga o
+// aquecimento). Com a CPU disputada, falhavam sem defeito nenhum. O limite só diz quando desistir:
+// o waitFor termina assim que a condição vale. Ver docs/TROUBLESHOOTING.md (2026-11-26).
+configure({ asyncUtilTimeout: 3000 })
 
 // Cleanup após cada teste
 afterEach(() => {

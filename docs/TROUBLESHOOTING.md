@@ -4,6 +4,44 @@ Log de erros, conflitos e comportamentos inesperados encontrados durante o desen
 
 ---
 
+## Testes de formulário falhando só com a máquina ocupada
+
+**Data**: 2026-11-26
+
+**Sintoma**: o pre-push falhou duas vezes, sem nenhuma mudança em `src/`, com a máquina recém-ligada
+(load average 10 a 23):
+
+- `CityTagsField > offers only the served cities`: `expect(element).toBeEnabled()` dentro de um
+  `waitFor`, com o campo ainda desabilitado.
+- `NewAccountForm > hides the cities for the administration...`: `Test timed out in 5000ms`.
+
+Rodados de novo, ou isolados, passavam.
+
+**Causa raiz**: limites calibrados para uma máquina ociosa. Medidos em 3 rodadas, os testes desses
+arquivos levam de 290 a 670 ms. O mais lento é sempre o primeiro do arquivo, que paga o aquecimento
+(primeira renderização, primeiro cliente do React Query, código ainda não otimizado), e é justamente
+ele que dependia do limite mais curto: o `waitFor` desiste em 1 s por padrão, a ~1,5× do tempo
+normal. Com a CPU dividida entre VS Code, Chrome e a atualização do flatpak que roda depois do
+boot, a máquina ficou mais de duas vezes mais lenta e o limite estourou. Não é a aplicação: a API
+dos testes é falsa e responde na hora, o tempo é todo do jsdom e do `userEvent`.
+
+Hipóteses descartadas, porque não reproduziram: CPU lenta (com 1 núcleo, o Vitest roda um arquivo
+por vez e nada falha) e CPU disputada isolada (suíte inteira em 2 núcleos, 4 workers e 2 processos
+queimando CPU: 1058 de 1058 nas duas rodadas). O pico real do pós-boot foi maior do que a simulação.
+
+**Solução**: `asyncUtilTimeout: 3000` no `src/test/setup.ts` (folga de ~5× sobre o pior caso
+medido) e `testTimeout: 10_000` no `vitest.config.ts`. O limite só diz quando desistir: o `waitFor`
+termina assim que a condição vale, então um teste que passa em 400 ms continua levando 400 ms. Prova:
+um `waitFor` cuja condição leva 1,5 s passa com o limite novo e falha em 1023 ms com o antigo.
+
+**Regra prática**: tempo limite de teste não mede desempenho; desempenho é do Lighthouse e do
+web-vitals. Para a lentidão não sumir de vista, `slowTestThreshold: 1000` destaca no relatório
+todo teste acima de 1 s, sem falhar. Na primeira rodada ele apontou dois, ambos de tentativas
+repetidas com espera (`useIbgeCities` e `ServiceAreasPage`). Quando um teste instável aparecer,
+guardar a saída inteira do hook: no primeiro episódio, só o resumo "1 failed" ficou registrado.
+
+---
+
 ## A `key` no `<Route>` não remonta a pasta, e um teste "provou" o contrário
 
 **Data**: 2026-11-22

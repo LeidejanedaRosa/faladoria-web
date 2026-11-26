@@ -6,6 +6,27 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-11-26 — Limites de tempo dos testes unitários
+
+**Contexto**: dois testes de formulário falharam por tempo com a máquina ocupada, sem defeito na
+aplicação (ver TROUBLESHOOTING, 2026-11-26). Valiam os padrões: 1 s para `waitFor`/`findBy` e 5 s
+por teste.
+
+**Decisão**: `asyncUtilTimeout: 3000` (`src/test/setup.ts`), `testTimeout: 10_000` e
+`slowTestThreshold: 1000` (`vitest.config.ts`).
+
+**Alternativas rejeitadas**:
+
+- Aumentar o tempo só dos dois testes (`it(..., 10_000)`): remendo pontual; o próximo teste
+  instável apareceria em outro arquivo.
+- Não mudar nada: falha falsa no pre-push e, no CI, uma nova rodada inteira (o E2E leva ~45 min).
+
+**Raciocínio**: os limites dizem quando desistir, não quanto o teste deve demorar. Desempenho é
+medido pelo Lighthouse CI e pelo web-vitals, no navegador real. O `slowTestThreshold` mantém a
+lentidão visível no relatório sem transformá-la em falha.
+
+---
+
 ## 2026-11-25 — Hooks, commitlint e template de PR no padrão do react-vite-template
 
 **Contexto**: depois do CI (#91), sobravam diferenças de padrão fora dos workflows: o pre-push
