@@ -6,51 +6,9 @@ test.describe('Performance & Core Web Vitals Tests', () => {
   })
 
   test.describe('Performance Metrics - Google Core Web Vitals', () => {
-    test('should have acceptable Largest Contentful Paint (LCP)', async ({
-      page,
-    }) => {
-      const url = page.url()
-      const isLocalDev = url.includes('localhost') || url.includes('127.0.0.1')
-
-      test.skip(
-        isLocalDev,
-        'LCP metrics are unreliable in local dev — run against a deployed URL'
-      )
-
-      const lcp = await page.evaluate(() => {
-        return new Promise<number>(resolve => {
-          let resolved = false
-          const observer = new PerformanceObserver(list => {
-            if (resolved) return
-            const entries = list.getEntries()
-            const lastEntry = entries[
-              entries.length - 1
-            ] as PerformanceEntry & {
-              renderTime?: number
-              loadTime?: number
-            }
-            const lcpValue = lastEntry.renderTime || lastEntry.loadTime || 0
-            if (lcpValue > 0) {
-              resolved = true
-              observer.disconnect()
-              resolve(lcpValue)
-            }
-          })
-          observer.observe({ type: 'largest-contentful-paint', buffered: true })
-
-          setTimeout(() => {
-            if (!resolved) {
-              observer.disconnect()
-              resolve(-1)
-            }
-          }, 5000)
-        })
-      })
-
-      expect(lcp).toBeGreaterThan(0)
-      expect(lcp).toBeLessThan(2500)
-    })
-
+    // Tempo (LCP, FCP, carga, DOMContentLoaded, long tasks) é do Lighthouse CI, medido em 3
+    // execuções com mediana: num navegador dividindo a máquina com outro worker, falhava sem a
+    // página mudar. O CLS fica: é proporção de deslocamento, não tempo. Ver docs/DECISIONS.md.
     test('should have acceptable Cumulative Layout Shift (CLS)', async ({
       page,
     }) => {
@@ -75,39 +33,6 @@ test.describe('Performance & Core Web Vitals Tests', () => {
       })
 
       expect(cls).toBeLessThan(0.1)
-    })
-
-    test('should have acceptable First Contentful Paint (FCP)', async ({
-      page,
-    }) => {
-      const url = page.url()
-      const isLocalDev = url.includes('localhost') || url.includes('127.0.0.1')
-
-      test.skip(
-        isLocalDev,
-        'FCP metrics are unreliable in local dev — run against a deployed URL'
-      )
-
-      const fcp = await page.evaluate(() => {
-        const fcpEntry = performance
-          .getEntriesByType('paint')
-          .find(entry => entry.name === 'first-contentful-paint')
-        return fcpEntry?.startTime ?? -1
-      })
-
-      expect(fcp).toBeGreaterThan(0)
-      expect(fcp).toBeLessThan(1800)
-    })
-
-    test('should have acceptable DOM Interactive Time', async ({ page }) => {
-      const domInteractive = await page.evaluate(() => {
-        const navigationTiming = performance.getEntriesByType(
-          'navigation'
-        )[0] as PerformanceNavigationTiming
-        return navigationTiming.domInteractive
-      })
-
-      expect(domInteractive).toBeLessThan(3800)
     })
   })
 
@@ -223,57 +148,6 @@ test.describe('Performance & Core Web Vitals Tests', () => {
     })
   })
 
-  test.describe('JavaScript Performance', () => {
-    test('should not have excessive DOMContentLoaded handler execution time', async ({
-      page,
-    }) => {
-      const domContentLoadedDuration = await page.evaluate(() => {
-        const navigationTiming = performance.getEntriesByType(
-          'navigation'
-        )[0] as PerformanceNavigationTiming
-        return (
-          navigationTiming.domContentLoadedEventEnd -
-          navigationTiming.domContentLoadedEventStart
-        )
-      })
-
-      expect(domContentLoadedDuration).toBeLessThan(1000)
-    })
-
-    test('should not have long tasks', async ({ page, browserName }) => {
-      test.skip(
-        browserName === 'firefox',
-        'Long task observer not supported in Firefox'
-      )
-
-      await page.waitForLoadState('load')
-
-      const longTasks = await page.evaluate(() => {
-        return new Promise<number>(resolve => {
-          try {
-            const tasks: number[] = []
-            new PerformanceObserver(list => {
-              for (const entry of list.getEntries()) {
-                tasks.push(entry.duration)
-              }
-            }).observe({ type: 'longtask', buffered: true })
-
-            setTimeout(() => resolve(tasks.length), 3000)
-          } catch {
-            resolve(-1)
-          }
-        })
-      })
-
-      if (longTasks === -1) {
-        test.skip(true, 'PerformanceObserver for longtask not available')
-        return
-      }
-
-      expect(longTasks).toBeLessThanOrEqual(8)
-    })
-  })
-
   test.describe('Network Performance', () => {
     test('should use HTTP/2 or HTTP/3', async ({ page }) => {
       const url = page.url()
@@ -291,20 +165,6 @@ test.describe('Performance & Core Web Vitals Tests', () => {
 
       test.skip(isLocalDev, 'HTTP/2 not available in local dev')
       expect(protocol).toMatch(/h2|h3/)
-    })
-
-    test('should have acceptable page load time', async ({ page }) => {
-      const url = page.url()
-      const isLocalDev = url.includes('localhost') || url.includes('127.0.0.1')
-
-      const loadTime = await page.evaluate(() => {
-        const navigationTiming = performance.getEntriesByType(
-          'navigation'
-        )[0] as PerformanceNavigationTiming
-        return navigationTiming.loadEventEnd - navigationTiming.fetchStart
-      })
-      const threshold = isLocalDev ? 30000 : 3000
-      expect(loadTime).toBeLessThan(threshold)
     })
   })
 

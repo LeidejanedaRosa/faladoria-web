@@ -3,13 +3,23 @@ import { defineConfig, devices } from '@playwright/test'
 import { E2E_IBGE_URL } from './tests/helpers/ibgeApi'
 import { E2E_API_URL } from './tests/helpers/publicBoardApi'
 
+// Só leem o HTML (meta tags, JSON-LD, estrutura de títulos e landmarks): o resultado é o mesmo em
+// qualquer navegador, então rodam só no chromium. accessibility (axe) e performance-keywords
+// (APIs de tempo de cada motor, tamanho dos botões na tela) continuam nos cinco projetos.
+const HTML_ONLY_SPECS = [
+  '**/seo/metadata.spec.ts',
+  '**/seo/semantic-html.spec.ts',
+]
+
 export default defineConfig({
   testDir: './tests',
   timeout: 60 * 1000,
   fullyParallel: !process.env.CI,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  // A máquina do GitHub para repositório público tem 4 núcleos; 2 workers dividem os arquivos sem
+  // disputar CPU com o vite preview. Ver docs/DECISIONS.md (2026-11-26, E2E).
+  workers: process.env.CI ? 2 : undefined,
   reporter: 'html',
 
   use: {
@@ -29,18 +39,22 @@ export default defineConfig({
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
+      testIgnore: HTML_ONLY_SPECS,
     },
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
+      testIgnore: HTML_ONLY_SPECS,
     },
     {
       name: 'Mobile Chrome',
       use: { ...devices['Pixel 5'] },
+      testIgnore: HTML_ONLY_SPECS,
     },
     {
       name: 'Mobile Safari',
       use: { ...devices['iPhone 12'] },
+      testIgnore: HTML_ONLY_SPECS,
     },
   ],
 

@@ -6,6 +6,63 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-11-26 — E2E no CI: 2 workers, HTML só no chromium e tempo só no Lighthouse
+
+**Contexto**: o job de E2E levava ~36 min (2142 s no PR #92), quase todo no `pnpm run test:e2e`:
+2485 testes (~497 × 5 projetos) rodando um por vez (`workers: 1` no CI), ~0,86 s cada. Os outros
+jobs terminam em menos de 3 min.
+
+**Decisão**:
+
+- `workers: 2` no CI. A máquina do GitHub para repositório público tem 4 núcleos; com
+  `fullyParallel` desligado no CI, os dois workers dividem arquivos inteiros e os testes de cada
+  arquivo continuam em ordem.
+- `tests/seo/metadata.spec.ts` e `tests/seo/semantic-html.spec.ts` só no chromium (`testIgnore`
+  nos outros projetos): leem o HTML (meta tags, JSON-LD, títulos, landmarks) e dão o mesmo
+  resultado em qualquer navegador. São 196 execuções a menos.
+- `accessibility.spec.ts` (axe) e `performance-keywords.spec.ts` continuam nos cinco: o axe pode
+  variar entre motores, e o `performance-keywords` usa as APIs de tempo de cada motor e mede o
+  tamanho dos botões na tela (`boundingBox`).
+
+**Alternativas rejeitadas**:
+
+- `workers: 4`: toda a CPU para os testes, disputando com o `vite preview` que serve o app; mais
+  risco de teste instável. Subir só depois de medir o 2.
+- Sharding (vários jobs em paralelo): mais rápido, mas o nome do check vira "E2E (1/4)"..., quebra
+  o contrato com o ruleset e exige um job agregador.
+
+**Testes de tempo saem do E2E** (pergunta do CodeRabbit neste PR: com dois workers, um navegador
+mede tempo enquanto outro roda ao lado). Medido sem retries, 2 workers, chromium + Mobile Safari,
+`performance-keywords` + `sections`: 1 falha em 4 rodadas (374 testes cada). Qual teste falhou não
+ficou registrado (o filtro da saída descartou a mensagem). Saíram do `performance-keywords.spec.ts`
+os seis testes de tempo, cada um com dono no Lighthouse CI (3 execuções, mediana):
+
+| Teste removido                | Quem cobre                                                                                         |
+| ----------------------------- | -------------------------------------------------------------------------------------------------- |
+| LCP < 2500 ms                 | `largest-contentful-paint` (erro). O teste nunca rodava: pula em `localhost`, e o CI é `localhost` |
+| FCP < 1800 ms                 | `first-contentful-paint`, novo, como aviso                                                         |
+| domInteractive < 3800 ms      | `speed-index` e a nota de performance                                                              |
+| carga < 30 s (em `localhost`) | nota de performance; com 30 s, nunca falhava nem protegia                                          |
+| DOMContentLoaded < 1000 ms    | `total-blocking-time`                                                                              |
+| long tasks                    | `total-blocking-time` (é a soma do bloqueio das long tasks)                                        |
+
+O CLS fica no E2E: é proporção de deslocamento, não tempo. O FCP entrou no Lighthouse como aviso,
+não erro: ele simula celular lento, e os 1800 ms vinham de um navegador sem limitação; vira erro
+depois de ver os valores reais. Resultado: 2485 → 2259 testes.
+
+**Pendências**: (1) olhar os testes marcados como "flaky" no relatório do Playwright das próximas
+execuções do CI, para achar a falha não identificada, se não era de tempo; (2) os testes de HTTP/2
+e HTTPS também pulam em `localhost` e nunca rodam no CI — decidir se rodam contra o preview da
+Vercel ou saem.
+
+**Raciocínio**: um teste que dá o mesmo resultado em todo navegador não prova nada a mais rodando
+cinco vezes. E tempo não se mede em teste funcional numa máquina dividida: é do Lighthouse, no
+mesmo princípio dos limites dos testes unitários (2026-11-26). O tempo real fica medido no CI deste PR. Atenção: `retries: 2` no CI também esconde
+instabilidade (teste que passa na segunda tentativa conta como verde); o relatório do Playwright
+marca esses casos como "flaky".
+
+---
+
 ## 2026-11-26 — Limites de tempo dos testes unitários
 
 **Contexto**: dois testes de formulário falharam por tempo com a máquina ocupada, sem defeito na
