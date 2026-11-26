@@ -337,12 +337,16 @@ test.describe('TransparencySection', () => {
         .locator('div.rounded-xl.p-5')
         .first()
 
-      const loadingHeight = (await firstCard.boundingBox())!.height
+      // boundingBox() returns null while the browser has not laid out a freshly inserted
+      // element yet (seen in firefox), so the height is polled instead of read once.
+      const cardHeight = async () => (await firstCard.boundingBox())?.height
+
+      await expect.poll(cardHeight).toBeGreaterThan(0)
+      const loadingHeight = await cardHeight()
       releaseStats()
       await page.locator(SECTION_SELECTOR).locator('dl').first().waitFor()
-      const loadedHeight = (await firstCard.boundingBox())!.height
 
-      expect(loadedHeight).toBe(loadingHeight)
+      await expect.poll(cardHeight).toBe(loadingHeight)
     })
 
     test('should show an error with a retry that recovers when the API comes back', async ({
