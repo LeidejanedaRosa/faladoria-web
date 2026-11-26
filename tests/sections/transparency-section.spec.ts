@@ -338,15 +338,25 @@ test.describe('TransparencySection', () => {
         .first()
 
       // boundingBox() returns null while the browser has not laid out a freshly inserted
-      // element yet (seen in firefox), so the height is polled instead of read once.
-      const cardHeight = async () => (await firstCard.boundingBox())?.height
+      // element yet (seen in firefox). Polling only waits for the first real height: polling
+      // for equality would let a transient shift pass once the card settles.
+      const firstLaidOutHeight = async () => {
+        let height: number | undefined
+        await expect
+          .poll(async () => {
+            height = (await firstCard.boundingBox())?.height
+            return height
+          })
+          .toBeGreaterThan(0)
+        return height
+      }
 
-      await expect.poll(cardHeight).toBeGreaterThan(0)
-      const loadingHeight = await cardHeight()
+      const loadingHeight = await firstLaidOutHeight()
       releaseStats()
       await page.locator(SECTION_SELECTOR).locator('dl').first().waitFor()
+      const loadedHeight = await firstLaidOutHeight()
 
-      await expect.poll(cardHeight).toBe(loadingHeight)
+      expect(loadedHeight).toBe(loadingHeight)
     })
 
     test('should show an error with a retry that recovers when the API comes back', async ({
