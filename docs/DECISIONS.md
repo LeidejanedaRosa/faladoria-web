@@ -57,9 +57,22 @@ Vercel ou saem.
 
 **Raciocínio**: um teste que dá o mesmo resultado em todo navegador não prova nada a mais rodando
 cinco vezes. E tempo não se mede em teste funcional numa máquina dividida: é do Lighthouse, no
-mesmo princípio dos limites dos testes unitários (2026-11-26). O tempo real fica medido no CI deste PR. Atenção: `retries: 2` no CI também esconde
-instabilidade (teste que passa na segunda tentativa conta como verde); o relatório do Playwright
-marca esses casos como "flaky".
+mesmo princípio dos limites dos testes unitários (2026-11-26). Atenção: `retries: 2` no CI também
+esconde instabilidade (teste que passa na segunda tentativa conta como verde); o relatório do
+Playwright marca esses casos como "flaky".
+
+**Resultado medido** (#94):
+
+|                     | antes (#92) | depois (#94)  |
+| ------------------- | ----------- | ------------- |
+| `pnpm run test:e2e` | 2142 s      | 1647 s (−23%) |
+| job de E2E          | ~36 min     | 28 min 38 s   |
+
+A estimativa era de 15 a 20 min, contando que dois workers cortariam o tempo pela metade. Não
+cortaram: o ganho vem em boa parte dos 226 testes a menos (−9%). Hipótese, ainda não medida: com
+`fullyParallel` desligado no CI, os workers dividem arquivos inteiros, e um arquivo grande vira o
+gargalo enquanto o outro worker fica ocioso. Próximo passo: medir o tempo por arquivo no relatório
+antes de ligar o `fullyParallel` ou dividir arquivos.
 
 ---
 
