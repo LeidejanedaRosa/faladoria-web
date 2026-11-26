@@ -26,8 +26,10 @@ caixa visível. A explicação mais provável, não provada, é que o firefox ai
 layout do card recém-inserido. O `!` transformava esse "ainda não" num `TypeError`, que escondia o
 motivo.
 
-**Solução**: a altura é lida com `expect.poll`, que repete a leitura até ela valer, tanto antes
-(`toBeGreaterThan(0)`) quanto depois (`toBe(loadingHeight)`) da chegada dos totais. Provas:
+**Solução**: antes e depois da chegada dos totais, `expect.poll` repete a leitura só até existir
+uma altura (`toBeGreaterThan(0)`), guarda essa primeira altura e compara uma vez. Fazer polling até
+a altura ficar igual à do skeleton seria errado (apontado pelo CodeRabbit no #96): um card que
+aparece maior e depois se ajusta passaria, e o usuário teria visto o pulo. Provas:
 
 - 120 de 120 rodadas no firefox. Com a chance de falha de antes (1/40), passar em todas teria
   ~5% de chance.
