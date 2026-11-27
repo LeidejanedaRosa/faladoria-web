@@ -6,6 +6,36 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-11-27 — Cliente de testes do TanStack Query sem espera entre tentativas
+
+**Contexto**: o `slowTestThreshold` (2026-11-26) apontou `useIbgeCities > tries once more...` com
+~1050 ms em toda rodada, com a máquina ociosa ou ocupada. O cliente de testes
+(`src/test/queryClient.tsx`) usa `retry: false`, mas o `useIbgeCities` define `retry: 1` e tem
+prioridade. A nova tentativa acontecia depois do `retryDelay` padrão do TanStack (1 s na primeira):
+um segundo de espera real, sem nada a verificar.
+
+**Decisão**: `retryDelay: 0` no cliente de testes. A nova tentativa continua acontecendo e o teste
+segue verificando 2 chamadas. O `timeout: 3000` que o teste tinha por causa da espera saiu.
+
+| Teste                                        | antes   | depois (3 rodadas) |
+| -------------------------------------------- | ------- | ------------------ |
+| `useIbgeCities > tries once more...`         | 1051 ms | 68 a 115 ms        |
+| `ServiceAreasPage > falls back to free text` | 1451 ms | 292 a 677 ms       |
+
+Prova inversa: com `retry: false` no hook, o teste falha.
+
+**Os outros testes acima de 1 s ficam como estão.** Na mesma rodada (load average 10 em 4 núcleos)
+foram 23, quase todos de página ou formulário inteiro com `userEvent` (`TeamPage`,
+`NewAccountForm`, `AccountList`), e o tempo deles varia com a carga: na primeira medição, com a
+máquina ociosa, não apareciam. É custo de CPU, não espera. O destaque do `slowTestThreshold` é um
+sinal para investigar, não uma meta a zerar.
+
+**Alternativa rejeitada**: timers falsos (`vi.useFakeTimers`) no teste. Pede avançar o relógio
+junto com o `waitFor` e só resolveria um arquivo; o cliente de testes resolve para todo hook com
+`retry` próprio.
+
+---
+
 ## 2026-11-27 — HTTPS e HTTP/2 saem do E2E: são garantia da Vercel
 
 **Contexto**: `performance-keywords.spec.ts` tinha um teste de HTTP/2 e um de HTTPS. Os dois pulavam
