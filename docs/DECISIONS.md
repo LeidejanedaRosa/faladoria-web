@@ -6,6 +6,37 @@ Registro de decisões de tooling, configuração e arquitetura com contexto, alt
 
 ---
 
+## 2026-11-27 — HTTPS e HTTP/2 saem do E2E: são garantia da Vercel
+
+**Contexto**: `performance-keywords.spec.ts` tinha um teste de HTTP/2 e um de HTTPS. Os dois pulavam
+quando a URL era `localhost`, e o E2E roda sempre contra o `vite preview` em `localhost`, local e no
+CI. Nunca rodaram: eram os 10 "skipped" de cada execução (2 testes × 5 projetos), cobertura que
+aparecia no relatório sem verificar nada.
+
+**Decisão**: remover os dois testes. HTTPS, HTTP/2 e HSTS são da hospedagem, não do código: o
+`vercel.json` só tem o rewrite da SPA, e nenhum commit do projeto muda o protocolo. Conferido em
+produção (`faladoria-web.vercel.app`) em 2026-11-27:
+
+```bash
+curl -sI --http2 -o /dev/null -w '%{http_version} %{http_code}\n' https://faladoria-web.vercel.app/
+# 2 200
+curl -sI -o /dev/null -w '%{http_code} -> %{redirect_url}\n' http://faladoria-web.vercel.app/
+# 308 -> https://faladoria-web.vercel.app/
+curl -sI https://faladoria-web.vercel.app/ | grep -i strict-transport
+# strict-transport-security: max-age=63072000; includeSubDomains; preload
+```
+
+**Alternativa rejeitada**: um job que espera o deploy de preview da Vercel (`deployment_status`) e
+roda esses testes contra ele. Exige um workflow novo, um segredo para passar pela proteção do
+preview e um check novo no ruleset, só para testar a plataforma a cada PR.
+
+**Quando rever**: ao configurar o domínio próprio ou trocar de hospedagem. No domínio próprio, a
+Vercel continua emitindo e renovando o certificado, mas o HTTPS passa a depender do DNS configurado
+no projeto. Rodar os três `curl` acima contra o domínio novo, sem supor que o HSTS vem igual ao do
+`vercel.app`.
+
+---
+
 ## 2026-11-26 — E2E no CI: 2 workers, HTML só no chromium e tempo só no Lighthouse
 
 **Contexto**: o job de E2E levava ~36 min (2142 s no PR #92), quase todo no `pnpm run test:e2e`:
@@ -51,9 +82,9 @@ não erro: ele simula celular lento, e os 1800 ms vinham de um navegador sem lim
 depois de ver os valores reais. Resultado: 2485 → 2259 testes.
 
 **Pendências**: (1) olhar os testes marcados como "flaky" no relatório do Playwright das próximas
-execuções do CI, para achar a falha não identificada, se não era de tempo; (2) os testes de HTTP/2
-e HTTPS também pulam em `localhost` e nunca rodam no CI — decidir se rodam contra o preview da
-Vercel ou saem.
+execuções do CI, para achar a falha não identificada, se não era de tempo (resolvida: era o teste
+de CLS da Transparência, ver TROUBLESHOOTING 2026-11-26); (2) os testes de HTTP/2 e HTTPS também
+pulam em `localhost` e nunca rodam no CI (resolvida: saíram, ver 2026-11-27).
 
 **Raciocínio**: um teste que dá o mesmo resultado em todo navegador não prova nada a mais rodando
 cinco vezes. E tempo não se mede em teste funcional numa máquina dividida: é do Lighthouse, no
