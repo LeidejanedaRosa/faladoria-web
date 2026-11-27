@@ -44,9 +44,7 @@ describe('useIbgeCities', () => {
       wrapper: createQueryWrapper(),
     })
 
-    await waitFor(() => expect(result.current.isError).toBe(true), {
-      timeout: 3000,
-    })
+    await waitFor(() => expect(result.current.isError).toBe(true))
     expect(fetchMock).toHaveBeenCalledTimes(2)
   })
 })
