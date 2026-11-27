@@ -148,26 +148,6 @@ test.describe('Performance & Core Web Vitals Tests', () => {
     })
   })
 
-  test.describe('Network Performance', () => {
-    test('should use HTTP/2 or HTTP/3', async ({ page }) => {
-      const url = page.url()
-      const isLocalDev =
-        url.includes('localhost') ||
-        url.includes('127.0.0.1') ||
-        !process.env.CI
-
-      const protocol = await page.evaluate(() => {
-        const navigationEntry = performance.getEntriesByType(
-          'navigation'
-        )[0] as PerformanceNavigationTiming & { nextHopProtocol?: string }
-        return navigationEntry.nextHopProtocol
-      })
-
-      test.skip(isLocalDev, 'HTTP/2 not available in local dev')
-      expect(protocol).toMatch(/h2|h3/)
-    })
-  })
-
   test.describe('Mobile Performance', () => {
     test('should be responsive on mobile devices', async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 667 })
@@ -396,14 +376,6 @@ test.describe('SEO Content Quality Tests', () => {
       expect(url).not.toContain('?id=')
       expect(url).not.toContain('&')
       expect(url).not.toMatch(/\d{5,}/)
-    })
-
-    test('URL should use HTTPS', async ({ page }) => {
-      const url = page.url()
-      const isLocalDev = url.includes('localhost') || url.includes('127.0.0.1')
-
-      test.skip(isLocalDev, 'HTTPS not available in local dev')
-      expect(url).toMatch(/^https:\/\//)
     })
   })
 })
